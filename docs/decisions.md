@@ -183,7 +183,7 @@ metodplattform eller certifiering påstås. **Ersätter:** ingenting.
 
 ## AP04-ACCEPT — accepterat byggbeslut, 2026-09-20
 
-**Status:** aktivt byggmandat. **Grund:** ägarens direkta accept i Codex-sessionen
+**Status:** genomfört byggmandat; AP-04 avslutad vid 17ce93a / Runtime 2789ea0. **Grund:** ägarens direkta accept i Codex-sessionen
 som följer det samlade AP-04-förslaget. Följande är byggarens återgivning,
 inte ett ordagrant citat. Full funktion och klart-när står i docs/uppdrag.md.
 
@@ -220,3 +220,61 @@ revisioner, bevis, begränsningar, rekommendera fortsättning och stanna.
 **Ersätter framåt:** etableringens begränsning till dokumentarbete och dess
 förbud mot Runtime-arbete, endast inom ovanstående AP-04-omfattning. B-1–B-5
 och deras historiska räckvidd bevaras; definitionen ändras inte.
+
+
+## AP05-ACCEPT — accepterat byggbeslut
+
+**Status:** aktivt byggmandat. **Grund:** ägarens direkta accept i denna
+Codex-session efter AP-05-förslaget. Detta är byggarens sakliga återgivning,
+inte ett ordagrant citat. Ingen exakt klocktid tillskrivs ägaren.
+
+Ägaren accepterar en återanvändbar ändringsbedömning med spårbara skäl och
+kontroll av ändrat underlag. Första verkliga ärendet är ett aktuellt kartlager
+bredvid det bevarade historiska. Leveransen bedömer förändringen och lämnar
+nästa motiverade handling; den genomför inte kartförändringen.
+
+Tillstånd: implementera, testa, dokumentera, separat granska och integrera
+kodstödet i Nortropic/nortropic-projektkontor genom AP-04:s kvalificerade Runtime-väg.
+Genomför verklig fallbedömning med befintlig läsåtkomst och bevara underlag,
+bedömning, granskning och fortsättningspunkt i kontorsprojektet. Publicera kod,
+syntetiska tester, metodanvisning och innehållskontrollerad fallredovisning;
+inte interna källkopior, privata uppgifter eller råsessioner. Kontrollera också
+vad sammanfattningar, slutsatser, källidentifierare och sökvägar avslöjar.
+
+Inga ändringar i Runtime, kampanj, IR eller Obsidian-valv. Ingen ny kostnad,
+modellanslutning eller teknisk behörighet. Om befintlig körprofil inte räcker:
+redovisa konkret hinder utan tyst utvidgning. Normal uppdragskörning använder
+Runtimes befintliga lokala körstate/bevis; ingen Runtime-kod eller konfiguration ändras.
+
+Leverera både kodstöd och användbar separat granskad verklig bedömning.
+Återanvänd I-11 och FINAL-CHECK-1 inom respektive räckvidd, kontrollera relevanta
+senare ändringar. Redovisa vad som är avgjort, fortsatt stöds, behöver omprövas
+och exakt vilket beslut/underlag som återstår. Källuppgift, sakbedömning och
+befogenhet hålls isär. Struktur och oförändrade hashvärden är inget sakgodkännande.
+Bedöma, förbereda, skriva och publicera har skilda befogenheter per handling.
+
+Ange kontrollerade källor, bundna versioner, jämförelsetillfälle och beroende
+slutsatser. Ändrat/saknat underlag markerar berörda slutsatser för omprövning,
+inte automatiskt fel slutsats eller upphävt beslut. Oförändrat urval säger inte
+att alla senare/relevanta källor hittats. Motsägelser kräver omdöme. Bevara tidigare
+bedömningar; uppdatera inte referenshashar automatiskt.
+
+Enklast tillräckliga implementation med befintlig agent, beslutslogg,
+fil-/hashverktyg och Runtime. Ingen ny databas, generell tillitsmotor, obligatorisk
+kontroll för framtida uppdrag eller andra motor. Runtime bygger med syntetiska
+provdata. Verkliga källor läses av värden via tillåten åtkomst; inga interna
+källor i publik kandidat och inga utökade utförarrättigheter.
+
+Klart-när enligt docs/uppdrag.md: legitimt fall och relevanta negativa prov,
+ändring/borttagning bara i isolerade fixturer, separat granskning av kodkontroller
+och verkligt resonemang, färsk mottagare hittar bedömning/nästa handling.
+Återanvänd giltiga bevis; ingen kampanjaudit. A3/A6, FIND-004 och övriga fynd
+stängs inte av accepten eller resultatet.
+
+Kedjedrivaren håller planen aktuell och genomför självständigt till verifierad
+leverans utan rutinfrågor eller påhittad total tidsgräns. Hängningar och blinda
+omförsök hanteras med bevarad historik. Avsluta med funktion, verklig bedömning,
+granskning/körbevis, begränsningar och nästa kartärendehandling. AP-05 accepterar
+inte kartförändringen och ger inget skrivtillstånd till valvet.
+
+**Ersätter framåt:** AP-04 som aktivt uppdrag. Tidigare beslut och bevis bevaras.

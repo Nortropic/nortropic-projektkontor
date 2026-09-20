@@ -1,3 +1,32 @@
+# Levande plan — AP-05
+
+AKTUELLT STEG: Frysta syntetiska byggunderlag är färdiga och separat
+granskat kontraktsfynd rättat; verkligt källurval är bundet lokalt. AP-04 är avslutad vid kontor 17ce93a / Runtime 2789ea0;
+slutkvittot finns i evidence/ap04/local/. Starta inte dess uppdrag igen.
+
+NÄSTA HANDLING: Starta AP-05 genom tools/kontor.py start --task andringsbedomning.json
+när värdacceptans och brief är granskade och committade. Kandidatbas 17ce93a
+förblir remote main tills Runtime har integrerat kodstödet.
+
+ÅTERUPPTAGNINGSPUNKT: gren work/ap05; tasks/andringsbedomning.json, uppdrags-id
+office-change-assessment-1. Kontrollera Git, aktuell Runtime-status och tidigare
+skrivare före fortsatt arbete. Ingen körning startad ännu. Status/resultat är
+rena läsningar med --task andringsbedomning.json. Privat källmappning och
+mätningar finns i evidence/ap05/local/; publicera aldrig denna katalog.
+
+Ordning: fryst syntetiskt kontrakt → Runtime-bygge/test/review/integration →
+verklig tillämpning och separat sakgranskning → färsk mottagare → skyddad
+integration av kontrollerad fallredovisning och slutbevarande. Värdens arbete
+på denna gren och modellens isolerade kandidat har skilda filer; ingen annan
+skriver i värdens arbetsyta. Inga Runtime-kodändringar. Gamla auditfynd öppna.
+
+Tidigt sakfynd: generator och kartkvitto har nya identiteter efter FINAL-CHECK-1.
+Pröva domens tillämplighet; flytta inte dess PASS tyst till dagens kandidat.
+
+---
+
+## Historik — AP-04-plan (avslutad; aktiva steg ovan gäller)
+
 # Levande plan — AP-04
 
 AKTUELLT STEG: Resultatfunktionen är byggd genom kontorets ingång och skyddat

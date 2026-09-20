@@ -1,3 +1,47 @@
+# Uppdrag — AP-05: beslutsbunden ändringsbedömning
+
+Gällande mandat: [AP05-ACCEPT](decisions.md#ap05-accept--accepterat-byggbeslut).
+Definitionen i ../DEFINITION.md ändras inte. AP-04 är levererad inom sin räckvidd.
+
+Kodstödet binder utvalda källversioner till källuppgifter, sakbedömningar och
+handlingsspecifik befogenhet. Det visar vilka slutsatser som behöver omprövas
+när kontrollerade källor ändras eller saknas, utan att fatta beslut åt ägaren.
+Agenten gör omdömet; beslutsloggen bär besluten; Runtime bygger och integrerar.
+Verkligt fall: bedömning av aktuellt kartlager vid sidan av bevarad historik.
+
+## Omfattning och gränser
+
+Kontorsrepo: kod, syntetiska prov, metod, fallbedömning, granskning och bevis.
+Befintlig Runtime 2789ea0770e4234161e9bdb0378a6e3e7b8432d2 används utan ändringar.
+Dess befintliga evidence_index återanvänds för mätning; nytt kodstöd binder
+mätresultatet till bedömningen. Ingen ny databas, motor eller generell grind.
+Verkligt källmaterial läses av värden, bevaras lokalt i evidence/ap05/local/
+och förs aldrig in i modellkandidaten. Endast kontrollerad fallredovisning
+publiceras. Ingen ändring i kampanj, IR, Runtime-kod eller valv. Inga nya
+kostnader, modeller, behörigheter eller publicering av interna källor.
+
+## Klart-när
+
+1. Runtime har byggt återanvändbart kodstöd med syntetiska data, fått frysta
+   värdprov och separat granskning godkända och skyddat integrerat exakt kandidat.
+2. Legitimt fall fungerar. Ändrad/saknad/otillgänglig/okontrollerad källa markerar
+   berörda slutsatser. Fel källbindning och saknade skäl/referenser avvisas.
+   Inga referenshashar eller historiska bedömningar ändras automatiskt.
+3. Källuppgift, omdöme och handlingsspecifik befogenhet är skilda. Giltig struktur
+   eller oförändrat urval blir aldrig generellt tillstånd eller sakgodkännande.
+4. Verklig kartbedömning återanvänder I-11 och FINAL-CHECK-1, visar relevanta
+   senare ändringar och exakt vad som är avgjort, fortsatt stött, omprövningsbart
+   och återstående. A3/A6/FIND-004 och övriga fynd lämnas öppna.
+5. Separat granskning omfattar kodkontroller och verkligt resonemang utan olösta
+   blockerare inom AP-05. Färsk utförare finner bedömning och nästa tillåtna steg.
+6. Publicerat innehåll är kontrollerat, verkliga kör-/gransknings-/integrationsbevis
+   binds till kontors- och Runtime-revision, arbetsläge och lokal privat evidens
+   bevaras. Leveransen redovisas och stannar före kartändring eller nästa fas.
+
+---
+
+## Historik — avslutat AP-04-uppdrag
+
 # Uppdrag — AP-04: körbar uppdragsfunktion
 
 Aktivt byggmandat: ägarens accept i denna session, återgiven i
