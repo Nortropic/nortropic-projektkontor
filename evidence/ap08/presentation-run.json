@@ -1,0 +1,47 @@
+{
+  "task": "office-owner-view-1",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "input_revision": "d05842b387be01da34dc9222aa2bf8a2c897c345",
+  "base": "43b6c8667780acc57059664954a4759d8a981ebc",
+  "integration": {
+    "merged": true,
+    "candidate": "98f6622fa12bfc0faa87d1debb354f008d1822c6",
+    "merge_commit": "908a63b125ed091ed3993e7021533148b128dd9e",
+    "tree": "079a757b3eecfbe517e6a9c20e75d2da78138e89",
+    "url": "https://github.com/Nortropic/nortropic-projektkontor/pull/12"
+  },
+  "observed_at": "2026-09-20T22:05:04.698024+00:00",
+  "remote_checked_at": "2026-09-20T22:07:19.644130+00:00",
+  "acceptance_sha256": "1dcc40be623a4d19a5abd16166d00e5dcc3ed313f72b1864cb176dd43b4ffe5c",
+  "mechanical_passed": true,
+  "review_verdict": "approved",
+  "reviewer_run": "01a0c0d9-6dc5-7843-ae1c-ba048d50b044",
+  "product_files_sha256": {
+    "tools/AGARBILD.md": "b703a2c2afbe6098d4716f6b875ba11ec6a7b133f9aa824bfeb4ee2dd832a275",
+    "tools/agarbild.py": "a68b478abc8a6f0d96bdc04fb71ff9df81fe4426386893d1249541efdf8c7337",
+    "tools/test_agarbild.py": "92f2e8468c25ba4c8b5bdf122321bc0de545bbe8e25bc31825868aa4069ff2a0"
+  },
+  "proof": [
+    {
+      "artifact": "evidence/runs/office-owner-view-1/accepted.json",
+      "sha256": "67f840ba4b3184ed3f3f60373906d3b677c55ac8b5b2d0779f026b9f4917d243"
+    },
+    {
+      "artifact": "evidence/runs/office-owner-view-1/attempt-1/acceptance.json",
+      "sha256": "efa83a2a032659ac3cb684b44a66fed82663ab5db36cfd9f9d035960e4c39fc3"
+    },
+    {
+      "artifact": "evidence/runs/office-owner-view-1/attempt-1/result.json",
+      "sha256": "f926ed5919f31f520415bcf21c4aa6a6a967e9110a7cbfe6757adef5062b6ab5"
+    },
+    {
+      "artifact": "evidence/runs/office-owner-view-1/review-1/decision.json",
+      "sha256": "4f30227fcf20d3e1d1e1268feb908c9546b87da44c94eea3dea9c4be8f9a05d3"
+    },
+    {
+      "artifact": "evidence/runs/office-owner-view-1/integration.json",
+      "sha256": "10d19e535208a3c9e01135684444c2c3cbe1f8f2a7da02cdd4f8f112f3ca1919"
+    }
+  ],
+  "scope": "Qualified presentation-code delivery. Real private application, browser/recipient and phase closeout separately verified; not self-certified by rendered output."
+}

@@ -1,0 +1,22 @@
+{
+  "id": "office-owner-view-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "43b6c8667780acc57059664954a4759d8a981ebc",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "allowed_paths": [
+    "tools/agarbild.py",
+    "tools/test_agarbild.py",
+    "tools/AGARBILD.md"
+  ],
+  "attempt_seconds": 1200,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md and implement its exact bounded private owner-report contract with synthetic tests. Existing Runtime owns external acceptance, independent review and protected integration. No private source access, execution/authority engine or changes to the active host path."
+    }
+  ],
+  "brief": "tasks/agarbild.md",
+  "acceptance": "acceptance/agarbild.py",
+  "acceptance_sha256": "1dcc40be623a4d19a5abd16166d00e5dcc3ed313f72b1864cb176dd43b4ffe5c"
+}

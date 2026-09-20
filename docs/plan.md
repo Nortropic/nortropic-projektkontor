@@ -1,31 +1,33 @@
-# Levande plan — AP07 avslut och stopp
+# Levande plan — AP08 slutleverans
 
-AKTUELLT STEG: AP07:s låsta pilot är genomförd. [Metodbeslut ANPASSA](metodbeslut-ap07.md)
-ger valbart stöd i befintlig arbetsform, ingen ny kontrollrutin. Läs
-[tillämpningsbevisen](../evidence/ap07/tillampning.md) och
-[leveransredovisningen](../evidence/ap07/leverans.md). Etableringen, AP04–AP06 och
-kartleveransen tillgodoräknas inom sina räckvidder. A3/A6 och tidigare fynd består.
+AKTUELLT STEG: presentationskoden är byggd av befintlig Runtime, separat granskad
+ och skyddat integrerad genom PR12. Verkligt privat arbetsuttag, källgranskning,
+HTML-kontroll och färskt modellbaserat mottagarprov är genomförda. Kontrollerat
+avslut och slutbild binds till faktiskt kvitto i `evidence/ap08/local/final.json`.
+Kvitto med `status=verified_delivered` och matchande revisioner betyder att AP08
+är avslutad inom redovisad räckvidd; den egna HTML-utskriften räcker inte.
 
-NÄSTA HANDLING: Finns verifierat evidence/ap07/local/final-<fjärr-main-revision>.json
-som matchar detta publicerade träd är AP07 levererad: redovisa och stanna.
-Saknas kvittot ska kedjedrivaren endast slutföra det redan granskade avslutets
-skyddade integration, fjärrjämförelse och privata bevarande. Inga pilotkörningar,
-byggen eller tidigare tasks ska startas om. Ny funktionell fas är inte beställd.
-En publik klon utan privat evidens kan läsa resultatet men inte fabricera kvittot.
+NÄSTA HANDLING: kedjedrivaren verifierar det skyddade avslutet och det privata
+slutkvittot. När kvittot är verifierat: lämna `evidence/ap08/local/final-view/index.html`
+till ägaren och stanna. Ingen ytterligare fas är beställd och inget nytt ägarbeslut
+behövs för AP08:s avslut. Ingen uppgift ska återstartas för att en gammal rapport
+visar ett dåtida körläge.
 
-ÅTERUPPTAGNING: work/ap07-delivery; kontrollera Git, aktuell fjärr-main, separat
-review, publication-gate/publication-kvitto och faktiska registrerade processers
-avslut före skrivövertagande. Status/resultat är rena läsningar. Tekniska
-avslutssteg bärs av kedjedrivaren, inte av nya rutinprompter från ägaren.
+ÅTERUPPTAGNING: börja med privat `evidence/ap08/local/LAS-MIG.md`, kvittot och
+faktisk Git/Runtime-status innan skrivansvar tas. Avslutsgren `work/ap08-delivery`;
+förberedelse, arbetsuttag och hela utförarhistoriken är bevarade privat. Om kvittot
+saknas eller inte matchar: slutför endast redovisad kvarstående verifiering inom
+AP08, inte ombyggnad eller ny modellkörning. Kontrollera journalerna före omtag.
+Källor och tidigare rapporter ersätts inte. Runtime-revisionen för denna fas är
+2789ea0770e4234161e9bdb0378a6e3e7b8432d2; faktisk kontorsrevision finns i slutkvittot.
 
-Runtime 2789ea0770e4234161e9bdb0378a6e3e7b8432d2 är oförändrad. Metodartefakten
-levererades genom office-method-trial-1, PR10 / 16d11720e4c5f0caba30b9709d0a877cfab83217.
-Dess prövningsversion är bevarad; slutpaketet tillför metodbedömning och läsanvisning.
-Fyra färska hostledda försök har egna nativejournaler under local/trial-runs/ och
-exakta provytor under local/trials/. De är avslutade engångsprov, inte nya schedulers.
+UPPDATERING: en behörig kedjedrivare framställer nästa daterade bild under aktivt
+beställt arbete enligt `tools/AGARBILD.md` och privat anvisning. Planen äger nästa
+handling, Runtime äger körstate; HTML är en projektion. Ägaren sammanför inga
+JSON-filer eller köridentiteter. Öppning är lokal läsning, ingen uppdatering.
 
-Privat återfinns mandat, tidigare AP05/AP06-beredningsversioner, faktiska indata,
-råspår, granskning och arkiv i evidence/ap07/local/. Det tidigare beredningsarbetet
-finns även på work/ap07 och i ap07-work-history.bundle; det är inte publik ancestry.
-Ingen Runtime-kod, kampanj, IR, valv eller annan byggfas ingår. AP06 CLI1 är en
-bevarad ersatt väntan och får aldrig återupptas eller få frysta kontroller ändrade.
+BEVARAT: etablering, AP04–AP06 och kartleverans tillgodoräknas. AP06 CLI1 är ersatt
+historik och får aldrig återupptas. AP07 är avslutad ANPASSA, enbart frivilligt stöd
+vid konkret behov; ingen förbättring är belagd och piloten upprepas inte. A3/A6,
+FIND-004 och tidigare auditstatus behåller räckvidd och betydelse. Ingen ny
+Runtime-kod, kampanj-/IR-/valvskrivning, tjänst, kostnad eller rättighet ingår.

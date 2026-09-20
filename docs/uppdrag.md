@@ -1,3 +1,21 @@
+# AP08 — privat leverans- och beslutsbild, slutleverans
+
+Mandatet är AP08-ACCEPT i beslutsloggen, fulltext privat i
+`evidence/ap08/local/accepted-mandate.md`. Presentation genom befintlig Runtime,
+verklig sammanställning, separat källkontroll och faktisk mottagning ingår.
+[Leveransredovisningen](../evidence/ap08/leverans.md) anger räckvidden. Planen äger
+aktuellt steg; faktiskt privat slutkvitto avgör om avslutet är verifierat.
+
+Den verkliga ägarbilden och dess källor publiceras inte. Öppning är ren lokal
+läsning, ingen källa uppdateras och inget arbete startas. Ingen ny motor, server,
+rättighet, kostnad eller valvskrivning. AP07 förblir avslutad och frivillig utan
+belagd förbättring. Tidigare leveranser och auditstatus bevaras.
+
+Tidigare uppdrag nedan är historik. Inget av dem eller någon ny fas ska startas
+automatiskt när AP08 har avslutats.
+
+---
+
 # AP07 — avgränsad metodpilot och avslut
 
 Mandatet är AP07-ACCEPT i beslutsloggen. Den fulla ägartexten och det tidigare

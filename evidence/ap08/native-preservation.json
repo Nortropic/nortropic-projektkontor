@@ -1,0 +1,15 @@
+{
+  "checked_at": "2026-09-20T22:07:20.916723+00:00",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "runtime_tracked_changes": [],
+  "tasks": [
+    "office-owner-view-1"
+  ],
+  "unfinished_recorded_writers": false,
+  "database_backup_integrity": "ok",
+  "archive": "evidence/ap08/local/native-ap08.tar.gz",
+  "archive_sha256": "86972ee838a23058b4249f63157ef423c534b8940841fafe23aae3e16a9f6daa",
+  "regular_files_reread": 733,
+  "reread_verified": true,
+  "scope": "Private archive of AP08 presentation task workspaces, complete execution/review histories and consistent canonical DB backup. No raw sessions/DB published. Earlier histories remain in canonical state. Same-disk preservation is not disaster recovery."
+}
