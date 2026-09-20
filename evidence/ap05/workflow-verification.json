@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "checked_at": "2026-09-20T18:59:07.746946+00:00",
+  "code_sha256": "8f0f059447fec11c49435124c1dd72dcc2a7677d74d488e3c4328dfbb456dffc",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "checks": [
+    {
+      "case": "legitimate unchanged selection",
+      "verifier_exit": 0,
+      "source_status": {
+        "s0": "ok",
+        "s1": "ok"
+      },
+      "affected": [],
+      "map_write_authority": "not_granted",
+      "expected_bindings_retained": true
+    },
+    {
+      "case": "changed selected file",
+      "verifier_exit": 1,
+      "source_status": {
+        "s0": "ok",
+        "s1": "changed"
+      },
+      "affected": [
+        "s1"
+      ],
+      "map_write_authority": "not_granted",
+      "expected_bindings_retained": true
+    },
+    {
+      "case": "missing selected file",
+      "verifier_exit": 1,
+      "source_status": {
+        "s0": "ok",
+        "s1": "missing"
+      },
+      "affected": [
+        "s1"
+      ],
+      "map_write_authority": "not_granted",
+      "expected_bindings_retained": true
+    },
+    {
+      "case": "unsafe symlink within isolated fixture",
+      "verifier_exit": 1,
+      "source_status": {
+        "s0": "ok",
+        "s1": "unsafe"
+      },
+      "affected": [
+        "s1"
+      ],
+      "map_write_authority": "not_granted",
+      "expected_bindings_retained": true
+    },
+    {
+      "case": "invalid measurement",
+      "verifier_exit": 2,
+      "report_created": false,
+      "measurement": "unavailable"
+    }
+  ],
+  "scope": "Host used existing evidence_index CLI with stdin; all mutations isolated synthetic fixtures. No original source modified."
+}

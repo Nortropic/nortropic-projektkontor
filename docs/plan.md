@@ -1,26 +1,23 @@
 # Levande plan — AP-05
 
-AKTUELLT STEG: Runtime genomför försök 3 efter bevarad granskad reparation.
-Försök 2 klarade fryst
-värdacceptans; review-2 fann att bråkdelar av timmar/minuter tolkades som sekunder
-i standardbiblioteket. Detta är en konkret ny diagnos, inte blint omförsök.
-Metodens stdin och värdansvar är rättade; dess mappvillkor behöver även tillåta
-privat ny utdatamapp under ett brett gemensamt källrotsträd. Ingen integration.
-Historik och kandidater c4ac46b/5044212 bevaras.
+AKTUELLT STEG: Kodstödet är Runtime-integrerat i PR4/ad3e7a1 efter tre försök
+med frysta prov och separat review. Verklig tillämpning (1235 bundna källor)
+och isolerade ändrat/saknat/unsafe-fixturer är godkända; valvskrivning kvarstår
+uttryckligen som not_granted. En kompletterande metodgranskning fann en
+kollisionslucka för output under saknad källsökväg; den rättas före fasavslut.
 
-NÄSTA HANDLING: Läs status för samma uppdrag; signalen --review-repair med
-diagnosen i evidence/ap05/repair-2.json är redan skickad. Skicka inte igen.
-Runtime rättar inom de tre befintliga filerna, testar hela kontraktet och
-separat granskar en ny kandidat före publicering.
+NÄSTA HANDLING: Starta det avgränsade tekniska rättelseuppdraget
+`python3 -B tools/kontor.py start --task andringsbedomning-metod.json` när dess
+frysta värdprov är granskat och committat. Huvuduppdraget är completed och får
+inte startas igen. Verifiera därefter slutkandidat, färsk mottagare och bevarande.
 
-ÅTERUPPTAGNINGSPUNKT: gren work/ap05, tasks/andringsbedomning.json,
-office-change-assessment-1; bas 17ce93a och Runtime 2789ea0 oförändrade.
-Status läses med tools/kontor.py status --task andringsbedomning.json. Kontrollera
-processkvitton före fortsatt. Verklig fallbedömning v3 och publik text är separat
-godkända; efter kodintegration återstår faktisk tillämpning, negativa fixturprov,
-färsk mottagare, separat avslutsgranskning och bevarande. Privat ärendeindex:
-evidence/ap05/local/case-history.json. Ingen hostintegration som flyttar main
-före Runtimes kodintegration.
+ÅTERUPPTAGNINGSPUNKT: gren work/ap05; huvuduppdrag office-change-assessment-1
+är completed, tre bevarade försök/reviews och en publicering. Rättelseuppdrag
+ office-change-assessment-recipe-1 har bas ad3e7a1 och samma Runtime 2789ea0.
+Källor/fall v1-v3 ligger lokalt enligt evidence/ap05/local/case-history.json.
+Verkliga tillämpningen: evidence/ap05/local/application-v3/; syntetiskt värdprov:
+evidence/ap05/local/workflow-verification.json. Flytta inte remote main innan
+Runtime integrerat metodrättelsen. Fråga inte ägaren om detta tekniska delsteg.
 
 Ordning: fryst syntetiskt kontrakt → Runtime-bygge/test/review/integration →
 verklig tillämpning och separat sakgranskning → färsk mottagare → skyddad

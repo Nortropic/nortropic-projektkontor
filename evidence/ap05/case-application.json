@@ -1,0 +1,20 @@
+{
+  "case_id": "map-layer-assessment-3",
+  "checked_at": "2026-09-20T18:59:08.232242+00:00",
+  "sources_checked": 1235,
+  "all_selected_sources_unchanged": true,
+  "complete_search": false,
+  "structure_valid": true,
+  "facts": 8,
+  "judgments": 4,
+  "decisions": 1,
+  "actions": 6,
+  "next_action": "NEXT_OWNER",
+  "map_write_authority": "not_granted",
+  "historical_assessment_retained": true,
+  "case_sha256": "179e43593f52b9a44a881b41adcc8cd525e2a001b07d61fc86366a21fe61ef2c",
+  "report_sha256": "525e18542aa0abb15f2695d73c203760255b3f5b1a8a97132e55aea919e66dc4",
+  "check_sha256": "9f7b3cf27fc8ed43a1c1069efa790fcf5009439536b0b946d757fb9770d88bef",
+  "code_sha256": "8f0f059447fec11c49435124c1dd72dcc2a7677d74d488e3c4328dfbb456dffc",
+  "limitation": "Unchanged since explicitly authored AP05 reference, not since FINAL-CHECK-1; supplied observation does not decide truth/authority/completeness."
+}
