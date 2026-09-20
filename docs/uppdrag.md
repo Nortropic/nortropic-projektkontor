@@ -1,0 +1,121 @@
+# Uppdrag — första byggfasen: ett hem för ägarens beslut
+
+Aktiv hemvist för den accepterade arbetsordern UPPDRAG-TILL-CODEX,
+SHA-256 `e2f774ec83b1207328de8a8c6261ef033da9d6b5038b1c66c86e8a060ad9409d`.
+Ägarens accept B-5, 2026-09-20T17:11Z, finns i [beslutsloggen](decisions.md).
+Kampanjkopian bevaras som källunderlag; den är inte en parallell arbetsordning.
+[DEFINITION.md](../DEFINITION.md) är Nortropics centrala definition.
+
+## Åtagande och tillstånd
+
+Codex etablerar och prövar kontorets besluthem så att arbetet kan fortsätta ur
+besluten utan ägarens återberättelse. Fasen omfattar endast definitionen,
+intervjubesluten med status, arbetsformen, riktad nulägesläsning, P1, P3 och
+separat dokumentgranskning, följt av verifierad publicering och lokal bevaring.
+
+B-3 ger tillstånd 1 att skapa och arbeta i `nortropic-projektkontor` under
+`~/nortropic-repos/`. B-4 ger tillstånd 2 att skapa det **publika** fjärrrepot
+`Nortropic/nortropic-projektkontor` och publicera exakt det angivna innehållet.
+Tillstånd 3 för Runtimes publicerare ingår inte. Separat granskning före integration
+är en arbetsregel; denna fas inför ingen tekniskt påtvingad publiceringsgrind.
+
+Tillåtna filer: `DEFINITION.md`, `AGENTS.md`, `CLAUDE.md`, `README.md`,
+`docs/uppdrag.md`, `docs/plan.md`, `docs/decisions.md` och provprotokoll samt
+rapporter under `evidence/entry/`. Lokala arkiv, råprotokoll och filhashar förvaras
+också där, i en Git-exkluderad lokal del. Git-metadata ingår i det tillåtna lokala repot.
+
+Före varje uppladdning kontrolleras hela arbetsträdet och Git-innehållet som ska
+överföras: bara definitionen och de bekräftade rättelserna, intervjubesluten med
+status, projektets uppdrag, plan, arbetsregler och provprotokoll. Inga andra
+samtalsutdrag, kampanjfiler, IR, familjefiler, helhetsbild, nycklar eller lokala
+konfigurationer får publiceras. Källor anges med namn och meddelande, aldrig med
+absoluta sökvägar på ägarens dator. Vid osäkerhet om innehållstillstånd: ingen
+uppladdning, fråga ägaren. Kan fjärrrepot inte skapas med befintlig behörighet:
+stanna, bevara läget och ange exakt vad som saknas; skaffa ingen ny rättighet.
+
+## Riktad nulägesläsning vid byggstart 2026-09-20
+
+Sökvägar anges hemrelativt av publiceringsskäl. Detta är en avgränsad läsning för
+rätt arbetsyta och återanvändning, ingen inventeringskampanj.
+
+| Läge | Sökväg och revision | Betydelse |
+|---|---|---|
+| Finns | `~/Nortropic Runtime`, main/HEAD `a941207a9ca57697967cf33dcd1c3ea5d884051a`; `v0.1.0` avskalad till commit `580630bcb9d46bb11e17e25053664eec4e23b8ae` | Arbetsform, laddningsprov och ett mottagarprov återanvänds som former; deras resultat gäller Runtime-repot |
+| Finns | Runtime: `AGENTS.md`, `CLAUDE.md`, uppdraget, `docs/plan.md`, `docs/decisions.md` D013/D019, `docs/runbook.md`, `evidence/claude-qualification/result.md`, `evidence/v0.1/claude-receiver/assessment.md` och `verification.json` vid samma HEAD | En regelkälla via import, planens ansvar, läsning före skrivövertagande och avgränsad evidens |
+| Finns | `~/nortropic/intake-campaigns/improvements-preparation-2026-09`, lästa källors SHA-256 i `evidence/entry/start.json` | Accepterad arbetsorder, intervju, rättelser och originalturer; läses, ändras aldrig |
+| Fanns inte | `~/nortropic-repos/nortropic-projektkontor` före skapandet; ingen revision | Det godkända målrepot behöver etableras |
+| Inte funnet i riktad sökning | En befintlig central `DEFINITION.md` eller fil med projektkontorsnamn under `~/nortropic-repos/` eller `~/nortropic/` | Ingen sådan fil återanvänds. Filnamnssökning och lästa ingångar bevisar inte att varje tänkbar äldre text saknas |
+| Kunde inte nås | Inget av det namngivna underlag som denna fas behöver | Inget läshinder konstaterat vid start |
+
+Runtime-planen väntar på nästa verksamhetsutfall och mål. Dess lästa profil gäller
+Runtime/tools och dess egen publicerare; detta repo kvalificeras inte genom
+etableringen. Release-taggen är annoterad: taggobjekt och commit är olika identiteter.
+
+## Definition och beslut
+
+B-2 styr exakt innehåll. De tre styckena ur CONV-042, meddelande 1, förs in
+mekaniskt byte för byte; inramning och avslutande brainstorminstruktion utesluts.
+Därtill endast de bekräftade rättelserna om Runtime och egna repos 2026-09-19,
+den bekräftade delen av CONV-059, meddelande 160, och den tillskrivna beslutsraden
+2026-09-20. Källhänvisningar och uppgiften om ingen tolkning står under ett streck.
+Ingen annan assistenttext förs in i definitionen.
+
+I-01–I-13 inklusive I-07b samt B-1–B-5 förs in med faktiskt svar, datum,
+innebörd, påverkan och status. I-09 är avsikt, B-5 byggmandat. Nya beslut är inte
+bevis för gammal historik. Beslutsloggens B-3 utelämnar källans förklarande absoluta
+platsangivelse av publiceringsskäl; ägarens svar är ordagrant.
+
+## Klart-när, vid en namngiven commit
+
+Samtliga följande villkor måste vara uppfyllda; körda prov ensamt räcker inte:
+
+- Definitionen motsvarar det bekräftade innehållet ord för ord, med tre stycken
+  byte för byte. Beslutsloggen återger svaren korrekt med rätt status.
+- Uppdrag, plan, beslut, definition och ingång är samstämmiga. Planen har exakt
+  ett aktuellt steg, en nästa handling och en återupptagningspunkt. Inga obeställda
+  krav eller obelagda färdigpåståenden finns; varje ”mätt” har befintlig evidens.
+- **P1:** en färsk interaktiv Claude Code-session i repots rot, enbart läsrätt,
+  utan chatthistorik, ägarens återberättelse eller byggarens facit, anger rätt
+  åtagande, utfört arbete, skyddat material, begränsningar och nästa konkreta
+  tillåtna handling med citat ur filerna. Värden kontrollerar svaren och bevarar
+  protokoll med commit. En återgiven markör räcker inte.
+- **P3:** en färsk interaktiv session per verktyg, Codex och Claude Code,
+  startad i repots rot, återger den unika markörraden och planens sökväg utan att
+  få svaret i prompten. Det visar laddning vid det tillfället, inte efterlevnad.
+- **Separat dokumentgranskning:** en session utan byggarens kontext, som inte
+  skrivit filerna, prövar BYGGFORSLAG §6 A12 O1–O9. Underlag, observationer och
+  begränsningar bevaras. Blockerande fynd rättas och granskaren ser rättelsen;
+  inga olösta blockerare får återstå i den godkända leveransen.
+- Tillåtet innehåll finns verifierat i det publika fjärrrepot; en lokal kopia
+  med arkiv och filhashar är återläst och verifierad. Rapporter binder de
+  faktiskt granskade och prövade revisionerna; senare förändringar redovisas.
+
+Granskningsfrågorna O1–O9: korrekt mottagande genom ingången; obeställda krav;
+saknade krav; obelagda tillstånd; avgörbart slutkriterium; arbetsregel skild från
+skrivspärr; definitionens ordagrannhet; beslutens riktighet och status;
+samstämmighet mellan de fem styrande dokumenten.
+
+## Utanför fasen och bevisens räckvidd
+
+Inget briefverktyg/AP-02, `verify_entry.py` eller fixturprov, AP-04,
+Runtime-kvalificering eller Runtime-körning, kartarbete, Obsidian-ändring,
+ägaryta, schemaläggning, självförbättring, affärsval, ny motor,
+instruktionssynkronisering, metodplattform, global verktygsändring,
+installation eller köpt tjänst ingår. Ingen fil utanför målrepot ändras.
+Självförbättring väntar enligt I-07b på utfört arbete i kontoret.
+
+Förberedelsen är en kandidat: **A3 ej uppfyllt, sex öppna auditfynd; A6 ej
+uppfyllt**. FIND-004 är inte stängt. Fasens grund är originalturer, direktiv och
+intervjusvar; inga nya krav tas från kompileringen utan läst källtur. Senaste
+förberedelserättelser och arbetsordern saknar separat omkontroll; vår granskning
+prövar denna leverans mot det bekräftade, inte kampanjen på nytt.
+
+Ett godkänt P1 visar en mottagare, en commit och detta repo. Det visar inte
+utförd nästa uppgift, minskad ägarbörda eller efterlevnad över tid. P3 visar
+kontextladdning, inte rätt fortsättning. Ingen Runtime-förmåga mot annat repo
+bevisas. Dokumenterade arbetsregler är inte tekniska spärrar.
+
+När allt är verifierat levererat redovisar Codex revision, prov och räckvidd,
+granskningsutfall, begränsningar och exakt nästa möjliga handling, och stannar.
+Kedjedrivarens förberedelse av nästa nyttiga uppgift och senare Runtime-användning
+ligger utanför denna fas; nästa bygge behöver ett eget accepterat uppdrag.

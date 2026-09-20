@@ -1,0 +1,19 @@
+{
+  "observed_at": "2026-09-20T17:18:17.696511+00:00",
+  "source_sha256": {
+    "delivery/UPPDRAG-TILL-CODEX.md": "e2f774ec83b1207328de8a8c6261ef033da9d6b5038b1c66c86e8a060ad9409d",
+    "delivery/INTERVJU.md": "c2f18aa7720e0216cb0c54dac706b3888723ba59e2b362e0a53d77d9e84b9dbd",
+    "delivery/BYGGFORSLAG.md": "14e746fe0e68ceb97ed19c0ca48c895425ecef3848422c14b63de5086cc06b13",
+    "delivery/ERRATA.md": "03bae26fe27053da39d2b69345015d3955a64f7a580fc4afd5889085e7db208a",
+    "delivery/INGANG.md": "b1727bb7edca77dfe9df31f74641a98545adef266e16715126cf1641b26acb89",
+    "delivery/CLOSEOUT.md": "63fd887b9aec3910d9724e65b204d9f60cbf9f4cbf6c9147298c07ff0a7ea955"
+  },
+  "B5_accept_verified": true,
+  "target_existed_before_start": false,
+  "writer_check": "Målkatalogen fanns inte; processlistan kontrollerad före skapandet. Inga processer kunde ha målkatalogen som befintlig arbetskatalog. Byggaren är ensam skrivare i målrepot.",
+  "runtime_head": "a941207a9ca57697967cf33dcd1c3ea5d884051a",
+  "runtime_release_commit": "580630bcb9d46bb11e17e25053664eec4e23b8ae",
+  "definition_three_paragraphs_sha256": "1d879ae3eb1c932e532c0c2be5dd7ab13a42c460fb3c22d670dfdb3a01554022",
+  "definition_three_paragraphs_bytes": 913,
+  "scope": "Riktad startkontroll, inte full inventering eller global skrivspärr."
+}
