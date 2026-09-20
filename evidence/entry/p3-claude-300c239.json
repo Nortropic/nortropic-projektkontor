@@ -1,0 +1,19 @@
+{
+  "probe": "p3-claude",
+  "source_commit": "300c239f2e33abf29140ac41e2e9d3b220a2cf00",
+  "session_id": "594922d2-a818-4dbb-91a8-51226d8e67a6",
+  "interactive": true,
+  "start_directory": "repository root",
+  "cli_version": "Claude Code 2.1.257",
+  "fresh_session": true,
+  "injected_project_context": false,
+  "available_tools": [],
+  "tool_calls": 0,
+  "tool_names": [],
+  "session_log_sha256": "0ceb745e4fc780ffdb040b55a23e0381329b7728ed6dbb21aa88cbc918111256",
+  "answer_file": "p3-claude-300c239-answer.md",
+  "answer_sha256": "d5dd549143ee593280909b0610d68a146386ea70f6860a163da1eb5de8ee120c",
+  "started_at": "2026-09-20T17:21:44.649Z",
+  "last_answer_at": "2026-09-20T17:21:50.393Z",
+  "read_scope": "Only files in target repository; no external source validation by receiver."
+}

@@ -152,7 +152,7 @@ uppfyllda; B-5 stänger inga auditfynd. Originalkällans identitet finns i
 **2026-09-20T17:07Z** — ägarens faktiska svar (valt svarsalternativ): ”nortropic-projektkontor, lokalt (Recommended)” — *Namn: nortropic-projektkontor. Plats: [lokal sökväg utelämnad i publik återgivning]. Codex får skapa ett lokalt git-repo där och arbeta i det. Ingenting laddas upp genom detta beslut.* **Beslut:** namn och lokal arbetskatalog fastställda; **tillstånd 1 (skapa och arbeta lokalt) givet.** Säger ingenting om uppladdning.
 
 **Status:** byggbeslut 2026-09-20. **Grund:** INTERVJU, Byggbesluten, B-3.
-**Publiceringsnot:** endast källans förklarande platsangivelse är utelämnad; ägarens faktiska svar och svarsalternativet är ordagranna. Godkänd plats är detta repo under `~/nortropic-repos/`.
+**Publiceringsnot:** den absoluta platsangivelsen är uttryckligt utelämnad i återgivningen; övriga bytes i källraden är oförändrade. Ägarens val ”nortropic-projektkontor, lokalt (Recommended)” är ordagrant. Godkänd plats är detta repo under `~/nortropic-repos/`.
 **Innebörd och påverkan:** Tillstånd 1: skapa lokalt git-repo och arbeta här; ingen uppladdning följer av detta. **Ersätter:** inget tidigare svar; tillför byggbeslut efter I-09 och I-13.
 
 ## B-4 — Tillstånd 2: bevara/publicera angivet innehåll i fjärrrepo — synlighet

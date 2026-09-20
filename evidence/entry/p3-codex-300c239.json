@@ -1,0 +1,20 @@
+{
+  "probe": "P3 Codex",
+  "source_commit": "300c239f2e33abf29140ac41e2e9d3b220a2cf00",
+  "session_id": "01a0bfd6-650f-77e3-89b9-099a5bb56bd7",
+  "interactive": true,
+  "start_directory": "repository root",
+  "cli_version": "0.155.0-alpha.2.6 (existing application binary)",
+  "fresh_session": true,
+  "injected_project_context": false,
+  "tool_calls": 0,
+  "session_log_sha256": "c90f5bb889cd639852b3b777add03be19cdef74514a8f18e61dec905434d7c78",
+  "answer_file": "p3-codex-300c239-answer.md",
+  "answer_sha256": "e86cc12203f6e02e3e3eb1d6f3db77f26065bcbcdf6c38f34748f4f77e3497ca",
+  "earlier_attempt": {
+    "cli_version": "0.147.0",
+    "outcome": "HTTP 400: configured gpt-6-astra model requires newer Codex",
+    "session_id": "01a0bfd5-cf5e-7290-b627-461d34f92f04",
+    "disposition": "Stopped. Retried only after selecting an already-installed newer binary; no installation or model substitution."
+  }
+}

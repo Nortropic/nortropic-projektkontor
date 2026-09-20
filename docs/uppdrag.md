@@ -62,8 +62,8 @@ Ingen annan assistenttext förs in i definitionen.
 
 I-01–I-13 inklusive I-07b samt B-1–B-5 förs in med faktiskt svar, datum,
 innebörd, påverkan och status. I-09 är avsikt, B-5 byggmandat. Nya beslut är inte
-bevis för gammal historik. Beslutsloggens B-3 utelämnar källans förklarande absoluta
-platsangivelse av publiceringsskäl; ägarens svar är ordagrant.
+bevis för gammal historik. Beslutsloggens B-3 markerar en utelämnad absolut platsangivelse i
+svarsalternativet av publiceringsskäl; ägarens val och resten av källraden är ordagranna.
 
 ## Klart-när, vid en namngiven commit
 

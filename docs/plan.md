@@ -1,10 +1,10 @@
 # Levande plan — besluthemmet
 
-AKTUELLT STEG: Verifiera etablerade dokument genom P1, P3 och separat dokumentgranskning; fasen är ännu inte levererad.
+AKTUELLT STEG: Separat dokumentgranskning efter körda P1 och P3; fasen är ännu inte levererad.
 
-NÄSTA HANDLING: Byggaren bevarar dokumentkandidaten i Git och startar det färska interaktiva P1-provet med Claude Code i repots rot, enbart läsrätt.
+NÄSTA HANDLING: Låt den separata granskaren pröva dokumentkandidaten och provprotokollen mot O1–O9; rätta eventuella blockerare och visa rättelserna för granskaren före uppladdning.
 
-ÅTERUPPTAGNINGSPUNKT: `docs/plan.md` i `nortropic-projektkontor`, gren `main`. Börja utan skrivningar, kontrollera `git status --short --branch`, `git log -1 --oneline`, artefakter och processläge. Byggaren Codex äger skrivansvaret under pågående fas; övertagande kräver att den föregående skrivaren konstaterats avslutad. Inga provsessioner är ännu startade.
+ÅTERUPPTAGNINGSPUNKT: `docs/plan.md` i `nortropic-projektkontor`, gren `main`. Börja utan skrivningar, kontrollera `git status --short --branch`, `git log -1 --oneline`, artefakter och processläge. Byggaren Codex äger skrivansvaret under pågående fas; övertagande kräver att den föregående skrivaren konstaterats avslutad. P1 och båda P3-sessionerna har lämnat svar och avslutats med exit 0; granskaren arbetar enbart läsande.
 
 ## Utfört och läst
 
@@ -22,13 +22,19 @@ Riktat nuläge (full läsredovisning i uppdraget):
 
 ## Återstående inom accepterad fas
 
-P1 och P3, separat dokumentgranskning O1–O9 med eventuella rättelser och omkontroll,
+Separat dokumentgranskning O1–O9 med eventuella rättelser och omkontroll,
 innehållskontroll, publikt fjärrrepo, verifierad uppladdning samt lokal arkivkopia
-med filhashar. Proven är ännu inte körda. Lokal råevidens och bevarandepunkter
+med filhashar. P1 och P3 är körda på commit `300c239f2e33abf29140ac41e2e9d3b220a2cf00`;
+värdens bedömning finns i `evidence/entry/provbedomning-300c239.md`. Lokal råevidens och bevarandepunkter
 ligger i Git-exkluderade `evidence/entry/local/` och ska inte laddas upp.
 
 ## Väntan och begränsningar
 
+Codex CLI 0.147.0 nekades modellen med HTTP 400. Försöket bevarades och
+avslutades; redan installerad appbinär 0.155.0-alpha.2.6 gav lyckat P3. Ingen
+installation eller global verktygsinställning ändrades av byggaren. Interaktiva
+verktygsstarter lagrar själva sessionshistorik och projektets trust-val i sin
+befintliga användarprofil; inga andra projekts inställningar ändrades.
 Inget känt kapacitetsstopp. Ingen saknad ägaraccept. A3 och A6 för förberedelsen
 är inte uppfyllda; FIND-004 är inte stängt. Ingen Runtime-körning, ingen visad
 minskad ägarbörda och inget bevis för efterlevnad över tid. När denna fas är
