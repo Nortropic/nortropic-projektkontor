@@ -1,37 +1,40 @@
 # Levande plan — AP-04
 
-AKTUELLT STEG: Startkopplingen är separat godkänd och skyddat integrerad.
-Runtime 09268df5f59a180afe863d4cf7f95c9ad95f8639 (PR15), kontor
-71e90f01f9ee3c8fb4ca003b879fc74bc4206b17 (PR1); integrerade träd/baser
-matchar granskade kandidater. Resultatuppdragets brief och acceptans är separat
-godkända och frysta i tasks/resultat.json, tasks/resultat.md, acceptance/resultat.py.
+AKTUELLT STEG: Resultatfunktionen är byggd genom kontorets ingång och skyddat
+integrerad av Runtime i PR2, 5a6084ee156bb2d12537f5e58af62e125d83be14.
+Funktion, verkligt avbrott/återupptagande, negativa fall, färsk mottagare och
+oberoende jämförelse mot körbevis/fjärrintegration är verifierade. Endast separat
+slutgranskning, integration av avslutstexterna och slutligt Git/arkivbevarande återstår.
 
-NÄSTA HANDLING: Samma uppdrag office-result-1 har återupptagits med bevarad
-diagnos genom kontorets `fortsatt`; försök 2 pågår genom Runtime. Följ enbart
-`python3 -B tools/kontor.py status` tills completed eller dokumenterat vänteläge.
-Starta inte fler arbetare/signaler under körningen. Runtime gör hostacceptans,
-separat review och skyddad integration. Vid väntan: inspektera bevis och processer,
-rätta bara relevant förutsättning och använd befintlig diagnos-/review-återgång.
-Färsk mottagare har verifierat rätt återupptagning: evidence/ap04/handover.json.
+NÄSTA HANDLING: Granska exakt avslutskandidat i båda repon separat. Rätta bara
+relevanta blockerare; integrera sedan kontrollerat innehåll genom skyddade PR:er.
+Jämför slutlig HEAD och origin/main samt GitHub-arkiv och lokalt arkiv byte för
+byte i båda repon. Bevara ett lokalt final-<office HEAD>-<runtime HEAD>.json
+under evidence/ap04/local/ som binder slutrevisionerna utan självrefererande
+commit. Om detta kvitto redan finns och matchar revisionerna är fasen avslutad:
+redovisa och stanna; starta inte fler uppdrag eller nästa byggfas.
 
-ÅTERUPPTAGNINGSPUNKT: Kontor work/ap04-result-task; Runtime main vid ovanstående
-pinnade revision, spårad kod ren. Rå körloggar ligger i lokalt Git-exkluderad
-evidence/runs/office-result-1/. Kör-id office-result-1, underlag tasks/resultat.json.
-`python3 -B tools/kontor.py status` är en läsning; `fortsatt` är en aktiv handling.
-Codex är kedjedrivare. Kontrollera Runtime evidence/runs/office-result-1 och
-.runtime/tasks/office-result-1 samt processer innan skrivansvaret tas över.
-Raw sessions sparas enbart lokalt, aldrig i offentligt Git. Om katalogerna ännu
-saknas är uppdraget inte startat. Om de finns får start inte upprepas.
+ÅTERUPPTAGNINGSPUNKT: Kontor work/ap04-closeout; Runtime work/ap04-receipt.
+Körd Runtime-kod: 09268df5f59a180afe863d4cf7f95c9ad95f8639. Senare Runtime-
+ändringar gäller endast bevis, plan och Git-exkludering av privata råloggar.
+Uppdrag office-result-1 är completed, två försök, en publicering. Även aktiv
+återupptagning av avslutat uppdrag gav oförändrade räknare, inga nya modellkörningar
+eller publiceringar. Alla registrerade processgrupper avslutade. Starta inte om.
+Status och resultat kan läsas med `python3 -B tools/kontor.py status` respektive
+`python3 -B tools/kontor.py resultat`. De läser snapshots, inte livebevakning.
 
-Granskning /root/ap04_review godkände Runtime 26cd64f och kontor 68ebffb;
-AP04-R1 rättat (verkliga försökskvitton krävs). 28 Runtime-prov och 3 kontorsprov
-PASS. GitHub nekade kontorsmerge utan obligatoriska statusar med HTTP405,
-"2 of 2 required status checks are expected". Därefter korrekta statusar och
-skyddad squashintegration. Underlagsgranskning rättade två acceptansluckor
-(import-I/O och gemensamma returfält); slutlig acceptans SHA256 5f193ad4...
-godkänd, tre native I/O-negativprov PASS. Detta är ännu inte AP04-slutleverans.
+Bevis: evidence/ap04/delivery-verification.json, result.json, interruption.json,
+handover.json och leverans.md. Runtime evidence/ap04/result-run.json innehåller
+försöks-/gransknings-/integrationsidentiteter; native-preservation.json binder
+återläst lokalt arkiv och konsekvent databasbackup. Råhistorik är Git-exkluderad.
+En färsk klon får inte hitta på lokala bevis: frånvaro visas som unavailable.
 
-## Byggordning
+Nästa möjliga fas är ett nytt accepterat internt utvecklingsuppdrag med egen
+verksamhetsnytta; rekommendationen i leverans.md är inget byggmandat. A3/A6 och
+tidigare auditfynd är oförändrade. Alla fynd i just AP04:s start-/underlagsgranskning
+är rättade och omkontrollerade; slutgranskningen prövar detta pakets bevis.
+
+## Genomförd byggordning (slutbevarande återstår enligt ovan)
 
 1. Startkoppling och målrepoanpassning, riktade negativa prov, separat granskning.
 2. Verifiera main-skyddet. Integrera granskade startkandidater i båda repon.
@@ -45,9 +48,9 @@ godkänd, tre native I/O-negativprov PASS. Detta är ännu inte AP04-slutleveran
 
 Etableringens bevis under evidence/entry bevaras oförändrade. Runtime v0.1 och
 review-continuation återanvänds inom sin räckvidd. Ny fas får evidence/ap04;
-rådata förvaras endast lokalt i Git-exkluderad local/. Inga nya PASS påstås ännu.
+rådata förvaras endast lokalt i Git-exkluderad local/. Nya bevis och deras räckvidd står i leverans.md.
 GitHub visar publikt kontorsrepo, befintlig adminåtkomst och oskyddad main vid start.
-Skyddet ska införas och verifieras före integration. A3/A6 och auditfynd är oförändrade.
+Skyddet infördes och verifierades före integration; HTTP405-provet finns bevarat. A3/A6 och auditfynd är oförändrade.
 
 ---
 

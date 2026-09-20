@@ -1,0 +1,9 @@
+{
+  "case": "actual remote main differs from deliberately stale accepted base",
+  "result": "rejected",
+  "message": "Remote main changed; new candidate/test/review required",
+  "observed_remote_main": "71e90f01f9ee3c8fb4ca003b879fc74bc4206b17",
+  "model_calls": 0,
+  "remote_mutations": 0,
+  "observed_at_epoch": 1789927902.987571
+}
