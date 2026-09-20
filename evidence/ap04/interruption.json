@@ -1,0 +1,24 @@
+{
+  "task": "office-result-1",
+  "state": "waiting_diagnosis",
+  "attempt": {
+    "task": "office-result-1",
+    "attempt": 1,
+    "provider": "codex",
+    "provider_completed": false,
+    "exit_code": 130,
+    "thread_id": "01a0c000-591c-73f3-988d-cbafd8196286",
+    "usage": null,
+    "role": "implementation",
+    "interrupted": "signal",
+    "process_group_removed": true,
+    "elapsed_seconds": 7.62,
+    "evidence": "evidence/runs/office-result-1/attempt-1"
+  },
+  "worker_removed": true,
+  "engine_removed": true,
+  "runtime_revision": "09268df5f59a180afe863d4cf7f95c9ad95f8639",
+  "input_revision": "0693a4c7429b6f7068fb887a5469bd4c48ba2279",
+  "history_sha256": "f475c060ed158aff5e789bc8b3c377bf1ad64827da99ca2b10656adf0762cf21",
+  "diagnosis": "Controlled SIGTERM of verified attempt executor after provider started; no automatic retry; all recorded process groups removed. Original task, scope and verifier unchanged. Resume with diagnosis through office entry."
+}
