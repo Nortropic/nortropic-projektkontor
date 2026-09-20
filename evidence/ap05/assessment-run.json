@@ -1,0 +1,165 @@
+{
+  "task_id": "office-change-assessment-1",
+  "checked_at": "2026-09-20T19:01:36.139740+00:00",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "input_revision": "a218038b0952ab9d6b48f04bec4d231d5c16cbeb",
+  "base": "17ce93ade62b509024095efc83b1dfe589a178f5",
+  "task_sha256": "6a6d0c46b6b5887cbe8a37cd81022d633a312c25d594ec7bf9978d117c9b134e",
+  "acceptance_sha256": "0b291823a9e7f20617c150cb7a48dc35b0bcba5e9255dcef3a5ad9ace81fcf3b",
+  "brief_sha256": "ece0dbabfdb04d6419e88f57c9a43f811ac39e3ca32d95fc87a587138d9f4ff2",
+  "attempts": 3,
+  "integration": {
+    "merged": true,
+    "candidate": "627bfac916a6ed0e5e47aa6d3ec439a8b1c4353a",
+    "merge_commit": "ad3e7a1187cdfb52fbe58e38f07782774c415eff",
+    "tree": "f0630ef1467be91e2d9e0262e8bfff0244e045da",
+    "url": "https://github.com/Nortropic/nortropic-projektkontor/pull/4"
+  },
+  "verified_saved_inspection": true,
+  "independent_remote_comparison": {
+    "pr_head": "627bfac916a6ed0e5e47aa6d3ec439a8b1c4353a",
+    "merged": true,
+    "merge_commit": "ad3e7a1187cdfb52fbe58e38f07782774c415eff",
+    "tree": "f0630ef1467be91e2d9e0262e8bfff0244e045da",
+    "required_statuses": {
+      "runtime/tests": "success",
+      "runtime/review": "success"
+    }
+  },
+  "proof": [
+    {
+      "artifact": "evidence/runs/office-change-assessment-1/attempt-1/result.json",
+      "sha256": "3bf30b0ef6f39dc0ed0c57e6eb458e684b38bbcc26e9187ba18e52e50af3e7ce",
+      "observed": {
+        "attempt": 1,
+        "provider_completed": true,
+        "process_group_removed": true,
+        "thread_id": "01a0c022-aa69-77d2-9d02-a59bb8567acf"
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-1/attempt-2/result.json",
+      "sha256": "beb86a32e91b9c478304dc4a2434533de437cfcf28041f968977068aadffaf5e",
+      "observed": {
+        "attempt": 2,
+        "provider_completed": true,
+        "process_group_removed": true,
+        "thread_id": "01a0c029-94cb-77a1-a899-b210797f5fbe"
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-1/attempt-3/result.json",
+      "sha256": "cb122f4d634422c0eac5848003a04b48d1bf3aa0041b778d4caa434ab19ef0cb",
+      "observed": {
+        "attempt": 3,
+        "provider_completed": true,
+        "process_group_removed": true,
+        "thread_id": "01a0c02c-6889-7ff0-8a55-4a8e5e065878"
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-1/attempt-1/acceptance.json",
+      "sha256": "47031bc9c2c278ae536a776375bad583a9037c43b1d431886fb0d06050cb444a",
+      "observed": {
+        "candidate_files_sha256": {
+          "tools/change_assessment.py": "a753b1c749983a407859822a5272923c682464cb75de7f71263e0082cd691079",
+          "tools/test_change_assessment.py": "f0b48790d6efb9ed79b167e3bcf94381533605d5c04115582759621b9d1ca110",
+          "tools/CHANGE_ASSESSMENT.md": "f0fab86d6f839faa992a27034a19ad5d00403712f8f3a4a5f2473a6c253486b0"
+        },
+        "passed": true,
+        "checks": [
+          "legitimate separated report, exact binding, no global permission",
+          "changed missing unsafe unobserved propagate only to dependent claims/actions",
+          "authority-only dependency marks applicability without revoking decision",
+          "missing authority stays missing with unchanged source checks",
+          "malformed source refs/reasons/authority/timestamps/paths rejected",
+          "wrong reference and malformed observation rejected; empty coverage not success",
+          "no I/O in import and APIs; inputs/reference identities retained",
+          "native CLI manifest/report, missing-source data, duplicate keys/constants/error exits"
+        ]
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-1/attempt-2/acceptance.json",
+      "sha256": "a1e43765cf0a52079709bdc91bb4d9cf5155d543ef6ac592af6a05c8c4248987",
+      "observed": {
+        "candidate_files_sha256": {
+          "tools/change_assessment.py": "c075567cade9192a6b76609e5a61e5bfd266876e80ba62f8d52fc3ecc8b776ce",
+          "tools/test_change_assessment.py": "0066e40af35fb2fd9ebbbb0e90cc93180ac0a78f578f98a41dc862ce7039862c",
+          "tools/CHANGE_ASSESSMENT.md": "62ab6c47e02573c3b06a475db2318fa77b0c3c0051fc53147086c826df329106"
+        },
+        "passed": true,
+        "checks": [
+          "legitimate separated report, exact binding, no global permission",
+          "changed missing unsafe unobserved propagate only to dependent claims/actions",
+          "authority-only dependency marks applicability without revoking decision",
+          "missing authority stays missing with unchanged source checks",
+          "malformed source refs/reasons/authority/timestamps/paths rejected",
+          "wrong reference and malformed observation rejected; empty coverage not success",
+          "no I/O in import and APIs; inputs/reference identities retained",
+          "native CLI manifest/report, missing-source data, duplicate keys/constants/error exits"
+        ]
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-1/attempt-3/acceptance.json",
+      "sha256": "a57568d6ce7d7523b18d286bce440a6c70bc33fc121a6046e81a548d6c59fa07",
+      "observed": {
+        "candidate_files_sha256": {
+          "tools/change_assessment.py": "8f0f059447fec11c49435124c1dd72dcc2a7677d74d488e3c4328dfbb456dffc",
+          "tools/test_change_assessment.py": "be5f02b7490e3b09c7e8e4b26a045c52f8555447e75faf0cac2f17b164496b9a",
+          "tools/CHANGE_ASSESSMENT.md": "4d3feafa0f5cbb42481d0c83c7728780aec22bf10d93d211573126dea2aad1e0"
+        },
+        "passed": true,
+        "checks": [
+          "legitimate separated report, exact binding, no global permission",
+          "changed missing unsafe unobserved propagate only to dependent claims/actions",
+          "authority-only dependency marks applicability without revoking decision",
+          "missing authority stays missing with unchanged source checks",
+          "malformed source refs/reasons/authority/timestamps/paths rejected",
+          "wrong reference and malformed observation rejected; empty coverage not success",
+          "no I/O in import and APIs; inputs/reference identities retained",
+          "native CLI manifest/report, missing-source data, duplicate keys/constants/error exits"
+        ]
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-1/review-1/decision.json",
+      "sha256": "d87142fa2e407f5d28d588aa55fb7a9d041a212c2bdb0e5d6be5272dcdb0408c",
+      "observed": {
+        "candidate": "c4ac46ba3d14467a74680a4da5681c08eb1ce7ae",
+        "reviewer_run": "01a0c028-6dc5-7f93-bcc3-5a0bd1f76fa1",
+        "verdict": "rejected",
+        "blocking_findings": [
+          "tools/change_assessment.py:37\u201340: The timestamp regex rejects valid timezone-aware ISO8601 forms allowed by the brief. Independently reproduced with `20260102T090000Z` and `2026-01-02T09:00:00+0000`: Python 3.12 parses both, but reference_manifest raises ValueError; assess similarly rejects a checked_at with `+0000`. Accept valid ISO8601 calendar timestamps beyond the restricted format and add regression tests for both fields."
+        ],
+        "summary": "All 15 supplied tests passed. One timestamp-contract blocker remains. No private content was identified in the three reviewed files."
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-1/review-2/decision.json",
+      "sha256": "5f3205bc3126aeb93b29451ed95df2e0678153a4bc95dc0fd9ea4eff420454bf",
+      "observed": {
+        "candidate": "504421253e959f9af155e786edd34b3173542652",
+        "reviewer_run": "01a0c02a-e4b2-7902-aff3-fbd3f64365c4",
+        "verdict": "rejected",
+        "blocking_findings": [
+          "tools/change_assessment.py:40\u201353 accepts fractional hours/minutes but datetime.fromisoformat interprets their fractions as seconds. Reproduced: created_at='2026-01-02T09.5Z' (09:30 UTC), checked_at='2026-01-02T09:15:00Z' returns structure_valid=true because creation is parsed as 09:00:00.500000. Likewise, '09:30.5Z' is misread as 09:30:00.5 instead of 09:30:30. This violates the requirement that checked_at cannot precede created_at. Correct fractional-unit parsing and add regression coverage."
+        ],
+        "summary": "Inspected all three accepted files; all 17 tests passed. Independent edge-case checks found one blocking timestamp defect. No private content identified or source files changed."
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-1/review-3/decision.json",
+      "sha256": "cd3585e7e0d8972adbf66976736dee6be1828838c46503baea28a9433b60f5ca",
+      "observed": {
+        "candidate": "627bfac916a6ed0e5e47aa6d3ec439a8b1c4353a",
+        "reviewer_run": "01a0c02e-14f7-77d3-ba5d-5855d65ac963",
+        "verdict": "approved",
+        "blocking_findings": [],
+        "summary": "All three files satisfy the accepted brief. All 19 tests passed, plus independent checks covering 125 source-status combinations, 1,356 input mutations, and 21 timestamp comparisons. No private content or blocking violations found."
+      }
+    }
+  ],
+  "limitation": "These are revision-bound saved observations. Remote state was directly compared at checked_at; it is not live monitoring."
+}

@@ -28,6 +28,10 @@ anger räckvidd och återstående avslutskontroll. Nästa byggfas behöver eget 
 
 ## AP-05 — ändringsbedömning
 
+Kodstödet är verifierat med befintlig Python 3.12. På denna värd används
+`/opt/homebrew/bin/python3.12` för metodens Python-kommandon; systemets `python3`
+kan vara en äldre version. Ingen installation eller ny anslutning behövs.
+
 [Metoden och kommandona](tools/CHANGE_ASSESSMENT.md) binder utvalda källversioner
 till källuppgifter, sakbedömningar och befogenhet för varje handling. Ändrat eller
 saknat underlag markerar berörda slutsatser för omprövning; verktyget fattar inga
