@@ -1,20 +1,41 @@
 # Levande plan — AP-04
 
-AKTUELLT STEG: Etablera minimal startkoppling och Runtime-anpassning till
-Nortropic/nortropic-projektkontor enligt AP04-ACCEPT. Fas 1 är avslutad.
+AKTUELLT STEG: Resultatfunktionen är byggd genom kontorets ingång och skyddat
+integrerad av Runtime i PR2, 5a6084ee156bb2d12537f5e58af62e125d83be14.
+Funktion, verkligt avbrott/återupptagande, negativa fall, färsk mottagare och
+oberoende jämförelse mot körbevis/fjärrintegration är verifierade. Endast separat
+slutgranskning, integration av avslutstexterna och slutligt Git/arkivbevarande återstår.
 
-NÄSTA HANDLING: Implementera och testa intag, namngivet mål, frysta underlag,
-exakta skrivgränser, läsande observation och kontorets start/status/fortsätt.
-Separat granska exakta kandidater innan skyddad integration och första modellkörning.
+NÄSTA HANDLING: Granska exakt avslutskandidat i båda repon separat. Rätta bara
+relevanta blockerare; integrera sedan kontrollerat innehåll genom skyddade PR:er.
+Jämför slutlig HEAD och origin/main samt GitHub-arkiv och lokalt arkiv byte för
+byte i båda repon. Bevara ett lokalt final-<office HEAD>-<runtime HEAD>.json
+under evidence/ap04/local/ som binder slutrevisionerna utan självrefererande
+commit. Om detta kvitto redan finns och matchar revisionerna är fasen avslutad:
+redovisa och stanna; starta inte fler uppdrag eller nästa byggfas.
 
-ÅTERUPPTAGNINGSPUNKT: Läs uppdrag och AP04-ACCEPT; kontrollera båda repos Git,
-bevis och processer före skrivövertagande. Kontor: work/ap04-start från cbd7290;
-Runtime: work/ap04-target från a941207. Codex är ensam byggskrivare; separat
-ap04_review granskar endast läsande. Ingen Runtime-körning har startats.
-Runtime finns nu i syskonkatalogen `Nortropic Runtime`; gamla hemrelativa
-sökvägar i etableringens historik beskriver det då dokumenterade läget.
+ÅTERUPPTAGNINGSPUNKT: Kontor work/ap04-closeout; Runtime work/ap04-receipt.
+Körd Runtime-kod: 09268df5f59a180afe863d4cf7f95c9ad95f8639. Efter körrevisionen avgränsas office-profilen dessutom till faktiskt prövad
+Codex-provider med riktat test; gammal Runtime-providerprofil är oförändrad.
+Övriga senare ändringar gäller bevis, plan och råloggsexkludering.
+Uppdrag office-result-1 är completed, två försök, en publicering. Även aktiv
+återupptagning av avslutat uppdrag gav oförändrade räknare, inga nya modellkörningar
+eller publiceringar. Alla registrerade processgrupper avslutade. Starta inte om.
+Status och resultat kan läsas med `python3 -B tools/kontor.py status` respektive
+`python3 -B tools/kontor.py resultat`. De läser snapshots, inte livebevakning.
 
-## Byggordning
+Bevis: evidence/ap04/delivery-verification.json, result.json, interruption.json,
+handover.json och leverans.md. Runtime evidence/ap04/result-run.json innehåller
+försöks-/gransknings-/integrationsidentiteter; native-preservation.json binder
+återläst lokalt arkiv och konsekvent databasbackup. Råhistorik är Git-exkluderad.
+En färsk klon får inte hitta på lokala bevis: frånvaro visas som unavailable.
+
+Nästa möjliga fas är ett nytt accepterat internt utvecklingsuppdrag med egen
+verksamhetsnytta; rekommendationen i leverans.md är inget byggmandat. A3/A6 och
+tidigare auditfynd är oförändrade. Alla fynd i just AP04:s start-/underlagsgranskning
+är rättade och omkontrollerade; slutgranskningen prövar detta pakets bevis.
+
+## Genomförd byggordning (slutbevarande återstår enligt ovan)
 
 1. Startkoppling och målrepoanpassning, riktade negativa prov, separat granskning.
 2. Verifiera main-skyddet. Integrera granskade startkandidater i båda repon.
@@ -28,9 +49,9 @@ sökvägar i etableringens historik beskriver det då dokumenterade läget.
 
 Etableringens bevis under evidence/entry bevaras oförändrade. Runtime v0.1 och
 review-continuation återanvänds inom sin räckvidd. Ny fas får evidence/ap04;
-rådata förvaras endast lokalt i Git-exkluderad local/. Inga nya PASS påstås ännu.
+rådata förvaras endast lokalt i Git-exkluderad local/. Nya bevis och deras räckvidd står i leverans.md.
 GitHub visar publikt kontorsrepo, befintlig adminåtkomst och oskyddad main vid start.
-Skyddet ska införas och verifieras före integration. A3/A6 och auditfynd är oförändrade.
+Skyddet infördes och verifierades före integration; HTTP405-provet finns bevarat. A3/A6 och auditfynd är oförändrade.
 
 ---
 

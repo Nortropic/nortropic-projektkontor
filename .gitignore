@@ -1,0 +1,5 @@
+# Private raw evidence and machine-local archives must never be published.
+/evidence/**/local/
+__pycache__/
+*.pyc
+.DS_Store

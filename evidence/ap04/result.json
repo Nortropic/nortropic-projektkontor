@@ -1,0 +1,24 @@
+{
+  "observation": "snapshot",
+  "status": "delivered",
+  "live": false,
+  "remote_current": false,
+  "limitations": [
+    "This is a saved Runtime observation, not current engine or remote status. No live GitHub verification is performed; the snapshot may be stale and this presentation is not independent delivery evidence."
+  ],
+  "task_id": "office-result-1",
+  "phase": "completed",
+  "target": "Nortropic/nortropic-projektkontor",
+  "observed_at_epoch": 1789928029.3061624,
+  "age_seconds": 16.916,
+  "runtime_revision": "09268df5f59a180afe863d4cf7f95c9ad95f8639",
+  "input_revision": "0693a4c7429b6f7068fb887a5469bd4c48ba2279",
+  "base": "71e90f01f9ee3c8fb4ca003b879fc74bc4206b17",
+  "candidate": "e3eb7e93c936b4d69e19d967e90d87d1f291785b",
+  "acceptance_sha256": "5f193ad4f0648ed7532b78e315c31d8bda3c6ba16c01517143c273b7477d83c1",
+  "review_run": "01a0c004-c252-7ff0-a8f4-a1a80cce280a",
+  "merge_commit": "5a6084ee156bb2d12537f5e58af62e125d83be14",
+  "tree": "1dd335b63a54ede503e4913dc85a12ba33e95f6b",
+  "url": "https://github.com/Nortropic/nortropic-projektkontor/pull/2",
+  "evidence": "evidence/runs/office-result-1/observations/31687ed610274181a5bdbbc481b77e1a/state.json"
+}

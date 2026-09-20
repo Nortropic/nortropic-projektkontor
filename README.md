@@ -3,18 +3,25 @@
 Ett hem för ägarens definition och beslut, etablerat inom Nortropics första byggfas.
 Börja i [AGENTS.md](AGENTS.md). Aktuellt läge finns i [planen](docs/plan.md).
 
-## AP-04 — uppdragsfunktionen byggs
+## AP-04 — uppdragsfunktionen
 
-Aktivt mandat och klart-när: [uppdrag](docs/uppdrag.md). Aktuellt läge och nästa
-handling finns bara i [planen](docs/plan.md). Etableringen är avslutad.
+Från repots rot, med befintlig Runtime i syskonkatalogen `Nortropic Runtime`:
 
-Från repots rot: `python3 -B tools/kontor.py start --task resultat.json` startar
-ett bevarat accepterat uppdrag. `status` läser senast sparad Runtime-observation;
-den visar ålder och påstår inte att motorn eller GitHub observeras live.
-`fortsatt` använder Runtimes befintliga återupptagning; `--diagnosis`,
-`--review-repair`, `--review-retry` eller `--reconcile` kräver ett utrett skäl.
-Kedjedrivaren håller uppdrag och kommandon aktuella i planen.
+- `python3 -B tools/kontor.py status` visar senaste sparade observation.
+- `python3 -B tools/kontor.py resultat` visar verifierad leverans och bevisreferenser.
+- `python3 -B tools/kontor.py start --task NAMN.json` startar ett nytt accepterat,
+  committat uppdrag. Det avslutade resultatbygget får inte startas igen.
+- `python3 -B tools/kontor.py fortsatt --task NAMN.json` återupptar samma körning.
+  Diagnos/review-återgång använder dokumenterat skäl och befintlig Runtime-grind.
 
-`resultat` är nästa verkliga uppgift genom den granskade startingången; modulen
-är ännu inte levererad. Ingen av läshandlingarna får starta eller fortsätta arbete.
-Runtime ska ligga i den befintliga syskonkatalogen `Nortropic Runtime`.
+Utan --task väljs den levererade uppgiften `resultat.json`. Status och resultat är
+rena läsningar och visar observationens ålder; ingen livebevakning eller aktuell
+GitHub-status påstås. De kräver lokala Runtime-bevis. En klon utan dessa ger
+otillgänglig evidens, inte en fabricerad leverans. Start/fortsättning kräver exakt
+Runtime-revision som uppdraget accepterar; läsning kräver inte ny modellkörning.
+Kontorets kvalificerade utförarprofil är Codex; gamla Runtime-repots providers
+är oförändrade. Kedjedrivaren bär kommando, kör-id och diagnos i [planen](docs/plan.md).
+
+[Leveransbevis](evidence/ap04/delivery-verification.json) binder den riktiga
+resultatfunktionen, avbrottet/återupptagningen och PR2. [Slutredovisningen](evidence/ap04/leverans.md)
+anger räckvidd och återstående avslutskontroll. Nästa byggfas behöver eget mandat.

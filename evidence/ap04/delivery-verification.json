@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "task": "office-result-1",
+  "runtime_used": "09268df5f59a180afe863d4cf7f95c9ad95f8639",
+  "office_input": "0693a4c7429b6f7068fb887a5469bd4c48ba2279",
+  "office_base": "71e90f01f9ee3c8fb4ca003b879fc74bc4206b17",
+  "office_merge": "5a6084ee156bb2d12537f5e58af62e125d83be14",
+  "candidate": "e3eb7e93c936b4d69e19d967e90d87d1f291785b",
+  "tree": "1dd335b63a54ede503e4913dc85a12ba33e95f6b",
+  "url": "https://github.com/Nortropic/nortropic-projektkontor/pull/2",
+  "read_commands_files_unchanged": 329,
+  "history_initial_events": 10,
+  "history_final_events": 33,
+  "history_prefix_preserved": true,
+  "attempts": 2,
+  "publication_attempts": 1,
+  "review_run": "01a0c004-c252-7ff0-a8f4-a1a80cce280a",
+  "acceptance_sha256": "5f193ad4f0648ed7532b78e315c31d8bda3c6ba16c01517143c273b7477d83c1",
+  "checked_at_epoch": 1789928047.9010408,
+  "limits": [
+    "Read commands consume saved observations; remote independently checked by this host verification."
+  ]
+}
