@@ -15,8 +15,9 @@ commit. Om detta kvitto redan finns och matchar revisionerna är fasen avslutad:
 redovisa och stanna; starta inte fler uppdrag eller nästa byggfas.
 
 ÅTERUPPTAGNINGSPUNKT: Kontor work/ap04-closeout; Runtime work/ap04-receipt.
-Körd Runtime-kod: 09268df5f59a180afe863d4cf7f95c9ad95f8639. Senare Runtime-
-ändringar gäller endast bevis, plan och Git-exkludering av privata råloggar.
+Körd Runtime-kod: 09268df5f59a180afe863d4cf7f95c9ad95f8639. Efter körrevisionen avgränsas office-profilen dessutom till faktiskt prövad
+Codex-provider med riktat test; gammal Runtime-providerprofil är oförändrad.
+Övriga senare ändringar gäller bevis, plan och råloggsexkludering.
 Uppdrag office-result-1 är completed, två försök, en publicering. Även aktiv
 återupptagning av avslutat uppdrag gav oförändrade räknare, inga nya modellkörningar
 eller publiceringar. Alla registrerade processgrupper avslutade. Starta inte om.

@@ -19,7 +19,8 @@ rena läsningar och visar observationens ålder; ingen livebevakning eller aktue
 GitHub-status påstås. De kräver lokala Runtime-bevis. En klon utan dessa ger
 otillgänglig evidens, inte en fabricerad leverans. Start/fortsättning kräver exakt
 Runtime-revision som uppdraget accepterar; läsning kräver inte ny modellkörning.
-Kedjedrivaren bär kommando, kör-id och diagnos i [planen](docs/plan.md).
+Kontorets kvalificerade utförarprofil är Codex; gamla Runtime-repots providers
+är oförändrade. Kedjedrivaren bär kommando, kör-id och diagnos i [planen](docs/plan.md).
 
 [Leveransbevis](evidence/ap04/delivery-verification.json) binder den riktiga
 resultatfunktionen, avbrottet/återupptagningen och PR2. [Slutredovisningen](evidence/ap04/leverans.md)

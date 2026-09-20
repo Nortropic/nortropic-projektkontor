@@ -35,7 +35,9 @@ Det visar denna kedja och överlämning; det är inget mått på långsiktig äg
 | Fryst hostacceptans SHA256 | 5f193ad4f0648ed7532b78e315c31d8bda3c6ba16c01517143c273b7477d83c1 |
 | Separat Runtime-review | 01a0c004-c252-7ff0-a8f4-a1a80cce280a |
 
-Senare commits bevarar inputs, tester/rapporter och avslutstexter; de är inte den
+Senare commits bevarar inputs, tester/rapporter och avslutstexter samt begränsar
+kontorets provider-val till faktiskt prövad Codex (riktat test; gamla Runtime-val
+bevarade). De är inte den
 Runtime-revision som körde uppdraget. Slutkvittot binder även båda slutliga main.
 Inputhistoriken är bevarad på state/ap04-result-input; den är inte en separat
 integration eller auktoritetskälla vid sidan av main och frysta Runtime-inputs.
@@ -98,7 +100,9 @@ kontorsrepot är tillagt. Kontorsuppdrag stöder den prövade tools/-profilen me
 exakta filrättigheter; den aktiva tools/kontor.py är hostägd. Legacy access/base-
 omskrivning är inte aktiverad för kontorsuppdrag. Fryst Runtime-revision krävs för
 start/återupptagning; framtida uppdrag ska binda sin accepterade revision.
-Det verkliga nya målprovet gäller Codex med separat Codex-review. Äldre Claude-
+Det verkliga nya målprovet gäller Codex med separat Codex-review. Kontorsprofilens
+selector tillåter därför bara Codex; Claude för det nya målet kräver egen riktad
+kvalificering. Äldre Claude-
 bevis återanvänds inom sin gamla räckvidd; ingen ny faktisk Claude-skrivkörning
 mot kontorsrepot påstås. Lokala bevis måste finnas för status/resultat efter kloning.
 
