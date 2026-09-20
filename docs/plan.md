@@ -1,12 +1,14 @@
 # Levande plan — AP-05
 
-AKTUELLT STEG: Runtime väntar på granskad reparation. Försök 1 klarade fryst
-värdacceptans men separat review-1 avslog giltiga ISO8601-format. Ingen integration.
-Separat metodgranskning fann också felaktigt manifest-argv och fel rollfördelning
-för verklig källåtkomst. Historik och kandidat c4ac46b bevaras.
+AKTUELLT STEG: Runtime väntar på granskad reparation. Försök 2 klarade fryst
+värdacceptans; review-2 fann att bråkdelar av timmar/minuter tolkades som sekunder
+i standardbiblioteket. Detta är en konkret ny diagnos, inte blint omförsök.
+Metodens stdin och värdansvar är rättade; dess mappvillkor behöver även tillåta
+privat ny utdatamapp under ett brett gemensamt källrotsträd. Ingen integration.
+Historik och kandidater c4ac46b/5044212 bevaras.
 
 NÄSTA HANDLING: Återuppta samma uppdrag med --review-repair och den bevarade
-diagnosen i evidence/ap05/repair-1.json. Runtime ska rätta inom de tre befintliga
+diagnosen i evidence/ap05/repair-2.json. Runtime ska rätta inom de tre befintliga
 filerna, testa hela kontraktet och separat granska en ny kandidat före publicering.
 
 ÅTERUPPTAGNINGSPUNKT: gren work/ap05, tasks/andringsbedomning.json,
