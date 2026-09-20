@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-09-20T19:05:51.743846+00:00",
+  "campaign_selected_files": 36,
+  "campaign_selected_unchanged": true,
+  "initial_manifest_sha256": "b09cf85b46c74accb6d5eb76081d97ab63f1ae4f1d2c7e115524de9f6f7b8da5",
+  "historical_order_sha256": "e2f774ec83b1207328de8a8c6261ef033da9d6b5038b1c66c86e8a060ad9409d",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "runtime_tracked_changes": [],
+  "preserved_office_paths": [
+    "DEFINITION.md",
+    "evidence/entry",
+    "evidence/ap04",
+    "tools/kontor.py",
+    "tools/kontor_result.py",
+    "tests/test_entry.py"
+  ],
+  "office_comparison_revision": "17ce93ade62b509024095efc83b1dfe589a178f5",
+  "preserved_office_paths_unchanged": true,
+  "limits": "Selected read-only campaign sources; not a new total inventory. Actual vault never accessed. New native execution evidence is local engine state, not a Runtime source modification."
+}

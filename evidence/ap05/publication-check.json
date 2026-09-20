@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-09-20T19:06:47.780509+00:00",
+  "reviewed_head": "637fb2bca1ee4d96990fa3742c46897c17e56491",
+  "unpublished_commits_scanned": 11,
+  "new_file_versions_scanned": 36,
+  "new_private_paths_or_key_markers_found": false,
+  "private_local_paths_tracked": false,
+  "inherited_public_marker_lines": 8,
+  "inherited_comparison_revision": "17ce93ade62b509024095efc83b1dfe589a178f5",
+  "scope": "Full new file objects across unpublished history checked, including intermediate commits. Exact inherited historical source-pointer lines already public at baseline are distinguished from new disclosure.",
+  "human_content_review": "All new content was read during construction and separate contract/case/native reviews. Includes only mandate, synthetic source/tests, method, controlled case assessment and delivery facts. Internal originals, private mappings/archives/raw histories remain excluded. Marker scan alone is not the privacy review.",
+  "pending": "Final handover and review receipts must also be checked before final push."
+}
