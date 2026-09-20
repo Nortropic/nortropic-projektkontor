@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-09-20T19:04:04.907270+00:00",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "runtime_tracked_changes": [],
+  "tasks": [
+    "office-change-assessment-1",
+    "office-change-assessment-recipe-1"
+  ],
+  "unfinished_recorded_writers": false,
+  "database_backup_integrity": "ok",
+  "archive": "evidence/ap05/local/native-ap05.tar.gz",
+  "archive_sha256": "8ffa51438d73107935cc2d8d6d14f382c99964f36440a9e5bbbab04b8303545d",
+  "regular_files_reread": 1521,
+  "reread_verified": true,
+  "scope": "Private archive of both AP05 task workspaces, complete execution/review histories and consistent canonical database backup. No raw sessions or database published. Other Runtime histories retained in original canonical state."
+}

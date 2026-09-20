@@ -1,3 +1,46 @@
+# Levande plan — AP-05
+
+AKTUELLT STEG: AP-05:s kodstöd och verkliga kartbedömning är verifierade.
+Runtime har skyddat integrerat huvudbygget i PR4/ad3e7a1 och metodrättelsen i
+PR5/f4deee4. Båda uppdragen är completed; inga nya körningar ska startas.
+Endast färsk mottagare, separat avslutsgranskning, skyddad integration av det
+kontrollerade dokument-/bevispaketet och slutligt arkivbevarande återstår.
+
+NÄSTA HANDLING: Slutför just avslutet ovan. Bind publicerad slut-HEAD och
+återlästa GitHub-/lokalarkiv i evidence/ap05/local/final-<HEAD>.json. Om kvittot
+redan finns och matchar HEAD/origin/main är AP-05 avslutad: redovisa och stanna.
+Kartärendets följande handling är ägarens begriplighetsprövning och separat
+beslut om eventuell kartleverans enligt cases/map-layer/assessment.md; inget
+nytt principval I-11 och ingen kartskrivning inom AP-05.
+
+ÅTERUPPTAGNINGSPUNKT: gren work/ap05 fram till avslutsintegration, därefter main.
+Börja med Git/status och final-kvittot innan skrivansvar tas. Leverans och
+bevis: evidence/ap05/leverans.md. Verkligt fall: cases/map-layer/assessment.md;
+privat aktuell version map-case-v3.json hittas genom evidence/ap05/local/case-history.json.
+Det slutliga dokumenterade receptets riktiga tillämpning finns lokalt under
+evidence/ap05/local/documented-application-v3/ och kontrollerat i
+evidence/ap05/documented-application.json. Läs Runtime-snapshots endast vid
+behov med tools/kontor.py status/resultat --task andringsbedomning.json eller
+andringsbedomning-metod.json. completed är inte ett uppdrag att fortsätta.
+Runtime-kodrevision 2789ea0 är oförändrad; råhistorik/DB-backup och privata
+källor är bevarade och återlästa lokalt, aldrig publicerade.
+
+Ordning: fryst syntetiskt kontrakt → Runtime-bygge/test/review/integration →
+verklig tillämpning och separat sakgranskning → färsk mottagare → skyddad
+integration av kontrollerad fallredovisning och slutbevarande. Värdens arbete
+på denna gren och modellens isolerade kandidat har skilda filer; ingen annan
+skriver i värdens arbetsyta. Inga Runtime-kodändringar. Gamla auditfynd öppna.
+
+Sakläge: generator/kvitto ändrade efter FINAL-CHECK-1. Ny read-only observation
+med separat reproduktion stödjer dagens rättelsetäckning, baslinjebevarande och
+lagergräns. cases/map-layer/assessment.md redovisar exakt återstående ägaromdöme
+och skrivbeslut. Privat aktuell version: evidence/ap05/local/map-case-v3.json;
+v1/v2 bevarade. Valvet och kampanjen är orörda.
+
+---
+
+## Historik — AP-04-plan (avslutad; aktiva steg ovan gäller)
+
 # Levande plan — AP-04
 
 AKTUELLT STEG: Resultatfunktionen är byggd genom kontorets ingång och skyddat

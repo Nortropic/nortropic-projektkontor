@@ -1,0 +1,22 @@
+{
+  "id": "office-change-assessment-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "17ce93ade62b509024095efc83b1dfe589a178f5",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "allowed_paths": [
+    "tools/change_assessment.py",
+    "tools/test_change_assessment.py",
+    "tools/CHANGE_ASSESSMENT.md"
+  ],
+  "attempt_seconds": 900,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md and implement the complete AP05 contract in the three allowed files using only synthetic fixtures. Runtime owns startup, verification, separate review and publication. Do not access external sources, install dependencies, or edit host authority. Use existing Python for useful tests."
+    }
+  ],
+  "acceptance": "acceptance/andringsbedomning.py",
+  "brief": "tasks/andringsbedomning.md",
+  "acceptance_sha256": "0b291823a9e7f20617c150cb7a48dc35b0bcba5e9255dcef3a5ad9ace81fcf3b"
+}

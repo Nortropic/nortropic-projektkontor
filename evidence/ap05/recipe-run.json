@@ -1,0 +1,69 @@
+{
+  "task_id": "office-change-assessment-recipe-1",
+  "checked_at": "2026-09-20T19:03:34.273622+00:00",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "input_revision": "aa20fcf0822cfa44a5befbe1ad37b489571fb982",
+  "base": "ad3e7a1187cdfb52fbe58e38f07782774c415eff",
+  "task_sha256": "239b6da5665bfd6272b85165c512c36337b3b47f5ea04d3fa95b3adf8bc5124d",
+  "acceptance_sha256": "4a0222c17fe3978876ecf0e7af2964a2a7f6dd6ea434d12537b595d44b1e4203",
+  "brief_sha256": "e32411d6233a48622682bce9ffd6a4fe1ca21c1d884b39de2e8601dbdd89b600",
+  "attempts": 1,
+  "integration": {
+    "merged": true,
+    "candidate": "a6d9eec1e3a84ee7ee71716900c8063dd21c813b",
+    "merge_commit": "f4deee4086efd9134060a4a42a4406c4d9fdc422",
+    "tree": "106feffd62348a4b1f58cf6ee7fa0640ab03cb48",
+    "url": "https://github.com/Nortropic/nortropic-projektkontor/pull/5"
+  },
+  "verified_saved_inspection": true,
+  "independent_remote_comparison": {
+    "pr_head": "a6d9eec1e3a84ee7ee71716900c8063dd21c813b",
+    "merged": true,
+    "merge_commit": "f4deee4086efd9134060a4a42a4406c4d9fdc422",
+    "tree": "106feffd62348a4b1f58cf6ee7fa0640ab03cb48",
+    "required_statuses": {
+      "runtime/tests": "success",
+      "runtime/review": "success"
+    }
+  },
+  "proof": [
+    {
+      "artifact": "evidence/runs/office-change-assessment-recipe-1/attempt-1/result.json",
+      "sha256": "60ff492ab3f0db287d16da7afc0d17497821cfc0f15a5330581343fae147231c",
+      "observed": {
+        "attempt": 1,
+        "provider_completed": true,
+        "process_group_removed": true,
+        "thread_id": "01a0c031-9b2c-7900-b433-6347ee0c9aac"
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-recipe-1/attempt-1/acceptance.json",
+      "sha256": "69147d07abe952e0cd846f7c636503ff283856a12463fb5a9df543f26c317b55",
+      "observed": {
+        "candidate_files_sha256": {
+          "tools/CHANGE_ASSESSMENT.md": "dd1dd5fd49b8c150397812ba2ed1e193f278dbc309df583a9e57eb90278fe773",
+          "tools/test_change_assessment.py": "7606743d184bd8d86fe8dcc27c538c84e185b89ee919102476422d0329145fe8"
+        },
+        "passed": true,
+        "checks": [
+          "output below/equal/above selected missing source refused before mutation",
+          "fresh sibling output under common root works with unchanged case/missing source"
+        ],
+        "unit_tests": 20
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-change-assessment-recipe-1/review-1/decision.json",
+      "sha256": "3426fe23d86988c15b6f74fdf15836f8db32f2087eeab11ee83c3297bac12cd4",
+      "observed": {
+        "candidate": "a6d9eec1e3a84ee7ee71716900c8063dd21c813b",
+        "reviewer_run": "01a0c032-9bdd-7bd3-b8ec-dd1098eaafe9",
+        "verdict": "approved",
+        "blocking_findings": [],
+        "summary": "The recipe rejects equality and both containment directions for every selected source and the case before mkdir or verifier execution. The regression executes the documented recipe and checks that the missing source, nested output, and verifier marker remain absent. Broad-root output coverage and existing safeguards remain intact. Content is synthetic and public-safe. All 15 independent read-only containment checks passed; host acceptance was not rerun."
+      }
+    }
+  ],
+  "limitation": "These are revision-bound saved observations. Remote state was directly compared at checked_at; it is not live monitoring."
+}

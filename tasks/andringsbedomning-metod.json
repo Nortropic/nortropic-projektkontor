@@ -1,0 +1,21 @@
+{
+  "id": "office-change-assessment-recipe-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "ad3e7a1187cdfb52fbe58e38f07782774c415eff",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "allowed_paths": [
+    "tools/CHANGE_ASSESSMENT.md",
+    "tools/test_change_assessment.py"
+  ],
+  "attempt_seconds": 600,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md. Correct only the independently identified documented-recipe path overlap and regression test within the two allowed files. Reuse delivered core and all previous evidence. Runtime owns process checks, acceptance, review and publication. No installations or other source changes."
+    }
+  ],
+  "acceptance": "acceptance/andringsbedomning-metod.py",
+  "brief": "tasks/andringsbedomning-metod.md",
+  "acceptance_sha256": "4a0222c17fe3978876ecf0e7af2964a2a7f6dd6ea434d12537b595d44b1e4203"
+}

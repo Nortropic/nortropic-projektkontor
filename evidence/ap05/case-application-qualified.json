@@ -1,0 +1,21 @@
+{
+  "case_id": "map-layer-assessment-3",
+  "checked_at": "2026-09-20T19:02:16.299410+00:00",
+  "sources_checked": 1235,
+  "all_selected_sources_unchanged": true,
+  "complete_search": false,
+  "structure_valid": true,
+  "facts": 8,
+  "judgments": 4,
+  "decisions": 1,
+  "actions": 6,
+  "next_action": "NEXT_OWNER",
+  "map_write_authority": "not_granted",
+  "historical_assessment_retained": true,
+  "case_sha256": "179e43593f52b9a44a881b41adcc8cd525e2a001b07d61fc86366a21fe61ef2c",
+  "report_sha256": "99657954f38265b22cca20af13a849a04239ee2c99a2ebd59b0f2dfbb5a6ee78",
+  "check_sha256": "20326d0db7efd0058dde390a9ed223c8e2e6ec39b879bc114c4a9c9e11f8f093",
+  "code_sha256": "8f0f059447fec11c49435124c1dd72dcc2a7677d74d488e3c4328dfbb456dffc",
+  "limitation": "Unchanged since explicitly authored AP05 reference, not since FINAL-CHECK-1; supplied observation does not decide truth/authority/completeness.",
+  "interpreter": "/opt/homebrew/bin/python3.12"
+}

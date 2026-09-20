@@ -1,0 +1,8 @@
+{
+  "task": "office-change-assessment-1",
+  "candidate": "c4ac46ba3d14467a74680a4da5681c08eb1ce7ae",
+  "review": "review-1 rejected; repair allowed",
+  "additional_review": "ap05_contract_review, independently confirmed existing-tool CLI/host role defects",
+  "diagnosis": "Repair the independent review ISO8601 blocker for both created_at and checked_at, including valid compact calendar dates and compact timezone offsets, with regression tests. Also repair the independently reviewed method defects under the SAME accepted brief: the installed Runtime evidence_index CLI is exactly `python -B path/to/evidence_index.py verify ROOT`, reading the JSON manifest on STDIN, not a positional manifest argument. Set subprocess.run(input=json.dumps(manifest), text=True). Give the host verifier file path as an operator parameter; preserve expected manifest and error/mismatch handling. Real source reading, private case preservation and supervising this read-only utility are performed by the host using existing authorized access, NOT the Runtime candidate sandbox or engine. Runtime only builds/tests/reviews/publishes synthetic office code. No Runtime changes, new rights, or internal sources. The host independent method review bound document f0fab86d6f839faa992a27034a19ad5d00403712f8f3a4a5f2473a6c253486b0; validate the actual stdin recipe using synthetic fixtures. No scope expansion.",
+  "preservation": "Original attempt and review retained; same task/base/acceptance/write scope."
+}
