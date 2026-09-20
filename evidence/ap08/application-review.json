@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-20T22:10:40.004274+00:00",
+  "source_review": {
+    "reviewer": "/root/map_install_review",
+    "verdict": "approved",
+    "selected_sources": 13,
+    "scope": "Selected substantive claims, historical times and authority distinctions; no completeness or live availability assertion",
+    "resolved_findings": [
+      "Combined historical statement dated to later supporting receipt",
+      "Availability wording limited to referenced evidence"
+    ]
+  },
+  "presentation_review": {
+    "reviewer": "/root/ap06_handover",
+    "verdict": "approved",
+    "text_values_checked": 153,
+    "valid_fragment_links": 26,
+    "scope": "Actual private work snapshot and two controlled delivery proof files; final version checked separately"
+  },
+  "recipient": {
+    "receiver": "/root/ap08_recipient",
+    "fresh_context": true,
+    "surface": "Actual local HTML in existing Chrome, only its UI",
+    "observed": "Recovered usable capabilities, limits, observation age at generation, justified next action/responsible person and no-current-owner-decision; opened all13 evidence details and navigated internal plan/mandate links",
+    "limitations": "Model retrieval only; not owner personal comprehension, burden reduction, live state or independent verification of source truth"
+  },
+  "privacy": "Private inputs, source snapshots, report and full receipt remain excluded from Git; public file contains only controlled verification summary",
+  "remaining": "Final closed-phase private snapshot, exact documentary integration and final receipt are bound locally by the canonical plan"
+}

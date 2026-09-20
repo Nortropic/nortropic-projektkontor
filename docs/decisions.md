@@ -329,3 +329,36 @@ metodarmarna; effektivisering och minskad ägarbörda är inte belagda.
 befintliga bevis/läsning räcker och tillräckligt nästa steg. Tidigare beslut raderas
 inte. I07b:s bedömning gäller endast denna pilot; A3/A6 och tidigare fynd består.
 **Avslut:** integration och faktiskt slutkvitto enligt planen; ingen nästa fas startas.
+
+## AP08-ACCEPT — privat leverans- och beslutsbild
+
+Uttryckligt genomförandemandat: ägarens bifogade accept, fulltext och hash privat i
+evidence/ap08/local/accepted-mandate.md och acceptance-start.json. Genomför berett
+paket, inte ny förslagsrunda. Minsta presentation i kontorsrepot genom befintlig
+Runtime samt verklig privat sammanställning och mottagningsverifiering krävs.
+Kod, syntetiska exempel, anvisning och kontrollerade bevis får integreras skyddat;
+verklig ägarbild och privata underlag stannar Git-exkluderade lokalt.
+Planen äger nästa handling, Runtime körstate. Håll leverans/tillgänglighet,
+historiskt utfall/observerat arbetsläge och förslag/mandat isär. Bevarad ersatt
+väntan är inget aktivt hinder. Tekniska frågor inom mandatet bärs av kedjedrivaren.
+Rapporttid föryngrar inte observation; saknad observation är inte inaktivitet.
+Rena läsningar, ingen server/bevakare eller godkännandefunktion. Separat kontroll
+mot verkliga källor, riktade negativa fixturer och färsk mottagare krävs. Modellprov
+bevisar inte ägarens begriplighet/arbetsbesparing; ingen obligatorisk ägarintervju.
+Inga Runtime-ändringar, nya tjänster/kostnader/rättigheter/repon eller valvskrivningar.
+AP07 frivilligt ANPASSA; tidigare leveranser och auditstatus bevaras. Kedjedrivaren
+driver tekniska delsteg utan rutinfrågor och stannar efter verifierat avslut.
+
+## AP08-LEVERANS — redovisningsförmåga inom avgränsat mandat
+
+Minsta presentationsfunktion är byggd, provad, separat granskad och skyddat
+integrerad genom befintlig Runtime. Verklig privat sammanställning och färskt
+modellbaserat UI-mottagarprov ingår i tillämpningsbeviset. Kontrollerad
+slutredovisning och privat kvitto binder fasens slutläge enligt planen.
+
+Utfallet ger en återöppningsbar svensk läsleverans; det bevisar inte ägarens
+personliga begriplighet, tidsbesparing eller minskade samordningsbörda. Plan och
+Runtime behåller sina roller. Ingen ny skyldighet att godkänna varje fil eller
+ständig bevakning införs. Presentation, formatkontroll och oförändrade hashvärden
+är inte sakgodkännande, driftstatus eller mandat. Tidigare auditstatus och AP07
+ANPASSA påverkas inte. Nästa fas kräver ett eget accepterat mål.

@@ -64,3 +64,14 @@ passar och när läsning eller befintliga bevis räcker. [Tillämpning och jämf
 visar självständigt provval, fungerande kontrast och samma beslut i grundarmarna.
 Ingen tidsvinst, minskad ägarbörda eller ny obligatorisk kontroll är visad eller införd.
 Aktuellt läge och nästa handling finns som tidigare endast i [planen](docs/plan.md).
+
+## AP-08 — privat leverans- och beslutsbild
+
+Kontoret kan lämna en lokalt öppningsbar svensk sammanställning av valda
+leveranser, begränsningar, observationer och nästa motiverade handling.
+[Anvisningen](tools/AGARBILD.md) beskriver den levererade presentationsfunktionen;
+[leveransredovisningen](evidence/ap08/leverans.md) binder prov och räckvidd.
+Kedjedrivaren sköter sammanställningen enligt planen. Den verkliga privata
+ingången återfinns lokalt via `evidence/ap08/local/LAS-MIG.md`; den ingår inte i
+en publik klon. Rapporten är daterad, inte live. Läsning ger inga befogenheter,
+startar inget arbete och skickar inga godkännanden.
