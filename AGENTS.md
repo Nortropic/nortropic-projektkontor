@@ -15,11 +15,13 @@ Beslut raderas inte: en ersatt post märks SUPERSEDED med pekare till ersättare
 Mottagare och granskare svarar i sessionen; värden bevarar deras protokoll.
 Dessa är dokumenterade arbetsregler, inte tekniskt påtvingade skrivspärrar.
 
-Kampanjen, Runtime, syskonrepon och Obsidian-valvet är skyddade: läs endast det
-uppdraget behöver, ändra aldrig där. Ingen installation, köpt tjänst, ny extern
-behörighet, Runtime-körning eller ändrad global inställning ingår. Publicera bara
-B-4:s tillåtna innehåll efter kontroll inför varje uppladdning; inga andra
-korpusutdrag, nycklar, lokala konfigurationer eller absoluta lokala sökvägar.
+Kampanjen, övriga syskonrepon och Obsidian-valvet är skyddade. AP04-ACCEPT
+medger endast den specificerade målrepoanpassningen i Runtime och körning genom
+befintlig Runtime. Läs uppdragets exakta tillstånd före arbete. Publicera endast
+fasens kontrollerade kod, tester, nödvändiga underlag och bevis; inga privata
+källsamlingar, råsessioner, nycklar eller lokala konfigurationer. Status/resultat
+är rena läsningar. Kandidaten får aldrig ändra sin aktiva körväg eller acceptans.
+Separat granskning och verifierat serverskydd krävs före integration.
 
 Commit löpande. Bevara väntan, diagnos, evidens och nästa kommando i planen före
 avbrott. Avbryt hängande anrop; inga blinda omförsök. Vid upprepat samma fel:

@@ -1,3 +1,62 @@
+# Uppdrag — AP-04: körbar uppdragsfunktion
+
+Aktivt byggmandat: ägarens accept i denna session, återgiven i
+`docs/decisions.md` under AP04-ACCEPT. Etableringen är avslutad vid
+`cbd729051327c7cee05cae15b7d86de41cd2a38e`; dess underlag och prov bevaras.
+Nortropics definition är oförändrad i `DEFINITION.md`.
+
+## Leverans och tillstånd
+
+En lokal ingång i detta repo ska starta, visa läge, återuppta och hämta resultat
+för accepterade utvecklingsuppdrag genom befintlig Runtime. Runtime ensam äger
+körningens tillstånd, återupptagning, granskning och publiceringsgrindar.
+Status och resultat läser bara; de visar observationstid, inaktualitet och
+saknade bevis utan att starta modeller, signalera eller publicera.
+
+Kedjedrivaren äger teknisk uppdelning, diagnos, granskning, integration och
+bevarande inom denna fas. Ägaren ska inte bära kommandon, kör-id eller fynd.
+Först etableras och separat granskas startkopplingen och den namngivna
+målrepoanpassningen. Sedan bygger Runtime resultatfunktionen genom denna väg.
+Kandidatens skrivrätt omfattar aldrig aktiv körväg, fryst acceptans eller
+publiceringsbehörighet. Resultatets egen utskrift är inte ensam bevisning.
+
+Tillåtna arbetsytor: detta repo och endast nödvändig målrepoanpassning i
+`Nortropic/nortropic-runtime` (inläsning, frysta underlag, kandidatbygge,
+instruktioner, skrivgränser, publicering, berörda tester och dokumentation).
+Kampanjen och alla övriga syskonrepon förblir orörda. Ingen ny motor,
+scheduler, daemon, ytterligare målrepo, tjänst, kostnad eller kontobehörighet.
+
+Fasens kod, tester, nödvändiga uppdragsunderlag och kontrollerade bevis får
+publiceras i befintliga publika repon efter kontroll av allt som överförs.
+Inga interna källsamlingar, rå sessioner, hemligheter eller privat innehåll.
+Kontorets main skyddas före första integrationen; värdpubliceraren får göra PR,
+rapportera verkliga kontroller och integrera godkända kandidater utan ägarsteg.
+Skydd får inte kringgås. Separat granskning krävs även för startkopplingen.
+
+## Klart-när
+
+- Startingången används för verkligt resultatfunktionsbygge genom Runtime.
+- Exakt kandidat har godkända tester och separat granskning utan blockerare,
+  följt av verifierad skyddad integration i kontorsrepot.
+- Resultatfunktionen återger verklig revision/bevis och falsifieras mot saknade,
+  felaktiga och otillgängliga underlag; faktiska körbevis och fjärrintegration jämförs.
+- Relevant avbrott och återupptagande av samma arbete visas utan dubbel
+  publicering/konkurrerande skrivare; färsk mottagare kan ta över ur bevarat läge.
+- Negativa fall prövar fel mål, otillåtna skrivningar, ändrad acceptans,
+  inaktuell bas och utebliven godkänd granskning.
+- Slutbevis binder faktiskt använda revisioner i båda repon. Arbetsläge och
+  kontrollerade bevis är bevarade och återlästa. Giltiga tidigare prov återanvänds.
+
+A3/A6 och tidigare auditfynd ändras inte av accepten. Berörda krav grundas i
+lästa original/beslut, inte en okontrollerad kompilering. Relevanta blockerare
+hanteras i paketet; ingen totalgranskning beställs. När villkoren är uppfyllda:
+redovisa funktion, båda revisioner, bevis, begränsningar och rekommenderad
+fortsättning; starta ingen nästa fas automatiskt.
+
+---
+
+## Historik — avslutad etablering (tidigare aktivt uppdrag)
+
 # Uppdrag — första byggfasen: ett hem för ägarens beslut
 
 Aktiv hemvist för den accepterade arbetsordern UPPDRAG-TILL-CODEX,

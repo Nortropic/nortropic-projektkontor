@@ -1,3 +1,41 @@
+# Levande plan — AP-04
+
+AKTUELLT STEG: Etablera minimal startkoppling och Runtime-anpassning till
+Nortropic/nortropic-projektkontor enligt AP04-ACCEPT. Fas 1 är avslutad.
+
+NÄSTA HANDLING: Implementera och testa intag, namngivet mål, frysta underlag,
+exakta skrivgränser, läsande observation och kontorets start/status/fortsätt.
+Separat granska exakta kandidater innan skyddad integration och första modellkörning.
+
+ÅTERUPPTAGNINGSPUNKT: Läs uppdrag och AP04-ACCEPT; kontrollera båda repos Git,
+bevis och processer före skrivövertagande. Kontor: work/ap04-start från cbd7290;
+Runtime: work/ap04-target från a941207. Codex är ensam byggskrivare; separat
+ap04_review granskar endast läsande. Ingen Runtime-körning har startats.
+Runtime finns nu i syskonkatalogen `Nortropic Runtime`; gamla hemrelativa
+sökvägar i etableringens historik beskriver det då dokumenterade läget.
+
+## Byggordning
+
+1. Startkoppling och målrepoanpassning, riktade negativa prov, separat granskning.
+2. Verifiera main-skyddet. Integrera granskade startkandidater i båda repon.
+3. Frys accepterat resultatfunktionsuppdrag i kontorsrepot. Starta via kontorets
+   ingång; bevara faktiskt avbrott/diagnos och återuppta samma uppdrag.
+4. Runtime testar, separat granskar och integrerar resultatfunktionen.
+5. Jämför resultat med riktiga körbevis/fjärrrevision, prova läsningars sidoeffektfrihet,
+   färsk överlämning och bevarande. Slutgranska och redovisa; stanna.
+
+## Bevis och begränsningar
+
+Etableringens bevis under evidence/entry bevaras oförändrade. Runtime v0.1 och
+review-continuation återanvänds inom sin räckvidd. Ny fas får evidence/ap04;
+rådata förvaras endast lokalt i Git-exkluderad local/. Inga nya PASS påstås ännu.
+GitHub visar publikt kontorsrepo, befintlig adminåtkomst och oskyddad main vid start.
+Skyddet ska införas och verifieras före integration. A3/A6 och auditfynd är oförändrade.
+
+---
+
+## Historik — etableringens slutplan (avslutad)
+
 # Levande plan — besluthemmet
 
 AKTUELLT STEG: Avsluta fas 1 med separat kontrollerad slutredovisning och sista bevarandet. Definition, beslut, arbetsform, P1, P3, dokumentgranskning och första verifierade publicering är levererade; slutkandidaten ska också bindas till fjärrrevision och lokalt arkiv före byggarens slutbesked.

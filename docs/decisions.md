@@ -180,3 +180,43 @@ Plats: Nortropic/nortropic-runtime, `docs/UPPDRAG-NORTROPIC-RUNTIME.md` och
 läsning före skrivövertagande och separat granskning av konkret kandidat.
 **Påverkar:** hemvisterna i detta repo och provprotokollen. Ingen extern metodmall,
 metodplattform eller certifiering påstås. **Ersätter:** ingenting.
+
+## AP04-ACCEPT — accepterat byggbeslut, 2026-09-20
+
+**Status:** aktivt byggmandat. **Grund:** ägarens direkta accept i Codex-sessionen
+som följer det samlade AP-04-förslaget. Följande är byggarens återgivning,
+inte ett ordagrant citat. Full funktion och klart-när står i docs/uppdrag.md.
+
+Ägaren accepterar körbar uppdragsfunktion i Nortropic/nortropic-projektkontor
+för start, läge, återupptagning och resultat genom Runtime och ger fyra tillstånd:
+(1) implementera, testa, dokumentera, separat granska och integrera funktionen;
+kedjedrivaren delar själv upp uppgifter inom mål/acceptans; (2) ändra Runtime
+endast för namngiven repokoppling, inläsning, frysta underlag, kandidatbygge,
+instruktioner, skrivgränser, publicering och berörda tester/dokumentation;
+bevara historiker/bevis, lämna kampanj och andra repon orörda; (3) publicera
+fasens kod, tester, nödvändiga uppdragsunderlag och kontrollerade bevis efter
+kontroll före varje överföring, aldrig interna källsamlingar, råsessioner,
+hemligheter eller privat innehåll; (4) etablera erforderligt main-skydd och ge
+Runtime-värden rätt att göra PR, rapportera verkliga kontroller och integrera
+efter godkända grindar utan rutinmässiga ägarbesked. Skydd verifieras först.
+
+Preciseringar: en motor; status/resultat får inte starta modeller, signalera
+fortsättning eller publicera, och ska visa inaktualitet/otillgänglighet. Först
+minimal startkoppling och målrepoanpassning med separat granskning; sedan ska
+Runtime genom denna väg bygga resultatfunktionen och bära tester, separat
+review och skyddad integration. Kandidaten får inte ändra aktiv körväg,
+acceptans eller publiceringsrätt för sitt försök. Egen utskrift räcker inte
+som bevis; jämför körbevis och fjärrintegration. Bind slutbevis till båda
+faktiskt använda revisioner. Visa riktig leverans, relevant avbrott/återgång
+och negativa repoövergångsfall; återanvänd giltiga prov utan totalgranskning.
+Kedjedrivaren håller samman arbetet; ägaren bär inte kommandon, kör-id eller
+fynd. Spara accept och konkret levande plan i befintliga hemvister för nästa
+Claude/Codex. Fortsätt självständigt utan rutinfrågor eller projekttidsgräns;
+hängningar/blinda omförsök hanteras. Inga nya konton, kostnader, organisations-
+behörigheter, målrepon, daemoner eller ytterligare verksamhetsfunktioner.
+A3/A6 och auditfynd påverkas inte. Vid verifierad leverans: redovisa funktion,
+revisioner, bevis, begränsningar, rekommendera fortsättning och stanna.
+
+**Ersätter framåt:** etableringens begränsning till dokumentarbete och dess
+förbud mot Runtime-arbete, endast inom ovanstående AP-04-omfattning. B-1–B-5
+och deras historiska räckvidd bevaras; definitionen ändras inte.
