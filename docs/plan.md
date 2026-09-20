@@ -1,18 +1,22 @@
 # Levande plan — AP-05
 
-AKTUELLT STEG: Frysta syntetiska byggunderlag är färdiga och separat
-granskat kontraktsfynd rättat; verkligt källurval är bundet lokalt. AP-04 är avslutad vid kontor 17ce93a / Runtime 2789ea0;
-slutkvittot finns i evidence/ap04/local/. Starta inte dess uppdrag igen.
+AKTUELLT STEG: Runtime bygger kodstödet i isolerad kandidat. Uppdraget startades
+via kontorets ingång; snapshot visade running_codex, försök 1. Värden bedömer
+parallellt kartärendet på denna gren och ändrar inga kandidatfiler.
 
-NÄSTA HANDLING: Starta AP-05 genom tools/kontor.py start --task andringsbedomning.json
-när värdacceptans och brief är granskade och committade. Kandidatbas 17ce93a
-förblir remote main tills Runtime har integrerat kodstödet.
+NÄSTA HANDLING: Läs status och faktiska körbevis för office-change-assessment-1;
+hantera eventuell väntan med konkret diagnos, annars invänta fryst acceptans,
+separat Runtime-granskning och skyddad integration. Kartbedömning v3 och publik falltext är separat sakgranskade utan blockerare.
+Efter kodintegration: kör verkliga fallet med kodstödet, verifiera negativa
+fixturfall och färsk mottagare, granska och integrera avslutet.
 
-ÅTERUPPTAGNINGSPUNKT: gren work/ap05; tasks/andringsbedomning.json, uppdrags-id
-office-change-assessment-1. Kontrollera Git, aktuell Runtime-status och tidigare
-skrivare före fortsatt arbete. Ingen körning startad ännu. Status/resultat är
-rena läsningar med --task andringsbedomning.json. Privat källmappning och
-mätningar finns i evidence/ap05/local/; publicera aldrig denna katalog.
+ÅTERUPPTAGNINGSPUNKT: gren work/ap05; inputrevision a218038b0952ab9d6b48f04bec4d231d5c16cbeb,
+tasks/andringsbedomning.json. `python3 -B tools/kontor.py status --task
+andringsbedomning.json` är ren läsning. `fortsatt` används bara efter diagnos
+av faktisk väntan. Kandidatbas 17ce93a; Runtime 2789ea0. Körbevis finns i Runtimes
+evidence/runs/office-change-assessment-1/. Privat källmappning och mätningar finns
+i evidence/ap05/local/; publicera aldrig denna katalog. Ingen hostintegration
+som flyttar main före Runtimes kodintegration.
 
 Ordning: fryst syntetiskt kontrakt → Runtime-bygge/test/review/integration →
 verklig tillämpning och separat sakgranskning → färsk mottagare → skyddad
@@ -20,8 +24,11 @@ integration av kontrollerad fallredovisning och slutbevarande. Värdens arbete
 på denna gren och modellens isolerade kandidat har skilda filer; ingen annan
 skriver i värdens arbetsyta. Inga Runtime-kodändringar. Gamla auditfynd öppna.
 
-Tidigt sakfynd: generator och kartkvitto har nya identiteter efter FINAL-CHECK-1.
-Pröva domens tillämplighet; flytta inte dess PASS tyst till dagens kandidat.
+Sakläge: generator/kvitto ändrade efter FINAL-CHECK-1. Ny read-only observation
+med separat reproduktion stödjer dagens rättelsetäckning, baslinjebevarande och
+lagergräns. cases/map-layer/assessment.md redovisar exakt återstående ägaromdöme
+och skrivbeslut. Privat aktuell version: evidence/ap05/local/map-case-v3.json;
+v1/v2 bevarade. Valvet och kampanjen är orörda.
 
 ---
 

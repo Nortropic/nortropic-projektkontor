@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "current_assessment": "map-layer-assessment-3",
+  "private_artifact_bindings": [
+    {
+      "artifact": "evidence/ap05/local/map-case-v1.json",
+      "sha256": "084cb9812bef0d8ecff9222816d62b7cdd8b9ba5ad9b176f01e58cc18d644a4a",
+      "publication": "local only; private mappings/content excluded"
+    },
+    {
+      "artifact": "evidence/ap05/local/map-case-v2.json",
+      "sha256": "156f5e20346e1f98fb9463175179735b0bdb55d8e23fb1b9dc3e7024725a6f64",
+      "publication": "local only; private mappings/content excluded"
+    },
+    {
+      "artifact": "evidence/ap05/local/map-case-v3.json",
+      "sha256": "179e43593f52b9a44a881b41adcc8cd525e2a001b07d61fc86366a21fe61ef2c",
+      "publication": "local only; private mappings/content excluded"
+    },
+    {
+      "artifact": "evidence/ap05/local/initial-source-observation.json",
+      "sha256": "71438432095b13f13fbd17f3eb7666237eca26d4453081f6df07615aaee02dee",
+      "publication": "local only; private mappings/content excluded"
+    },
+    {
+      "artifact": "evidence/ap05/local/current-map-check-v1.json",
+      "sha256": "d8e64b7d94f1554fa9da343b75fa4d54ea49b029a2ee1b39d05509246f9944ac",
+      "publication": "local only; private mappings/content excluded"
+    },
+    {
+      "artifact": "evidence/ap05/local/current-map-files-v1.json",
+      "sha256": "e383eb5d0a929b61be0543ce1265ba79753ac2528ffd53fa00873c6aefd8a46e",
+      "publication": "local only; private mappings/content excluded"
+    },
+    {
+      "artifact": "evidence/ap05/local/check_current_map.py",
+      "sha256": "c417840314560d631db9f476b7ed673f445a37d5ae82b5d98ba3a3bde1529b03",
+      "publication": "local only; private mappings/content excluded"
+    }
+  ],
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "historical_technical_sources": {
+    "generator_sha256": "6cd4755eae47c67d0491ea2fe68dab5224d3d57c9c0f9345699c3f65558032c3",
+    "receipt_sha256": "e5b5fc911b101915b6e65754501cb220dcbd6cd40c7f27d10726b6852a9d65e6"
+  },
+  "current_technical_sources": {
+    "generator_sha256": "68b395ef0688d2ae97ef156461c0baec1f68df2b7f17f324d67012a4a834d560",
+    "receipt_sha256": "850f55632f3c7a37722b5708c2449eb1a0ab59272cb8d358fbd16dd435a62c5d"
+  },
+  "observation_at": "2026-09-20T18:47:13.004973+00:00",
+  "independent_observation_at": "2026-09-20T18:49:11Z",
+  "measured": {
+    "baseline_identical": 938,
+    "candidate_files": 1199,
+    "added_inside_layer": 260,
+    "added_outside_layer": 1,
+    "lexical_utf8_files": 1194,
+    "excluded_historical_binary_files": 5,
+    "lexical_hits": 12
+  },
+  "publication_review": "Only scoped technical case conclusions, counts and digests. No original source text, topic/family names, private identifiers, absolute source roots or raw sessions. Local artifact names describe this assessment only. Hashes bind hidden evidence but do not disclose its bytes. Public readers cannot independently reproduce private source measurements without authorized source access.",
+  "limits": [
+    "No live vault read/write",
+    "No IR content audit or A3/A6 closure",
+    "No exact old/new generator diff",
+    "Lexical scope only",
+    "Selected sources, not exhaustive later-source discovery"
+  ]
+}

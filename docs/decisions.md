@@ -224,7 +224,7 @@ och deras historiska räckvidd bevaras; definitionen ändras inte.
 
 ## AP05-ACCEPT — accepterat byggbeslut
 
-**Status:** aktivt byggmandat. **Grund:** ägarens direkta accept i denna
+**Status:** accepterat byggmandat; leveransläge i planen. **Grund:** ägarens direkta accept i denna
 Codex-session efter AP-05-förslaget. Detta är byggarens sakliga återgivning,
 inte ett ordagrant citat. Ingen exakt klocktid tillskrivs ägaren.
 
