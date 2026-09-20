@@ -1,0 +1,280 @@
+# AP06 pure assignment preparation
+
+`assignment_preparation.prepare(case, check, spec)` compiles explicitly selected
+material into a **DRAFT**, even when `mechanical_complete` is true. It uses only
+Python's standard library and a normal sibling import of `change_assessment`.
+Use it with `tools/` on the Python import path. There is no CLI in this phase.
+
+The function is silent and deterministic for the supplied values. It does no
+filesystem, network or process operations, hashing, source discovery, Runtime
+invocation, acceptance generation or execution. It never modifies inputs or
+updates pinned versions. It returns detached dictionaries/lists suitable for
+JSON serialization. Invalid structures or contradictory bindings raise
+`ValueError`; structurally valid but incomplete preparation returns concrete gaps.
+
+## Trust and publication boundary
+
+AP06-ACCEPT authorizes the host's selection of technical work within the phase.
+It is not evidence this function authenticates. The function is a mechanical
+compiler, never a permission engine. Authored `granted` authority, matched lookup
+observations and unchanged selected sources are supplied claims, not grants or
+independent evidence produced by this function.
+
+AP05 checks applicability of selected dependencies. The agent still chooses
+requirements, judges contradictions and mandates, and reviews the sufficiency
+of observable tests. A nonempty observable passes only a text-presence check;
+its behavioral meaning and adequacy require human substantive review.
+
+`private` contains sensitive source metadata, claims, decisions, authority,
+quotes and complete inputs. **Do not publish the whole return value.** The
+`package` boundary uses explicit authored export fields and never automatically
+copies raw AP05 source/claim/action content or lookup identifiers/quotes into
+the worker brief. This is field selection, not content sanitization. Requirement
+IDs, texts and reasons, test IDs/observables/methods, every task value, and every
+`export` field are publication inputs. The host must review all their content,
+including paths, prompts and identifiers, for disclosure and misleading claims.
+A string checker cannot establish privacy or public safety. Authored Markdown
+is retained as text, not certified or made safe for arbitrary renderers.
+
+Comparisons apply only at the supplied `check.checked_at`. They do not establish
+freshness, exhaustive later-source discovery or continued validity. Reassessment
+does not automatically invalidate facts or revoke decisions/authority. The
+caller preserves earlier input and output versions; this core writes nothing.
+
+## Input schema
+
+Inputs are JSON-shaped Python values: objects are dictionaries, arrays are lists,
+and text is a string. Nonempty text means `str.strip()` is nonempty, but original
+text is retained without trimming. IDs are case-sensitive except the explicit
+task path alias rules below. Unknown object fields are errors. Missing fields
+are errors except for top-level fields *inside* `task`, where they become gaps.
+Booleans are not accepted as integers.
+
+### Existing AP05 inputs
+
+`case` and `check` use the existing AP05 schema without extensions. They are
+validated and assessed by `change_assessment.assess(case, check)`; AP06 does not
+duplicate timestamp, manifest, hash or per-source observation semantics. See
+[CHANGE_ASSESSMENT.md](CHANGE_ASSESSMENT.md) and the existing implementation.
+
+- `case`: exactly `schema, id, created_at, sources, claims, actions, next_action`.
+- Each source: `id, title, version, path, sha256, size`.
+- Each claim: `id, kind, text, reason, standing, sources`.
+- Each action: `id, text, reason, claims, authority`; authority has exactly
+  `status, scope, sources`.
+- `check`: exactly `checked_at, manifest, result`. The manifest has `version,
+  files`, with entries `path, sha256, size`. The result has `ok, files`, with
+  entries `path, status`. AP05 represents an omitted observation as `not_checked`.
+
+### Preparation specification
+
+`spec` has exactly these eight fields, all required:
+
+| Field | Value |
+| --- | --- |
+| `schema` | Integer `1` |
+| `action` | Nonempty ID selecting an existing case action, independently of `case.next_action` |
+| `references` | List of reference objects below; IDs unique within the list |
+| `reference_checks` | List of lookup observations below; IDs unique within the list |
+| `requirements` | List of derived requirement objects below; IDs unique within the list |
+| `tests` | List of test objects below; IDs unique within the list |
+| `export` | Authored worker-facing context below |
+| `task` | Supplied Runtime task draft below |
+
+Reference objects have exactly `{id, source, version, quote}`. All fields are
+nonempty strings except `quote`, which may be empty for a non-quote locator.
+`source` must select a case source, and `version` must exactly equal that source's
+pinned label. The identifier names the actual selected lookup; no random or
+fabricated reference identities are generated by the core.
+
+Reference checks have exactly `{id, source, version, sha256, quote, status}`.
+`id` selects an existing reference; `status` is exactly `matched`, `mismatch` or
+`not_checked`. The source, version and quote must equal that reference, and the
+SHA-256 must equal its selected source's pinned SHA-256. These are the expected
+lookup bindings for **all** statuses: `mismatch` reports a failed observation of
+that target, not a new target/hash/quote. Contradictory bindings, unknown IDs and
+duplicates raise `ValueError`. Missing observations, `mismatch` and `not_checked`
+produce gaps. Observations come from the host's existing lookup/quote tools;
+AP06 never fetches a link or executes code to establish a match.
+
+A matched lookup does not override AP05. A `changed`, `missing`, `unsafe` or
+`not_checked` source marks the reference as noncurrent, requiring reassessment
+even when its recorded lookup was matched. Each supplied reference must have a
+matched, bound observation, including references not linked to a requirement.
+
+Requirements have exactly `{id, text, reason, claims, references, tests}`:
+
+- `id`, `text`, `reason`: nonempty strings; only IDs must be unique.
+- `claims`: list of unique existing case claim IDs.
+- `references`: list of unique selected reference IDs.
+- `tests`: list of unique test IDs from this spec.
+
+Empty link lists are permitted but each creates its own gap. Unknown, duplicate
+or nonstring link IDs are errors. Requirements are authored derivations, not
+verbatim source facts. Their dependency set is the union of all linked claims'
+sources and all linked references' sources. Only requirements depending on a
+noncurrent source get a dependency-reassessment gap. Failed or absent reference
+observations and incomplete linked tests also produce requirement-specific gaps.
+An empty requirements list is a gap.
+
+Tests have exactly `{id, observable, method}`. `id` is nonempty; `observable` and
+`method` must be strings. Empty/whitespace-only observables and methods create
+separate gaps, including for unlinked tests. An empty tests list is a gap. A test
+link alone does not establish verification; the observable should describe the
+behavior/result the host intends to check. The core checks nonemptiness only.
+
+Export has exactly `{title, context, scope, limitations}`:
+
+- `title`: nonempty string.
+- `context`: list of objects with exactly `{kind, text}`; `kind` is `fact`,
+  `judgment`, `decision` or `authority`; `text` is nonempty.
+- `scope`, `limitations`: lists of nonempty strings.
+
+Empty context/scope/limitations lists each create a gap. This context is authored
+for export, separate from private AP05 content, and grouped by kind in the brief.
+Fixed caveats are always included even when authored limitations are empty.
+
+### Runtime task draft
+
+Only the following keys are permitted. Missing keys and null or empty values
+produce one specific gap per field. Empty means `None`, empty/whitespace-only
+string, empty list or empty dictionary. These values are retained exactly; no
+defaults, IDs, bindings, placeholders, files or digests are manufactured. False,
+zero and nonempty values are validated normally. In particular, integer zero is
+valid for `automatic_retries` and invalid for `attempt_seconds`.
+
+| Key | Nonempty value validation |
+| --- | --- |
+| `id` | String matching `[a-z0-9][a-z0-9-]{0,79}` |
+| `target` | Exactly `Nortropic/nortropic-projektkontor` |
+| `base` | Full 40-character lowercase hexadecimal revision |
+| `runtime_revision` | Full 40-character lowercase hexadecimal revision |
+| `allowed_paths` | List of unique, explicit safe paths under `tools/`; restrictions below |
+| `attempt_seconds` | Integer `1..3600` |
+| `automatic_retries` | Integer `0` |
+| `steps` | List of objects with exactly `{provider, prompt}`; provider exactly `codex`, prompt a nonempty string |
+| `acceptance` | Explicit safe relative path under `acceptance/` |
+| `acceptance_sha256` | Full 64-character lowercase hexadecimal digest supplied by the host |
+| `brief` | Explicit safe relative path under `tasks/` |
+
+Missing/extra step keys, empty step prompts and invalid step providers are errors;
+the empty-value gap rule applies to task fields, not the nested step schema.
+All paths match `[A-Za-z0-9_./-]+`, use the stated case-sensitive directory prefix,
+and have no empty, `.` or `..` components. Absolute paths, globs, trailing slashes,
+backslashes, spaces and control characters are rejected. Path duplicates are
+compared with `casefold()`. `tools/kontor.py` and
+`tools/assignment_preparation.py` are forbidden in `allowed_paths`, including
+case aliases such as `tools/KONTOR.py` on the qualified Mac filesystem.
+
+Path validation is lexical only. The pure core cannot establish regular-file
+type, absence of symlinks, current repository revisions, actual file bytes or
+technical rights. The host later uses Runtime's actual validator and freezes the
+reviewed bytes. The `acceptance` field is only a path and its digest only a supplied
+binding; no acceptance source/code is loaded, emitted, generated or executed.
+
+The chosen action requires an authored `granted` authority with source bindings
+and unchanged AP05 dependency coverage. Missing grant or changed/unchecked
+action dependencies create separate gaps. This check grants no permission and
+preserves the original authority status. AP05 itself rejects malformed granted
+authority without sources; AP06 does not weaken that existing schema.
+
+## Output schema
+
+Exactly five top-level keys:
+
+| Key | Meaning |
+| --- | --- |
+| `status` | Always `"draft"` |
+| `mechanical_complete` | Boolean `not gaps`; neither acceptance nor authority |
+| `gaps` | List of objects with exactly nonempty string `code` and `subject` |
+| `private` | Private assessment, original inputs and full traces below |
+| `package` | Worker-facing draft below, requiring host content review |
+
+`private` has exactly `assessment, case, check, spec, references, requirements`:
+
+- `assessment` is the unmodified AP05 report; `case`, `check`, `spec` are deep
+  copies of inputs, retaining full bindings and authored decisions/statuses.
+- `references` is in supplied reference order. Each entry has `ordinal` (one
+  based), `reference` (full object), `check` (full observation or null),
+  `source_status` (AP05 status), and `current` (matched and source `ok`).
+- `requirements` is in supplied requirement order. Each entry has `requirement`
+  (full object), `sources` (dependency union in case source order),
+  `affected_sources` (noncurrent subset), `unverified_references` (linked
+  references whose `current` is false), and `incomplete_tests` (linked tests
+  with empty observable/method). The AP05 report retains dependent claim details.
+
+`package` has exactly:
+
+- `brief`: Markdown containing a DRAFT banner, context separated by kind, scope,
+  derived requirements/reasons and test links, test observables/methods, gaps and
+  limitations. It includes explicit no-authority, selected-source-only, host
+  review/freezing and export-review caveats even when no gaps exist.
+- `task_draft`: deep copy of exactly the supplied task; omissions stay omitted.
+- `requirements`: list of objects containing **only** `id, text, reason, tests`.
+- `tests`: deep copy of the supplied tests.
+- `gaps`: detached copy of the top-level gaps.
+- `limitations`: nonempty list of fixed caveats followed by authored limitations.
+
+No raw AP05 facts/decisions/authority, source IDs/metadata/paths, private claim IDs,
+reference IDs/quotes or checks are rendered into this package. The explicit
+export fields may themselves contain sensitive content; that remains the host's
+publication responsibility.
+
+### Stable gap codes
+
+Subjects are public requirement IDs, public test IDs, task field names, or
+`reference:N` (one-based position in the supplied references list). `brief` is
+the public task-field subject for preparation-wide, context and action gaps.
+No private action, source, claim or reference identifier/path is used as a subject.
+Codes carry the specific missing condition; private traces provide source detail.
+
+| Code | Subject | Condition |
+| --- | --- | --- |
+| `requirements_empty` | `brief` | No requirements |
+| `tests_empty` | `brief` | No tests |
+| `requirement_claims_empty` | Requirement ID | No claim links |
+| `requirement_references_empty` | Requirement ID | No reference links |
+| `requirement_tests_empty` | Requirement ID | No test links |
+| `requirement_dependencies_need_reassessment` | Requirement ID | A dependency is not `ok` in AP05 |
+| `requirement_references_unverified` | Requirement ID | A linked lookup is absent, unmatched or depends on a noncurrent source |
+| `requirement_verification_incomplete` | Requirement ID | A linked test has an empty observable or method |
+| `test_observable_empty` | Test ID | Observable empty/whitespace |
+| `test_method_empty` | Test ID | Method empty/whitespace |
+| `reference_check_missing` | `reference:N` | No supplied observation |
+| `reference_check_mismatch` | `reference:N` | Host reports mismatch |
+| `reference_check_not_checked` | `reference:N` | Host reports not checked |
+| `reference_source_needs_reassessment` | `reference:N` | Source is not `ok`, even with matched lookup |
+| `export_context_empty` | `brief` | No authored context |
+| `export_scope_empty` | `brief` | No authored scope |
+| `export_limitations_empty` | `brief` | No authored limitations |
+| `task_field_missing` | Task field name | Key absent |
+| `task_field_empty` | Task field name | Supplied empty/null value |
+| `action_authority_missing` | `brief` | Selected action has no authored grant |
+| `action_dependencies_need_reassessment` | `brief` | Selected action's AP05 dependency coverage is not unchanged |
+
+Gaps are emitted deterministically: test fields, requirement link lists, empty
+requirements/tests, export lists, task fields in the table's order, action gaps,
+references in input order, then requirement dependency/verification gaps in input
+order. Multiple distinct conditions may coexist for one subject.
+
+## Synthetic verification and host handoff
+
+From the repository root, using an installed Python 3 interpreter:
+
+```sh
+python3 -B -m unittest discover -s tools -p 'test_assignment_preparation.py' -v
+```
+
+The tests construct all cases and repeated-character hashes in memory. They cover
+complete drafts, scoped changed/missing/unsafe/not-checked dependencies, unchanged
+recorded decisions, selected action coverage, lookup failures and contradictory
+bindings, exact schemas and IDs, empty verification and task bindings, invalid
+repositories/paths and case aliases, export privacy boundaries, deep-copy
+isolation, silence and absence of file/network/process/hash side effects.
+
+Runtime separately runs the frozen host tests in its native read-only sandbox,
+independent review and protected integration. These local tests do not claim
+those gates passed. The next Runtime candidate may use the integrated core to
+prepare the actual CLI assignment; it may not edit this active core or its own
+host inputs/acceptance. No changes to dependencies, host inputs, authority or
+Runtime are part of this three-file implementation.
