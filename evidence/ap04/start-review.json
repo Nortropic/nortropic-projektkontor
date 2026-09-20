@@ -1,0 +1,1 @@
+{"reviewer":"/root/ap04_review","runtime":"26cd64f668ea9ae8992bb878c5de86294396afee","office":"68ebffbd0b2eaf129121e38f0f671785ceae8ed0","verdict":"approved","blocking_findings":[],"resolved":"AP04-R1: cross-check actual attempt receipts, acceptance and candidate bytes; reject incomplete provider sequence","scope":"start connection only; real run and final acceptance pending"}

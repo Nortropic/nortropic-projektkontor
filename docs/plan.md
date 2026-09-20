@@ -1,18 +1,33 @@
 # Levande plan — AP-04
 
-AKTUELLT STEG: Etablera minimal startkoppling och Runtime-anpassning till
-Nortropic/nortropic-projektkontor enligt AP04-ACCEPT. Fas 1 är avslutad.
+AKTUELLT STEG: Startkopplingen är separat godkänd och skyddat integrerad.
+Runtime 09268df5f59a180afe863d4cf7f95c9ad95f8639 (PR15), kontor
+71e90f01f9ee3c8fb4ca003b879fc74bc4206b17 (PR1); integrerade träd/baser
+matchar granskade kandidater. Resultatuppdragets brief och acceptans är separat
+godkända och frysta i tasks/resultat.json, tasks/resultat.md, acceptance/resultat.py.
 
-NÄSTA HANDLING: Implementera och testa intag, namngivet mål, frysta underlag,
-exakta skrivgränser, läsande observation och kontorets start/status/fortsätt.
-Separat granska exakta kandidater innan skyddad integration och första modellkörning.
+NÄSTA HANDLING: Efter kontroll av bevarade inputs och att inga gamla skrivare
+lever, kör `python3 -B tools/kontor.py start`. Uppdrag office-result-1 ska först
+utsättas för ett dokumenterat kontrollerat avbrott av sitt första försök efter
+verifierad processidentitet. Inspektera dess kvitto/processavslut, bevara diagnos
+och använd `python3 -B tools/kontor.py fortsatt --diagnosis "..."` för samma uppdrag.
+Ingen blind ny start. Därefter hanteras eventuella test-/granskningsfynd inom uppdraget.
 
-ÅTERUPPTAGNINGSPUNKT: Läs uppdrag och AP04-ACCEPT; kontrollera båda repos Git,
-bevis och processer före skrivövertagande. Kontor: work/ap04-start från cbd7290;
-Runtime: work/ap04-target från a941207. Codex är ensam byggskrivare; separat
-ap04_review granskar endast läsande. Ingen Runtime-körning har startats.
-Runtime finns nu i syskonkatalogen `Nortropic Runtime`; gamla hemrelativa
-sökvägar i etableringens historik beskriver det då dokumenterade läget.
+ÅTERUPPTAGNINGSPUNKT: Kontor work/ap04-result-task; Runtime main vid ovanstående
+pinnade revision, rent. Kör-id office-result-1, underlag tasks/resultat.json.
+`python3 -B tools/kontor.py status` är en läsning; `fortsatt` är en aktiv handling.
+Codex är kedjedrivare. Kontrollera Runtime evidence/runs/office-result-1 och
+.runtime/tasks/office-result-1 samt processer innan skrivansvaret tas över.
+Raw sessions sparas enbart lokalt, aldrig i offentligt Git. Om katalogerna ännu
+saknas är uppdraget inte startat. Om de finns får start inte upprepas.
+
+Granskning /root/ap04_review godkände Runtime 26cd64f och kontor 68ebffb;
+AP04-R1 rättat (verkliga försökskvitton krävs). 28 Runtime-prov och 3 kontorsprov
+PASS. GitHub nekade kontorsmerge utan obligatoriska statusar med HTTP405,
+"2 of 2 required status checks are expected". Därefter korrekta statusar och
+skyddad squashintegration. Underlagsgranskning rättade två acceptansluckor
+(import-I/O och gemensamma returfält); slutlig acceptans SHA256 5f193ad4...
+godkänd, tre native I/O-negativprov PASS. Detta är ännu inte AP04-slutleverans.
 
 ## Byggordning
 

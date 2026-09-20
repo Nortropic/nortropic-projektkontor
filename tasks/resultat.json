@@ -1,0 +1,21 @@
+{
+  "id": "office-result-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "71e90f01f9ee3c8fb4ca003b879fc74bc4206b17",
+  "runtime_revision": "09268df5f59a180afe863d4cf7f95c9ad95f8639",
+  "allowed_paths": [
+    "tools/kontor_result.py",
+    "tools/test_kontor_result.py"
+  ],
+  "attempt_seconds": 600,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md and implement its complete accepted result-retrieval contract in the two allowed files. Runtime owns startup, process checks, external acceptance, independent review and publication; do not perform operator startup or edit host authority. You may use existing Python to check your implementation. Do not install dependencies. The host will preserve and diagnose interruption; continue the same task if an earlier attempt left partial code."
+    }
+  ],
+  "acceptance": "acceptance/resultat.py",
+  "brief": "tasks/resultat.md",
+  "acceptance_sha256": "5f193ad4f0648ed7532b78e315c31d8bda3c6ba16c01517143c273b7477d83c1"
+}
