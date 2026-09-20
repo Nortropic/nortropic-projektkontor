@@ -1,0 +1,22 @@
+{
+  "id": "office-assignment-cli-2",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "dd1f8c56456b575f017219621402658b5200c592",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "allowed_paths": [
+    "tools/bered_uppdrag.py",
+    "tools/test_bered_uppdrag.py",
+    "tools/BERED_UPPDRAG.md"
+  ],
+  "attempt_seconds": 1200,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md. Reconstruct the three retained Runtime-authored reference files provided there, retaining bytes unless a concrete R1-R7 violation requires correction. The host corrected only its import launcher. Do not add product workarounds for the old host bug. Run synthetic tests; Runtime performs corrected frozen acceptance, fresh independent review and protected integration. Core/host authority remain read-only."
+    }
+  ],
+  "acceptance": "acceptance/uppdragsberedning-cli-continued.py",
+  "brief": "tasks/uppdragsberedning-cli-continued.md",
+  "acceptance_sha256": "ef0950d8fb00a7d4c597634d0ff3bc5807642ee09f2ec065b943cb3b1c866dd1"
+}

@@ -1,0 +1,22 @@
+{
+  "checked_at": "2026-09-20T20:41:58.923350+00:00",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "runtime_tracked_changes": [],
+  "tasks": [
+    "office-assignment-core-1",
+    "office-assignment-cli-1",
+    "office-assignment-cli-2"
+  ],
+  "superseded_native_wait": {
+    "task": "office-assignment-cli-1",
+    "phase": "waiting_diagnosis",
+    "reason": "Immutable erroneous host launcher; replaced by separately frozen CLI2. No process remains; do not resume."
+  },
+  "unfinished_recorded_writers": false,
+  "database_backup_integrity": "ok",
+  "archive": "evidence/ap06/local/native-ap06.tar.gz",
+  "archive_sha256": "be1d421638664a269938b453204f9511a9193cb3a0a774fd21b6b337fab6e732",
+  "regular_files_reread": 1131,
+  "reread_verified": true,
+  "scope": "Private archive of AP06 task workspaces, complete execution/review histories and consistent canonical DB backup. No raw sessions/DB published. Earlier histories remain in canonical state. Same-disk preservation is not disaster recovery."
+}

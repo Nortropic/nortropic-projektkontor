@@ -38,9 +38,20 @@ saknat underlag markerar berörda slutsatser för omprövning; verktyget fattar 
 beslut och ger inga tillstånd. Befintligt Runtime-verktyg mäter filerna, värden
 läser verkliga källor och bevarar privata ärenden lokalt.
 
-[Det verkliga kartärendet](cases/map-layer/assessment.md) redovisar tidigare beslut,
-nya avgränsade observationer och exakt återstående ägaromdöme/skrivbeslut.
+[Det verkliga kartärendet](cases/map-layer/assessment.md) bevarar AP-05:s dåvarande
+bedömning. Den senare kartleveransen är avslutad; öppna den inte på nytt ur denna
+historiska falltext. Aktuellt läge ägs av planen.
 [AP-05:s leveransbevis](evidence/ap05/leverans.md) anger körning, granskning och
 begränsningar. Endast kontrollerad fallredovisning är publik; intern källmappning
 och original ligger i den lokala, Git-exkluderade evidensdelen. Nästa handling
 ägs fortsatt av [planen](docs/plan.md), inte av en parallell ärendemotor.
+
+## AP-06 — källbunden uppdragsberedning
+
+[Användning och exempel](tools/BERED_UPPDRAG.md) är ingången till det lokala
+kommandot. Det sammanställer valda underlag till ett nytt privat utkastspaket,
+med spårbara krav/skäl/prov och konkreta luckor. Kedjedrivaren väljer och bedömer
+underlag, sakgranskar och fryser uppdraget före AP04:s Runtime-start; inga
+rutinmässiga ägarbesked införs. Beredningen startar aldrig Runtime eller ger mandat.
+[Leverans och bevis](evidence/ap06/leverans.md) beskriver det verkliga uppdrag
+som kärnan beredde och Runtime genomförde. Nästa handling finns endast i planen.

@@ -1,3 +1,41 @@
+# Uppdrag — AP-06: källbunden uppdragsberedning
+
+Gällande mandat: AP06-ACCEPT i docs/decisions.md. Full ägartext bevaras privat i
+evidence/ap06/local/accepted-mandate.md. Definitionen ändras inte.
+
+Leverera en återanvändbar mekanisk beredning av agentens valda källor, bedömda krav,
+beslut, handlingsspecifika mandat och observerbara prov till ett tydligt utkast.
+AP05:s källkontroll och Runtimes faktiska taskformat återanvänds. Komplett format
+eller oförändrat underlag är varken sakgodkännande, äkthetsbevis eller befogenhet.
+Saknade grunder blir konkreta luckor; inga uppdiktade revisioner/verifierare/mandat.
+Beredningen startar inte Runtime, publicerar inte och aktiverar ingen acceptans.
+Sakgranskning utförs av behörig kedjedrivare och separat granskare; kärnmetodens
+ord "human substantive review" inför ingen ny rutinmässig ägargrind. Ägaren
+tillfrågas endast vid verklig ändring av mål, kostnad eller befogenhet.
+
+Byggordning: Runtime bygger minsta kärna med syntetiska prov; separat granskning
+ och skyddad integration. Kedjedrivaren använder den levererade kärnan för det
+verkliga återstående CLI-/ändpunktsuppdraget inom AP06, granskar innehåll och fryser
+värdacceptans. Runtime bygger/testar/granskar/integrerar det uppdraget utan
+skrivrätt till kärnan, egna värdindata eller acceptans. Bevara hela spårkedjan.
+
+Tillåtet: kontorskod, tester, metod, uppdragsunderlag och kontrollerade bevis i
+befintligt publikt kontorsrepo; privat källäsning/bevarande i befintlig hemvist.
+Ingen Runtime-kodändring, ny tjänst/kostnad/behörighet/repo, kampanj-/IR-/valvskrivning.
+Interna kopior, råhistorik och privat information publiceras inte, inte heller via
+sammanfattningar, identifierare eller sökvägar. Kartleverans och tidigare fynd öppnas inte.
+
+Klart-när: legitim och negativa fall prövar referenser, källa/version/citat,
+mandatgrund, observerbara prov och mål; separata fakta/omdömen/beslut/befogenheter;
+verkligt berett CLI-uppdrag genomförs via AP04 och skyddas; kod och innehåll
+separat granskas; färsk mottagare finner fortsättningen; slutbevis binder revisioner,
+bevis, kvarstående manuellt omdöme och begränsningar. Ingen omätt tidsvinst påstås.
+A3/A6 och tidigare fynd stängs inte. Ingen ny fas startas efter slutredovisningen.
+
+---
+
+## Historik — avslutat AP-05-uppdrag
+
 # Uppdrag — AP-05: beslutsbunden ändringsbedömning
 
 Gällande mandat: [AP05-ACCEPT](decisions.md#ap05-accept--accepterat-byggbeslut).

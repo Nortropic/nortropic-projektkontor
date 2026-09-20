@@ -1,0 +1,67 @@
+{
+  "checked_at": "2026-09-20T20:41:34.504041+00:00",
+  "candidate": "2b7939a6c31662f7e948996c8d09af5c714de8f0",
+  "integration": "8e5f1c07a79ff288fc8e0a646bb9f7eb66a58f44",
+  "method_sha256": "0ed526e04d4734c38f1cfb841b746b9ac3b088480f3dd87a7b9414a2d05058a8",
+  "documented_examples": [
+    {
+      "document_block": 1,
+      "exit_code": 0,
+      "stdout": [
+        {
+          "status": "draft",
+          "mechanical_complete": true,
+          "gaps": [],
+          "files": [
+            "private.json",
+            "package.json",
+            "task.draft.json",
+            "brief.draft.md"
+          ]
+        }
+      ]
+    },
+    {
+      "document_block": 2,
+      "exit_code": 2,
+      "stdout": [
+        {
+          "status": "draft",
+          "mechanical_complete": false,
+          "gaps": [
+            {
+              "code": "action_dependencies_need_reassessment",
+              "subject": "brief"
+            },
+            {
+              "code": "reference_source_needs_reassessment",
+              "subject": "reference:1"
+            },
+            {
+              "code": "requirement_dependencies_need_reassessment",
+              "subject": "R1"
+            },
+            {
+              "code": "requirement_references_unverified",
+              "subject": "R1"
+            }
+          ],
+          "files": [
+            "private.json",
+            "package.json",
+            "task.draft.json",
+            "brief.draft.md"
+          ]
+        },
+        {
+          "error": "Preparation failed: invalid command, input, or output."
+        }
+      ]
+    }
+  ],
+  "repeat_refused_unchanged": true,
+  "missing_selected_fixture_stayed_missing": true,
+  "interpreter": "Existing qualified Python3.12 selected as permitted by method",
+  "fixture_versions": "Fresh synthetic version names chosen to preserve prior examples",
+  "scope": "Actual Markdown shell examples executed in existing native sandbox; no original source mutation or Runtime invocation. Endpoint suite results reused from frozen acceptance, not redundantly rerun."
+}

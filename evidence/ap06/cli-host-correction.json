@@ -1,0 +1,20 @@
+{
+  "id": "AP06-CLI-HOST-PROBE-1",
+  "at": "2026-09-20T20:36:20.489791+00:00",
+  "superseded_task": "office-assignment-cli-1",
+  "observed_phase": "waiting_diagnosis",
+  "old_acceptance_passed": false,
+  "candidate": "bb1811009962d81ae58ded06ddbc24a76908b7b1",
+  "candidate_files_sha256": {
+    "tools/bered_uppdrag.py": "6e2919114262b5c7978e759f79ab8f00c52b247be48cdb8cbc2b9513b0f033fc",
+    "tools/test_bered_uppdrag.py": "6c55c48a076135641f24f8c7a76166442406d95135377dbf17db76815448faeb",
+    "tools/BERED_UPPDRAG.md": "0ed526e04d4734c38f1cfb841b746b9ac3b088480f3dd87a7b9414a2d05058a8"
+  },
+  "cause": "Frozen host launcher removed standard script-directory import context through -I/runpy. Actual ModuleNotFoundError matches independently diagnosed harness defect. Not a demonstrated R1 product failure.",
+  "correction": "Add only the controlled CLI parent to child sys.path before runpy, preserving -I, audit hook, native sandbox and all acceptance assertions.",
+  "reviewer": "/root/ap06_case_review",
+  "old_inputs_immutable": true,
+  "replacement_task": "office-assignment-cli-2",
+  "policy": "Do not resume old flawed verifier or change frozen bytes; new within-AP06 technical task with reviewed inputs, same allowed scope/base and Runtime-built candidate reference.",
+  "prior_contract_review_correction": "V2 approval missed host launcher context; corrected on this precise point, not a broader audit."
+}

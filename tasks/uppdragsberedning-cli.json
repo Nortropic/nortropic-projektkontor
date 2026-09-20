@@ -1,0 +1,22 @@
+{
+  "id": "office-assignment-cli-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "dd1f8c56456b575f017219621402658b5200c592",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "allowed_paths": [
+    "tools/bered_uppdrag.py",
+    "tools/test_bered_uppdrag.py",
+    "tools/BERED_UPPDRAG.md"
+  ],
+  "attempt_seconds": 1200,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Implement the accepted TASK.md in the three allowed CLI/test/method files. The delivered preparation core is read-only. Use only synthetic fixtures. Runtime owns tests, independent review and protected integration; do not access private sources or change host authority."
+    }
+  ],
+  "acceptance": "acceptance/uppdragsberedning-cli.py",
+  "brief": "tasks/uppdragsberedning-cli.md",
+  "acceptance_sha256": "f9cffaf1ff94afdc3cefbcfa6550069e591b601610d9bf052e9e1e6e22a4f03d"
+}

@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-09-20T20:40:02.549851+00:00",
+  "files_sha256": {
+    "tools/bered_uppdrag.py": "6e2919114262b5c7978e759f79ab8f00c52b247be48cdb8cbc2b9513b0f033fc",
+    "tools/test_bered_uppdrag.py": "6c55c48a076135641f24f8c7a76166442406d95135377dbf17db76815448faeb",
+    "tools/BERED_UPPDRAG.md": "0ed526e04d4734c38f1cfb841b746b9ac3b088480f3dd87a7b9414a2d05058a8"
+  },
+  "comparison": "Exact bytes match content-reviewed, synthetic/code/method reference in separately approved continued brief",
+  "scope": "Publication selection only: three allowed code/test/method files on reviewed public base; no private source collections, raw history or unselected host/map commits",
+  "authority": "AP06 scoped publication; independent Runtime tests/review/protection still required",
+  "privacy_limit": "Not a general automatic privacy certification; all authored prose, IDs and paths in this exact reference were reviewed"
+}

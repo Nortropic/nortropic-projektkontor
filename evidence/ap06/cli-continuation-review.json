@@ -1,0 +1,24 @@
+{
+  "reviewer": "/root/ap06_case_review",
+  "verdict": "approved",
+  "scope": "V3 technical continuation after explicitly corrected host launcher defect",
+  "blocking_findings": [],
+  "sha256": {
+    "tasks/uppdragsberedning-cli-continued.md": "d2279550faa73cb0caed2562e52b58e82ee65c6f77837bb50e5e96b8499ec51e",
+    "tasks/uppdragsberedning-cli-continued.json": "067b8f7b440fa041bba57837d028c50a79eb627d1120b4a3d64e28ddc56ca62e",
+    "acceptance/uppdragsberedning-cli-continued.py": "ef0950d8fb00a7d4c597634d0ff3bc5807642ee09f2ec065b943cb3b1c866dd1",
+    "evidence/ap06/cli-host-correction.json": "c62ab60f931c81cc8fbd99aaebd9b3e4bd7d0d1d8a0c346b7694f18efc42f341"
+  },
+  "correction_to_prior_approval": "V2 review missed removal of normal sibling-import context by isolated runpy launcher; actual failure preserved. Only controlled CLI parent restored; all sandbox/audit/acceptance assertions retained.",
+  "observations": [
+    "Old task/brief/acceptance immutable",
+    "Original six source bindings and R1-R7 retained, correction source explicitly added",
+    "Core independently reproduces V3, Runtime validates exact task",
+    "Three reference files byte-identical to retained Runtime candidate bb1811009962d81ae58ded06ddbc24a76908b7b1",
+    "Reference files content-reviewed: code, method and synthetic tests, not private source access"
+  ],
+  "limits": [
+    "Diagnostic probe observed, not rerun by this reviewer",
+    "Fresh full Runtime acceptance/review/integration required"
+  ]
+}
