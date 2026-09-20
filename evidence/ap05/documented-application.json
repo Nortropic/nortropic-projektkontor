@@ -1,0 +1,16 @@
+{
+  "case_id": "map-layer-assessment-3",
+  "checked_at": "2026-09-20T19:03:35.709157+00:00",
+  "sources_checked": 1235,
+  "all_selected_sources_unchanged": true,
+  "complete_search": false,
+  "map_write_authority": "not_granted",
+  "next_action": "NEXT_OWNER",
+  "method_sha256": "dd1dd5fd49b8c150397812ba2ed1e193f278dbc309df583a9e57eb90278fe773",
+  "code_sha256": "8f0f059447fec11c49435124c1dd72dcc2a7677d74d488e3c4328dfbb456dffc",
+  "case_sha256": "179e43593f52b9a44a881b41adcc8cd525e2a001b07d61fc86366a21fe61ef2c",
+  "report_sha256": "d985c2dc9f6471eeea371f0d73d1c4be82071746a8aec821617e0f5ae2f409a8",
+  "check_sha256": "6065faa61a4a2b45ac1c71ee38b7885a9a194a6dbbd09096269d336a7fb4d22c",
+  "interpreter": "Python 3.12",
+  "scope": "Executed final documented recipe verbatim using actual existing evidence_index and retained real case. Private root/mappings/output remain local."
+}

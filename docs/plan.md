@@ -1,23 +1,29 @@
 # Levande plan — AP-05
 
-AKTUELLT STEG: Kodstödet är Runtime-integrerat i PR4/ad3e7a1 efter tre försök
-med frysta prov och separat review. Verklig tillämpning (1235 bundna källor)
-och isolerade ändrat/saknat/unsafe-fixturer är godkända; valvskrivning kvarstår
-uttryckligen som not_granted. En kompletterande metodgranskning fann en
-kollisionslucka för output under saknad källsökväg; den rättas före fasavslut.
+AKTUELLT STEG: AP-05:s kodstöd och verkliga kartbedömning är verifierade.
+Runtime har skyddat integrerat huvudbygget i PR4/ad3e7a1 och metodrättelsen i
+PR5/f4deee4. Båda uppdragen är completed; inga nya körningar ska startas.
+Endast färsk mottagare, separat avslutsgranskning, skyddad integration av det
+kontrollerade dokument-/bevispaketet och slutligt arkivbevarande återstår.
 
-NÄSTA HANDLING: Starta det avgränsade tekniska rättelseuppdraget
-`python3 -B tools/kontor.py start --task andringsbedomning-metod.json` när dess
-frysta värdprov är granskat och committat. Huvuduppdraget är completed och får
-inte startas igen. Verifiera därefter slutkandidat, färsk mottagare och bevarande.
+NÄSTA HANDLING: Slutför just avslutet ovan. Bind publicerad slut-HEAD och
+återlästa GitHub-/lokalarkiv i evidence/ap05/local/final-<HEAD>.json. Om kvittot
+redan finns och matchar HEAD/origin/main är AP-05 avslutad: redovisa och stanna.
+Kartärendets följande handling är ägarens begriplighetsprövning och separat
+beslut om eventuell kartleverans enligt cases/map-layer/assessment.md; inget
+nytt principval I-11 och ingen kartskrivning inom AP-05.
 
-ÅTERUPPTAGNINGSPUNKT: gren work/ap05; huvuduppdrag office-change-assessment-1
-är completed, tre bevarade försök/reviews och en publicering. Rättelseuppdrag
- office-change-assessment-recipe-1 har bas ad3e7a1 och samma Runtime 2789ea0.
-Källor/fall v1-v3 ligger lokalt enligt evidence/ap05/local/case-history.json.
-Verkliga tillämpningen: evidence/ap05/local/application-v3/; syntetiskt värdprov:
-evidence/ap05/local/workflow-verification.json. Flytta inte remote main innan
-Runtime integrerat metodrättelsen. Fråga inte ägaren om detta tekniska delsteg.
+ÅTERUPPTAGNINGSPUNKT: gren work/ap05 fram till avslutsintegration, därefter main.
+Börja med Git/status och final-kvittot innan skrivansvar tas. Leverans och
+bevis: evidence/ap05/leverans.md. Verkligt fall: cases/map-layer/assessment.md;
+privat aktuell version map-case-v3.json hittas genom evidence/ap05/local/case-history.json.
+Det slutliga dokumenterade receptets riktiga tillämpning finns lokalt under
+evidence/ap05/local/documented-application-v3/ och kontrollerat i
+evidence/ap05/documented-application.json. Läs Runtime-snapshots endast vid
+behov med tools/kontor.py status/resultat --task andringsbedomning.json eller
+andringsbedomning-metod.json. completed är inte ett uppdrag att fortsätta.
+Runtime-kodrevision 2789ea0 är oförändrad; råhistorik/DB-backup och privata
+källor är bevarade och återlästa lokalt, aldrig publicerade.
 
 Ordning: fryst syntetiskt kontrakt → Runtime-bygge/test/review/integration →
 verklig tillämpning och separat sakgranskning → färsk mottagare → skyddad
