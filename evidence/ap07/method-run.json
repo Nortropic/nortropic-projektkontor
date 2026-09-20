@@ -1,0 +1,39 @@
+{
+  "task": "office-method-trial-1",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "base": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21",
+  "integration": {
+    "merged": true,
+    "candidate": "3b6bee7145ba961dcf1460d3c35101824d07964e",
+    "merge_commit": "16d11720e4c5f0caba30b9709d0a877cfab83217",
+    "tree": "143ce4a4fb7ab13f4858134f6132803740167afd",
+    "url": "https://github.com/Nortropic/nortropic-projektkontor/pull/10"
+  },
+  "method_sha256": "0608ee679c1b920a9033c2339ff4e761bd8f7f171706cf8078fb5a820ab2fda3",
+  "frozen_acceptance_sha256": "dc564411119f82c331ddbee10eb753d16e525b2ceb76c8df3952870d5a611c4e",
+  "mechanical_passed": true,
+  "review_verdict": "approved",
+  "proof": [
+    {
+      "artifact": "evidence/runs/office-method-trial-1/accepted.json",
+      "sha256": "b1f4001498c65e2f2a1020961faabcaa9188c0baede01a69f4b9af16435a865b"
+    },
+    {
+      "artifact": "evidence/runs/office-method-trial-1/attempt-1/acceptance.json",
+      "sha256": "c021341ff6b5d8865f3fa0b5aff8f0480501a56eb29dd7df439a0fcbcf19c592"
+    },
+    {
+      "artifact": "evidence/runs/office-method-trial-1/attempt-1/result.json",
+      "sha256": "115215dfa4d3edf184d425c58b20a657cc748c44202e6dd7ec5479e9cf72eab3"
+    },
+    {
+      "artifact": "evidence/runs/office-method-trial-1/review-1/decision.json",
+      "sha256": "01bd343ee8666a41e6253bdbafcfe521df13a5de4bac6110489af18c8c00f77d"
+    },
+    {
+      "artifact": "evidence/runs/office-method-trial-1/integration.json",
+      "sha256": "06f14702abfac65acbd784a60909c4f03f6e7f6e66efa755e90b828e9024fec4"
+    }
+  ],
+  "scope": "Qualified Runtime artifact delivery; not evidence of method effectiveness"
+}

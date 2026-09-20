@@ -1,0 +1,15 @@
+{
+  "checked_at": "2026-09-20T21:26:29.513582+00:00",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "runtime_tracked_changes": [],
+  "tasks": [
+    "office-method-trial-1"
+  ],
+  "unfinished_recorded_writers": false,
+  "database_backup_integrity": "ok",
+  "archive": "evidence/ap07/local/native-ap07.tar.gz",
+  "archive_sha256": "f809d2b51d83bf45037b5741351dd3a53d2bf6f1fdc303eac21d6c1c0b3e38c0",
+  "regular_files_reread": 531,
+  "reread_verified": true,
+  "scope": "Private archive of AP07 method task workspaces, complete execution/review histories and consistent canonical DB backup. No raw sessions/DB published. Earlier histories remain in canonical state. Same-disk preservation is not disaster recovery."
+}

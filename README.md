@@ -55,3 +55,12 @@ underlag, sakgranskar och fryser uppdraget före AP04:s Runtime-start; inga
 rutinmässiga ägarbesked införs. Beredningen startar aldrig Runtime eller ger mandat.
 [Leverans och bevis](evidence/ap06/leverans.md) beskriver det verkliga uppdrag
 som kärnan beredde och Runtime genomförde. Nästa handling finns endast i planen.
+
+## AP-07 — praktisk metodpilot
+
+[Metodbeslutet](docs/metodbeslut-ap07.md) är **anpassa**: ett valbart stöd för ett
+redan motiverat litet förprov. [Anvisningen](tools/METODPROV.md) beskriver när det
+passar och när läsning eller befintliga bevis räcker. [Tillämpning och jämförelse](evidence/ap07/tillampning.md)
+visar självständigt provval, fungerande kontrast och samma beslut i grundarmarna.
+Ingen tidsvinst, minskad ägarbörda eller ny obligatorisk kontroll är visad eller införd.
+Aktuellt läge och nästa handling finns som tidigare endast i [planen](docs/plan.md).

@@ -1,0 +1,21 @@
+{
+  "at": "2026-09-20T21:34:49.184704+00:00",
+  "reviewer": "/root/map_install_review",
+  "verdict": "approved",
+  "blocking_findings": [],
+  "scope": "Substantive method application, historical transfer and functioning contrast, exposure, resource limits, bounded ADAPT decision and controlled report; exact final commit separately reviewed",
+  "reviewed_sha256": {
+    "docs/metodbeslut-ap07.md": "73751ef20a404fcde22d68ec5c6989eccb33cbe538748901324c2ea2a8965865",
+    "evidence/ap07/tillampning.md": "69f0e22e33f42ea685afcd1f7522aae0927fcd2b6a19c3d7bfd52f691ddd6f7a",
+    "evidence/ap07/trial-summary.json": "b3cceaa24eac45be869590d34826ed7d27e09ea45acd2a8fc5ce31b8880cff11"
+  },
+  "findings": [
+    "All four raw logs, extracts, resources and immutable inputs agree; one self-selected original-recipe experiment per arm",
+    "Both X arms found same interface issue by reading; no unique decision improvement",
+    "Both Y arms preserved successful report and missing authority, stopped without repair/escalation",
+    "AP06 demonstrates retrospective feasibility with then-existing components, not future CLI or effect",
+    "More native session time/output in method arms is descriptive, not causal human cost",
+    "Prior evidence reuse exact; contrast does not test abstaining when old execution evidence is available",
+    "Controlled public report contains no private source text, personal absolute paths or raw sessions"
+  ]
+}

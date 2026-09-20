@@ -1,0 +1,45 @@
+{
+  "artifacts": [
+    {
+      "artifact": "evidence/ap05/workflow-verification.json",
+      "sha256": "f57d9dbf5ec5d333ef8d593104c8343ced0dbc3007f163b0dc1497d3d0679785",
+      "unchanged_from": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21"
+    },
+    {
+      "artifact": "evidence/ap05/assessment-run.json",
+      "sha256": "2248e0070d3db3663addb615b88f8a55c7ab046231ee49ada8c39737336422e0",
+      "unchanged_from": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21"
+    },
+    {
+      "artifact": "evidence/ap05/recipe-run.json",
+      "sha256": "95f34700d554ee200871f961f7129ac1a696e5793ae2f41e76ad40b2903ed1a1",
+      "unchanged_from": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21"
+    },
+    {
+      "artifact": "evidence/ap06/cli-host-correction.json",
+      "sha256": "c62ab60f931c81cc8fbd99aaebd9b3e4bd7d0d1d8a0c346b7694f18efc42f341",
+      "unchanged_from": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21"
+    },
+    {
+      "artifact": "evidence/ap06/cli-continuation-review.json",
+      "sha256": "21f8802899bdf7090d22351ba34abe5834e2f01597cb8f66061462b2e09aadaf",
+      "unchanged_from": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21"
+    },
+    {
+      "artifact": "evidence/ap06/method-verification.json",
+      "sha256": "d9b7b533b190b86e55d18dd7d7c17d9a45ece1064b530d5e956c2c17834ded8e",
+      "unchanged_from": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21"
+    },
+    {
+      "artifact": "tools/change_assessment.py",
+      "sha256": "8f0f059447fec11c49435124c1dd72dcc2a7677d74d488e3c4328dfbb456dffc",
+      "unchanged_from": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21"
+    },
+    {
+      "artifact": "tools/CHANGE_ASSESSMENT.md",
+      "sha256": "dd1dd5fd49b8c150397812ba2ed1e193f278dbc309df583a9e57eb90278fe773",
+      "unchanged_from": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21"
+    }
+  ],
+  "scope": "AP05 selected-source changed/missing and missing-authority handling, fixed recipe preservation; AP06 old launcher correction and preparation negatives. Historical checks reused only within their tested scope; not new method-effect observations."
+}
