@@ -1,0 +1,22 @@
+{
+  "id": "office-assignment-core-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "fcc2d45939e6284849704c6ef07d0faf025d9cee",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "allowed_paths": [
+    "tools/assignment_preparation.py",
+    "tools/test_assignment_preparation.py",
+    "tools/ASSIGNMENT_PREPARATION.md"
+  ],
+  "attempt_seconds": 1200,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md and implement the complete AP06 pure preparation core in the three allowed files. Use synthetic tests only. Do not modify existing core dependencies, host inputs or authority. Runtime runs frozen tests, independent review and protected integration."
+    }
+  ],
+  "acceptance": "acceptance/uppdragsberedning-karn.py",
+  "brief": "tasks/uppdragsberedning-karn.md",
+  "acceptance_sha256": "25740b03f2569ccd669984a33c8592054d784757bdbcd6a565698f075db5d636"
+}

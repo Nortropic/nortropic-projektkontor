@@ -1,0 +1,19 @@
+{
+  "receiver": "/root/ap06_handover",
+  "candidate": "5d0afa26b4a9c0b98a93ace38079b26d813c83ad",
+  "verdict": "handover_understood",
+  "blocking_findings": [],
+  "scope": "Fresh receiver without oral owner context; read-only location, evidence, authority and next-action check. Not final integration acceptance.",
+  "observations": [
+    "Clean one-commit delivery candidate on remote main 8e5f1c07a79ff288fc8e0a646bb9f7eb66a58f44",
+    "Mandate and current private case, native evidence, six product files, four real bundle outputs and native archive hashes located and matched",
+    "Core and CLI2 completed; CLI1 remains superseded waiting_diagnosis and must not be resumed",
+    "Final closeout confirmation, protected integration, reread final receipt and stop identified without owner retelling",
+    "No active AP06 writers found; three provider receipts completed and cleaned up"
+  ],
+  "limits": [
+    "Older unrelated interactive processes with Runtime working directory were observed; receiver did not claim these had exited or stop them",
+    "Source selection, substantive judgment, permission interpretation and export review still require the authorized agent and separate reviewer",
+    "This was a receiver probe, not a transfer of write ownership; the existing host continues closeout"
+  ]
+}

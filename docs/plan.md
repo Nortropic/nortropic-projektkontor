@@ -1,144 +1,66 @@
-# Levande plan — AP-05
+# Levande plan — AP-06, verifierad funktion; slutpaketets integration/bevarande återstår
 
-AKTUELLT STEG: AP-05:s kodstöd och verkliga kartbedömning är verifierade.
-Runtime har skyddat integrerat huvudbygget i PR4/ad3e7a1 och metodrättelsen i
-PR5/f4deee4. Båda uppdragen är completed; inga nya körningar ska startas.
-Endast färsk mottagare, separat avslutsgranskning, skyddad integration av det
-kontrollerade dokument-/bevispaketet och slutligt arkivbevarande återstår.
+AKTUELLT STEG: Källbunden uppdragsberedning är byggd och verifierad genom AP04:s
+befintliga Runtime. Kärnan är integrerad i PR7/dd1f8c5; det verkliga CLI-uppdrag som
+kärnan beredde är genomfört och integrerat i PR8/8e5f1c0. Separat kod-/sakgranskning,
+fryst acceptans, verklig användning och metodexempel är prövade. Slutpaketets separata avslutsgranskning och färska mottagare är godkända enligt
+closeout-review.json och handover.json. Revisionsbekräftelse av dessa protokoll,
+skyddad integration och slutarkiv återstår.
 
-NÄSTA HANDLING: Slutför just avslutet ovan. Bind publicerad slut-HEAD och
-återlästa GitHub-/lokalarkiv i evidence/ap05/local/final-<HEAD>.json. Om kvittot
-redan finns och matchar HEAD/origin/main är AP-05 avslutad: redovisa och stanna.
-Kartärendets följande handling är ägarens begriplighetsprövning och separat
-beslut om eventuell kartleverans enligt cases/map-layer/assessment.md; inget
-nytt principval I-11 och ingen kartskrivning inom AP-05.
+NÄSTA HANDLING: Slutför just dessa avslutssteg på work/ap06-delivery. Kandidaten
+har ett enda publicerbart commit på aktuell main, med kontrollerade AP06-underlag,
+metodpekare och bevis; privata eller tidigare opublicerade kart-/planhistoriker
+ska inte följa med. Efter godkända verkliga grindar: integrera med befintlig
+värdpublicerare, jämför HEAD/origin/main/GitHub-arkiv, bevara och återläs det lokala
+final-<HEAD>.json i evidence/ap06/local/. Om ett sådant kvitto redan finns och
+matchar publicerad main är AP06 färdig: redovisa och STANNA. Starta ingen ny fas.
 
-ÅTERUPPTAGNINGSPUNKT: gren work/ap05 fram till avslutsintegration, därefter main.
-Börja med Git/status och final-kvittot innan skrivansvar tas. Leverans och
-bevis: evidence/ap05/leverans.md. Verkligt fall: cases/map-layer/assessment.md;
-privat aktuell version map-case-v3.json hittas genom evidence/ap05/local/case-history.json.
-Det slutliga dokumenterade receptets riktiga tillämpning finns lokalt under
-evidence/ap05/local/documented-application-v3/ och kontrollerat i
-evidence/ap05/documented-application.json. Läs Runtime-snapshots endast vid
-behov med tools/kontor.py status/resultat --task andringsbedomning.json eller
-andringsbedomning-metod.json. completed är inte ett uppdrag att fortsätta.
-Runtime-kodrevision 2789ea0 är oförändrad; råhistorik/DB-backup och privata
-källor är bevarade och återlästa lokalt, aldrig publicerade.
+ÅTERUPPTAGNINGSPUNKT: Börja utan skrivningar; kontrollera Git, kvittot och gamla
+skrivare. Definition/uppdrag/AP06-ACCEPT är gällande grund. Läs
+[evidence/ap06/leverans.md](../evidence/ap06/leverans.md) och
+[use-case.md](../evidence/ap06/use-case.md), sedan relevanta bindningar i core-run.json,
+cli-run.json, cli-continuation-review.json, real-application.json och
+method-verification.json. Ingång till funktionen: tools/BERED_UPPDRAG.md.
+Planen ensam äger nästa handling; inga tekniska delsteg ska bäras av ägaren.
 
-Ordning: fryst syntetiskt kontrakt → Runtime-bygge/test/review/integration →
-verklig tillämpning och separat sakgranskning → färsk mottagare → skyddad
-integration av kontrollerad fallredovisning och slutbevarande. Värdens arbete
-på denna gren och modellens isolerade kandidat har skilda filer; ingen annan
-skriver i värdens arbetsyta. Inga Runtime-kodändringar. Gamla auditfynd öppna.
+## Exakta körningar och privat kontinuitet
 
-Sakläge: generator/kvitto ändrade efter FINAL-CHECK-1. Ny read-only observation
-med separat reproduktion stödjer dagens rättelsetäckning, baslinjebevarande och
-lagergräns. cases/map-layer/assessment.md redovisar exakt återstående ägaromdöme
-och skrivbeslut. Privat aktuell version: evidence/ap05/local/map-case-v3.json;
-v1/v2 bevarade. Valvet och kampanjen är orörda.
+- office-assignment-core-1: completed; startas inte igen. Accepterad fil
+  tasks/uppdragsberedning-karn.json, integration dd1f8c56456b575f017219621402658b5200c592.
+- office-assignment-cli-2: completed; startas inte igen. Accepterad fil
+  tasks/uppdragsberedning-cli-continued.json, integration 8e5f1c07a79ff288fc8e0a646bb9f7eb66a58f44.
+- office-assignment-cli-1: bevarad historisk waiting_diagnosis efter VÄRDENS
+  felaktiga importlauncher. Ingen process finns kvar, inget integrerades.
+  Den är uttryckligen ersatt av CLI2 inom samma mandat; återuppta den INTE och
+  ändra aldrig dess frysta acceptans. cli-host-correction.json redovisar detta.
 
----
+Status/resultat läses vid behov med tools/kontor.py och rätt --task. De är sparade
+observationer, inte livekontroll och inte order om fortsatt körning. Runtime är
+2789ea0770e4234161e9bdb0378a6e3e7b8432d2, oförändrad. Inga aktiva AP06-körningar enligt nativeprocesskvitton. Detta är inte ett
+påstående om att alla äldre interaktiva sessioner på datorn har avslutats.
 
-## Historik — AP-04-plan (avslutad; aktiva steg ovan gäller)
+Privat fullmandat/start: evidence/ap06/local/accepted-mandate.md och start.json.
+Aktuell beredning: local/real-cli-v3/ med case/check/spec/prepared, host-amendment,
+freeze och command-bundle-v1. V1/V2, gammalt verifieringsutfall och explicita
+omprövningar bevaras, inga referenser uppdaterades automatiskt. Värdens lokala
+arbetsgren work/ap06 behåller tidigare opublicerade plan-/kartcommits.
+Nativehistorik/DB-backup: local/native-ap06.tar.gz enligt native-preservation.json.
+Slutligt Git/ärendearkiv binds i final-kvittot. Rådata stannar lokalt och Git-exkluderat.
+En färsk klon utan detta material får inte fabricera lokal evidens eller mandat.
 
-# Levande plan — AP-04
+## Tillgodoräknat och avgränsat
 
-AKTUELLT STEG: Resultatfunktionen är byggd genom kontorets ingång och skyddat
-integrerad av Runtime i PR2, 5a6084ee156bb2d12537f5e58af62e125d83be14.
-Funktion, verkligt avbrott/återupptagande, negativa fall, färsk mottagare och
-oberoende jämförelse mot körbevis/fjärrintegration är verifierade. Endast separat
-slutgranskning, integration av avslutstexterna och slutligt Git/arkivbevarande återstår.
+Etableringen, AP04, AP05 och KART-INFORANDE-01 är levererade inom sina redovisade
+räckvidder. Tidigare käll-/audit-/kartspår öppnas endast vid konkret behov, inte
+som rutin. Tidigare slutkvitton och evidence/entry, ap04 och ap05 bevaras.
+Kartans slutkvitto finns privat i evidence/map-delivery/local/final.json; ingen
+valvläsning/skrivning eller kartomkörning gjordes i AP06. Begränsad ägaråterkoppling
+är fortfarande inte bevisad begriplighet eller tekniskt PASS.
 
-NÄSTA HANDLING: Granska exakt avslutskandidat i båda repon separat. Rätta bara
-relevanta blockerare; integrera sedan kontrollerat innehåll genom skyddade PR:er.
-Jämför slutlig HEAD och origin/main samt GitHub-arkiv och lokalt arkiv byte för
-byte i båda repon. Bevara ett lokalt final-<office HEAD>-<runtime HEAD>.json
-under evidence/ap04/local/ som binder slutrevisionerna utan självrefererande
-commit. Om detta kvitto redan finns och matchar revisionerna är fasen avslutad:
-redovisa och stanna; starta inte fler uppdrag eller nästa byggfas.
-
-ÅTERUPPTAGNINGSPUNKT: Kontor work/ap04-closeout; Runtime work/ap04-receipt.
-Körd Runtime-kod: 09268df5f59a180afe863d4cf7f95c9ad95f8639. Efter körrevisionen avgränsas office-profilen dessutom till faktiskt prövad
-Codex-provider med riktat test; gammal Runtime-providerprofil är oförändrad.
-Övriga senare ändringar gäller bevis, plan och råloggsexkludering.
-Uppdrag office-result-1 är completed, två försök, en publicering. Även aktiv
-återupptagning av avslutat uppdrag gav oförändrade räknare, inga nya modellkörningar
-eller publiceringar. Alla registrerade processgrupper avslutade. Starta inte om.
-Status och resultat kan läsas med `python3 -B tools/kontor.py status` respektive
-`python3 -B tools/kontor.py resultat`. De läser snapshots, inte livebevakning.
-
-Bevis: evidence/ap04/delivery-verification.json, result.json, interruption.json,
-handover.json och leverans.md. Runtime evidence/ap04/result-run.json innehåller
-försöks-/gransknings-/integrationsidentiteter; native-preservation.json binder
-återläst lokalt arkiv och konsekvent databasbackup. Råhistorik är Git-exkluderad.
-En färsk klon får inte hitta på lokala bevis: frånvaro visas som unavailable.
-
-Nästa möjliga fas är ett nytt accepterat internt utvecklingsuppdrag med egen
-verksamhetsnytta; rekommendationen i leverans.md är inget byggmandat. A3/A6 och
-tidigare auditfynd är oförändrade. Alla fynd i just AP04:s start-/underlagsgranskning
-är rättade och omkontrollerade; slutgranskningen prövar detta pakets bevis.
-
-## Genomförd byggordning (slutbevarande återstår enligt ovan)
-
-1. Startkoppling och målrepoanpassning, riktade negativa prov, separat granskning.
-2. Verifiera main-skyddet. Integrera granskade startkandidater i båda repon.
-3. Frys accepterat resultatfunktionsuppdrag i kontorsrepot. Starta via kontorets
-   ingång; bevara faktiskt avbrott/diagnos och återuppta samma uppdrag.
-4. Runtime testar, separat granskar och integrerar resultatfunktionen.
-5. Jämför resultat med riktiga körbevis/fjärrrevision, prova läsningars sidoeffektfrihet,
-   färsk överlämning och bevarande. Slutgranska och redovisa; stanna.
-
-## Bevis och begränsningar
-
-Etableringens bevis under evidence/entry bevaras oförändrade. Runtime v0.1 och
-review-continuation återanvänds inom sin räckvidd. Ny fas får evidence/ap04;
-rådata förvaras endast lokalt i Git-exkluderad local/. Nya bevis och deras räckvidd står i leverans.md.
-GitHub visar publikt kontorsrepo, befintlig adminåtkomst och oskyddad main vid start.
-Skyddet infördes och verifierades före integration; HTTP405-provet finns bevarat. A3/A6 och auditfynd är oförändrade.
-
----
-
-## Historik — etableringens slutplan (avslutad)
-
-# Levande plan — besluthemmet
-
-AKTUELLT STEG: Avsluta fas 1 med separat kontrollerad slutredovisning och sista bevarandet. Definition, beslut, arbetsform, P1, P3, dokumentgranskning och första verifierade publicering är levererade; slutkandidaten ska också bindas till fjärrrevision och lokalt arkiv före byggarens slutbesked.
-
-NÄSTA HANDLING: Slutför endast slutkandidatens bevarandekontroll: efter separat kontroll av avslutstexterna, innehållskontroll och uppladdning, jämför `git rev-parse HEAD` med `git ls-remote origin refs/heads/main`, återläs GitHub-arkiv och lokalt arkiv mot filhasharna; redovisa därefter och stanna. Om slutkvittot redan finns och matchar HEAD är denna handling utförd: invänta ett eget accepterat uppdrag, starta inget nytt bygge.
-
-ÅTERUPPTAGNINGSPUNKT: `docs/plan.md`, gren `main` i `nortropic-projektkontor`. Börja utan skrivningar med `git status --short --branch` och `git log -1 --oneline`; kontrollera bevis, åtkomst och att föregående skrivare är avslutad. Alla P1/P3-processer är avslutade. Byggaren Codex har ensam skrivansvaret fram till sitt slutbesked. Slutkvittot är lokalt `evidence/entry/local/final-<full HEAD>.json`; det binder den sista uppladdningen och arkivåterläsningen utan självrefererande Git-commit. En ny klon kan själv jämföra HEAD, remote och samtliga spårade filers bytes. Lokal råevidens och arkiv följer inte med klonen.
-
-## Levererat och belagt
-
-- **Definition och beslut:** `DEFINITION.md` och `docs/decisions.md`. Originalets tre stycken matchar mekaniskt, 913 byte. Samtliga 14 I-svar och B-besluten är kontrollerade; B-3 har en uttryckligt markerad utelämning av absolut lokal sökväg. Ingen tolkning har lagts in i definitionen.
-- **Arbetsformen och nuläget:** `AGENTS.md`, enradig `CLAUDE.md`, uppdraget och denna enda plan. Startkontroll och källidentiteter i `evidence/entry/start.json`.
-- **P1 och P3:** körda interaktivt på `300c239f2e33abf29140ac41e2e9d3b220a2cf00`. Svar, sessioner och räckvidd i `evidence/entry/provbedomning-300c239.md` med länkade kvitton. P1 visar mottagande, P3 laddning. Senare ändringar är dokumentgranskade, inte nya mottagningsprov.
-- **Separat granskning:** O1–O9 PASS utan olösta blockerande fynd för `06217b60f23737244964f1a17b47677cad697333`, rapport `evidence/entry/granskning-06217b6.md`. Ett mindre precisionsfel rättat och omkontrollerat.
-- **Publikt fjärrrepo:** [Nortropic/nortropic-projektkontor](https://github.com/Nortropic/nortropic-projektkontor). Första uppladdade revision `5f78f016039a2d7ded72a7ded086b0893fafafc2` är återhämtad från GitHub och alla 16 filers bytes jämförda. Lokal arkivkopia återläst mot samma filhashar: `evidence/entry/publicering-5f78f01.json`. Slutkandidatens bevarande bokförs enligt återupptagningspunkten ovan.
-
-## Lästa nuläget vid byggstart
-
-Full redovisning med räckvidd i uppdraget:
-- **Finns:** `~/Nortropic Runtime`, HEAD/main `a941207a9ca57697967cf33dcd1c3ea5d884051a`, releasecommit `580630bcb9d46bb11e17e25053664eec4e23b8ae`; arbetsform och provformer återanvänds.
-- **Finns:** förberedelsekampanjen under `~/nortropic/intake-campaigns/improvements-preparation-2026-09`, filrevisioner i startprotokollet. B-5 och arbetsorderns SHA-256 stämmer.
-- **Fanns inte:** målrepot före start; central definitionsfil inte funnen i riktad sökning. Det senare är ingen total inventering.
-- **Kunde inte nås:** inget nödvändigt namngivet underlag.
-
-## Väntan, diagnos och begränsningar
-
-Inget kvarstående kapacitets- eller behörighetshinder. Codex CLI 0.147.0 nekades
-modellen med HTTP 400; försöket bevarades och avslutades. Redan installerad appbinär
-0.155.0-alpha.2.6 gav lyckat P3. Ingen installation, modellväxling eller
-API-fallback gjordes. Interaktiva verktygsstarter lagrar själva sessionshistorik
-och projektets trust-val i sin befintliga användarprofil; byggaren har inte ändrat
-global verktygspolicy eller andra projekts inställningar.
-
-Förberedelsens A3/A6 är inte uppfyllda; FIND-004 är inte stängt. Ingen Runtime-körning,
-utförd nästa uppgift, minskad ägarbörda eller efterlevnad över tid är visad.
-Arbetsregler är inte tekniska skrivspärrar. Lokala arkiv är på samma disk och skyddar
-inte mot diskförlust. `.git/info/exclude` utesluter `evidence/entry/local/` lokalt;
-regeln följer inte med en klon och ersätter aldrig kontroll före uppladdning.
-
-Efter verifierat slutbevarande är fasen slut. Nästa möjliga arbete är att
-kedjedrivaren förbereder nästa nyttiga uppgift för ett eget accepterat uppdrag.
-Det arbetet och senare användning av Runtime startas inte genom denna fas.
+Beredningen är mekanik. Kedjedrivare och separat granskare väljer/läser och bedömer
+källor, krav, provens tillräcklighet, handlingsspecifikt mandat och exportinnehåll.
+Utdata förblir utkast; inga automatiska rättigheter, acceptansprogram, modellstarter
+eller publiceringar. Ingen omätt tidsvinst eller allomfattande källaktualitet påstås.
+A3/A6 och tidigare fynd stängs inte. Ingen ny motor, Runtime-ändring, IR-kompilering,
+tjänst/kostnad/behörighet eller nästa byggfas ingår. Fråga ägaren endast vid verklig
+ändring av mål, kostnad eller befogenhet — inga rutinmässiga fortsättningsbesked.

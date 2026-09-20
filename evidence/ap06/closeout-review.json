@@ -1,0 +1,27 @@
+{
+  "reviewer": "/root/map_install_review",
+  "candidate": "5d0afa26b4a9c0b98a93ace38079b26d813c83ad",
+  "verdict": "approved",
+  "blocking_findings": [],
+  "scope": "AP06 final documentation, prepared real case, immutable native bindings, privacy selection and preservation. No new map/audit campaign.",
+  "verified": [
+    "Core and CLI2 frozen inputs, acceptance, independent review, product hashes and direct GitHub PR7/PR8 identities/statuses match",
+    "16 core plus 20 AP05 tests and 12 CLI endpoint tests supported by actual run history; prior valid execution reused",
+    "V1/V2/V3 reproduced independently in memory with delivered core; source bytes, sizes and quotes match; V3 retains six original bindings and seven requirements/tests plus explicit correction source",
+    "CLI1 failure/wait preserved; only host import context corrected; CLI2 product is byte-identical to original Runtime reference and has new real gate evidence",
+    "Four delivered CLI outputs match real V3 preparation and recorded hashes",
+    "1131 native archive regular files reread, manifest/hash and SQLite integrity match; Runtime tracked source unchanged",
+    "32 candidate publication files checked; private sources and raw sessions excluded; old evidence preserved"
+  ],
+  "remaining_at_review": [
+    "Fresh receiver protocol and this review to be recorded",
+    "Exact revised candidate confirmation",
+    "Protected final documentation integration",
+    "Private final archives and reread revision-bound receipt"
+  ],
+  "limits": [
+    "Approval applies to the named candidate and scope; it does not claim remaining closeout steps already happened",
+    "A3/A6 and earlier findings unchanged; map not reopened"
+  ],
+  "reviewer_mutations": false
+}

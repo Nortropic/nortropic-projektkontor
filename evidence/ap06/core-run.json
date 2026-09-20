@@ -1,0 +1,71 @@
+{
+  "task_id": "office-assignment-core-1",
+  "checked_at": "2026-09-20T20:27:26.612968+00:00",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "input_revision": "a2965dc9c1dab2d89c06325ec0532896acf69703",
+  "base": "fcc2d45939e6284849704c6ef07d0faf025d9cee",
+  "task_sha256": "63e594add839fe73c0cfc1a8d4c3e918d2330261658c484c26b3515153259214",
+  "acceptance_sha256": "25740b03f2569ccd669984a33c8592054d784757bdbcd6a565698f075db5d636",
+  "brief_sha256": "3952267fc84a2b61c37b921b39fdbf3f37692c2a6314121ee7b3a8be96a91688",
+  "attempts": 1,
+  "integration": {
+    "merged": true,
+    "candidate": "a11c1e609d56382ac84ce3ae973694a9a44f8376",
+    "merge_commit": "dd1f8c56456b575f017219621402658b5200c592",
+    "tree": "7e3b86ebe6aa54c5a8fd5635cfd5f28b9287d72a",
+    "url": "https://github.com/Nortropic/nortropic-projektkontor/pull/7"
+  },
+  "verified_saved_inspection": true,
+  "independent_remote_comparison": {
+    "pr_head": "a11c1e609d56382ac84ce3ae973694a9a44f8376",
+    "merged": true,
+    "merge_commit": "dd1f8c56456b575f017219621402658b5200c592",
+    "tree": "7e3b86ebe6aa54c5a8fd5635cfd5f28b9287d72a",
+    "required_statuses": {
+      "runtime/review": "success",
+      "runtime/tests": "success"
+    }
+  },
+  "proof": [
+    {
+      "artifact": "evidence/runs/office-assignment-core-1/attempt-1/result.json",
+      "sha256": "6fad0be87e8852caf3a598e5a0f0ac466b251258dc664fb1ddb95a598337638d",
+      "observed": {
+        "attempt": 1,
+        "provider_completed": true,
+        "process_group_removed": true,
+        "thread_id": "01a0c07a-e655-75d1-af15-e641487bfd2e"
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-assignment-core-1/attempt-1/acceptance.json",
+      "sha256": "dd4c1fe4302bae02d449ea67210cdd74b9b44758546defdfac8715e980f4cc64",
+      "observed": {
+        "candidate_files_sha256": {
+          "tools/assignment_preparation.py": "cdcde5bd10aebf8eeba2a45aa980433f4785dbe7d06a466bc2cce1c0131c74fc",
+          "tools/test_assignment_preparation.py": "bba560b9e0709764f9e6fa40eab235b9822baca4215dd9cf581f652c9affc4f7",
+          "tools/ASSIGNMENT_PREPARATION.md": "f1023c287a10f91f7d1b7e0de82a939198d988a1f965fe5e4351eced773a0d27"
+        },
+        "passed": true,
+        "checks": [
+          "source applicability does not revoke decision, raw identities never export",
+          "missing reference, authority, observable verification and exact binding produce draft gaps",
+          "invalid identities, quotes, bindings, target and authority paths rejected",
+          "pure API has no I/O, no acceptance execution, no input mutation"
+        ]
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-assignment-core-1/review-1/decision.json",
+      "sha256": "51992f74e62cb89785160683628f7f01b885f0aaee5506ef2edf97b073f8313f",
+      "observed": {
+        "candidate": "a11c1e609d56382ac84ce3ae973694a9a44f8376",
+        "reviewer_run": "01a0c07f-b551-7c23-90c4-0911b7d6ce1b",
+        "verdict": "approved",
+        "blocking_findings": [],
+        "summary": "The three accepted files implement the brief; no blocking violations found. All 16 synthetic tests and 969 additional edge-case probes passed using Python 3.12. No files were changed or external services called."
+      }
+    }
+  ],
+  "limitation": "Saved revision-bound observations, directly compared with remote at checked_at. No live-monitoring or general authority claim."
+}

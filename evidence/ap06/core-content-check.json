@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-09-20T20:30:42.513457+00:00",
+  "scope": "Controlled content comparison of integrated core files; Runtime independently reviewed exact candidate before its protected publication",
+  "files": {
+    "tools/assignment_preparation.py": "cdcde5bd10aebf8eeba2a45aa980433f4785dbe7d06a466bc2cce1c0131c74fc",
+    "tools/test_assignment_preparation.py": "bba560b9e0709764f9e6fa40eab235b9822baca4215dd9cf581f652c9affc4f7",
+    "tools/ASSIGNMENT_PREPARATION.md": "f1023c287a10f91f7d1b7e0de82a939198d988a1f965fe5e4351eced773a0d27"
+  },
+  "assessment": "Only implementation, generic schema/method and explicitly synthetic fixtures. No actual private source text, identifiers or absolute private paths found. Export caveats expressly require authored-content review.",
+  "selection_origin": "Existing public base plus reviewed synthetic core brief; no private source copies supplied to candidate",
+  "integration": "dd1f8c56456b575f017219621402658b5200c592"
+}

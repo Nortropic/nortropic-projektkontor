@@ -1,0 +1,26 @@
+{
+  "checked_at": "2026-09-20T20:41:57.884881+00:00",
+  "case_location": "evidence/ap06/local/real-cli-v3/",
+  "selected_source_count": 7,
+  "selected_sources_unchanged_at_check": true,
+  "reference_manifest_unchanged": true,
+  "actual_delivered_cli_used": true,
+  "output_matches_prepared_v3": true,
+  "command_output": "evidence/ap06/local/real-cli-v3/command-bundle-v1/",
+  "private_bundle_hashes": {
+    "brief.draft.md": "6e1a16581dd005f7dd058fae15e53fc429109e0f3d1a11cd03087171cbafdfb1",
+    "private.json": "d62634c70966a90635e17dc8046d7534acfc54c2a73017a8b813f7c3d753bd49",
+    "task.draft.json": "067b8f7b440fa041bba57837d028c50a79eb627d1120b4a3d64e28ddc56ca62e",
+    "package.json": "be4ae418380483ef0b745090d81d74aeba8256cc031d639fb166f10fc6f280bd"
+  },
+  "requirements": 7,
+  "observable_checks": 7,
+  "core_integration": "dd1f8c56456b575f017219621402658b5200c592",
+  "cli_integration": "8e5f1c07a79ff288fc8e0a646bb9f7eb66a58f44",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "limits": [
+    "Private output not published",
+    "CLI retained supplied comparison timestamp; separate post-delivery comparison recorded without reference refresh",
+    "Selected sources only, not exhaustive discovery or a grant of authority"
+  ]
+}

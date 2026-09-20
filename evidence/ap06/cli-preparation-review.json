@@ -1,0 +1,27 @@
+{
+  "reviewer": "/root/ap06_case_review",
+  "verdict": "approved",
+  "scope": "real CLI preparation v2, substantive requirements, source applicability, export selection and host task/acceptance before implementation",
+  "blocking_findings": [],
+  "sha256": {
+    "tasks/uppdragsberedning-cli.md": "5b67c91e0b2e4c8f0923c3455c7ab084bfa18f0784da463867f619888f434231",
+    "tasks/uppdragsberedning-cli.json": "8b3680fc43d33d40bc530bccbf32ddd1c0c2f72e03723382c1808152d6941442",
+    "acceptance/uppdragsberedning-cli.py": "f9cffaf1ff94afdc3cefbcfa6550069e591b601610d9bf052e9e1e6e22a4f03d",
+    "evidence/ap06/prepared-cli-package.json": "9fd341a8cb481b746b3b1f73417a09b15964d48ce7fe26f2784d34f7468a0038",
+    "docs/uppdrag.md": "b09ae5d06b8ce8f578e03dd20a0171c7026d8ede8db15df9d4ec09e8794c06fb"
+  },
+  "observations": [
+    "All six selected source bindings and quotes matched read sources",
+    "Pure core independently reproduced complete prepared package; task exact; brief wrapper documented",
+    "R1-R7 map to observable behaviors and within-mandate CLI task",
+    "V1 preserved; explicit host scope change marks old dependent requirements, not revoked owner decision",
+    "Active core/dependency/entry/host authority outside three allowed files",
+    "Worker context self-contained and content-reviewed; private references not required"
+  ],
+  "limits": [
+    "Endpoint implementation/tests and method reproduction still required",
+    "Independent Runtime candidate review and protected integration still required"
+  ],
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "base": "dd1f8c56456b575f017219621402658b5200c592"
+}

@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-09-20T20:41:57.884881+00:00",
+  "office_comparison_revision": "fcc2d45939e6284849704c6ef07d0faf025d9cee",
+  "preserved_office_paths": [
+    "DEFINITION.md",
+    "evidence/entry",
+    "evidence/ap04",
+    "evidence/ap05",
+    "cases",
+    "tools/kontor.py",
+    "tools/kontor_result.py",
+    "tools/change_assessment.py",
+    "tools/test_change_assessment.py",
+    "tools/CHANGE_ASSESSMENT.md",
+    "tests/test_entry.py"
+  ],
+  "preserved_office_paths_unchanged": true,
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "runtime_tracked_changes": [],
+  "campaign_preselected_files": 2,
+  "campaign_preselected_unchanged": true,
+  "actual_vault_accessed": false,
+  "scope": "Only previously selected proposal/correction texts rechecked; no new campaign audit, no IR compilation, no vault operation. Existing delivered evidence retained."
+}

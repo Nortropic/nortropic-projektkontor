@@ -278,3 +278,20 @@ granskning/körbevis, begränsningar och nästa kartärendehandling. AP-05 accep
 inte kartförändringen och ger inget skrivtillstånd till valvet.
 
 **Ersätter framåt:** AP-04 som aktivt uppdrag. Tidigare beslut och bevis bevaras.
+
+## AP06-ACCEPT — accepterat byggbeslut
+
+**Status:** uttryckligt byggmandat, ägarens AP-06-meddelande i denna session.
+**Grund:** full ordalydelse och bindning bevarade i evidence/ap06/local/.
+**Innebörd (sammanfattning):** källbunden uppdragsberedning från bedömd förändring
+till granskningsbart uppdrag. Kedjedrivaren formulerar tekniska deluppgifter inom
+fasen; Runtime bygger, testar, separat granskar och skyddat integrerar kontorskoden.
+Kärnan byggs först, används sedan för verkligt CLI-/ändpunktsuppdrag som genomförs.
+Kandidaten får inte ändra aktiv kärna, värdindata eller egen acceptans.
+**Tillstånd:** kontorets kod/test/metod och kontrollerade nödvändiga underlag/bevis
+får publiceras. Privat källmaterial förblir lokalt. Inga Runtime-kodändringar,
+kampanj-/IR-/valvskrivningar, nya tjänster/kostnader/behörigheter eller målrepon.
+**Gräns:** mekanisk beredning är inte sakgodkännande eller autentisering av mandat.
+Luckor förblir luckor. Ingen automatisk värdacceptans, start eller publicering.
+Ägaren behöver inte acceptera rutinmässiga tekniska delsteg. A3/A6 och tidigare
+fynd behåller status. Kartleveransen är avslutad. Ingen nästa fas beställs.

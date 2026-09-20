@@ -1,0 +1,72 @@
+{
+  "task_id": "office-assignment-cli-2",
+  "checked_at": "2026-09-20T20:40:57.342516+00:00",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "input_revision": "b12bde2489f80122d29b670f581ccb836c2935dd",
+  "base": "dd1f8c56456b575f017219621402658b5200c592",
+  "task_sha256": "4eb88f566d62c69cda00614be06d861cd6193162cee5d506d2428366e46cef8f",
+  "acceptance_sha256": "ef0950d8fb00a7d4c597634d0ff3bc5807642ee09f2ec065b943cb3b1c866dd1",
+  "brief_sha256": "d2279550faa73cb0caed2562e52b58e82ee65c6f77837bb50e5e96b8499ec51e",
+  "attempts": 1,
+  "integration": {
+    "merged": true,
+    "candidate": "2b7939a6c31662f7e948996c8d09af5c714de8f0",
+    "merge_commit": "8e5f1c07a79ff288fc8e0a646bb9f7eb66a58f44",
+    "tree": "08633af50b133c04ad72fca4334a71f4cd41cb7e",
+    "url": "https://github.com/Nortropic/nortropic-projektkontor/pull/8"
+  },
+  "verified_saved_inspection": true,
+  "independent_remote_comparison": {
+    "pr_head": "2b7939a6c31662f7e948996c8d09af5c714de8f0",
+    "merged": true,
+    "merge_commit": "8e5f1c07a79ff288fc8e0a646bb9f7eb66a58f44",
+    "tree": "08633af50b133c04ad72fca4334a71f4cd41cb7e",
+    "required_statuses": {
+      "runtime/review": "success",
+      "runtime/tests": "success"
+    }
+  },
+  "proof": [
+    {
+      "artifact": "evidence/runs/office-assignment-cli-2/attempt-1/result.json",
+      "sha256": "fd9104f2d3b6b5c1397b32f892059d03317234f4eb5cb24693fcd76c7a6d93bc",
+      "observed": {
+        "attempt": 1,
+        "provider_completed": true,
+        "process_group_removed": true,
+        "thread_id": "01a0c08a-e9a4-7691-8ef1-ef23988567eb"
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-assignment-cli-2/attempt-1/acceptance.json",
+      "sha256": "8b65bcd21b79ba0868adeba6aff4cad1ce9d1ff6287235e8391d18b228645f97",
+      "observed": {
+        "candidate_files_sha256": {
+          "tools/bered_uppdrag.py": "6e2919114262b5c7978e759f79ab8f00c52b247be48cdb8cbc2b9513b0f033fc",
+          "tools/test_bered_uppdrag.py": "6c55c48a076135641f24f8c7a76166442406d95135377dbf17db76815448faeb",
+          "tools/BERED_UPPDRAG.md": "0ed526e04d4734c38f1cfb841b746b9ac3b088480f3dd87a7b9414a2d05058a8"
+        },
+        "passed": true,
+        "checks": [
+          "actual CLI calls delivered core; private bundle modes, exact separated output, no overwrite",
+          "incomplete observations preserved as marked draft, never authority",
+          "strict JSON, symlink/input/output and both-direction source collisions refused without mutation",
+          "separate output with missing selected source is valid draft; no process/network/acceptance execution"
+        ],
+        "candidate_endpoint_tests": 12
+      }
+    },
+    {
+      "artifact": "evidence/runs/office-assignment-cli-2/review-1/decision.json",
+      "sha256": "ecbc7accd24c4b1294b6efe0f4460e98883ad37dd14ed3785e03ee5f8e892d33",
+      "observed": {
+        "candidate": "2b7939a6c31662f7e948996c8d09af5c714de8f0",
+        "reviewer_run": "01a0c08b-db6c-7590-ad01-371003d5716a",
+        "verdict": "approved",
+        "blocking_findings": [],
+        "summary": "Reviewed all three accepted files against R1\u2013R7 and the delivered core contracts. No blocking violations found. Independent in-memory checks passed for core-output equivalence, strict parsing, generic errors and path overlaps. The filesystem-writing suite was inspected but not rerun, respecting the no-file-changes instruction; host acceptance was reported passed."
+      }
+    }
+  ],
+  "limitation": "Saved revision-bound observations, directly compared with remote at checked_at. No live-monitoring or general authority claim."
+}

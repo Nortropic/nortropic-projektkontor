@@ -1,0 +1,18 @@
+{
+  "reviewer": "/root/ap06_contract_review",
+  "verdict": "approved",
+  "scope": "host core task and acceptance before implementation",
+  "prior_blocker": "Case aliases could address protected active files on the qualified filesystem",
+  "correction": "Casefold protected paths and duplicates, with three host negative tests",
+  "blocking_findings": [],
+  "sha256": {
+    "tasks/uppdragsberedning-karn.md": "3952267fc84a2b61c37b921b39fdbf3f37692c2a6314121ee7b3a8be96a91688",
+    "tasks/uppdragsberedning-karn.json": "c2c0917102f8ab80cda221f5833a5b172c6c7d49e6f585d768fa9ebfdd175d16",
+    "acceptance/uppdragsberedning-karn.py": "25740b03f2569ccd669984a33c8592054d784757bdbcd6a565698f075db5d636"
+  },
+  "limits": [
+    "Implementation not yet reviewed",
+    "CLI actual allowlist to be checked after core integration",
+    "Candidate tests/review must cover selective dependencies and full private trace"
+  ]
+}

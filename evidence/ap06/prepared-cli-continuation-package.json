@@ -1,0 +1,134 @@
+{
+  "brief": "# DRAFT — AP06 remaining task: private assignment preparation CLI\n\nDRAFT only. Mechanical completeness is neither acceptance nor authority; this tool grants no permission and does not authenticate AP06-ACCEPT.\n\n## Context\n\n### Fact\n\n- The core tools/assignment_preparation.py and its schema documentation are delivered on the exact task base; read them. AP05 is available read-only.\n- The first CLI attempt stopped at an erroneous host import launcher. This separately frozen technical continuation preserves that failed task and corrects only host startup context. Retained Runtime-authored source is supplied as unapproved reference, not as acceptance evidence.\n\n### Judgment\n\n- The host chose a thin file interface and source-collision checks to make existing preparation usable without a second execution engine.\n\n### Decision\n\n- AP06 authorizes core first, then this real CLI task using it; earlier phases and map delivery remain closed.\n\n### Authority\n\n- Host reviewed/frozen task permits only the three listed tools files, synthetic tests and method. No Runtime/source/vault/host authority changes. Content-review all code/docs/test summaries before publication; no private data or absolute local paths.\n\n## Scope\n\n- Implement R1-R7 within the three listed files.\n- tools/assignment_preparation.py, tools/change_assessment.py and tools/kontor.py are read-only.\n- The host separately reviews and freezes acceptance; the worker must not generate or activate host acceptance.\n- Reuse the three retained reference files supplied by the host; change only a concrete requirement defect, not the accepted scope or active core.\n\n## Derived requirements\n\n### R1\n\nThin private preparation command: Expose prepare(CASE,CHECK,SPEC) through: python3 -B tools/bered_uppdrag.py CASE CHECK SPEC --source-root ROOT --output NEWDIR. Read strict JSON, call the delivered core; no new assessment logic.\n\nReason: Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.\n\nTests: T1\n\n### R2\n\nImmutable private bundle: Create NEWDIR exclusively, mode0700, with private.json, package.json, task.draft.json, brief.draft.md as exclusive0600 files. Parent must already exist. Existing output refused unchanged; preserve partial output on failure for diagnosis.\n\nReason: Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.\n\nTests: T2\n\n### R3\n\nNo source or input mutation: Before any mkdir refuse symlink output or ancestors and all overlap directions between output and three input files plus selected case source paths under ROOT, including missing sources. Use resolved paths and casefold for Mac aliases. Do not create missing output ancestors. Reject symlink JSON inputs. Trusted local use, no claim of hostile concurrent-filesystem safety.\n\nReason: Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.\n\nTests: T3\n\n### R4\n\nExplicit drafts and safe failures: Well-formed incomplete input writes marked draft, exit0. Malformed/duplicate-key/non-JSON constants or unreadable inputs return exit2 with one generic JSON error, no raw private input or path in stdout or stderr. Stdout success has status=draft, mechanical_complete, gaps and file names. No ready/approved/authorized assertion.\n\nReason: Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.\n\nTests: T4\n\n### R5\n\nOne engine, no activation: CLI does not hash or remeasure sources, refresh references, execute acceptance, start Runtime, signal, invoke models or publish. Do not edit tools/assignment_preparation.py, change_assessment.py, kontor.py, host tasks or acceptance.\n\nReason: Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.\n\nTests: T5\n\n### R6\n\nUsable method and endpoint examples: Write tools/BERED_UPPDRAG.md with complete reproducible synthetic example (or documented fixture in tools/test_bered_uppdrag.py), exact CLI command, AP05 measurement recipe pointer, host lookup/quote observations, real later decision IDs, explicit export review, immutable versions, host review/freezing and actual Runtime format. Explain meaning/verification adequacy remain host judgments. Clarify that the authorized chain driver and separate reviewer perform substantive review; the earlier core-method wording human substantive review creates no new owner gate. Only genuine goal/cost/authority changes return to owner. Use ignored evidence/**/local/ for real bundles and .scratch for isolated tests; arbitrary output path is not automatically private.\n\nReason: Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.\n\nTests: T6\n\n### R7\n\nCandidate endpoint regression: Add tools/test_bered_uppdrag.py with synthetic legitimate and negative CLI fixtures; reuse delivered core API instead of changing it. Include case aliases and source collisions in both directions; scope tests to this command.\n\nReason: Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.\n\nTests: T7\n\n## Verification\n\n### T1\n\nObservable: Output exactly matches core private/package/task_draft/brief for a complete synthetic input; input bytes remain unchanged.\n\nMethod: Frozen host subprocess test compares actual CLI output files with core API.\n\n### T2\n\nObservable: Repeated output path returns exit2 without changing any existing byte; fresh directory/files have required modes.\n\nMethod: Host endpoint tests inspect modes and before/after bytes.\n\n### T3\n\nObservable: Equal/ancestor/descendant source and input collisions, symlink alias, absent parent all fail with no new source/output; separate output with missing selected source works.\n\nMethod: Isolated fixtures only; test negative paths and verify source remains missing. No original mutations.\n\n### T4\n\nObservable: Missing source creates gaps and stays draft; malformed/duplicate/NaN inputs create no bundle and report generic error without fixture secrets.\n\nMethod: Frozen host and candidate CLI tests exercise these cases.\n\n### T5\n\nObservable: Audited actual CLI invocation succeeds while process/network/ctypes execution are forbidden; active core hashes unchanged.\n\nMethod: Native host endpoint invocation with audit hook, exact core hash comparison, Runtime file grants and separate code review.\n\n### T6\n\nObservable: Fresh reader can reproduce legitimate and negative examples without private sources; no private or fictitiously accessible worker dependencies.\n\nMethod: Run documented synthetic example and independent method/content review.\n\n### T7\n\nObservable: Endpoint suite passes and demonstrates required behaviors against actual command.\n\nMethod: python3 -B -m unittest discover -s tools -p test_bered_uppdrag.py plus frozen host acceptance and independent Runtime review.\n\n## Gaps\n\nNo mechanical gaps detected. Still DRAFT; host review is required.\n\n## Limitations\n\n- DRAFT only. Mechanical completeness is neither acceptance nor authority; this tool grants no permission and does not authenticate AP06-ACCEPT.\n- Selected-source-only comparison at the supplied checked_at: no assurance of freshness or exhaustive discovery of later or relevant sources.\n- Reference checks are host-supplied observations, not authenticated evidence. No sources, quotes, links or source hashes are independently verified here.\n- Changed dependencies require reassessment, not automatic falsehood or revocation of recorded decisions or authority.\n- Host review must assess requirements, contradictions, mandates and the substantive adequacy of test observables; nonempty text is not proof.\n- Export review is required for every authored field, including IDs, reasons, test methods and task values. No string checker proves privacy or public safety.\n- The host must use Runtime's actual validator, review and freeze file bytes, and obtain independent review and protected integration. This draft neither generates nor executes acceptance and never invokes Runtime.\n- The preparation result is always a draft, never substantive approval, permission or evidence of complete source discovery.\n- Sources and lookup observations are host-supplied; timestamps describe the supplied comparison only.\n- Agent judgment selects requirements, authority scope, adequate observables and export content; no measured time saving is claimed.\n- This exported brief is self-contained together with files on the accepted base. No private references must be fetched.\n",
+  "task_draft": {
+    "id": "office-assignment-cli-2",
+    "target": "Nortropic/nortropic-projektkontor",
+    "base": "dd1f8c56456b575f017219621402658b5200c592",
+    "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+    "allowed_paths": [
+      "tools/bered_uppdrag.py",
+      "tools/test_bered_uppdrag.py",
+      "tools/BERED_UPPDRAG.md"
+    ],
+    "attempt_seconds": 1200,
+    "automatic_retries": 0,
+    "steps": [
+      {
+        "provider": "codex",
+        "prompt": "Read TASK.md. Reconstruct the three retained Runtime-authored reference files provided there, retaining bytes unless a concrete R1-R7 violation requires correction. The host corrected only its import launcher. Do not add product workarounds for the old host bug. Run synthetic tests; Runtime performs corrected frozen acceptance, fresh independent review and protected integration. Core/host authority remain read-only."
+      }
+    ],
+    "acceptance": "acceptance/uppdragsberedning-cli-continued.py",
+    "brief": "tasks/uppdragsberedning-cli-continued.md",
+    "acceptance_sha256": "ef0950d8fb00a7d4c597634d0ff3bc5807642ee09f2ec065b943cb3b1c866dd1"
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "Thin private preparation command: Expose prepare(CASE,CHECK,SPEC) through: python3 -B tools/bered_uppdrag.py CASE CHECK SPEC --source-root ROOT --output NEWDIR. Read strict JSON, call the delivered core; no new assessment logic.",
+      "reason": "Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.",
+      "tests": [
+        "T1"
+      ]
+    },
+    {
+      "id": "R2",
+      "text": "Immutable private bundle: Create NEWDIR exclusively, mode0700, with private.json, package.json, task.draft.json, brief.draft.md as exclusive0600 files. Parent must already exist. Existing output refused unchanged; preserve partial output on failure for diagnosis.",
+      "reason": "Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.",
+      "tests": [
+        "T2"
+      ]
+    },
+    {
+      "id": "R3",
+      "text": "No source or input mutation: Before any mkdir refuse symlink output or ancestors and all overlap directions between output and three input files plus selected case source paths under ROOT, including missing sources. Use resolved paths and casefold for Mac aliases. Do not create missing output ancestors. Reject symlink JSON inputs. Trusted local use, no claim of hostile concurrent-filesystem safety.",
+      "reason": "Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.",
+      "tests": [
+        "T3"
+      ]
+    },
+    {
+      "id": "R4",
+      "text": "Explicit drafts and safe failures: Well-formed incomplete input writes marked draft, exit0. Malformed/duplicate-key/non-JSON constants or unreadable inputs return exit2 with one generic JSON error, no raw private input or path in stdout or stderr. Stdout success has status=draft, mechanical_complete, gaps and file names. No ready/approved/authorized assertion.",
+      "reason": "Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.",
+      "tests": [
+        "T4"
+      ]
+    },
+    {
+      "id": "R5",
+      "text": "One engine, no activation: CLI does not hash or remeasure sources, refresh references, execute acceptance, start Runtime, signal, invoke models or publish. Do not edit tools/assignment_preparation.py, change_assessment.py, kontor.py, host tasks or acceptance.",
+      "reason": "Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.",
+      "tests": [
+        "T5"
+      ]
+    },
+    {
+      "id": "R6",
+      "text": "Usable method and endpoint examples: Write tools/BERED_UPPDRAG.md with complete reproducible synthetic example (or documented fixture in tools/test_bered_uppdrag.py), exact CLI command, AP05 measurement recipe pointer, host lookup/quote observations, real later decision IDs, explicit export review, immutable versions, host review/freezing and actual Runtime format. Explain meaning/verification adequacy remain host judgments. Clarify that the authorized chain driver and separate reviewer perform substantive review; the earlier core-method wording human substantive review creates no new owner gate. Only genuine goal/cost/authority changes return to owner. Use ignored evidence/**/local/ for real bundles and .scratch for isolated tests; arbitrary output path is not automatically private.",
+      "reason": "Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.",
+      "tests": [
+        "T6"
+      ]
+    },
+    {
+      "id": "R7",
+      "text": "Candidate endpoint regression: Add tools/test_bered_uppdrag.py with synthetic legitimate and negative CLI fixtures; reuse delivered core API instead of changing it. Include case aliases and source collisions in both directions; scope tests to this command.",
+      "reason": "Derived bounded CLI work required to complete AP06 using the delivered core; host substantive choices are separately reviewed.",
+      "tests": [
+        "T7"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "T1",
+      "observable": "Output exactly matches core private/package/task_draft/brief for a complete synthetic input; input bytes remain unchanged.",
+      "method": "Frozen host subprocess test compares actual CLI output files with core API."
+    },
+    {
+      "id": "T2",
+      "observable": "Repeated output path returns exit2 without changing any existing byte; fresh directory/files have required modes.",
+      "method": "Host endpoint tests inspect modes and before/after bytes."
+    },
+    {
+      "id": "T3",
+      "observable": "Equal/ancestor/descendant source and input collisions, symlink alias, absent parent all fail with no new source/output; separate output with missing selected source works.",
+      "method": "Isolated fixtures only; test negative paths and verify source remains missing. No original mutations."
+    },
+    {
+      "id": "T4",
+      "observable": "Missing source creates gaps and stays draft; malformed/duplicate/NaN inputs create no bundle and report generic error without fixture secrets.",
+      "method": "Frozen host and candidate CLI tests exercise these cases."
+    },
+    {
+      "id": "T5",
+      "observable": "Audited actual CLI invocation succeeds while process/network/ctypes execution are forbidden; active core hashes unchanged.",
+      "method": "Native host endpoint invocation with audit hook, exact core hash comparison, Runtime file grants and separate code review."
+    },
+    {
+      "id": "T6",
+      "observable": "Fresh reader can reproduce legitimate and negative examples without private sources; no private or fictitiously accessible worker dependencies.",
+      "method": "Run documented synthetic example and independent method/content review."
+    },
+    {
+      "id": "T7",
+      "observable": "Endpoint suite passes and demonstrates required behaviors against actual command.",
+      "method": "python3 -B -m unittest discover -s tools -p test_bered_uppdrag.py plus frozen host acceptance and independent Runtime review."
+    }
+  ],
+  "gaps": [],
+  "limitations": [
+    "DRAFT only. Mechanical completeness is neither acceptance nor authority; this tool grants no permission and does not authenticate AP06-ACCEPT.",
+    "Selected-source-only comparison at the supplied checked_at: no assurance of freshness or exhaustive discovery of later or relevant sources.",
+    "Reference checks are host-supplied observations, not authenticated evidence. No sources, quotes, links or source hashes are independently verified here.",
+    "Changed dependencies require reassessment, not automatic falsehood or revocation of recorded decisions or authority.",
+    "Host review must assess requirements, contradictions, mandates and the substantive adequacy of test observables; nonempty text is not proof.",
+    "Export review is required for every authored field, including IDs, reasons, test methods and task values. No string checker proves privacy or public safety.",
+    "The host must use Runtime's actual validator, review and freeze file bytes, and obtain independent review and protected integration. This draft neither generates nor executes acceptance and never invokes Runtime.",
+    "The preparation result is always a draft, never substantive approval, permission or evidence of complete source discovery.",
+    "Sources and lookup observations are host-supplied; timestamps describe the supplied comparison only.",
+    "Agent judgment selects requirements, authority scope, adequate observables and export content; no measured time saving is claimed.",
+    "This exported brief is self-contained together with files on the accepted base. No private references must be fetched."
+  ]
+}

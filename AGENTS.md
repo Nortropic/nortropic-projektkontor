@@ -15,9 +15,9 @@ Beslut raderas inte: en ersatt post märks SUPERSEDED med pekare till ersättare
 Mottagare och granskare svarar i sessionen; värden bevarar deras protokoll.
 Dessa är dokumenterade arbetsregler, inte tekniskt påtvingade skrivspärrar.
 
-Kampanjen, övriga syskonrepon och Obsidian-valvet är skyddade. AP05-ACCEPT
-medger kontorets ändringsbedömning och körning genom befintlig Runtime.
-Runtime-kod, kampanj, IR och valv får inte ändras i AP-05. Läs uppdragets exakta tillstånd före arbete. Publicera endast
+Kampanjen, övriga syskonrepon och Obsidian-valvet är skyddade. AP06-ACCEPT
+medger källbunden uppdragsberedning och körning genom befintlig Runtime.
+Runtime-kod, kampanj, IR och valv får inte ändras i AP-06. Läs uppdragets exakta tillstånd före arbete. Publicera endast
 fasens kontrollerade kod, tester, nödvändiga underlag och bevis; inga privata
 källsamlingar, råsessioner, nycklar eller lokala konfigurationer. Status/resultat
 är rena läsningar. Kandidaten får aldrig ändra sin aktiva körväg eller acceptans.
