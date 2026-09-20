@@ -65,5 +65,12 @@
     "No exact old/new generator diff",
     "Lexical scope only",
     "Selected sources, not exhaustive later-source discovery"
-  ]
+  ],
+  "private_preservation": {
+    "archive": "evidence/ap05/local/case-sources-v3.tar.gz",
+    "sha256": "0ec6bcb0fab4f6f5d869cd94a3938950e6ff21ff05044de8789af00155e118e9",
+    "source_count": 1235,
+    "reread_verified": true,
+    "publication": "private local archive only; no archive or original source bytes transferred"
+  }
 }
