@@ -195,8 +195,9 @@ manifest = reference_manifest(case)
 # The host chooses this private location; this check grants no write authority.
 protected = [case_path] + [(source_root / entry["path"]).resolve()
                            for entry in manifest["files"]]
-if any(path == output or output in path.parents for path in protected):
-    raise ValueError("Output must not contain the case or any selected source file")
+if any(path == output or output in path.parents or path in output.parents
+       for path in protected):
+    raise ValueError("Output must not overlap the case or any selected source file")
 verifier = os.environ["AP05_VERIFIER"]
 if not verifier.strip():
     raise ValueError("Supply the installed verifier file path")
