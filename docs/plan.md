@@ -1,22 +1,22 @@
 # Levande plan — AP-05
 
-AKTUELLT STEG: Runtime bygger kodstödet i isolerad kandidat. Uppdraget startades
-via kontorets ingång; snapshot visade running_codex, försök 1. Värden bedömer
-parallellt kartärendet på denna gren och ändrar inga kandidatfiler.
+AKTUELLT STEG: Runtime väntar på granskad reparation. Försök 1 klarade fryst
+värdacceptans men separat review-1 avslog giltiga ISO8601-format. Ingen integration.
+Separat metodgranskning fann också felaktigt manifest-argv och fel rollfördelning
+för verklig källåtkomst. Historik och kandidat c4ac46b bevaras.
 
-NÄSTA HANDLING: Läs status och faktiska körbevis för office-change-assessment-1;
-hantera eventuell väntan med konkret diagnos, annars invänta fryst acceptans,
-separat Runtime-granskning och skyddad integration. Kartbedömning v3 och publik falltext är separat sakgranskade utan blockerare.
-Efter kodintegration: kör verkliga fallet med kodstödet, verifiera negativa
-fixturfall och färsk mottagare, granska och integrera avslutet.
+NÄSTA HANDLING: Återuppta samma uppdrag med --review-repair och den bevarade
+diagnosen i evidence/ap05/repair-1.json. Runtime ska rätta inom de tre befintliga
+filerna, testa hela kontraktet och separat granska en ny kandidat före publicering.
 
-ÅTERUPPTAGNINGSPUNKT: gren work/ap05; inputrevision a218038b0952ab9d6b48f04bec4d231d5c16cbeb,
-tasks/andringsbedomning.json. `python3 -B tools/kontor.py status --task
-andringsbedomning.json` är ren läsning. `fortsatt` används bara efter diagnos
-av faktisk väntan. Kandidatbas 17ce93a; Runtime 2789ea0. Körbevis finns i Runtimes
-evidence/runs/office-change-assessment-1/. Privat källmappning och mätningar finns
-i evidence/ap05/local/; publicera aldrig denna katalog. Ingen hostintegration
-som flyttar main före Runtimes kodintegration.
+ÅTERUPPTAGNINGSPUNKT: gren work/ap05, tasks/andringsbedomning.json,
+office-change-assessment-1; bas 17ce93a och Runtime 2789ea0 oförändrade.
+Status läses med tools/kontor.py status --task andringsbedomning.json. Kontrollera
+processkvitton före fortsatt. Verklig fallbedömning v3 och publik text är separat
+godkända; efter kodintegration återstår faktisk tillämpning, negativa fixturprov,
+färsk mottagare, separat avslutsgranskning och bevarande. Privat ärendeindex:
+evidence/ap05/local/case-history.json. Ingen hostintegration som flyttar main
+före Runtimes kodintegration.
 
 Ordning: fryst syntetiskt kontrakt → Runtime-bygge/test/review/integration →
 verklig tillämpning och separat sakgranskning → färsk mottagare → skyddad
