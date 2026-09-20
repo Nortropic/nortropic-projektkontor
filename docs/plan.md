@@ -6,17 +6,17 @@ Runtime 09268df5f59a180afe863d4cf7f95c9ad95f8639 (PR15), kontor
 matchar granskade kandidater. Resultatuppdragets brief och acceptans är separat
 godkända och frysta i tasks/resultat.json, tasks/resultat.md, acceptance/resultat.py.
 
-NÄSTA HANDLING: Uppdrag office-result-1 är startat och står i waiting_diagnosis
-på försök 1 efter avsiktligt SIGTERM-prov. Provider avslutad med exit130,
-interrupted=signal; provider-, worker- och engine-grupper är verifierat avslutade.
-Kör först `python3 -B tools/kontor.py status` och kontrollera kvitto/processer.
-Återuppta sedan samma uppdrag med:
-`python3 -B tools/kontor.py fortsatt --diagnosis "Controlled interruption completed; provider, worker and engine groups removed; unchanged accepted input and verifier; continue same task"`.
-Starta inte ett nytt uppdrag. Hantera därefter verkliga test-/granskningsutfall
-med Runtimes diagnos-/review-återgång. evidence/ap04/interruption.json binder provet.
+NÄSTA HANDLING: Samma uppdrag office-result-1 har återupptagits med bevarad
+diagnos genom kontorets `fortsatt`; försök 2 pågår genom Runtime. Följ enbart
+`python3 -B tools/kontor.py status` tills completed eller dokumenterat vänteläge.
+Starta inte fler arbetare/signaler under körningen. Runtime gör hostacceptans,
+separat review och skyddad integration. Vid väntan: inspektera bevis och processer,
+rätta bara relevant förutsättning och använd befintlig diagnos-/review-återgång.
+Färsk mottagare har verifierat rätt återupptagning: evidence/ap04/handover.json.
 
 ÅTERUPPTAGNINGSPUNKT: Kontor work/ap04-result-task; Runtime main vid ovanstående
-pinnade revision, rent. Kör-id office-result-1, underlag tasks/resultat.json.
+pinnade revision, spårad kod ren. Rå körloggar ligger i lokalt Git-exkluderad
+evidence/runs/office-result-1/. Kör-id office-result-1, underlag tasks/resultat.json.
 `python3 -B tools/kontor.py status` är en läsning; `fortsatt` är en aktiv handling.
 Codex är kedjedrivare. Kontrollera Runtime evidence/runs/office-result-1 och
 .runtime/tasks/office-result-1 samt processer innan skrivansvaret tas över.

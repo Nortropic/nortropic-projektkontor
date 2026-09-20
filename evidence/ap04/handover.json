@@ -1,0 +1,18 @@
+{
+  "reviewer": "/root/ap04_handover",
+  "context": "fresh session without prior conversation; read-only",
+  "office_revision": "6e07121302002f498136d062181e3c0fd607db7e",
+  "runtime_revision": "09268df5f59a180afe863d4cf7f95c9ad95f8639",
+  "observed_task": "office-result-1",
+  "observed_phase": "waiting_diagnosis",
+  "attempts": 1,
+  "correct_mandate": true,
+  "correct_next_action": "same-task continued execution with recorded diagnosis after process and input checks",
+  "registered_processes_absent": true,
+  "frozen_acceptance_matched": true,
+  "frozen_brief_matched": true,
+  "result_files_empty": true,
+  "delivery_not_claimed": true,
+  "minor_finding": "Runtime tracked source clean but raw run directory was untracked; it is now explicitly excluded locally from Git to prevent publication. Raw logs remain preserved.",
+  "scope": "one fresh receiver at this interruption, not long-term operation"
+}
