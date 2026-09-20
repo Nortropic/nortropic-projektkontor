@@ -503,6 +503,37 @@ class CLITests(unittest.TestCase):
         self.assertEqual(reads, [str(self.case_file), str(self.check_file)])
         self.assertTrue(json.loads(out.getvalue())["structure_valid"])
 
+    def test_documented_host_recipe_rejects_output_under_missing_source(self):
+        document = Path(assessment.__file__).with_name("CHANGE_ASSESSMENT.md").read_text(encoding="utf-8")
+        recipe = document.split("```python\n", 1)[1].split("\n```", 1)[0]
+        source_root = self.root / "synthetic-sources"
+        (source_root / "office").mkdir(parents=True)
+        self.case["sources"][0]["path"] = "office/pending.txt"
+        self.case_file.write_text(json.dumps(self.case), encoding="utf-8")
+        original = self.case_file.read_bytes()
+        selected = source_root / "office/pending.txt"
+        output = selected / "run"
+        marker = self.root / "verifier-called"
+        verifier = self.root / "synthetic_verifier.py"
+        verifier.write_text(
+            "from pathlib import Path\n"
+            "Path(__file__).with_name('verifier-called').touch()\n",
+            encoding="utf-8")
+        env = dict(os.environ, AP05_CASE=str(self.case_file),
+                   AP05_SOURCE_ROOT=str(source_root), AP05_OUTPUT=str(output),
+                   AP05_VERIFIER=str(verifier))
+        self.assertFalse(selected.exists())
+        self.assertFalse(output.exists())
+        rejected = subprocess.run([sys.executable, "-B", "-c", recipe], env=env,
+                                  cwd=Path(__file__).resolve().parents[1],
+                                  capture_output=True, text=True, timeout=20)
+        self.assertNotEqual(rejected.returncode, 0)
+        self.assertFalse(selected.exists(), "Recipe created the missing selected source")
+        self.assertFalse(output.exists())
+        self.assertFalse(marker.exists(), "Verifier ran before overlap rejection")
+        self.assertEqual(self.case_file.read_bytes(), original)
+        self.assertIn("Output must not overlap", rejected.stderr)
+
     def test_documented_host_recipe_with_synthetic_verifier_observations(self):
         document = Path(assessment.__file__).with_name("CHANGE_ASSESSMENT.md").read_text(encoding="utf-8")
         recipe = document.split("```python\n", 1)[1].split("\n```", 1)[0]
