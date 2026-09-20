@@ -25,3 +25,18 @@ Kontorets kvalificerade utförarprofil är Codex; gamla Runtime-repots providers
 [Leveransbevis](evidence/ap04/delivery-verification.json) binder den riktiga
 resultatfunktionen, avbrottet/återupptagningen och PR2. [Slutredovisningen](evidence/ap04/leverans.md)
 anger räckvidd och återstående avslutskontroll. Nästa byggfas behöver eget mandat.
+
+## AP-05 — ändringsbedömning
+
+[Metoden och kommandona](tools/CHANGE_ASSESSMENT.md) binder utvalda källversioner
+till källuppgifter, sakbedömningar och befogenhet för varje handling. Ändrat eller
+saknat underlag markerar berörda slutsatser för omprövning; verktyget fattar inga
+beslut och ger inga tillstånd. Befintligt Runtime-verktyg mäter filerna, värden
+läser verkliga källor och bevarar privata ärenden lokalt.
+
+[Det verkliga kartärendet](cases/map-layer/assessment.md) redovisar tidigare beslut,
+nya avgränsade observationer och exakt återstående ägaromdöme/skrivbeslut.
+[AP-05:s leveransbevis](evidence/ap05/leverans.md) anger körning, granskning och
+begränsningar. Endast kontrollerad fallredovisning är publik; intern källmappning
+och original ligger i den lokala, Git-exkluderade evidensdelen. Nästa handling
+ägs fortsatt av [planen](docs/plan.md), inte av en parallell ärendemotor.
