@@ -1,0 +1,37 @@
+{
+  "observed_at": "2026-09-20T17:26:46.023247+00:00",
+  "repository": {
+    "defaultBranchRef": {
+      "name": "main"
+    },
+    "nameWithOwner": "Nortropic/nortropic-projektkontor",
+    "url": "https://github.com/Nortropic/nortropic-projektkontor",
+    "visibility": "PUBLIC"
+  },
+  "commit": "5f78f016039a2d7ded72a7ded086b0893fafafc2",
+  "remote_main_equals_commit": true,
+  "github_archive_sha256": "cd3180ca0b0001b0e5995856e9b04f212a300e2b1c12462284357aa2edfeeda5",
+  "remote_files_match_local": true,
+  "local_archive": "evidence/entry/local/checkpoint-5f78f016039a.tar.gz",
+  "local_archive_sha256": "25f843e8e1469d66b664d8e7b006cffc610da1fc01e5340ad2de17a064c3fe45",
+  "local_archive_reread_verified": true,
+  "files": {
+    "AGENTS.md": "21b9e79330e9b0e1933b5000ed64e81f1dfd8d2ecc5d31568d630f4de5a14612",
+    "CLAUDE.md": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+    "DEFINITION.md": "16142baf9aea632e7fc04b1780d133025849f7e65c909bd2fa594f369f3fc7d5",
+    "README.md": "028f2b517747fe0d5d223dc9f3cf3d1bbabb4fa41b7fd0d3696402e38d34a116",
+    "docs/decisions.md": "5524ac0d68f376ec47430a59527ce5fd218ba891fd14bab98a789f48ddc4f538",
+    "docs/plan.md": "c7c464f7799b81a8c1155a24351aad7320df9aad406ab2e694b8d96a753cf797",
+    "docs/uppdrag.md": "b845a9e004b10be5a02412e7900d5485bbec4245f046552e9501e6b51ab5cf15",
+    "evidence/entry/granskning-06217b6.md": "737b47021fa35bd540cf6008637baa8a016242e2ba700a2cb41a7bf97673cdb7",
+    "evidence/entry/p1-300c239-answer.md": "363bd5064fb29dd1af4244bfc86647f6f0ffb307b9bfbbcc4ddc728a5e166684",
+    "evidence/entry/p1-300c239.json": "432c2495742e3f4ddc8eeab4326a61b71cf18ab636af68584366eea6309693b3",
+    "evidence/entry/p3-claude-300c239-answer.md": "d5dd549143ee593280909b0610d68a146386ea70f6860a163da1eb5de8ee120c",
+    "evidence/entry/p3-claude-300c239.json": "2d9e5725809626d0a195da3381c7782cbd9fdd7b5215c34dc35152ab27f680c9",
+    "evidence/entry/p3-codex-300c239-answer.md": "e86cc12203f6e02e3e3eb1d6f3db77f26065bcbcdf6c38f34748f4f77e3497ca",
+    "evidence/entry/p3-codex-300c239.json": "31ea61d77749ef471ee74545400d961093361739c01a41fb123b03bdfbf411b8",
+    "evidence/entry/provbedomning-300c239.md": "74d04a5eefa3a1c12120b341a3372a318ec1bae806b148fc6c5e5dd6a0baf209",
+    "evidence/entry/start.json": "42b738312e9f695050cd9f813103a35df438b39767d9613d6716957f80028515"
+  },
+  "scope": "All tracked files in exact GitHub archive compared with local bytes. Local preservation on same disk. This receipt does not verify its own later commit."
+}
