@@ -1,0 +1,8 @@
+{
+  "at": "2026-09-20T21:35:27.934702+00:00",
+  "archive": "evidence/ap07/local/pilot-private.tar.gz",
+  "archive_sha256": "eca1e7bc93ee2181c7f978985aea8d2db047a4d81dbb50096caf1003ec7ebdc4",
+  "regular_files_reread": 308,
+  "reread_verified": true,
+  "scope": "Private frozen trial inputs, inherited instructions, actual native histories and outputs, AP05/AP06 preparation versions, mandate, reviews and method source snapshots available at this timestamp. Same-disk preservation; not disaster recovery."
+}

@@ -1,10 +1,14 @@
 # Metodprov: pröva en osäker koppling i liten skala
 
-Detta är en frivillig försökskandidat inom AP07. Metoden är ännu inte bedömd
-mot verkliga tillämpningar. Den ger inget belägg för förbättrad produktivitet.
-Värden genomför senare falltillämpningar och separat utfallsbedömning. Befintlig
-Runtime ansvarar för frysta exempelkontroller, separat granskning och skyddad
-integration. Dokumentet inför inget nytt körsystem eller automatiskt godkännande.
+AP07:s separat sakgranskade beslut är **ANPASSA**: använd anvisningen som valbart
+stöd i befintlig beredning vid en konkret osäker koppling. Försöken visar inte bättre
+beslut än befintlig arbetsform eller förbättrad produktivitet. Läs
+[metodbeslut och tillämpningsgräns](../docs/metodbeslut-ap07.md) före användning.
+Detta inför ingen ny rutin, tillitsregel, befogenhet eller automatiskt godkännande.
+
+Den ursprungliga prövningsversionen byggdes, testades, separat granskades och
+integrerades av befintlig Runtime i PR10. AP07:s senare fallbedömning ändrar här
+status och läsanvisning; det fristående exemplet och arbetsreceptet är bevarade.
 
 ## När ett förprov kan hjälpa
 
@@ -176,7 +180,8 @@ Två primärkällor ger stöd för uppläggets idéer:
 Källbeskrivningarna bygger på värdens lästa och granskade sammanfattningar i
 uppdraget. För IHI avser läsningen förklaringssidan; ingen nedladdad arbetsmall
 eller läsning av ett fullständigt ramverk påstås. Dessa källor motiverar ett
-försöksupplägg men bevisar inte effekten av vår ännu omätta tillämpning.
+försöksupplägg men bevisar inte lokal effekt; AP07:s begränsade utfall finns i
+metodbeslutet.
 
 Tillräckligt resultat är ett underbyggt svar på det avgränsade nästa beslutet,
 eller ett tydligt besked om varför underlaget inte räcker. Bevara observation,

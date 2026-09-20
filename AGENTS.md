@@ -15,13 +15,18 @@ Beslut raderas inte: en ersatt post märks SUPERSEDED med pekare till ersättare
 Mottagare och granskare svarar i sessionen; värden bevarar deras protokoll.
 Dessa är dokumenterade arbetsregler, inte tekniskt påtvingade skrivspärrar.
 
-Kampanjen, övriga syskonrepon och Obsidian-valvet är skyddade. AP06-ACCEPT
-medger källbunden uppdragsberedning och körning genom befintlig Runtime.
-Runtime-kod, kampanj, IR och valv får inte ändras i AP-06. Läs uppdragets exakta tillstånd före arbete. Publicera endast
-fasens kontrollerade kod, tester, nödvändiga underlag och bevis; inga privata
-källsamlingar, råsessioner, nycklar eller lokala konfigurationer. Status/resultat
-är rena läsningar. Kandidaten får aldrig ändra sin aktiva körväg eller acceptans.
+Kampanjen, övriga syskonrepon och Obsidian-valvet är skyddade. AP07-ACCEPT
+medger endast den avgränsade metodpiloten och dess kontrollerade avslut. Runtime-kod,
+IR, kampanj och valv får inte ändras. Läs uppdragets exakta tillstånd före arbete.
+Publicera bara innehållskontrollerad metod, syntetiska exempel och begränsad
+fallredovisning; inga privata källsamlingar, råsessioner, nycklar eller lokala
+konfigurationer. Status/resultat är rena läsningar. Kandidaten får aldrig ändra sin aktiva körväg eller acceptans.
 Separat granskning och verifierat serverskydd krävs före integration.
+
+Vid en konkret osäker koppling i en accepterad uppgift kan
+`docs/metodbeslut-ap07.md` och `tools/METODPROV.md` hjälpa att välja ett litet prov.
+Börja med giltiga befintliga bevis och läsning; det är ingen obligatorisk kontroll.
+Metoden ger inga befogenheter och AP07 öppnar inget generellt förbättringsprogram.
 
 Commit löpande. Bevara väntan, diagnos, evidens och nästa kommando i planen före
 avbrott. Avbryt hängande anrop; inga blinda omförsök. Vid upprepat samma fel:

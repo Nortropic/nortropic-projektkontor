@@ -295,3 +295,37 @@ kampanj-/IR-/valvskrivningar, nya tjänster/kostnader/behörigheter eller målre
 Luckor förblir luckor. Ingen automatisk värdacceptans, start eller publicering.
 Ägaren behöver inte acceptera rutinmässiga tekniska delsteg. A3/A6 och tidigare
 fynd behåller status. Kartleveransen är avslutad. Ingen nästa fas beställs.
+
+## AP07-ACCEPT — avgränsad metodpilot
+
+**Status:** uttryckligt genomförandemandat i ägarens senaste meddelande; fulltext
+privat i evidence/ap07/local/accepted-mandate.md. AP04–AP06 bedöms tillräckliga
+enligt I07b för JUST denna pilot. Inget generellt självförbättringsprogram öppnas.
+**Mål:** pröva ett återanvändbart arbetssätt med AP06 som första tillämpning, AP05
+som metodöverföring och fungerande kontrast. Lås hypotes/jämförelse/motbevis före
+prov. Färsk utförare väljer/kör själv utan rättelsefacit; bevara faktiskt underlag
+och redovisa exponering. Gamla rättelser och bevis tillgodoräknas, skrivs inte om.
+**Tillstånd:** pilot, dokumentation, separat sakgranskning och skyddad integration
+av metodbeskrivning och avgränsat anta/anpassa/avstå-beslut i kontorsrepot. Publicera
+endast innehållskontrollerad metod, syntetiska exempel och begränsad fallredovisning.
+Privata källor/uppgifter/råsessioner stannar privat. Befintlig Runtime-väg används.
+**Gränser:** inga nya motorer, verktyg där befintliga räcker, plattformar, databaser,
+schedulers, modellanslutningar, Runtime-kodändringar, tjänster, kostnader, rättigheter
+eller valvskrivningar. Ingen universell grind eller ändrad befogenhet. Ingen utvidgning
+för positivt resultat, ingen obelagd tidsvinst eller nytt mätsystem. Separat review
+bedömer faktisk metodtillämpning/resultat. Tidigare auditstatus/leveranser bevaras.
+Kedjedrivaren äger tekniska omtag och samordning inom mandatet; inga rutinfrågor.
+Efter verifierat avslut redovisa och stanna; nästa fas beställs inte.
+
+## AP07-METOD — ANPASSA, ingen ny rutin
+
+**Beslut:** kedjedrivaren använder AP07-ACCEPT:s mandat efter separat sakgranskning
+utan blockerare. Behåll anvisningen som frivilligt stöd i befintlig beredning.
+Ingen ny universell grind, tillitsregel eller befogenhet införs.
+**Skäl:** färska utförare valde relevanta små prov och stannade i fungerande kontrast,
+men grundarmarna nådde samma beslut. Mer native sessionstid/output observerades i
+metodarmarna; effektivisering och minskad ägarbörda är inte belagda.
+**Tillämpning:** [metodbeslutet](metodbeslut-ap07.md) anger när stödet passar, när
+befintliga bevis/läsning räcker och tillräckligt nästa steg. Tidigare beslut raderas
+inte. I07b:s bedömning gäller endast denna pilot; A3/A6 och tidigare fynd består.
+**Avslut:** integration och faktiskt slutkvitto enligt planen; ingen nästa fas startas.

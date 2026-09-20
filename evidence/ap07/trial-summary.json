@@ -1,0 +1,77 @@
+{
+  "trials": [
+    {
+      "trial": "baseline-x",
+      "elapsed_seconds": 86.73,
+      "usage": {
+        "input_tokens": 112604,
+        "cached_input_tokens": 87168,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4583,
+        "reasoning_output_tokens": 487
+      },
+      "input_files_unchanged": true,
+      "raw_sha256": "5b9c078badc69a46bfd3c66f9a4031de214ff6d94d6290c3d839805a3130545c",
+      "completed": true,
+      "process_group_removed": true,
+      "shell_commands_completed": 5,
+      "recipe_experiments": 1,
+      "input_manifest_sha256": "c06b0aad4cdda7ec0e96b3960cca6285dd5c46e429c57facaa7e498806b6093e"
+    },
+    {
+      "trial": "method-x",
+      "elapsed_seconds": 105.623,
+      "usage": {
+        "input_tokens": 156609,
+        "cached_input_tokens": 132736,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 5499,
+        "reasoning_output_tokens": 251
+      },
+      "input_files_unchanged": true,
+      "raw_sha256": "9be9273757ef4238673c7ee7702efbba7f49eef5d05e7f0a9a584b5469f9107d",
+      "completed": true,
+      "process_group_removed": true,
+      "shell_commands_completed": 7,
+      "recipe_experiments": 1,
+      "input_manifest_sha256": "10cd495d3bb030d08bb8e1967870d25741e4962d8c02c1d0144412884c9a0c7d"
+    },
+    {
+      "trial": "baseline-y",
+      "elapsed_seconds": 72.911,
+      "usage": {
+        "input_tokens": 102476,
+        "cached_input_tokens": 84480,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 3713,
+        "reasoning_output_tokens": 327
+      },
+      "input_files_unchanged": true,
+      "raw_sha256": "68dc09554e796d698c76b783a895c3a7e326f53c2facc867f571979e0f7eed52",
+      "completed": true,
+      "process_group_removed": true,
+      "shell_commands_completed": 6,
+      "recipe_experiments": 1,
+      "input_manifest_sha256": "6ff916cc76327d33fed9fc297a386aafcb57cd00ba94b74aad80e2b63d1b9269"
+    },
+    {
+      "trial": "method-y",
+      "elapsed_seconds": 115.581,
+      "usage": {
+        "input_tokens": 159249,
+        "cached_input_tokens": 126208,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 5420,
+        "reasoning_output_tokens": 233
+      },
+      "input_files_unchanged": true,
+      "raw_sha256": "e8f75dbaba567d50ab8890f0fc15342741de35bf39099ede06ccdfb89191aa7c",
+      "completed": true,
+      "process_group_removed": true,
+      "shell_commands_completed": 9,
+      "recipe_experiments": 1,
+      "input_manifest_sha256": "a9efd8446457c8cefd0bd89ce19d07e98af327e5f87f1ce3f0bc8b33f3896351"
+    }
+  ],
+  "interpretation": "Native elapsed session time and usage, not human worktime, prices, savings or causal productivity; four historical selected cases, no automatic repeats. Private exact inputs/commands/session identities retained locally."
+}

@@ -1,3 +1,19 @@
+# AP07 — avgränsad metodpilot och avslut
+
+Mandatet är AP07-ACCEPT i beslutsloggen. Den fulla ägartexten och det tidigare
+beredda/granskade paketet bevaras privat under evidence/ap07/local/. Tidigare
+beredning behöver inte göras om. Fyra färska tillämpnings-/kontrastförsök och
+AP06-retrospektivet är genomförda. Läs [metodbeslutet](metodbeslut-ap07.md) och
+[leveransredovisningen](../evidence/ap07/leverans.md). Planen äger återupptagningen.
+
+Resultatet är en frivillig precisering av befintligt arbetssätt, inte en ny grind
+eller bevisad effektivisering. Slutlig integration och verifiering binds till
+faktisk revision i det lokala slutkvittot. Ny fas kräver nytt uttryckligt mandat.
+Ingen Runtime-kod, kampanj, IR eller valv ändras; inga nya rättigheter införs.
+Tidigare leveranser och auditstatus består. AP06-texten nedan är historik.
+
+---
+
 # Uppdrag — AP-06: källbunden uppdragsberedning
 
 Gällande mandat: AP06-ACCEPT i docs/decisions.md. Full ägartext bevaras privat i
