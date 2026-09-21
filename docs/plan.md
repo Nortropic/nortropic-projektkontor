@@ -1,27 +1,36 @@
-# Levande plan — AP09 genomförs inom AP09-ACCEPT
+# Levande plan — AP09 verifierat verksamhetsresultat och kontrollerat avslut
 
-AKTUELLT STEG: delmål 1–3 genomförda för första omgången; separat sakgranskning
-stöder avgränsat beslut med uttrycklig bevislucka. Verkliga uppgifter och utfall
-stannar privat. Befintliga verktyg räcker; ingen produktkod byggs om.
-Arbetsanvisning: tools/OMVARLDSARBETE.md. Första skyddade integrationen återstår.
+AKTUELLT STEG: båda verkliga intagen, aktuell lokal omobservation och färsk
+mottagares faktiska fortsättning är separat sakgranskade utan blockerare.
+Befintliga AP05/AP06/AP08 räckte; anvisningen är integrerad genom PR14.
+Den granskade avslutsredovisningen integreras skyddat genom samma värdpublicerare.
+Fasens slutstatus och faktiskt använda revisioner binds privat i
+`evidence/ap09/local/final.json`. Status `verified_delivered` med matchande
+revisioner innebär att AP09 är avslutad inom dess redovisade räckvidd.
 
-NÄSTA HANDLING: kedjedrivaren granskar och skyddat integrerar första avgränsade
-anvisningen. Överlämna därefter skrivansvaret uttryckligt till en färsk utförare
-för delmål 4–5: ett andra externt intag, ny lokal observation och faktisk motiverad
-fortsättning/avslut av samma ärende. Separat slutgranskning och slutkvitto krävs.
-Detta är tekniska delsteg inom redan accepterad AP09, inga nya ägarprompter.
+NÄSTA HANDLING: root verifierar slutkvittot och lämnar den privata slutbilden
+`evidence/ap09/local/picture-final/index.html` samt sakbeslutet till ägaren och
+stannar. Ingen vidare intagsomgång, modellkörning eller byggfas startas.
+Om kvittot saknas/ofullständigt: slutför bara kontrollerat avslut enligt kvarvarande
+privata kvitton inom AP09-ACCEPT, återstarta inte den redan genomförda kedjan.
 
-ÅTERUPPTAGNING: läs evidence/ap09/local/LAS-MIG.md och kontrollerat accepterat
-förslag/mandat där; kontrollera Git och registrerade skrivare före övertagande.
-Privata intag och AP05/AP06-utdata bevaras separat. Samma ärende fortsätter;
-uppdatera inte referenshashar tyst och starta ingen gammal Runtime-task.
-Planen ensam äger nästa handling. Skrivansvar är root tills en uttrycklig
-överlämning journalförts. AP08-lägesbilder är daterad information, inte accept.
+ÅTERUPPTAGNING: `evidence/ap09/local/LAS-MIG.md` leder till mandat, båda intagen,
+mottagarens faktiska handlingar, separata granskningar och integrationsbevis.
+Kontrollera Git, kvitto och registrerade skrivare före nytt skrivansvar. Root tog
+över först efter uttryckligt mottagarstopp. Syntetiska utfall är särredovisade.
+Planen ensam äger nästa handling; AP08 är daterad information, inte körstate.
 
-BEVARAT: etablering/AP04–AP08/karta tillgodoräknas; AP07 frivilligt ANPASSA utan
-belagd förbättring. Tidigare auditstatus inklusive A3/A6/FIND-004 består.
-Ingen Runtime-kodändring, installation, ny kostnad/rättighet, valvskrivning eller
-stående bevakning. Historisk AP08-plan nedan bär inte aktuell nästa handling.
+SENARE BESTÄLLD OMGÅNG: en då behörig utförare börjar här och använder
+`tools/OMVARLDSARBETE.md`, samma privata ärende och bevarade föregångare. Utför
+nytt externt intag OCH lokal kontroll, ompröva konkreta skillnader och använd
+AP06 bara vid motiverad åtgärd. Ingen ny rättighet eller stående bevakning följer
+av anvisningen. Tekniska kommandon och granskningssamordning bärs av utföraren.
+
+BEVARAT: etablering/AP04–AP08/karta tillgodoräknas. AP07 är frivilligt ANPASSA
+utan belagd förbättring; tidigare auditstatus inklusive A3/A6/FIND-004 består.
+Ingen installation, Runtime-kodändring, ny kostnad/rättighet eller valvskrivning.
+Lokala versions-/användningsuppgifter och råhistorik stannar privat. Historiskt
+AP08-avslut nedan bär inte aktuell nästa handling.
 
 ---
 

@@ -378,3 +378,21 @@ med en skrivare åt gången. Inget installations-/Runtime-/valvmandat, ny rätti
 kostnad eller stående bevakning. Tekniska delmål behöver inga nya ägarprompter.
 AP08-besked är information. Tidigare leveranser/auditstatus och AP07 ANPASSA bevaras.
 Efter verifierad leverans: redovisa och stanna.
+
+## AP09-LEVERANS — prövad omvärldsbevakningskedja
+
+Två verkliga externa intag, lokal omobservation och faktisk fortsatt handläggning
+av samma ärende är genomförda och separat sakgranskade. Befintliga funktioner
+räckte; ny kod är inte resultatet. [Anvisningen](../tools/OMVARLDSARBETE.md) kan
+användas av behörig utförare inom ett senare beställt uppdrag.
+
+Formatkontroll skiljs från bedömning. Transport-/serialiseringsskillnader är
+bevarade och uttryckligt omprövade; ursprungliga hashbindningar har inte ersatts.
+Källuppgift, lokal observation, slutsats och befogenhet hålls isär. Den privata
+fallbedömningen anger begränsat beslut och kvarvarande exakt bevislucka; inget
+obestyrkt påstående har omvandlats till tekniskt godkännande. Ingen automatisk
+installation eller ny Runtime-task har skapats för att få ett positivt resultat.
+
+Faktisk skyddad integration och revisioner binds av slutkvittot enligt planen.
+Tidigare auditstatus, AP07 ANPASSA och leveranser bevaras. Ingen stående bevakning,
+ny rättighet eller nästa fas följer av AP09:s avslut.
