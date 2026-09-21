@@ -14,6 +14,10 @@ _TASK_FIELDS = (
     "attempt_seconds", "automatic_retries", "steps", "acceptance",
     "acceptance_sha256", "brief",
 )
+# Explicit executor choice (owner decision AP11-UTFÖRARNEUTRAL): an absent reviewer
+# choice is the original Codex reviewer, so it is never a gap and never defaulted here.
+_OPTIONAL_TASK_FIELDS = ("review_provider",)
+_EXECUTORS = ("codex", "claude")
 _KINDS = ("fact", "judgment", "decision", "authority")
 _LIMITATIONS = (
     "DRAFT only. Mechanical completeness is neither acceptance nor authority; "
@@ -90,8 +94,11 @@ def _empty(value):
 
 
 def _validate_task(task, gap):
-    if not isinstance(task, dict) or set(task) - set(_TASK_FIELDS):
+    if not isinstance(task, dict) or set(task) - set(_TASK_FIELDS) - set(_OPTIONAL_TASK_FIELDS):
         raise ValueError("task must be an object with only permitted fields")
+    if "review_provider" in task and (not isinstance(task["review_provider"], str)
+                                      or task["review_provider"] not in _EXECUTORS):
+        raise ValueError("task review_provider must be codex or claude")
     for field in _TASK_FIELDS:
         if field not in task:
             gap("task_field_missing", field)
@@ -128,8 +135,8 @@ def _validate_task(task, gap):
             _list(value, "task steps")
             for step in value:
                 _object(step, "provider prompt", "task step")
-                if step["provider"] != "codex":
-                    raise ValueError("task step provider must be codex")
+                if not isinstance(step["provider"], str) or step["provider"] not in _EXECUTORS:
+                    raise ValueError("task step provider must be codex or claude")
                 _text(step["prompt"], "task step prompt")
         else:
             _path(value, "acceptance" if field == "acceptance" else "tasks", "task " + field)

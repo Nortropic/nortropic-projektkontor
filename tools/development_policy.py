@@ -164,12 +164,21 @@ def prepare(context, answer):
     tests = copy.deepcopy(answer['tests'])
     requirements = [{**entry, 'claims': ['goal', 'need'], 'references': ['goal', 'observation'],
                      'tests': [test['id'] for test in tests]} for entry in answer['requirements']]
+    # The author and the separate reviewer are the host's frozen explicit choice,
+    # delivered in the context. The model answer can never select or change them,
+    # and nothing here falls back to another executor. Absent means original Codex.
+    chosen = context.get('executors', {'implementation': 'codex', 'review': 'codex'})
+    if (not isinstance(chosen, dict) or set(chosen) != {'implementation', 'review'}
+            or any(not isinstance(value, str) or value not in ('codex', 'claude') for value in chosen.values())):
+        raise ValueError('Frozen explicit executor selection is invalid')
     task = {'id': context['task_id'], 'target': 'Nortropic/nortropic-projektkontor',
             'base': context['base'], 'runtime_revision': context['runtime_revision'],
             'allowed_paths': list(WORK[work]), 'attempt_seconds': 480, 'automatic_retries': 0,
-            'steps': [{'provider': 'codex', 'prompt': answer['brief']}],
+            'steps': [{'provider': chosen['implementation'], 'prompt': answer['brief']}],
             'acceptance': RECIPES[work], 'acceptance_sha256': context['acceptance_sha256'],
             'brief': 'tasks/' + context['task_id'] + '.md'}
+    if chosen['review'] != 'codex':
+        task['review_provider'] = chosen['review']
     spec = {'schema': 1, 'action': 'execute', 'references': references, 'reference_checks': checks,
             'requirements': requirements, 'tests': tests, 'task': task,
             'export': {'title': 'AP11 ' + work,

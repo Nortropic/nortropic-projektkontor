@@ -152,7 +152,8 @@ valid for `automatic_retries` and invalid for `attempt_seconds`.
 | `allowed_paths` | List of unique, explicit safe paths under `tools/`; restrictions below |
 | `attempt_seconds` | Integer `1..3600` |
 | `automatic_retries` | Integer `0` |
-| `steps` | List of objects with exactly `{provider, prompt}`; provider exactly `codex`, prompt a nonempty string |
+| `steps` | List of objects with exactly `{provider, prompt}`; provider exactly `codex` or `claude`, prompt a nonempty string |
+| `review_provider` | OPTIONAL. Exactly `codex` or `claude`. Absent means the original Codex reviewer; absence is never a gap and no default is written. A PRESENT null, empty or any other value is an error (`ValueError`), not a gap: the empty-value gap rule does not apply to this optional field |
 | `acceptance` | Explicit safe relative path under `acceptance/` |
 | `acceptance_sha256` | Full 64-character lowercase hexadecimal digest supplied by the host |
 | `brief` | Explicit safe relative path under `tasks/` |
