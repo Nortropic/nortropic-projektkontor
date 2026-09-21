@@ -35,6 +35,44 @@ def python_index(*versions):
 
 
 class CollectionTests(unittest.TestCase):
+    def test_exact_local_file_extension(self):
+        self.assertEqual(intake.LOCAL_FILES, (
+            'runtime/worker.py', 'runtime/workflow.py', 'runtime/activities.py',
+            'runtime/run.py', 'runtime/service.py', 'runtime/profile.py',
+            'config/temporal-probe-requirements.lock', 'docs/runtime-v0.1.md',
+            'runtime/daemon.py', 'runtime/shared.py', 'runtime/release.py',
+            'runtime/private_workflow.py', 'runtime/private_activity.py',
+            'runtime/private_stage.py', 'runtime/obligation.py',
+        ))
+
+    def test_dated_python_index_stable_numeric_and_installed_line_selection(self):
+        for month in ('Aug.', 'August', 'Aug', 'Sep.', 'September', 'May', 'May.'):
+            raw = (python_index('3.12.1') + (
+                '<a href="/downloads/release/python-3129/">Python 3.12.9 - ' + month + ' 2, 2026</a>'
+                '<a href="/downloads/release/python-31214/">Python 3.12.14 - ' + month + ' 12, 2026</a>'
+                '<a href="/downloads/release/python-31399/">Python 3.13.99 - ' + month + ' 12, 2026</a>'
+                '<a href="/downloads/release/python-31299/">Python 3.12.99rc1 - ' + month + ' 12, 2026</a>'
+            ).encode())
+            self.assertEqual(intake._python_index(raw, '3.12.1'), ('3.12.14', None))
+        self.responses[intake.PYTHON_INDEX] = (
+            '<a href="/downloads/release/python-3121/">Python 3.12.1 - Jan. 2, 2026</a>'
+            '<a href="/downloads/release/python-31210/">Python 3.12.10 - August 12, 2026</a>'
+        ).encode()
+        self.assertTrue(self.collect()['complete'])
+
+    def test_dated_python_label_mismatch_and_full_matching(self):
+        for label in ('Python 3.12.14', 'Python 3.12.14 - Aug. 12, 2026'):
+            raw = python_index('3.12.1') + (
+                '<a href="/downloads/release/python-31213/">' + label + '</a>').encode()
+            with self.assertRaises(intake.IntakeError):
+                intake._python_index(raw, '3.12.1')
+        for label in ('Python 3.12.1 - Aug. 12, 2026 extra', 'prefix Python 3.12.1',
+                      'Python 3.12.1 - Nonsense 12, 2026', 'Python 3.12.1rc1',
+                      'Python 03.12.1 - Aug. 12, 2026'):
+            with self.assertRaises(intake.IntakeError):
+                intake._python_index(('<a href="/downloads/release/python-3121/">'
+                                     + label + '</a>').encode(), '3.12.1')
+
     def setUp(self):
         SCRATCH.mkdir(exist_ok=True)
         self.temp = tempfile.TemporaryDirectory(dir=SCRATCH)
@@ -101,7 +139,7 @@ class CollectionTests(unittest.TestCase):
         self.assertTrue(packet["complete"])
         self.assertEqual(packet["schema"], 1)
         self.assertEqual(len(self.calls), 6)
-        self.assertEqual(len(packet["local"]), 22)
+        self.assertEqual(len(packet["local"]), 30)
         self.assertEqual(len(packet["fingerprint"]), 64)
         self.assertFalse(packet["same_controlled_basis"])
         self.assertEqual(json.loads((self.output / "packet.json").read_bytes()), packet)
@@ -270,7 +308,7 @@ class CollectionTests(unittest.TestCase):
         self.roots["active"] = self.base / "missing"
         packet = self.collect()
         self.assert_incomplete(packet)
-        self.assertEqual(sum(r["status"] == "unavailable" for r in packet["local"]), 11)
+        self.assertEqual(sum(r["status"] == "unavailable" for r in packet["local"]), 15)
 
     def test_existing_output_and_symlink_ancestors_preserved_before_fetch(self):
         output = self.base / "existing"
