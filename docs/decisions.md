@@ -444,3 +444,17 @@ målrepon/valvskrivningar. Tidigare auditstatus och AP09-beslut/luckor bevaras.
 
 AP10-BEREDNING är slutförd och ersatt framåt av denna accept; tidigare
 beredningsartefakter behåller sin historiska status. Planen äger nästa handling.
+
+
+## AP10-LEVERANS — namngivet lokalt bevakningsansvar
+
+De fem delmålen har genomförts med verkligt kalenderintag/lokal observation,
+separat sakgranskning, faktiskt mottagararbete och behövligt AP04-bygge under
+aktivt bevakningsansvar. Riktad helkedjegranskning och slutbindning redovisas i
+[evidence/ap10/leverans.md](../evidence/ap10/leverans.md). Det separata terminalprovet
+påstås inte visa flera dygns drift eller avslutad övervakande assistentkonversation.
+
+AP10-ACCEPT medger fortsatt lokal drift endast av office-python-temporal tills
+paus/stopp. Ingen åtgärdsberedning ger uppgraderings-, kod- eller valvmandat.
+Tidigare sakbeslut, bevisluckor och auditstatus består. Byggfasen avslutas;
+planen äger nästa ordinarie handling och privat återupptagningspunkt.
