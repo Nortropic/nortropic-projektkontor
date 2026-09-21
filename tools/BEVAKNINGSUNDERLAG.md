@@ -26,12 +26,14 @@ icke-tomma strängar; installerade versioner ska vara numeriska stabila
 `major.minor.patch`. Versionsmappningen kopieras. Modulens strukturkontroll
 verifierar inte värdens revisions- eller konfigurationsuppgifter.
 
-`LOCAL_FILES` är den fasta läslistan för vardera roten:
+`LOCAL_FILES` är den fasta läslistan med femton filer för vardera roten:
 
 - `runtime/worker.py`, `runtime/workflow.py`, `runtime/activities.py`
 - `runtime/run.py`, `runtime/service.py`, `runtime/profile.py`
 - `config/temporal-probe-requirements.lock`, `docs/runtime-v0.1.md`
 - `runtime/daemon.py`, `runtime/shared.py`, `runtime/release.py`
+- `runtime/private_workflow.py`, `runtime/private_activity.py`
+- `runtime/private_stage.py`, `runtime/obligation.py`
 
 Ytterligare filer kräver en granskad kodändring. Varje fil får vara högst 1 MiB.
 Symlänkar avvisas i hela kedjan av rot, källfil och output, även i deras
@@ -69,11 +71,24 @@ utgåvor. Det garanterar inte att alla relevanta eller senare källor hittats.
 matchar `/downloads/release/python-[0-9]+/` och ovanstående numeriska
 Temporal-taggar. Okänd URL avvisas före nätkontakt. Transporten använder
 standardbibliotekets `urllib.request.build_opener`, explicit
-`ProxyHandler({})`, GET, fast User-Agent `Nortropic-Office-Intake/1`, normal
-TLS-verifiering och timeout 10 sekunder. Inga credentials, auth-hanterare eller
-proxy används. Redirect avvisas även till tillåten adress. HTTP-fel,
-nätfel och svar över 1 MiB ger otillgängligt underlag. Timeout är transportens
+`ProxyHandler({})`, GET, fast User-Agent `Nortropic-Office-Intake/1`, fast
+`Accept-Encoding: identity`, normal TLS-verifiering och timeout 10 sekunder.
+Inga credentials, auth-hanterare, cookies eller proxy används. Redirect avvisas
+även till tillåten adress. HTTP-fel och nätfel ger otillgängligt underlag. Timeout är transportens
 timeout, ingen garanti för total körtid för hela insamlingen.
+
+Svaret får innehålla högst 1 MiB kodade bytes; högst 1 MiB + 1 byte läses för
+att upptäcka överskridandet. Saknad `Content-Encoding` eller `identity` lämnar
+bytes oförändrade. `gzip` avkodas trots begärd identity, med en separat gräns
+på 1 MiB avkodade bytes. Expansionen begränsas under avkodningen. Exakt gräns
+accepteras, gräns + 1 avvisas. Kodning avgörs enbart av HTTP-headern, aldrig
+av innehållets magiska bytes. Omgivande blanktecken och bokstavsstorlek
+ignoreras. Explicit tom header, okänd kodning (även `br`, `deflate`, `x-gzip`),
+listor/kombinationer och upprepade `Content-Encoding`-headers avvisas.
+Gzip kräver en fullständig enda medlem med giltig trailer och kontrollsumma;
+trunkering, korruption, efterföljande bytes och sammanfogade medlemmar avvisas.
+Felaktig, otillåten eller för stor transport ger otillgänglig källa och
+ofullständigt paket; oberoende lyckade observationer bevaras.
 
 ## Paketets betydelse
 
@@ -85,8 +100,15 @@ lokala poster saknar `url` och `published_at`. Identiteterna är `python-index`,
 `temporal-index`, `python-<version>`, `temporal-<version>` och
 `active:<fil>`/`working:<fil>`. Filvägar i paketet är relativa till output.
 
-Lyckade svar bevaras som oförändrade bytes i `<id>.raw`; lokala kopior har
-prefix `active-` eller `working-`. Även hämtade svar vars innehåll inte går att
+`fetch` returnerar kroppens bytes efter HTTP-innehållsavkodning. Dessa bevaras
+oförändrade i `<id>.raw`: identity är mottagna kroppsbytes, gzip är avkodade
+kroppsbytes. Ingen teckenkonvertering, HTML-omskrivning eller JSON-omformatering
+sker. `.raw` betyder den oparsade kroppen, inte komprimerade överföringsbytes
+eller en nätverksinspelning. Källans SHA-256 och paketets fingeravtryck binder
+dessa lagrade innehållsavkodade bytes. Transportmetadata som inte registrerats
+läggs inte till i efterhand. Befintlig policy kopierar redan de bevarade bytesen.
+
+Lokala kopior har prefix `active-` eller `working-`. Även hämtade svar vars innehåll inte går att
 tolka bevaras i `<id>.raw` för privat felsökning, men deras post är
 `unavailable` med null i `sha256` och `path`. Ingen del av ett för stort svar
 bevaras som lyckad källa. Felorsaker är fasta och innehåller inga privata
@@ -113,6 +135,11 @@ lika. Värden lämnar föregående paket som en dict; den ändras inte. En ident
 bas är inte sakgodkännande, fullständighetsbevis eller befogenhet. Referenser
 flyttas inte fram och gamla beslut eller ärenden skrivs inte om eller dubbleras.
 
+Äldre ofullständiga eller komprimerade paket avkodas eller skrivs aldrig om
+i efterhand; deras ursprungliga revision och betydelse består. Senare intag
+är en ny exklusiv privat observation. En ändrad hash förblir ändrad och blir
+inte automatiskt godkänd genom transportreparationen.
+
 AP09:s beslut och bevisluckor består. AP05 kan använda förändrade/saknade
 underlag som stöd för omprövning. AP06 kan bereda motiverade åtgärdsförslag;
 verkställande kräver handlingsspecifik befogenhet utanför denna modul.
@@ -132,3 +159,10 @@ urllibs redirect-hanterare utan socket. Inga verkliga privata källor eller
 nätkällor läses. Proven omfattar giltigt/identiskt/ändrat underlag, urvalsgräns,
 deduplicering, råbytes, tidsuppgifter, saknade/felaktiga/för stora källor,
 URL/redirect, symlänkar, befintligt output och bevarande av original/föregångare.
+Transportfixturer använder `HTTPMessage` med verkligt stöd för upprepade headers.
+Proven omfattar även identity/gzip, kodningsfel, separata storleksgränser,
+begränsad expansion, trailer/kontrollsumma, gzip genom hela `collect` och
+oförändrade äldre komprimerade paket. Tidigare datumetikett- och
+URL/versionsregressioner finns kvar. Syntetiskt godkänt resultat återstartar
+ingen förbrukad bevakningsomgång och aktiverar ingen ändrad kod; fryst acceptans
+och oberoende granskning ägs av värden.

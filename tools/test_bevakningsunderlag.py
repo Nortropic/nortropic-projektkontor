@@ -2,6 +2,8 @@
 
 from copy import deepcopy
 from datetime import datetime
+import gzip
+from http.client import HTTPMessage
 import io
 import json
 import os
@@ -337,12 +339,102 @@ class CollectionTests(unittest.TestCase):
         with patch.object(intake, "fetch", side_effect=self.fetcher):
             self.assertTrue(intake.collect(self.base / "default", self.roots, self.versions)["complete"])
 
+    def collect_via_transport(self, name, previous=None, overrides=None):
+        responses = []
+
+        def open_response(request, timeout):
+            url = request.full_url
+            body, headers = (overrides or {}).get(url, (
+                gzip.compress(self.responses[url], mtime=0), (("Content-Encoding", "gzip"),)))
+            response = Response(body, headers, url)
+            responses.append(response)
+            return response
+
+        self.output = self.base / name
+        with patch.object(urllib.request, "build_opener") as build:
+            build.return_value.open.side_effect = open_response
+            packet = intake.collect(self.output, self.roots, self.versions, previous)
+        self.assertLessEqual(len(responses), 6)
+        self.assertTrue(all(response.closed for response in responses))
+        return packet
+
+    def test_gzip_through_collect_preserves_decoded_representation_and_hashes(self):
+        previous = self.collect()
+        saved_previous = deepcopy(previous)
+        saved_files = {p: p.read_bytes() for p in self.output.iterdir()}
+        packet = self.collect_via_transport("gzip", previous)
+        self.assertTrue(packet["complete"])
+        self.assertTrue(packet["same_controlled_basis"])
+        self.assertEqual(packet["fingerprint"], previous["fingerprint"])
+        for record in packet["sources"]:
+            raw = self.responses[record["url"]]
+            self.assertEqual((self.output / record["path"]).read_bytes(), raw)
+            self.assertEqual(record["sha256"], intake.sha256(raw).hexdigest())
+            self.assertEqual(record["published_at"], next(
+                r["published_at"] for r in previous["sources"] if r["id"] == record["id"]))
+        self.assertEqual(json.loads((self.output / "packet.json").read_bytes()), packet)
+        self.responses[intake._python_url("3.12.1")] += b"<p>new observation</p>"
+        changed = self.collect_via_transport("changed-gzip", packet)
+        self.assertTrue(changed["complete"])
+        self.assertFalse(changed["same_controlled_basis"])
+        self.assertNotEqual(changed["fingerprint"], packet["fingerprint"])
+        self.assertEqual(previous, saved_previous)
+        self.assertEqual({p: p.read_bytes() for p in saved_files}, saved_files)
+
+    def test_old_compressed_packet_stays_immutable_after_repaired_intake(self):
+        good = self.responses[intake.PYTHON_INDEX]
+        self.responses[intake.PYTHON_INDEX] = gzip.compress(good, mtime=0)
+        previous = self.collect()
+        self.assert_incomplete(previous)
+        saved_previous = deepcopy(previous)
+        saved_files = {p: p.read_bytes() for p in self.output.iterdir()}
+        self.responses[intake.PYTHON_INDEX] = good
+        repaired = self.collect_via_transport("new-observation", previous)
+        self.assertTrue(repaired["complete"])
+        self.assertFalse(repaired["same_controlled_basis"])
+        self.assertEqual(previous, saved_previous)
+        self.assertEqual({p: p.read_bytes() for p in saved_files}, saved_files)
+
+    def test_bad_transport_is_incomplete_with_independent_observations_preserved(self):
+        previous = self.collect()
+        good = gzip.compress(self.responses[intake.PYTHON_INDEX], mtime=0)
+        cases = [
+            (good[:-1], (("Content-Encoding", "gzip"),)),
+            (good, (("Content-Encoding", "br"),)),
+            (b"x" * (intake.MAX_BYTES + 1), (("Content-Encoding", "identity"),)),
+            (gzip.compress(b"x" * (intake.MAX_BYTES + 1), mtime=0),
+             (("Content-Encoding", "gzip"),)),
+        ]
+        for index, value in enumerate(cases):
+            with self.subTest(index=index):
+                packet = self.collect_via_transport("bad-transport-" + str(index), previous,
+                                                    {intake.PYTHON_INDEX: value})
+                self.assert_incomplete(packet)
+                failed = next(r for r in packet["sources"] if r["id"] == "python-index")
+                self.assertEqual(failed["error"], "source_retrieval_failed")
+                self.assertFalse((self.output / "python-index.raw").exists())
+                self.assertTrue(all(r["status"] == "available"
+                                    for r in packet["sources"] + packet["local"]
+                                    if r["id"] != "python-index"))
+
 
 class Response(io.BytesIO):
     status = 200
 
+    def __init__(self, body, headers=(), url=intake.PYTHON_INDEX):
+        super().__init__(body)
+        self.headers = HTTPMessage()
+        for name, value in headers:
+            self.headers.add_header(name, value)
+        self.url = url
+        self.read_sizes = []
+
+    def read(self, size=-1):
+        self.read_sizes.append(size)
+        return super().read(size)
+
     def geturl(self):
-        return intake.PYTHON_INDEX
+        return self.url
 
 
 class TransportTests(unittest.TestCase):
@@ -355,8 +447,121 @@ class TransportTests(unittest.TestCase):
             self.assertIsInstance(handlers[1], urllib.request.HTTPRedirectHandler)
             request = build.return_value.open.call_args.args[0]
             self.assertEqual(request.get_method(), "GET")
-            self.assertEqual(request.header_items(), [("User-agent", intake.USER_AGENT)])
+            self.assertEqual(request.header_items(), [
+                ("User-agent", intake.USER_AGENT), ("Accept-encoding", "identity")])
             self.assertEqual(build.return_value.open.call_args.kwargs, {"timeout": 10})
+
+    def fetch_response(self, response):
+        with patch.object(urllib.request, "build_opener") as build:
+            build.return_value.open.return_value = response
+            try:
+                return intake.fetch(intake.PYTHON_INDEX)
+            finally:
+                build.return_value.open.assert_called_once()
+                self.assertTrue(response.closed)
+                self.assertTrue(all(size == intake.MAX_BYTES + 1 for size in response.read_sizes))
+                self.assertLessEqual(len(response.read_sizes), 1)
+
+    def test_identity_and_missing_encoding_preserve_bytes_without_sniffing(self):
+        for raw in (b"", b"\xff\x00unchanged\r\n", gzip.compress(b"do not sniff", mtime=0)):
+            for headers in ((), (("Content-Encoding", "identity"),),
+                            (("content-encoding", " \tIdEnTiTy\t "),)):
+                with self.subTest(raw=raw, headers=headers):
+                    self.assertEqual(self.fetch_response(Response(raw, headers)), raw)
+
+    def test_gzip_decodes_exact_bytes_and_empty_body(self):
+        for raw in (b"", b"\xff\x00unchanged\r\n", b"<h1>synthetic</h1>", b'{ "synthetic": true }\n'):
+            for token in ("gzip", "GZIP", " \tgZiP\t "):
+                with self.subTest(raw=raw, token=token):
+                    response = Response(gzip.compress(raw, mtime=0), (("cOnTeNt-EnCoDiNg", token),))
+                    self.assertEqual(self.fetch_response(response), raw)
+
+    def test_unsupported_empty_stacked_and_repeated_encodings(self):
+        headers = [(("Content-Encoding", value),) for value in (
+            "", " \t ", "br", "deflate", "x-gzip", "gzip, identity", "gzip,gzip",
+            "identity, gzip", "gzip; secret=private", "secret private path")]
+        headers += [(("Content-Encoding", first), ("content-encoding", second))
+                    for first, second in (("gzip", "gzip"), ("identity", "identity"),
+                                          ("identity", "gzip"), ("", "gzip"))]
+        for values in headers:
+            with self.subTest(headers=values), self.assertRaises(intake.IntakeError) as error:
+                self.fetch_response(Response(gzip.compress(b"secret body", mtime=0), values))
+            self.assertEqual(str(error.exception), "content_encoding_unsupported")
+
+    def test_gzip_rejects_truncation_corruption_trailing_data_and_members(self):
+        member = gzip.compress(b"secret body", mtime=0)
+        bad_crc = member[:-8] + bytes([member[-8] ^ 1]) + member[-7:]
+        bad_size = member[:-1] + bytes([member[-1] ^ 1])
+        invalid = [member[:size] for size in range(len(member))]
+        invalid += [b"secret private path", bad_crc, bad_size,
+                    member + b"\x00", member + b"secret trailing data",
+                    member + member, member + gzip.compress(b"", mtime=0)]
+        for raw in invalid:
+            with self.subTest(size=len(raw)), self.assertRaises(intake.IntakeError) as error:
+                self.fetch_response(Response(raw, (("Content-Encoding", "gzip"),)))
+            self.assertEqual(str(error.exception), "gzip_invalid")
+
+    def test_separate_encoded_and_decoded_limits(self):
+        for size in (intake.MAX_BYTES, intake.MAX_BYTES + 1):
+            member = gzip.compress(b"small decoded body", mtime=0)
+            # FCOMMENT pads a valid single member to an exact encoded size.
+            padded = (member[:3] + bytes([member[3] | 16]) + member[4:10]
+                      + b"c" * (size - len(member) - 1) + b"\x00" + member[10:])
+            self.assertEqual(len(padded), size)
+            cases = [
+                (Response(b"x" * size), b"x" * size),
+                (Response(b"x" * size, (("Content-Encoding", "identity"),)), b"x" * size),
+                (Response(padded, (("Content-Encoding", "gzip"),)), b"small decoded body"),
+                (Response(gzip.compress(b"x" * size, mtime=0),
+                          (("Content-Encoding", "gzip"),)), b"x" * size),
+            ]
+            for response, expected in cases:
+                with self.subTest(size=size, headers=list(response.headers.items()),
+                                  encoded_size=len(response.getvalue())):
+                    if size == intake.MAX_BYTES:
+                        self.assertEqual(self.fetch_response(response), expected)
+                    else:
+                        with self.assertRaises(intake.IntakeError) as error:
+                            self.fetch_response(response)
+                        self.assertEqual(str(error.exception), "source_oversize")
+
+    def test_gzip_large_expansion_is_bounded_before_allocation(self):
+        raw = gzip.compress(b"x" * (intake.MAX_BYTES * 8), mtime=0)
+        original = intake.zlib.decompressobj
+        limits = []
+
+        def bounded_decoder(*args):
+            decoder = original(*args)
+
+            class Guard:
+                def decompress(self, data, max_length=0):
+                    self.assert_limit(max_length)
+                    return decoder.decompress(data, max_length)
+
+                @staticmethod
+                def assert_limit(limit):
+                    if not 0 < limit <= intake.MAX_BYTES + 1:
+                        raise AssertionError("unbounded expansion")
+                    limits.append(limit)
+
+            return Guard()
+
+        with patch.object(intake.zlib, "decompressobj", side_effect=bounded_decoder):
+            with self.assertRaises(intake.IntakeError) as error:
+                self.fetch_response(Response(raw, (("Content-Encoding", "gzip"),)))
+        self.assertEqual(str(error.exception), "source_oversize")
+        self.assertTrue(limits)
+
+    def test_gzip_does_not_bypass_status_or_final_url_checks(self):
+        for status, url in ((404, intake.PYTHON_INDEX), (302, intake.PYTHON_INDEX),
+                            (200, intake._python_url("3.12.1")), (200, "https://evil.invalid/")):
+            response = Response(gzip.compress(b"body", mtime=0),
+                                (("Content-Encoding", "gzip"),), url)
+            response.status = status
+            with self.subTest(status=status, url=url), self.assertRaises(intake.IntakeError) as error:
+                self.fetch_response(response)
+            self.assertEqual(str(error.exception), "http_or_redirect_error")
+            self.assertEqual(response.read_sizes, [])
 
     def test_unknown_urls_denied_before_transport(self):
         urls = ["http://www.python.org/downloads/source/", intake.PYTHON_INDEX + "?x=1",

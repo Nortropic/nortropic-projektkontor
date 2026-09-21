@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 import stat
 import urllib.request
+import zlib
 
 
 LOCAL_FILES = (
@@ -55,20 +56,41 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def fetch(url):
-    """One allowlisted HTTPS GET; build_opener is the synthetic transport seam."""
+    """Return bounded content-decoded bytes; build_opener is the transport seam."""
     if not _allowed(url):
         raise IntakeError("url_denied")
     try:
         opener = urllib.request.build_opener(
             urllib.request.ProxyHandler({}), _NoRedirect()
         )
-        request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT}, method="GET")
+        request = urllib.request.Request(
+            url, headers={"User-Agent": USER_AGENT, "Accept-Encoding": "identity"}, method="GET"
+        )
         with opener.open(request, timeout=TIMEOUT) as response:
             if response.status != 200 or response.geturl() != url:
                 raise IntakeError("http_or_redirect_error")
+            encodings = response.headers.get_all("Content-Encoding", [])
+            if len(encodings) > 1:
+                raise IntakeError("content_encoding_unsupported")
+            encoding = encodings[0].strip().lower() if encodings else "identity"
+            if encoding not in ("identity", "gzip"):
+                raise IntakeError("content_encoding_unsupported")
             raw = response.read(MAX_BYTES + 1)
             if len(raw) > MAX_BYTES:
                 raise IntakeError("source_oversize")
+            if encoding == "gzip":
+                # A gzip wrapper validates the trailer/CRC. Limit expansion itself;
+                # never flush an unbounded remainder or accept another member.
+                decoder = zlib.decompressobj(16 + zlib.MAX_WBITS)
+                try:
+                    decoded = decoder.decompress(raw, MAX_BYTES + 1)
+                except zlib.error:
+                    raise IntakeError("gzip_invalid") from None
+                if len(decoded) > MAX_BYTES:
+                    raise IntakeError("source_oversize")
+                if not decoder.eof or decoder.unused_data or decoder.unconsumed_tail:
+                    raise IntakeError("gzip_invalid")
+                return decoded
             return raw
     except IntakeError:
         raise
