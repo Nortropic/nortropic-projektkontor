@@ -35,7 +35,7 @@ assert value['reconciliation']['whole_goal_complete'] is False
 assert all(w['state']!='finished' for w in value['picture']['work'])
 # Mixed actual A interface result: delivery support MUST reach AP08 while the
 # other requirement remains missing. An always-missing handoff cannot pass.
-R={'task_id':'first','task_sha256':'a'*64,'observation':'snapshot','phase':'completed','verified_delivery':True,'target':'Nortropic/nortropic-projektkontor','observed_at_epoch':1790000000,'age_seconds':120,'runtime_revision':'b'*40,'input_revision':'c'*40,'base':'d'*40,'candidate':'e'*40,'acceptance_sha256':'f'*64,'review_run':'independent','evidence':'synthetic saved observation','integration':{'merged':True,'candidate':'e'*40,'merge_commit':'1'*40,'tree':'2'*40,'url':'https://github.com/Nortropic/nortropic-projektkontor/pull/1'}}
+R={'task_id':'first','task_sha256':'a'*64,'observation':'snapshot','phase':'completed','verified_delivery':True,'target':'Nortropic/nortropic-projektkontor','observed_at_epoch':1789991880,'age_seconds':120,'runtime_revision':'b'*40,'input_revision':'c'*40,'base':'d'*40,'candidate':'e'*40,'acceptance_sha256':'f'*64,'review_run':'independent','evidence':'synthetic saved observation','integration':{'merged':True,'candidate':'e'*40,'merge_commit':'1'*40,'tree':'2'*40,'url':'https://github.com/Nortropic/nortropic-projektkontor/pull/1'}}
 g=copy.deepcopy(G);g['requirements'][0]['task']={'id':'first','sha256':'a'*64,'acceptance_sha256':'f'*64,'merge_commit':'1'*40}
 before=copy.deepcopy((g,[R],P));active=True;v=m.present(g,[R],P);active=False
 assert (g,[R],P)==before
