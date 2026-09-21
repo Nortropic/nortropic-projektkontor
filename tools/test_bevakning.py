@@ -266,6 +266,80 @@ class PolicyTests(unittest.TestCase):
             self.assertFalse(self.finish(home)['reviewed'])
             target[field] = original
 
+    def test_duplicate_ids_rejected_despite_exact_independent_approval(self):
+        for field in ('evidence', 'claims'):
+            with self.subTest(field=field):
+                home, _ = self.round()
+                answer = self.answer(home)
+                if field == 'evidence':
+                    answer['evidence'].append(answer['evidence'][0])
+                else:
+                    answer.update(decision='propose_action', proposal=dict(
+                        text='Consider a scoped change', reason='Synthetic reason',
+                        requirement='Preserve scoped behavior', observable='Scoped behavior is observed',
+                        claims=['C1', 'C1']))
+                # The provider format permits duplicates; host acceptance must not.
+                policy._shape(answer, policy.schema('analysis'))
+                original = deepcopy(answer)
+                self.stages(home, answer)  # Recomputes approval of this exact malformed answer.
+                with self.assertRaises(ValueError):
+                    policy._answer(answer, 'analysis', policy._bundle(home))
+                report = self.finish(home)
+                self.assertFalse(report['reviewed'])
+                self.assertEqual(report['decision'], 'insufficient')
+                self.assertEqual(report['evidence'], [])
+                for key in ('review', 'reviewed_at', 'review_origin', 'ap06'):
+                    self.assertIsNone(report[key])
+                self.assertFalse(report['action_executed'])
+                self.assertFalse(report['publication'])
+                self.assertEqual(report['old_gaps'], self.watch['old_gaps'])
+                self.assertFalse((home / 'report/ap06.json').exists())
+                self.assertEqual(answer, original)
+                self.assertEqual(json.loads((home / 'analysis/result.json').read_bytes())['answer'], original)
+
+    def test_duplicate_origin_with_rebound_hashes_requires_fresh_assessment(self):
+        for field in ('evidence', 'claims'):
+            with self.subTest(field=field):
+                origin, _ = self.round()
+                answer = self.answer(origin)
+                if field == 'claims':
+                    answer.update(decision='propose_action', proposal=dict(
+                        text='Consider a scoped change', reason='Synthetic reason',
+                        requirement='Preserve scoped behavior', observable='Scoped behavior is observed',
+                        claims=['C1']))
+                self.stages(origin, answer)
+                prior = self.prior(origin)
+                self.assertTrue(prior['report']['reviewed'])
+                current, status = self.round(prior)
+                self.assertFalse(status['needs_model'])
+                ids = answer['evidence'] if field == 'evidence' else answer['proposal']['claims']
+                ids.append(ids[0])
+                self.stages(origin, answer)
+                # Rebind the historical approval, so stale hashes cannot be
+                # the reason strict origin validation rejects reuse.
+                report = prior['report']
+                report['evidence'] = answer['evidence']
+                report['review']['assessment_sha256'] = sha256(policy._canonical(answer)).hexdigest()
+                for role in ('analysis', 'review'):
+                    raw = (origin / role / 'result.json').read_bytes()
+                    report['review'][role + '_result_sha256'] = sha256(raw).hexdigest()
+                report['reviewed_at'] = policy.datetime.fromtimestamp(
+                    (origin / 'review/result.json').stat().st_mtime, policy.timezone.utc).isoformat()
+                write(origin / 'report/result.json', report)
+                write(current / 'intake/previous.json', prior)
+                # Claims must fail strict answer validation before the later
+                # AP06 comparison, even though that also remains protective.
+                with patch.object(policy, '_validate_draft', side_effect=AssertionError(
+                        'duplicate origin must fail before draft validation')):
+                    fresh, status = self.round(prior)
+                    self.assertEqual(status, dict(completed=True, needs_model=True, reason=policy.FRESH))
+                    for home in (current, fresh):
+                        result = self.finish(home)
+                        self.assertFalse(result['reviewed'])
+                        self.assertEqual(result['decision'], 'insufficient')
+                        self.assertIsNone(result['review'])
+                        self.assertIsNone(result['reused_from'])
+
     def test_prior_mismatches_bare_flag_damaged_evidence_and_cycle(self):
         origin, prior = self.approved()
         bad = deepcopy(prior)
@@ -492,6 +566,51 @@ class PolicyTests(unittest.TestCase):
         home, _ = self.round()
         with self.assertRaises(ValueError):
             policy.workspace(self.base, home, self.context, 'host-operation')
+
+    def test_provider_schemas_preserve_every_other_constraint(self):
+        def obj(properties):
+            return dict(type='object', properties=properties, required=list(properties), additionalProperties=False)
+
+        text = dict(type='string', minLength=1, pattern=r'\S')
+        digest = dict(type='string', pattern='^[0-9a-f]{64}$')
+        strings = dict(type='array', items=text)
+        proposal = obj(dict(text=text, reason=text, requirement=text, observable=text,
+                            claims=dict(strings, minItems=1)))
+        expected = {
+            'analysis': obj(dict(case_id=text, packet_sha256=digest,
+                decision=dict(type='string', enum=['retain', 'not_applicable', 'insufficient', 'propose_action']),
+                vendor=text, local=text, judgment=text, authority=text,
+                evidence=dict(strings, minItems=1), contradictions=strings,
+                proposal={'anyOf': [{'type': 'null'}, proposal]})),
+            'review': obj(dict(case_id=text, packet_sha256=digest, assessment_sha256=digest,
+                verdict=dict(type='string', enum=['approved', 'rejected']), reason=text, blockers=strings)),
+        }
+        for role in ('analysis', 'review'):
+            with self.subTest(role=role):
+                actual = policy.schema(role)
+                self.assertEqual(actual, expected[role])
+                self.assertNotIn('uniqueItems', json.dumps(actual))
+                self.assertTrue(policy.prompt(role).endswith(policy._canonical(actual).decode('ascii')))
+                # Mutate nested arrays, objects and both union branches.
+                actual['required'].clear()
+                actual['properties']['case_id']['pattern'] = '.*'
+                if role == 'analysis':
+                    actual['properties']['evidence']['minItems'] = 0
+                    actual['properties']['decision']['enum'].append('execute')
+                    choices = actual['properties']['proposal']['anyOf']
+                    choices[0]['type'] = 'string'
+                    choices[1]['properties']['claims']['minItems'] = 0
+                else:
+                    actual['properties']['verdict']['enum'].append('skip')
+                self.assertEqual(policy.schema(role), expected[role])
+        home, _ = self.round()
+        answer = self.answer(home)
+        for evidence in ([], ['python-3.12.1'] * 2, ['unknown'], [' ']):
+            answer['evidence'] = evidence
+            self.stages(home, answer)
+            self.assertFalse(self.finish(home)['reviewed'])
+        for text in ('unique current packet IDs', 'unique known frozen-case claim IDs'):
+            self.assertIn(text, policy.prompt('analysis'))
 
     def test_frozen_context_survives_original_removal_and_check_is_not_rebased(self):
         home, _ = self.round()
