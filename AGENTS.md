@@ -15,8 +15,8 @@ Beslut raderas inte: en ersatt post märks SUPERSEDED med pekare till ersättare
 Mottagare och granskare svarar i sessionen; värden bevarar deras protokoll.
 Dessa är dokumenterade arbetsregler, inte tekniskt påtvingade skrivspärrar.
 
-Kampanjen, övriga syskonrepon och Obsidian-valvet är skyddade. AP08-ACCEPT
-medger endast den privata läsingången, verklig tillämpning och kontrollerat avslut. Runtime-kod,
+Kampanjen, övriga syskonrepon och Obsidian-valvet är skyddade. AP09-ACCEPT
+medger avgränsat källintag, privat tillämpning, överlämning och kontrollerad integration. Runtime-kod,
 IR, kampanj och valv får inte ändras. Läs uppdragets exakta tillstånd före arbete.
 Publicera bara innehållskontrollerad kod, anvisning, syntetiska exempel och
 begränsade leveransbevis; verklig ägarbild och privata underlag stannar lokalt; inga privata källsamlingar, råsessioner, nycklar eller lokala

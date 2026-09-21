@@ -1,3 +1,18 @@
+# AP09 — accepterad omvärldsbevakning med prövad lokal betydelse
+
+Gällande mandat: AP09-ACCEPT i beslutsloggen. Full ägartext och identitet bevaras
+privat i evidence/ap09/local/accepted-mandate.md och acceptance-start.json.
+Genomför de fem delmålen i det privat bevarade accepterade byggbeslutet med ägarens preciseringar.
+Två verkliga externa intag och lokal omkontroll, faktisk överlämning, sakgranskning
+och skyddad integration ingår. Befintliga verktyg går före ny kod. Ingen Runtime-
+ändring, installation, ny kostnad/rättighet eller valvskrivning. Privata användnings-
+uppgifter publiceras inte. Planen ensam äger nästa handling.
+
+Tidigare beredningsstatus nedan är historik, ersatt av AP09-ACCEPT.
+
+
+---
+
 # AP08 — privat leverans- och beslutsbild, slutleverans
 
 Mandatet är AP08-ACCEPT i beslutsloggen, fulltext privat i
