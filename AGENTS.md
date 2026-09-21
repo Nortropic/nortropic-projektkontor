@@ -15,13 +15,15 @@ Beslut raderas inte: en ersatt post märks SUPERSEDED med pekare till ersättare
 Mottagare och granskare svarar i sessionen; värden bevarar deras protokoll.
 Dessa är dokumenterade arbetsregler, inte tekniskt påtvingade skrivspärrar.
 
-Kampanjen, övriga syskonrepon och Obsidian-valvet är skyddade. AP09-ACCEPT
-medger avgränsat källintag, privat tillämpning, överlämning och kontrollerad integration. Runtime-kod,
-IR, kampanj och valv får inte ändras. Läs uppdragets exakta tillstånd före arbete.
-Publicera bara innehållskontrollerad kod, anvisning, syntetiska exempel och
-begränsade leveransbevis; verklig ägarbild och privata underlag stannar lokalt; inga privata källsamlingar, råsessioner, nycklar eller lokala
-konfigurationer. Status/resultat är rena läsningar. Kandidaten får aldrig ändra sin aktiva körväg eller acceptans.
-Separat granskning och verifierat serverskydd krävs före integration.
+AP10-ACCEPT medger det namngivna bevakningsåtagandets fem delmål och därefter
+avgränsad lokal drift. Läs uppdragets exakta gränser. Kontoret och nödvändiga
+Runtime-kopplingar får ändras; kampanj, IR, valv och övriga repon är skyddade.
+Aktiv drift använder fryst granskad kod/config. Kandidater ändrar aldrig sin
+egen aktiva acceptans/körväg. Privat bedömningsutförare har inga publicerings-
+credentials, kod-/schema-/mandatskrivningar eller generell nätåtkomst.
+Separat granskning och verifierat serverskydd krävs före integration. Endast
+kontrollerat innehåll publiceras; privata källor/resultat/råhistorik stannar privat.
+Status/resultat/ägaryta är rena läsningar, inte aktivering. Paus/stopp är explicit.
 
 Vid en konkret osäker koppling i en accepterad uppgift kan
 `docs/metodbeslut-ap07.md` och `tools/METODPROV.md` hjälpa att välja ett litet prov.

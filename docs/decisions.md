@@ -396,3 +396,51 @@ installation eller ny Runtime-task har skapats för att få ett positivt resulta
 Faktisk skyddad integration och revisioner binds av slutkvittot enligt planen.
 Tidigare auditstatus, AP07 ANPASSA och leveranser bevaras. Ingen stående bevakning,
 ny rättighet eller nästa fas följer av AP09:s avslut.
+
+
+## AP10-BEREDNING — nästa sammanhängande operativa förmåga
+
+**SUPERSEDED → AP10-ACCEPT** för fortsatt arbete. Nedan bevaras beredningens dåtida status.
+
+2026-09-21, ägarens nya order efter AP09. Fulltext och hash bevaras privat i
+`evidence/ap10/local/order.md` och beredningsbindningarna. Ägaren tillgodoräknar
+AP09 inom slutkvittots räckvidd, behåller sakbeslut/bevisluckor och beställer
+endast beredning av ett samlat byggbeslut. Kontoret ska bära beredning, beroende
+uppgifter, granskning, integration och fortsättning inom ett accepterat mål;
+tekniska övergångar ska inte kräva nya ägarbeställningar.
+
+**Status:** mandat för lokal beredning, inte nytt bygg-/drift-/publiceringsmandat.
+Ingen ny intagsomgång eller Runtime-rättning för att stärka gammal garanti.
+Tidigare leveranser, AP07 ANPASSA och auditstatus bevaras. Ägarens syfte och
+besvarade vägval återöppnas inte.
+
+**Härledd rekommendation, ännu INTE accepterad:** AP10 — kontoret bär ett
+avgränsat återkommande Python-/Temporalbevakningsansvar, med fem beroende
+utvecklingsdelmål och uttryckligt nytt driftmandat. Dygnsintervall och lokal
+inloggningsstart är föreslagna val. Se `evidence/ap10/byggbeslut.md`.
+RF16 tas upp avgränsat; RF17/annan värd och avstängd dator ingår inte.
+Planen äger nästa handling. En senare accept ska registreras med egen faktisk
+identitet och exakta tillstånd; tystnad eller mekanisk beredning räcker inte.
+
+
+## AP10-ACCEPT — genomförande och namngiven lokal dygnsdrift
+
+Registrerad 2026-09-21T06:07:44.633794+00:00. Ägarens fulltext bevaras privat, SHA-256
+`163a08b4fe9e55e37c4c5bb280576ecea663255975566b61af83780c386b734d`. Accepterat förslag
+`e9d06f69d103dd822c54b0fe478bd471402e2707448b72fac81605d6079b3456` med ägarens preciseringar.
+
+Fem delmål genomförs självständigt och därefter fortsätter JUST Python-/Temporal-
+bevakningsåtagandet tills paus/stopp. Tillstånd: kontorsstöd, avgränsad Runtime-
+komplettering, användarspecifik inloggningsstart, befintliga abonnemang och
+innehållskontrollerad skyddad publicering i de två befintliga reporna.
+
+Krav: fryst aktiv kod/config, en motor med samexistens, privat begränsad profil
+utan publicerarcredentials, oberoende review utan att försvaga bygggrindar,
+verkställbara resursramar och budgetbeständig återkomst, paus/stopp som består,
+verklig schemastart efter interaktivt avslut, färsk faktisk fortsättning och
+helkedjegranskning. Nytt mål/kostnad/befogenhet tas till ägaren; rutinval görs
+av kedjedrivaren. Inga upgrades, nya betalda tjänster/modeller/externa rättigheter/
+målrepon/valvskrivningar. Tidigare auditstatus och AP09-beslut/luckor bevaras.
+
+AP10-BEREDNING är slutförd och ersatt framåt av denna accept; tidigare
+beredningsartefakter behåller sin historiska status. Planen äger nästa handling.
