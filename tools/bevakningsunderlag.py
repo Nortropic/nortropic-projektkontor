@@ -19,6 +19,8 @@ LOCAL_FILES = (
     "runtime/run.py", "runtime/service.py", "runtime/profile.py",
     "config/temporal-probe-requirements.lock", "docs/runtime-v0.1.md",
     "runtime/daemon.py", "runtime/shared.py", "runtime/release.py",
+    "runtime/private_workflow.py", "runtime/private_activity.py",
+    "runtime/private_stage.py", "runtime/obligation.py",
 )
 MAX_BYTES = 1024 * 1024
 TIMEOUT = 10
@@ -200,7 +202,10 @@ def _version_key(version):
 def _python_index(raw, installed):
     found = set()
     for href, label in _HTML(raw).links:
-        match = re.fullmatch(r"Python (" + VERSION + r")", label)
+        month = (r"(?:January|February|March|April|May|June|July|August|September|"
+                 r"October|November|December|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?)")
+        match = re.fullmatch(r"Python (" + VERSION + r")(?: - " + month
+                             + r" [0-9]{1,2}, [0-9]{4})?", label)
         if match:
             version = match[1]
             url = _python_url(version)
