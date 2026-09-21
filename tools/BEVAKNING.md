@@ -16,9 +16,18 @@ utförare, publiceringsväg, credential, AP08-projektion eller driftåtgärd inf
   Läsbart men ofullständigt intag kräver modellbedömning.
 - `workspace(workspace, round_home, context, role)` fyller en tom, värdskapad
   arbetskatalog för `analysis` eller `review`. Alla källor valideras före kopiering.
-- `prompt(role)` ger fasta instruktioner. `schema(role)` ger exakt JSON Schema
-  med obligatoriska fält och `additionalProperties: false` för alla objekt.
-  Policyn kontrollerar dessutom semantiska beroenden mellan fälten.
+- `prompt(role)` ger fasta instruktioner. `schema(role)` ger leverantörens
+  formatschema för analys och granskning. Endast `uniqueItems` utelämnas
+  rekursivt, även i `proposal.claims` under `anyOf`; alla andra nycklar och
+  värden bevaras, inklusive obligatoriska fält och `additionalProperties: false`.
+  Varje anrop ger ett fristående schema. Leverantörsformatet är snävare än
+  värdens strikta acceptanskontroll: värden kräver fortfarande unika beläggs-
+  och anspråks-ID:n samt samtliga semantiska beroenden mellan fälten.
+  Dubbletter avvisas utan deduplicering även med korrekt hashbundet syntetiskt
+  godkännande och vid återbruk; ogiltigt ursprung kräver ny bedömning.
+  Prompternas krav på unika ID:n kvarstår. Rättningen gäller observerad
+  `invalid_json_schema` för `uniqueItems`; lokala prov bevisar inte full
+  leverantörskompatibilitet eller en genomförd verksamhetsbedömning.
 - `finish(round_home, request, config)` returnerar rapporten. Runtime ensam
   skriver `round/report/result.json`; policyn skapar aldrig den filen.
   Ett godkänt åtgärdsförslag kan skapa `report/ap06.json` exklusivt. Värden

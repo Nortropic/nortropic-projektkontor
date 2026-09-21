@@ -224,8 +224,7 @@ def _object(properties):
     return dict(type='object', properties=properties, required=list(properties), additionalProperties=False)
 
 
-@_boundary
-def schema(role):
+def _strict_schema(role):
     _require(role in ('analysis', 'review'))
     text = {'type': 'string', 'minLength': 1, 'pattern': r'\S'}
     digest = {'type': 'string', 'pattern': '^[0-9a-f]{64}$'}
@@ -241,6 +240,19 @@ def schema(role):
                         vendor=text, local=text, judgment=text, authority=text,
                         evidence=dict(strings, minItems=1, uniqueItems=True), contradictions=strings,
                         proposal={'anyOf': [{'type': 'null'}, proposal]}))
+
+
+@_boundary
+def schema(role):
+    """Provider formatting only; host acceptance retains the strict schema."""
+    def project(value):
+        if isinstance(value, dict):
+            return {key: project(child) for key, child in value.items() if key != 'uniqueItems'}
+        if isinstance(value, list):
+            return [project(child) for child in value]
+        return value
+
+    return project(_strict_schema(role))
 
 
 def _shape(value, spec):
@@ -274,7 +286,7 @@ def _shape(value, spec):
 
 
 def _answer(answer, role, bundle, assessment_hash=None):
-    _shape(answer, schema(role))
+    _shape(answer, _strict_schema(role))
     _require(answer['case_id'] == bundle['case']['id']
              and answer['packet_sha256'] == _hash(bundle['packet_raw']))
     if role == 'review':
