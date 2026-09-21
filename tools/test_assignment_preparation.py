@@ -226,6 +226,28 @@ class PreparationTests(unittest.TestCase):
         self.assertEqual(result["package"]["task_draft"], {})
         self.assertEqual(len(result["gaps"]), len(original))
 
+    def test_explicit_executor_fields(self):
+        case, check, spec = fixture()
+        baseline = preparation.prepare(case, check, spec)
+        for provider in ("codex", "claude"):
+            chosen = copy.deepcopy(spec); chosen["task"]["steps"][0]["provider"] = provider
+            self.assertEqual(preparation.prepare(case, check, chosen)["gaps"], baseline["gaps"])
+        # An absent reviewer choice is original Codex: never a gap, never written as a default.
+        self.assertNotIn("review_provider", baseline["package"]["task_draft"])
+        self.assertFalse([g for g in baseline["gaps"] if g["subject"] == "review_provider"])
+        for reviewer in ("codex", "claude"):
+            chosen = copy.deepcopy(spec); chosen["task"]["review_provider"] = reviewer
+            result = preparation.prepare(case, check, chosen)
+            self.assertEqual(result["package"]["task_draft"]["review_provider"], reviewer)
+            self.assertEqual(result["gaps"], baseline["gaps"])
+        for bad in ("gpt", "", None, ["claude"], True, "Claude"):
+            chosen = copy.deepcopy(spec); chosen["task"]["review_provider"] = bad
+            with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, "review_provider"):
+                preparation.prepare(case, check, chosen)
+        extra = copy.deepcopy(spec); extra["task"]["publisher"] = "claude"
+        with self.assertRaisesRegex(ValueError, "only permitted fields"):
+            preparation.prepare(case, check, extra)
+
     def test_invalid_task_values(self):
         invalid = {
             "id": [True, 4, "Bad", "a_b", "-a", "a" * 81, "a\n"],
@@ -235,7 +257,8 @@ class PreparationTests(unittest.TestCase):
             "acceptance_sha256": ["C" * 64, "c" * 63, "c" * 65, False],
             "attempt_seconds": [True, False, 0, -1, 3601, 1.0, "1"],
             "automatic_retries": [True, False, 1, -1, 0.0, "0"],
-            "steps": ["codex", [None], [{"provider": "claude", "prompt": "Do it"}],
+            "steps": ["codex", [None], [{"provider": "gpt", "prompt": "Do it"}], [{"provider": None, "prompt": "Do it"}],
+                      [{"provider": ["claude"], "prompt": "Do it"}],
                       [{"provider": "codex", "prompt": " "}], [{"provider": "codex"}],
                       [{"provider": "codex", "prompt": "Do it", "extra": 1}]],
             "allowed_paths": ["tools/x.py", [None], ["tools/a.py", "tools/A.py"]],

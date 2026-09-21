@@ -191,7 +191,8 @@ The actual office Runtime format uses exactly the following supplied fields:
 | `base`, `runtime_revision` | Actual full 40-character revisions |
 | `allowed_paths` | Explicit permitted `tools/` files |
 | `attempt_seconds`, `automatic_retries` | Accepted per-attempt seconds and zero automatic retries |
-| `steps` | Objects with `provider: "codex"` and the reviewed `prompt` |
+| `steps` | Objects with the explicit accepted `provider` (`codex` or `claude`) and the reviewed `prompt` |
+| `review_provider` | Optional explicit reviewer executor (`codex` or `claude`); absent means Codex |
 | `acceptance`, `acceptance_sha256` | Host-controlled `acceptance/` module and its actual 64-character digest |
 | `brief` | Reviewed brief under `tasks/` |
 

@@ -36,6 +36,36 @@ class PolicyTests(unittest.TestCase):
         self.assertNotIn('tools/forbidden.py', policy.WORK['reconciliation'])
         self.assertNotIn('tools/forbidden.py', policy.prepare(c, p)['task']['allowed_paths'])
 
+    def test_child_executor_is_the_frozen_context_choice_never_the_model_answer(self):
+        # Absent selection (older Runtime) and explicit Codex give the original task bytes.
+        plain = policy.prepare(context(), proposal())['task']
+        self.assertEqual(plain['steps'][0]['provider'], 'codex'); self.assertNotIn('review_provider', plain)
+        c = context(); c['executors'] = {'implementation': 'codex', 'review': 'codex'}
+        self.assertEqual(policy.prepare(c, proposal())['task'], plain)
+        c['executors'] = {'implementation': 'claude', 'review': 'claude'}
+        chosen = policy.prepare(c, proposal())['task']
+        self.assertEqual((chosen['steps'][0]['provider'], chosen['review_provider']), ('claude', 'claude'))
+        self.assertEqual({k: v for k, v in chosen.items() if k not in ('steps', 'review_provider')},
+                         {k: v for k, v in plain.items() if k != 'steps'})
+        c['executors'] = {'implementation': 'claude', 'review': 'codex'}
+        mixed = policy.prepare(c, proposal())['task']
+        self.assertEqual(mixed['steps'][0]['provider'], 'claude'); self.assertNotIn('review_provider', mixed)
+        # The reviewer choice is independent of the author choice: Codex author, Claude reviewer.
+        c['executors'] = {'implementation': 'codex', 'review': 'claude'}
+        crossed = policy.prepare(c, proposal())['task']
+        self.assertEqual((crossed['steps'][0]['provider'], crossed['review_provider']), ('codex', 'claude'))
+        self.assertEqual({k: v for k, v in crossed.items() if k != 'review_provider'}, plain)
+        # A model answer cannot even carry an executor: the strict answer shape refuses the extra field.
+        for field in ('provider', 'executors', 'review_provider'):
+            p = proposal(); p[field] = 'claude'
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, 'bounded necessary task proposal'):
+                policy.prepare(context(), p)
+        for bad in ({'implementation': 'gpt', 'review': 'codex'}, {'implementation': 'claude'}, {'implementation': 'claude', 'review': None},
+                    {'implementation': 'claude', 'review': 'claude', 'driver': 'claude'}, ['claude'], 'claude', None):
+            c = context(); c['executors'] = bad
+            with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, 'executor selection is invalid'):
+                policy.prepare(c, proposal())
+
     def test_changed_source_blocks_preparation_not_erase_old_decision(self):
         c = context(); c['source_check']['result']['ok'] = False
         c['source_check']['result']['files'][0]['status'] = 'changed'
