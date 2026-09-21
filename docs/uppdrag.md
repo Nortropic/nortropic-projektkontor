@@ -1,3 +1,17 @@
+# AP09 — genomförd verksamhetskedja, avslut enligt slutkvitto
+
+Det accepterade femdelade paketet har tillämpats med två verkliga källintag,
+lokal omkontroll, befintliga AP05/AP06, faktiskt mottagarövertagande och separat
+sakgranskning. Ny produktkod behövdes inte. [Leveransens räckvidd](../evidence/ap09/leverans.md)
+och privat slutkvitto binder utfallet; planen ensam äger nästa handling.
+
+AP09-ACCEPT kvarstår för kontrollerat avslut, inte nya omgångar eller byggfaser.
+Full ägartext och identitet bevaras privat. Ingen bred effekt, fullständig
+aktualitet eller ny driftgaranti följer av det avgränsade resultatet. Tidigare
+leveranser och auditstatus är bevarade. Historiska uppdrag nedan startas inte om.
+
+---
+
 # AP09 — accepterad omvärldsbevakning med prövad lokal betydelse
 
 Gällande mandat: AP09-ACCEPT i beslutsloggen. Full ägartext och identitet bevaras
