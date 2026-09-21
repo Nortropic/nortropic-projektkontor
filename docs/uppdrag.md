@@ -1,3 +1,53 @@
+# AP10 — accepterat genomförande och avgränsad fortsatt drift
+
+Gällande mandat AP10-ACCEPT: fem beroende delmål i det redan beredda paketet,
+med ägarens fulla preciseringar privat i evidence/ap10/local/accepted-mandate.md.
+Identitet/revisioner binds av acceptance-start.json. Planen äger nästa handling.
+
+Runtime får nödvändig lokal aktivering, bestående samordning och privat
+läs-/bedömningskörning utan kodpublicering. Kontoret äger källurval och
+verksamhetslogik. En motor bär båda arbetsslagen; gamla grindar/historiker
+bevaras. Aktiv kod och konfiguration fryses; branchbyte får inte påverka drift.
+
+Tillåtet: implementera/testa/separat granska/skyddat integrera nödvändigt stöd
+i båda befintliga repon, användarspecifik inloggningsstart och avgränsat privat
+arbete via befintliga abonnemang. Kontrollera allt publicerat innehåll.
+Ingen root-tjänst, extern exponering, nya kostnader/modeller/repon/rättigheter,
+uppgradering, kampanj-/IR-/valvskrivning eller generell säkerhetsändring.
+Bevakningsutförare får enbart läsa fryst nödvändigt underlag och skriva privat
+resultat; inga publiceringscredentials eller rätt att ändra kod/mandat/schema.
+
+En omgång per dygn, högst en aktuell återkomst efter frånvaro. Verkställbara
+anrops-/omtags-/tidsramar binds före aktivering. Native historik ska hindra att
+omstart nollställer budget eller återkör hanterad omgång. Paus består; stopp
+avaktiverar bara åtagandet, inte orelaterade byggen. AP08 är daterad läsbild,
+ingen notifiering eller garanti för aktuell lyckad bevakning.
+
+Klart-när innefattar faktisk schemastart efter avslutad interaktiv session,
+verkligt intag/lokal kontroll/granskat besked, fortsättning av färsk utförare,
+avbrott/negativa prov och verkligt AP04-bygge med tjänsten aktiv. Båda revisioner
+plus aktiv konfiguration binds. Efter verifierad leverans lämnas JUST detta
+åtagande aktivt; om slutacceptans inte håller lämnas ingen obestyrkt drift aktiv.
+AP09:s sakbeslut/luckor, tidigare leveranser och auditstatus ändras inte.
+
+---
+
+# Historik — AP10-beredning, ersatt av AP10-ACCEPT
+
+Gällande nytt mandat: AP10-BEREDNING i beslutsloggen, full ägartext privat under
+`evidence/ap10/local/order.md`. AP09 tillgodoräknas som avslutad. Bered och separat
+granska ett enda samlat byggbeslut från definition, intervju, rättat byggförslag
+och faktisk leverans. [Förslaget](../evidence/ap10/byggbeslut.md) är inte accept.
+Planen ensam äger aktuellt steg, nästa handling och återupptagning.
+
+Tillåtet nu: riktad läsning, sakbedömning, befintliga AP05/AP06, lokal plan/
+beslutsuppdatering och bevarande. Inget nytt bygge, Runtime-ändring, schemalagd
+process, ny bevakningsomgång eller offentlig publicering. Syskonrepon, kampanj,
+IR och valv lämnas orörda. AP09:s bevislucka motiverar ingen rättning i sig.
+Tidigare mandat nedan är historik; de utvidgas inte till det nya förslaget.
+
+---
+
 # AP09 — genomförd verksamhetskedja, avslut enligt slutkvitto
 
 Det accepterade femdelade paketet har tillämpats med två verkliga källintag,

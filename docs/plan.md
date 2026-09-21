@@ -1,4 +1,112 @@
-# Levande plan — AP09 verifierat verksamhetsresultat och kontrollerat avslut
+# Levande plan — AP10 accepterad, delmål 1–2 pågår
+
+AKTUELLT STEG: AP10-ACCEPT registrerad och bunden till berett/granskat paket.
+Root har ensam skrivansvaret i båda namngivna repon. Ingen tjänst eller ny
+bevakningsomgång är ännu aktiverad. Grundbevis och AP09-resultat återanvänds.
+
+NÄSTA HANDLING: bind det namngivna åtagandet, lokal/external läslista och
+resursram; separat granska den minsta gemensamma Runtime-tjänsten och privata
+körvägen. Implementera/verifiera/integrera små delsteg. Därefter kontorskoppling,
+verklig schemastart/samexistens/övertagande och samlat driftavslut — inom samma
+accept, inga nya rutinmässiga ägarprompter.
+
+ÅTERUPPTAGNING: evidence/ap10/local/LAS-MIG.md, accepted-mandate.md och
+acceptance-start.json; work/ap10-runtime-service (Runtime), work/ap10-execution
+(kontoret). Kontrollera Git, aktiva kvitton/processer och föregående skrivare.
+Driftskonfiguration, nästa kommando och delresultat bevaras här före avbrott.
+Fortsätt redan beredda fem delmål; ombered inte från noll.
+
+Delmål: 1 bundet åtagande → 2 kvalificerad Runtime-koppling → 3 kontorets
+bevakningskedja → 4 verklig automatisk omgång, avbrott, mottagare och behövligt
+AP04-bygge med tjänsten aktiv → 5 separat slutgranskning och just åtagandet i
+dygnsdrift. Tekniska delsteg kräver inte ny ägaraccept. AP08 efter väsentliga
+resultat är information. Kvarstående osäkerhet är kvalificering, inte nytt mål.
+
+BEVARAT: ingen dependency upgrade, ny extern tjänst/kostnad/modell, valv-/kampanj-/IR-
+skrivning eller annan byggfas. AP09:s sakbeslut och graceful-drain-lucka är
+oförändrade. AP07 frivilligt ANPASSA; A3/A6/FIND004 och gamla bevis består.
+Om slutacceptans inte håller lämnas inte obestyrkt bevakning aktiv.
+
+---
+
+# Historik — AP10-beredning, ersatt av AP10-ACCEPT
+
+AKTUELLT STEG: AP09 tillgodoräknas som levererad enligt slutkvittot. Ägaren har
+beställt beredning av nästa sammanhängande operativa förmåga, inte byggstart.
+[Det samlade byggbeslutet](../evidence/ap10/byggbeslut.md) föreslår att kontoret
+bär ett avgränsat Python-/Temporalbevakningsansvar utan ny beställning per omgång.
+Förslagets prioritering och dygnsintervall är härledda rekommendationer.
+Ingen sådan drift har ännu accepterats eller startats.
+
+NÄSTA HANDLING: lämna det separat granskade samlade förslaget till ägaren för
+ett beslut om utvecklingsmål OCH avgränsad efterföljande drift. Efter uttrycklig
+accept registrerar kedjedrivaren dess faktiska identitet och driver de fem
+beroende delmålen inom samma fas. Fram till dess: ingen implementation,
+intagsomgång, modellkörning, Runtime-ändring, processinstallation eller publicering.
+
+ÅTERUPPTAGNING: gren `prep/ap10-operativt-bevakningsansvar`; börja med
+`evidence/ap10/local/LAS-MIG.md`, beredningspaketet och granskningen, kontrollera
+Git och faktisk accept före skrivövertagande. Ingen omberedning från noll.
+Beredningsunderlagets saknade exekveringsbindningar fylls först vid behörig
+teknisk uppdelning efter accept; de är inte nya ägarbeslut per fil.
+
+## Vad kontoret redan kan ta ansvar för
+
+- Etableringen: hitta definition, beslut, aktuellt uppdrag och återupptagningspunkt.
+- AP04: köra accepterat utvecklingsuppdrag genom Runtime till granskad skyddad
+  integration; status och resultat är rena läsningar.
+- AP05/AP06: bedöma valda källor/ändringar och bereda motiverade uppgifter med
+  skild källuppgift, bedömning och befogenhet. AP06 bar verkliga beroenden
+  kärna→CLI; kedjedrivaren tog tekniska omtag utan nya ägarbeställningar.
+- AP08: ge daterad privat leverans-/beslutsbild.
+- AP09: göra verkligt officiellt intag, pröva lokal betydelse, överlämna och låta
+  nästa utförare faktiskt fortsätta till separat granskat besked.
+- Kartleveransen och AP07:s begränsade metodresultat tillgodoräknas inom sina
+  räckvidder. De utgör inga återstående huvudprojekt.
+
+Detta är operativ förmåga under ett accepterat, operatörsdrivet mål. Flera
+beroende tekniska uppgifter behöver ett sammanhängande mandat, inte en ny
+projektmotor. Kontoret har inte därigenom stående obemannat ansvar.
+
+## Vad som återstår för den valda nästa förmågan
+
+Verksamhetsresultat: samma avgränsade bevakningsansvar bärs mellan ägarens
+beställningar. Befintlig agent, metoder och verktyg återanvänds. Verkliga
+produktluckor: återkommande aktivering i den befintliga Temporal-motorn,
+privat läs-/bedömningsuppdrag utan kod-PR, avgränsad profil och kontorets
+koppling av källintag/lokal observation till bedömning/beredning/AP08.
+Dessa finns inte i läst Runtime2789ea0: den startar/stänger tjänsten per
+anrop och dess DevelopmentTask går via kandidat till publicering.
+
+Nya mandatgränser: stående namngivet åtagande, lokal användarprocess med
+inloggningsstart, nödvändig Runtime-komplettering och privat uppdragsprofil.
+Inget behov av ny kostnad, värd, allmän scheduler, målrepo eller modellanslutning
+är visat. RF17/avstängd dator lämnas utanför, och kvotbrist innebär synlig väntan.
+
+## Ett sammanhängande användningsförlopp och fem delmål
+
+Ägaren accepterar målet en gång → (1) kedjedrivaren binder åtagandet till det
+verkliga AP09-ärendet → (2) kvalificerar minsta nödvändiga Runtime-väg →
+(3) kopplar kontorets befintliga arbetskedja → (4) en senare verklig omgång
+startar enligt schema efter avslutad interaktiv session, kontrollerar extern
+OCH lokal förändring, hanterar avbrott/övertagande och lämnar granskat sakbesked
+→ (5) hela kedjan slutgranskas och lämnas i avtalad, pausbar lokal drift.
+Beroenden: 1→2; 1+2→3→4→5. Detaljer, acceptans och tillstånd finns i samma
+byggbeslut, inte i en konkurrerande plan.
+
+Under accepterad fas: små relevanta ändringar, separat granskning och skyddad
+integration löpande; AP08 efter väsentliga resultat är information. Teknisk
+uppdelning, testkommandon, granskarfrågor och rutinomtag bärs av kedjedrivaren.
+Endast ändringar av mål, kostnad eller befogenhet återförs till ägaren.
+
+BEVARAT: AP09:s sakbeslut, shutdown-bevislucka och tidigare intag ändras inte.
+Ingen ny omgång eller rättning för att få starkare gammal garanti. AP07 är
+frivilligt ANPASSA utan belagd förbättring. A3/A6/FIND-004 och tidigare auditstatus
+bevaras. Historiken nedan är avslutad och bär ingen aktuell nästa handling.
+
+---
+
+# Historik — AP09 verifierat verksamhetsresultat och kontrollerat avslut
 
 AKTUELLT STEG: båda verkliga intagen, aktuell lokal omobservation och färsk
 mottagares faktiska fortsättning är separat sakgranskade utan blockerare.
