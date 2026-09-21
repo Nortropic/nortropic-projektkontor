@@ -362,3 +362,19 @@ Runtime behåller sina roller. Ingen ny skyldighet att godkänna varje fil eller
 ständig bevakning införs. Presentation, formatkontroll och oförändrade hashvärden
 är inte sakgodkännande, driftstatus eller mandat. Tidigare auditstatus och AP07
 ANPASSA påverkas inte. Nästa fas kräver ett eget accepterat mål.
+
+## AP09-ACCEPT — sammanhängande omvärldsbevakning
+
+Ägaren accepterar det beredda femdelade paketet; fulltext och SHA-256 finns privat
+i evidence/ap09/local/accepted-mandate.md och acceptance-start.json. Kedjedrivaren
+äger källintag, lokal läsning, tillåtna prov, överlämning, separat granskning och
+skyddad integration i kontorsrepot genom befintlig Runtime. Ny kod endast vid
+faktiskt behov. Publicera endast kontrollerad kod/anvisning, syntetiska exempel
+och begränsade bevis; verkliga lokala uppgifter/källkopior/råhistorik stannar privat.
+Två egna externa hämtningar och lokal omkontroll krävs; baslinjebehandling skiljs
+från ny publicering. Saknad källa är okänd, inte oförändrad. Beslut kan vara behåll,
+inte tillämpligt eller otillräckligt. Verklig mottagare fortsätter samma arbete
+med en skrivare åt gången. Inget installations-/Runtime-/valvmandat, ny rättighet,
+kostnad eller stående bevakning. Tekniska delmål behöver inga nya ägarprompter.
+AP08-besked är information. Tidigare leveranser/auditstatus och AP07 ANPASSA bevaras.
+Efter verifierad leverans: redovisa och stanna.

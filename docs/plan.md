@@ -1,3 +1,30 @@
+# Levande plan — AP09 genomförs inom AP09-ACCEPT
+
+AKTUELLT STEG: delmål 1–3 genomförda för första omgången; separat sakgranskning
+stöder avgränsat beslut med uttrycklig bevislucka. Verkliga uppgifter och utfall
+stannar privat. Befintliga verktyg räcker; ingen produktkod byggs om.
+Arbetsanvisning: tools/OMVARLDSARBETE.md. Första skyddade integrationen återstår.
+
+NÄSTA HANDLING: kedjedrivaren granskar och skyddat integrerar första avgränsade
+anvisningen. Överlämna därefter skrivansvaret uttryckligt till en färsk utförare
+för delmål 4–5: ett andra externt intag, ny lokal observation och faktisk motiverad
+fortsättning/avslut av samma ärende. Separat slutgranskning och slutkvitto krävs.
+Detta är tekniska delsteg inom redan accepterad AP09, inga nya ägarprompter.
+
+ÅTERUPPTAGNING: läs evidence/ap09/local/LAS-MIG.md och kontrollerat accepterat
+förslag/mandat där; kontrollera Git och registrerade skrivare före övertagande.
+Privata intag och AP05/AP06-utdata bevaras separat. Samma ärende fortsätter;
+uppdatera inte referenshashar tyst och starta ingen gammal Runtime-task.
+Planen ensam äger nästa handling. Skrivansvar är root tills en uttrycklig
+överlämning journalförts. AP08-lägesbilder är daterad information, inte accept.
+
+BEVARAT: etablering/AP04–AP08/karta tillgodoräknas; AP07 frivilligt ANPASSA utan
+belagd förbättring. Tidigare auditstatus inklusive A3/A6/FIND-004 består.
+Ingen Runtime-kodändring, installation, ny kostnad/rättighet, valvskrivning eller
+stående bevakning. Historisk AP08-plan nedan bär inte aktuell nästa handling.
+
+---
+
 # Levande plan — AP08 slutleverans
 
 AKTUELLT STEG: presentationskoden är byggd av befintlig Runtime, separat granskad
