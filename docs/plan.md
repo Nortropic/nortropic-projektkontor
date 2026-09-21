@@ -1,3 +1,25 @@
+# Levande plan — AP10 levererad; endast namngiven dygnsdrift fortsätter
+
+2026-09-21. AP10:s fem delmål är verifierade inom [slutredovisningens](../evidence/ap10/leverans.md)
+räckvidd. Byggfasen är avslutad. Endast `office-python-temporal` är aktivt,
+dagligen 09:00 Europe/Stockholm. [Driftanvisningen](bevakningsansvar-ap10.md)
+beskriver privat daterad AP08-läsning, resursgränser, paus, stopp och avregistrering.
+
+NÄSTA HANDLING: nästa ordinarie omgång drivs av det namngivna native schemat.
+Ingen ny ägarbeställning behövs för denna bevakning. Behörig mottagare börjar
+läsande i evidence/ap10/local/LAS-MIG.md, kontrollerar aktuell native status,
+senaste verkliga underlag och granskat besked samt föregående skrivares avslut.
+Det privata slutkvittot binder aktiva revisioner, config och bevis. Denna daterade
+plan är inte en livegaranti. Tekniskt bortfall hanteras genom bevarad diagnos;
+förslag om kod-/beroendeändring är ingen verkställighetsbefogenhet.
+
+AP09:s sakbeslut och bevisluckor, AP07 frivilligt ANPASSA och tidigare auditstatus
+består. Ingen annan stående skyldighet eller nästa byggfas aktiveras.
+
+---
+
+# Bevarad tidigare plan — historisk status
+
 # Levande plan — AP10 accepterad, delmål 1–2 pågår
 
 AKTUELLT STEG: AP10-ACCEPT registrerad och bunden till berett/granskat paket.
