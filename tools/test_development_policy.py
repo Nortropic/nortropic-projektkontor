@@ -104,6 +104,14 @@ class PolicyTests(unittest.TestCase):
     def test_roles_are_frozen_read_only_instructions_not_an_engine(self):
         for role in ('driver', 'preparation-review', 'diagnosis', 'final-review'):
             self.assertIn('structured data only', policy.instructions(role))
+            # Every role reads through the same delivered inventory; the finding aid names the files a reader
+            # without directory listing could not discover (measured 2026-09-22), and keeps hold permitted.
+            text = policy.instructions(role)
+            for needle in ('delivered_files', 'cannot list directories', 'never guess names', 'VERIFICATION_RECIPE.py',
+                           'tools/kontor_result.py', 'tools/agarbild.py', 'tools/development_result.py', 'AGENTS.md',
+                           'OUTPUT_SCHEMA.json', 'confers no authority', 'hold remains the right answer'):
+                self.assertIn(needle, text, (role, needle))
+            self.assertNotIn('always', text.split('hold remains')[0][-200:])
             self.assertFalse(policy.schema(role)['additionalProperties'])
 
 
