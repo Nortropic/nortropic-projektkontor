@@ -17,7 +17,7 @@ RECIPES = {'reconciliation': 'acceptance/ap11_reconciliation.py',
            'handoff': 'acceptance/ap11_handoff.py'}
 
 
-def instructions(role):
+def instructions(role, work=None):
     common = (
         'You are working only on the accepted finite Office AP11 goal. Read '
         'CONTEXT.json and the supplied frozen goal, authority, acceptance, '
@@ -47,7 +47,28 @@ def instructions(role):
         'remains the right answer when source or authority is truly insufficient. '
     )
     if role == 'driver':
-        return common + (
+        if work is not None and work not in WORK:
+            raise ValueError('Unknown driver work')
+        # Measured 2026-09-22 (interactive-retry-4, and the Codex driver of retry-1
+        # alike): "explain the dependency" invited prose in depends_on, which the
+        # receiving prepare() refuses for A. Every machine requirement that prepare()
+        # and the AP06 preparation enforce on the answer is stated here and in the
+        # schema; the identity field carries an identity, the explanation goes to reason.
+        contract = (
+            'ANSWER CONTRACT, enforced by the host exactly as written here and in '
+            'OUTPUT_SCHEMA.json: action is task (propose the one next task) or hold '
+            '(source or authority insufficient: a controlled stop that is counted but '
+            'delivers no task); work is ' + ("exactly '" + work + "'" if work else
+            "'reconciliation' for A or 'handoff' for B") + '; depends_on is an IDENTITY '
+            'field, never an explanation: for A (reconciliation) it is exactly the empty '
+            'string, because A has no delivered predecessor, and for B (handoff) it is '
+            'exactly the 40-hex merge commit of the ACTUALLY integrated A as CONTEXT.json '
+            'integrated.reconciliation.merge_commit states it; put every explanation in '
+            'reason. reason and brief are non-empty text. requirements is a non-empty '
+            'list of objects with exactly id, text and reason (non-empty, ids unique). '
+            'tests is a non-empty list of objects with exactly id, observable and method '
+            '(non-empty, ids unique). Nothing else is accepted. ')
+        return common + contract + (
             'Prepare only a genuinely necessary next task from the accepted '
             'remaining work and actual previous integration. A reconciles the '
             'named AP11 requirements with existing Runtime result readers and '
@@ -55,14 +76,15 @@ def instructions(role):
             'action. B must use the ACTUALLY integrated A interface/results to '
             'hand off this same reconciliation through existing AP08/result '
             'reading. It must not be a parallel report/decision platform. '
-            'Do not invent a B task before A exists. Explain the dependency '
-            'using its actual merge identity. Select small adequate technical '
+            'Do not invent a B task before A exists. Name the dependency only '
+            'in depends_on as the identity rule above states, and explain it in '
+            'reason. Select small adequate technical '
             'requirements and verification that tests useful behavior, including '
             'negative cases. The host supplies already reviewed fixed acceptance '
             'recipes; you may not change them or generate executable host tests. '
-            'Choose hold when source/authority is insufficient, finish only as '
-            'a proposal for independent whole-goal review. No task PASS can '
-            'establish whole-goal completion.'
+            'Choose hold when source/authority is insufficient. Whole-goal '
+            'completion is never a driver answer: it is judged by the separate '
+            'final review, and no task PASS can establish it.'
         )
     if role == 'preparation-review':
         return common + (
@@ -101,18 +123,35 @@ def instructions(role):
     raise ValueError('Unknown AP11 policy role')
 
 
-def schema(role):
+def schema(role, work=None):
     def obj(properties):
         return {'type': 'object', 'additionalProperties': False,
                 'properties': properties, 'required': list(properties)}
     text = {'type': 'string'}
+
+    def described(description):
+        return {'type': 'string', 'description': description}
     if role == 'driver':
+        if work is not None and work not in WORK:
+            raise ValueError('Unknown driver work')
+        # The identity field differs per work and is stated per work: A is exactly the empty
+        # string (an enum with one member); B is the merge commit of the actually integrated A,
+        # which prepare() compares with the observed integration.
+        depends_on = ({'type': 'string', 'enum': [''], 'description': 'Identity field, not an explanation: A has no delivered predecessor, so this is exactly the empty string; explain in reason'}
+                      if work == 'reconciliation' else
+                      described('Identity field, not an explanation: exactly the 40-hex merge commit of the ACTUALLY integrated A as CONTEXT.json integrated.reconciliation.merge_commit states it; explain in reason')
+                      if work == 'handoff' else
+                      described('Identity field, not an explanation: exactly the empty string for A (reconciliation); exactly the 40-hex merge commit of the actually integrated A for B (handoff); explain in reason'))
         return obj({
-            'action': {'type': 'string', 'enum': ['task', 'hold', 'finish']},
-            'work': {'type': 'string', 'enum': ['reconciliation', 'handoff', 'goal']},
-            'reason': text, 'brief': text, 'depends_on': text,
-            'requirements': {'type': 'array', 'items': obj({'id': text, 'text': text, 'reason': text})},
-            'tests': {'type': 'array', 'items': obj({'id': text, 'observable': text, 'method': text})},
+            'action': {'type': 'string', 'enum': ['task', 'hold'], 'description': 'task proposes the one next task; hold means source or authority is insufficient (a controlled stop, counted, no task delivered)'},
+            'work': {'type': 'string', 'enum': [work] if work else list(WORK), 'description': 'the accepted remaining work this answer prepares'},
+            'reason': described('non-empty: why this task is genuinely necessary now, with the dependency explained here'),
+            'brief': described('non-empty: the accepted task brief for the implementer'),
+            'depends_on': depends_on,
+            'requirements': {'type': 'array', 'description': 'at least one; ids unique; text and reason non-empty',
+                             'items': obj({'id': described('short unique label'), 'text': described('one testable requirement'), 'reason': described('why it is needed')})},
+            'tests': {'type': 'array', 'description': 'at least one; ids unique; observable and method non-empty',
+                      'items': obj({'id': described('short unique label'), 'observable': described('the observable behaviour that shows the requirement'), 'method': described('how the host-run recipe or the candidate tests observe it')})},
         })
     if role == 'diagnosis':
         return obj({'action': {'type': 'string', 'enum': ['repair', 'review_only', 'retry', 'hold']},
@@ -145,11 +184,18 @@ def prepare(context, answer):
         previous = context['integrated'].get('reconciliation')
         if (not previous or answer['depends_on'] != previous['merge_commit']
                 or not context.get('actual_reconciliation_source')):
-            raise ValueError('B must be newly prepared from actually integrated A')
-    elif answer['depends_on']:
-        raise ValueError('A has no invented delivery dependency')
-    if type(answer['brief']) is not str or not answer['brief'].strip():
-        raise ValueError('Concrete accepted-task content required')
+            raise ValueError('B must be newly prepared from actually integrated A: depends_on is exactly its merge commit')
+    elif answer['depends_on'] != '':
+        raise ValueError('A has no delivered predecessor: depends_on must be the empty string, explanations belong in reason')
+    for field in ('reason', 'brief'):
+        if type(answer[field]) is not str or not answer[field].strip():
+            raise ValueError('Concrete accepted-task content required: ' + field + ' must be non-empty text')
+    for field, keys in (('requirements', ('id', 'text', 'reason')), ('tests', ('id', 'observable', 'method'))):
+        entries = answer[field]
+        if (type(entries) is not list or not entries or any(type(e) is not dict or set(e) != set(keys) for e in entries)
+                or any(type(e[k]) is not str or not e[k].strip() for e in entries for k in keys)
+                or len({e['id'] for e in entries}) != len(entries)):
+            raise ValueError(field + ' must be a non-empty list of objects with exactly ' + ', '.join(keys) + ', non-empty, ids unique')
     sources = copy.deepcopy(context['sources'])
     if {s['id'] for s in sources} != {'authority', 'goal', 'observation'}:
         raise ValueError('Bind authority, frozen goal and actual observation separately')

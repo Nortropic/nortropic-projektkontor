@@ -115,5 +115,52 @@ class PolicyTests(unittest.TestCase):
             self.assertFalse(policy.schema(role)['additionalProperties'])
 
 
+class AnswerContractTests(unittest.TestCase):
+    """Instruction, schema and prepare() state and enforce ONE contract per work (measured 2026-09-22:
+    two drivers put an explanation into depends_on, which prepare() refused for A)."""
+
+    def test_instruction_and_schema_state_the_identity_rule_per_work(self):
+        for work, empty in (('reconciliation', True), ('handoff', False)):
+            text = policy.instructions('driver', work); schema = policy.schema('driver', work)
+            self.assertIn("work is exactly '" + work + "'", text); self.assertIn('IDENTITY field, never an explanation', text)
+            self.assertIn('exactly the empty string', text); self.assertIn('40-hex merge commit of the ACTUALLY integrated A', text)
+            self.assertNotIn('Explain the dependency using its actual merge identity', text, 'the sentence that invited prose is gone')
+            self.assertIn('explain it in reason', text)
+            self.assertEqual(schema['properties']['work']['enum'], [work])
+            self.assertEqual(schema['properties']['action']['enum'], ['task', 'hold'])
+            depends = schema['properties']['depends_on']
+            self.assertEqual(depends.get('enum'), [''] if empty else None); self.assertIn('not an explanation', depends['description'])
+            for name in ('reason', 'brief'):
+                self.assertIn('non-empty', schema['properties'][name]['description'])
+            for name, keys in (('requirements', ('id', 'text', 'reason')), ('tests', ('id', 'observable', 'method'))):
+                self.assertIn('at least one', schema['properties'][name]['description'])
+                self.assertEqual(schema['properties'][name]['items']['required'], list(keys))
+        with self.assertRaises(ValueError): policy.instructions('driver', 'goal')
+        with self.assertRaises(ValueError): policy.schema('driver', 'goal')
+        generic = policy.schema('driver'); self.assertEqual(generic['properties']['work']['enum'], ['reconciliation', 'handoff'])
+        self.assertNotIn('enum', generic['properties']['depends_on']); self.assertIn('empty string for A', generic['properties']['depends_on']['description'])
+        self.assertEqual(set(policy.schema('driver')['required']), {'action', 'work', 'reason', 'brief', 'depends_on', 'requirements', 'tests'})
+
+    def test_prepare_enforces_exactly_what_the_text_says(self):
+        base = proposal(); ctx = context()
+        self.assertEqual(policy.prepare(ctx, base)['task']['id'], 'fixture', 'a legitimate A passes through AP06')
+        prose = {**base, 'depends_on': 'none: first task of the application; base d' * 1}
+        with self.assertRaisesRegex(ValueError, 'depends_on must be the empty string'): policy.prepare(ctx, prose)
+        with self.assertRaisesRegex(ValueError, 'necessary task proposal'): policy.prepare(ctx, {**base, 'action': 'hold'})
+        for field in ('reason', 'brief'):
+            with self.assertRaisesRegex(ValueError, field + ' must be non-empty'): policy.prepare(ctx, {**base, field: '  '})
+        with self.assertRaisesRegex(ValueError, 'requirements must be'): policy.prepare(ctx, {**base, 'requirements': []})
+        with self.assertRaisesRegex(ValueError, 'requirements must be'): policy.prepare(ctx, {**base, 'requirements': [{'id': 'r1', 'text': 'x', 'reason': 'y', 'extra': 'z'}]})
+        with self.assertRaisesRegex(ValueError, 'requirements must be'): policy.prepare(ctx, {**base, 'requirements': [{'id': 'r1', 'text': 'x', 'reason': 'y'}, {'id': 'r1', 'text': 'x2', 'reason': 'y2'}]})
+        with self.assertRaisesRegex(ValueError, 'tests must be'): policy.prepare(ctx, {**base, 'tests': [{'id': 't1', 'observable': '', 'method': 'm'}]})
+        # B: exactly the observed merge commit, never prose, never another id, never before A is integrated.
+        merged = 'b' * 40; done = copy.deepcopy(ctx); done['integrated'] = {'reconciliation': {'merge_commit': merged}}; done['actual_reconciliation_source'] = 'source'
+        handoff = {**base, 'work': 'handoff', 'depends_on': merged}
+        self.assertEqual(policy.prepare(done, handoff)['task']['allowed_paths'], policy.WORK['handoff'])
+        with self.assertRaisesRegex(ValueError, 'exactly its merge commit'): policy.prepare(done, {**handoff, 'depends_on': 'the integrated A ' + merged})
+        with self.assertRaisesRegex(ValueError, 'exactly its merge commit'): policy.prepare(done, {**handoff, 'depends_on': 'c' * 40})
+        with self.assertRaisesRegex(ValueError, 'exactly its merge commit'): policy.prepare(ctx, handoff)
+
+
 if __name__ == '__main__':
     unittest.main()
