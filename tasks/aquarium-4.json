@@ -1,0 +1,23 @@
+{
+  "id": "office-aquarium-projection-4",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "011f611067a995a7e4f87ea679e1740c409d2924",
+  "runtime_revision": "c1cdaf5de3d10cd31d4a7aa0ea58e4e8d6b08797",
+  "allowed_paths": [
+    "tools/aquarium.py",
+    "tools/test_aquarium.py",
+    "tools/AQUARIUM.md"
+  ],
+  "attempt_seconds": 3000,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "claude",
+      "prompt": "Read TASK.md and implement exactly its bounded read-only Aquarium reading and display-safe projection, with synthetic tests under .scratch only and the PROBE constant verbatim. No real sources, network, model calls, operational controls or publication. Runtime owns frozen acceptance, separate review and protected integration."
+    }
+  ],
+  "review_provider": "claude",
+  "brief": "tasks/aquarium-4.md",
+  "acceptance": "acceptance/aquarium_2.py",
+  "acceptance_sha256": "5df29bdb89f5936f0e21aa2ee8e135f0b47c8844003af1921002e83f5a1b5998"
+}
