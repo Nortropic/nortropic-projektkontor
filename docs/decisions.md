@@ -1062,3 +1062,36 @@ namngivet ärende utanför leveransen: väktarens registrerade identitet stämme
 macOS omstart av Python (D031).
 
 **Ersätter:** ingenting. Följer efter UNDERHALL-INGANGAR-20260924.
+
+## UNDERHALL-INGANGAR-GENOMFORT-20260924 — ingångarna följer main; återfunnet underlag publicerat; protokollet på plats
+
+**Status:** genomfört 2026-09-24 av kedjedrivaren (Claude Code) enligt UNDERHALL-INGANGAR-20260924, efter det samlade
+beskedet om A och B och sedan övergång 15 aktiverats och lästs tillbaka.
+
+**Mätt, läsande:** för båda primärutcheckningarna aktuell gren, lokala grenar, stash och registrerade worktrees; för
+varje gren utan verifierad kopia på origin dess spets, gemensamma bas med main och unika innehåll per fil och blob mot
+mains historik, klassat som redan på main i annan form, värt att publicera, historik utan publiceringsvärde eller
+privat. Kontoret: ingången på main, 33 grenar varav 12 utan kopia, ingen stash. Runtime: ingången på en äldre
+arbetsgren (28 egna commits, 30 bakom), 57 grenar varav 8 utan kopia, ingen stash, en köad `runtime/integration.py`
+som var byte för byte mains och 535 ospårade filer under `evidence/runs`. Mätningen och klassningen bevaras privat.
+
+**Publicerat genom skyddad väg med separat granskning:** kontorets beslutsunderlag för AP07, AP08, AP09 och AP11 och de
+accepterade uppdragsfilerna med frusen acceptans för AP07, AP10 och AP11, byte för byte som de låg på grenarna (PR 38);
+briefarna och acceptansskripten är identiska med Runtimes frysta kopior, och uppdragsfilerna är samma uppdrag värde för
+värde (sju har ett avslutande radslut som värdens frysta kopia saknar). Runtimes accepterade kvalificeringsuppdrag
+`evidence-index-tree` publicerades på samma sätt (Runtime PR 60). Körbevisen under
+Runtimes `evidence/runs` är råhistorik och publiceras inte.
+
+**Arkiverat:** grenarna utan kopia på origin finns kvar och är arkiverade som git bundle med SHA256 i respektive privat
+hemvist; planerna namnger dem och vad arkiven bär.
+
+**Runtimes ingång:** flyttad till main lika med origin/main sedan mätningen visat att tjänsten inte läser dess spårade
+filer och att de läsare som finns förutsätter main. Den köade filen och de ospårade körbevisen är oförändrade, och den
+gamla grenen finns kvar.
+
+**Protokoll:** i kontorets `AGENTS.md` och planens rutin, med startkontrollen `tools/ingang.py`; i Runtime i planens rutin
+och runbooken, med `scripts/check_entry.py`. Runtimes `AGENTS.md` ändras inte: den är en bunden instruktionsingång i den
+aktiva releasen, och en ändring där stoppar varje nytt modellanrop, även bevakningen, tills en release med de nya
+bindningarna är aktiv (Runtime D032). Att ändå föra in rutinen där kräver en kontrollerad övergång och är ägarens beslut.
+
+**Ersätter:** ingenting. Följer efter AP10-SIGNALRATTNING-LEVERANS-20260924.
