@@ -1318,3 +1318,57 @@ redovisar den ändrade prognosen.
 **Ersätter:** gestaltningsdelen av AQUARIUM-V0-BEREDNING-20260924 (dioramat och dess fem platser) så som
 AQUARIUM-V0-ACCEPT-20260924 accepterade den; allt annat i dem står kvar. `office-aquarium-scene-1` parkerades därför och
 återupptas inte.
+
+## AQUARIUM-V0-ARBETSVARLD-20260924 — ägarens ja till arbetsvärlden som gestaltningsriktning, med avgränsade tillägg
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code). Ägarens besked bevaras ordagrant privat i
+`evidence/aquarium/local/owner-words-ja-arbetsvarld-20260924.md` (SHA256
+`06f419ad0bd8902848f705c9d96b89dc2f92afd4ee2818e50e9ecbddf44626b9`). Ingen exakt klocktid tillskrivs ägaren.
+
+**Bakgrund:** efter AQUARIUM-V0-GESTALTNING-20260924 visades en prototyp av en rumslig arbetsvärld i tre lägen (verkligt
+lugnt, aktivt förlopp med PROVDATA, inaktuellt och otillgängligt underlag med PROVDATA), med fyra redovisade skillnader
+utöver ren presentation. Ägaren känner igen Aquarium i den och tog ställning till skillnaderna.
+
+**Beslutet:** den sammanhängande rumsliga arbetsvärlden är gestaltningsriktningen. Beslutet godkänner riktningen och
+tilläggen nedan, inte den ännu ointegrerade implementationen. Arbetsvärldens struktur, de beständiga platserna,
+utförarna, arbetsobjekten och skillnaden mellan arbete, granskning, väntan, leverans och ägarbehov behålls; ingen ny
+grundläggande omdesign eller inspirationsrunda, utan vidare till en användbar integrerad vy. Tilläggen:
+- a. Projektionen utökas med den utförare och det aktuella steg som den befintliga källan faktiskt belägger för
+  körningen. Det är ingen lättnad av sanningskraven: konfigurerad eller planerad bemanning skiljs från observerat
+  utförande, en okänd identitet visas som okänd, och ingen modell eller person gissas ur en allmän konfiguration.
+- b. Pågående arbete namnges med namnen ur den befintliga motorläsningen där de finns: begripliga korta titlar i scenen,
+  tekniska identiteter i fördjupningen, och titel och kort kan bindas till rätt uppdrag.
+- c. Avgränsad läsning av de namngivna uppdragsfiler som behövs för redan identifierade parkerade uppdrag: bara
+  nödvändiga metadata för visningen, ingen generell genomsökning, ny skrivbehörighet eller leverans av promptar,
+  credentials, råhistorik eller privata källsökvägar till webbläsaren. Ett saknat eller oläsbart namn visas som en
+  begränsning, och uppdraget finns kvar.
+- d. I etapp 2 får två efterföljande läsningar jämföras och att samma arbetsobjekt fått ett nytt observerat läge
+  gestaltas. Förflyttningen illustrerar uppdaterat tillstånd och belägger inte händelsetid, färdväg, mellanliggande
+  steg eller överlämning mellan utförare; en specifik överlämning beskrivs som belagd bara när källunderlaget stödjer
+  just den relationen. Vid första läsningen, omstart eller otillräckligt underlag visas aktuellt känt läge utan påhittad
+  tidigare övergång, och samma förändring spelas inte upp som nytt arbete. Minsta presentationslogik; ingen
+  händelsemotor, kanonisk databas eller generell historikplattform.
+
+Två finjusteringar inom riktningen: arbetet dominerar scenen, så maskinrummets och det frostade rummets visuella tyngd
+tonas ned där det kan göras enkelt, med deras information och täckningsbegränsning kvar, och arbetskort och
+uppdragsnamn får god läsbarhet; PROVDATA märks tydligt och otvetydigt för hela provläget utan att upprepas på varje
+plats, och verkliga data och provdata hålls åtskilda. Sanning, ålder och täckning: figurer och aktivitet följer
+observerat arbete, tomma arbetsplatser är rätt när inget arbete observeras, och dekorativ rörelse påstår inte att arbete
+pågår; lästid, senaste resultat och aktuellt observerat tillstånd hålls isär, och ett gammalt granskat besked blir inte
+nytt för att bevakningsplatsen nyligen lästes; prototypens framtvingade färska utseende följer inte med den riktiga vyn,
+där de verkliga observationstiderna och aktualitetsreglerna gäller; vid inaktuell eller saknad källa går tidigare
+kunskap och osäkerheten att förstå, och nedtoningen gör inte viktig text oläsbar eller antyder att arbetet säkert
+upphört; interaktivt arbete som inte observeras ligger utanför de summeringar som påstår observerad aktivitet.
+
+**Gränser:** fungerande läsare, projektion, källbindningar, integritetsskydd och lokal drift återanvänds, och bara det
+som tilläggen behöver ändras. Den befintliga vyn och dess bevis bevaras som jämförelse. `office-aquarium-scene-1` förs
+inte vidare genom att dess frysta uppgift skrivs om; den ändrade uppgiften hanteras genom den accepterade arbetsvägen,
+med historiken kvar och utan dubbla utförare, och den beslutade kombinerade byggvägen följs där Runtime-profilen inte
+räcker (frusen acceptans, separat granskning och skyddad publicering). Runtime-förbättringen ligger fortsatt efter
+Aquarium; AP-11 återöppnas inte. Ingen ny modell, kostnad, databas, driftåtgärd från vyn, extern exponering eller annan
+Runtime-utökning. Ingen ytterligare principiell prototyp före kodarbetet: den nya vyn visas med verkliga källor när den
+är användbar, och därefter genomförs återstående accepterade prov. Den ursprungliga ChatGPT-diskussionen finns inte i
+kedjedrivarens arbetsplats; full källtäckning påstås inte, och ingen ny fullständig genomgång beställs. Prognosen
+uppdateras med tilläggen och redovisas i nästa ordinarie lägesbesked.
+
+**Ersätter:** ingenting; följer efter AQUARIUM-V0-GESTALTNING-20260924 och besvarar ägarens ställningstagande i dess ägartur.
