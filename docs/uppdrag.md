@@ -1,4 +1,22 @@
-# GÄLLANDE: det accepterade modellvalet för Claude Code och Codex (efter AP-11)
+# GÄLLANDE: riktad AP-10-rättning (A) och beredning av Aquarium v0 (B)
+
+Ägarbeslut 2026-09-24, se AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 i beslutsloggen; orden bevaras ordagrant privat.
+AP-11 och modellvalsförbättringen är avslutade inom sina redovisade räckvidder och återöppnas inte. Två avgränsade,
+separata arbeten i samma plan:
+
+A. Rätta AP-10:s dokumenterade signalfel i den privata anropsvägen, med prov i verklig process, separat granskning,
+   skyddad integration och kontrollerad driftövergång. Inget annat i AP-10 ändras: sakuppdrag, källor, modellval,
+   resursramar och körschema är oförändrade.
+B. Bered Aquarium v0 - en lugn läsvy över vad kontoret levererat, vad som arbetar eller väntar och vad som behöver
+   ägaren - ur befintligt underlag och dagens verkliga Office/Runtime, och lämna ett samlat byggbeslut för ägarens
+   accept. Ingen implementation, installation, publicering eller nytt repo före accepten.
+
+Inga nya abonnemang, betalningsvägar, modeller, organisationsbehörigheter eller valvskrivningar. Ingen generell
+härdnings- eller städkampanj. Planen äger aktuellt steg.
+
+---
+
+# Modellvalet för Claude Code och Codex — levererat och aktivt 2026-09-24; avsnittet är historik
 
 AP-11 är avslutat 2026-09-23 (se AP11-AVSLUT-20260924). Gällande uppdrag är fortsättningen som ägaren beslutade
 2026-09-22 och bekräftade 2026-09-24: ett återanvändbart modellval för både Claude och Codex, i befintliga
