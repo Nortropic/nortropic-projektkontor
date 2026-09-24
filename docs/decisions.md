@@ -1204,3 +1204,70 @@ schema ändras inte genom detta val.
 
 **Ersätter:** ingenting. Kompletterar UNDERHALL-INGANGAR-GENOMFORT-20260924 för v0:s Runtime-uppdrag. Följer efter
 AQUARIUM-V0-ACCEPT-20260924.
+
+## AQUARIUM-V0-SLUTGRANSKNING-20260924 — ägarbeslut: separat slutgranskning och skyddad integration när Runtimes granskningsprofil inte räcker
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code). Ägarens svar bevaras ordagrant privat i
+`evidence/aquarium/local/owner-words-slutgranskning-20260924.md` (SHA256
+`5c18cae9c72598622df2132bef71f224997527466550c38a84045615f3556502`). Ingen exakt klocktid tillskrivs ägaren. Övertagandet
+för den första kandidaten registrerades på uppdragsgrenen innan den publicerades.
+
+**Bakgrund:** Runtimes obligatoriska granskning av kontorsuppdrag har en fast modellgräns på 180 sekunder och avbröts för
+`office-aquarium-projection-4` utan utlåtande, sedan kandidaten klarat den frysta acceptansen. Ett nytt försök hade fått
+samma gräns, och en högre gräns är en Runtime-ändring, som inte ingår.
+
+**Beslutet:** ett uttryckligt undantag i byggvägen för Aquarium v0, inte en försvagning av produktens acceptans eller ett
+generellt sätt att kringgå obligatorisk granskning. Runtime bygger och kör den frysta acceptansen; när den befintliga
+granskningsprofilen inte räcker får en separat läsande granskning och den skyddade publiceringen färdigställa
+leveransen. Den aktuella kandidaten, dess frysta acceptans, körhistorik och förbrukade resurser bevaras;
+implementationen görs inte om för att granskningen avbröts, och det avbrutna granskningsförsöket står ofullständigt och
+skrivs inte om. Den separata granskningen görs av en färsk läsande granskarprocess enligt befintlig behörighetsprofil,
+med uttrycklig tids- och resursram, över hela uppgiften och med riktiga sökvägar och en åtkomlig filförteckning;
+godkännande kräver ett färdigt utlåtande, och verkliga kandidatfynd rättas inom samma omfattning, provas och granskas
+igen med tidigare versioner bevarade. Publiceringen sker bara genom den befintliga skyddade publiceraren med verkliga,
+kandidatbundna test- och granskningsresultat, på frusen bas och med oförändrade tillåtna filer och acceptans; PR,
+integrerad revision och filträd läses tillbaka. Runtime-körningen markeras inte som klar: saknas en stödd
+avbrytningsväg står den uttryckligt parkerad, med hänvisning till den externa leveransen och besked om att den inte
+återupptas för att publicera samma arbete igen. Aquarium och slutrapporten skiljer "Runtime byggde och prövade
+kandidaten" från "separat granskad och skyddat integrerad av kedjedrivaren". Samma avgränsade arbetsform får användas
+för renderaren och övriga accepterade v0-koduppgifter där granskningsprofilen inte räcker; granskningsvägen planeras
+före start.
+
+**Gränser:** ingen Runtime-ändring, ny modell, betalningsväg, rättighet, återöppning av AP-11 eller ombyggnad av en
+godtagbar kandidat. Undantaget för uppdragsgrenen och den frysta fjärrbasen gäller tills integrationen är hanterad.
+
+**Ersätter:** ingenting. Kompletterar AQUARIUM-V0-UPPDRAGSGREN-20260924.
+
+## AQUARIUM-V0-PROJEKTION-20260924 — etapp 1: läsningen och projektionen integrerade, scenmallen publicerad
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code) inom AQUARIUM-V0-ACCEPT-20260924,
+AQUARIUM-V0-UPPDRAGSGREN-20260924 och AQUARIUM-V0-SLUTGRANSKNING-20260924. Ingen drift ändrades.
+
+**Vad som hände:** Aquarium v0:s läsning och visningssäkra projektion byggdes genom Runtimes kontorsväg. De tre första
+uppdragen föll var och ett på en enda lucka i kedjedrivarens egna indata, aldrig på projektionens regler:
+`office-aquarium-projection-1` genom en acceptans som läste `TASK.md`, som inte finns i Runtimes prövningskatalog (en ren
+klon av basen med kandidatens commit), och krävde ett ord som beskrivningen inte angav; `office-aquarium-projection-2`
+genom en beskrivning som tillät två läsningar av ett `paused` som inte är booleskt; `office-aquarium-projection-3`
+genom att kandidatens tester tog bort själva `.scratch`, vilket värdens sandlåda vägrar och beskrivningen inte hade
+beskrivit. Varje gång klarade samma kandidat hela acceptansen när bara den punkten ändrades. För ett kontorsuppdrag ger
+Runtimes omförsök efter diagnos samma prompt utan diagnosen och i samma arbetskatalog, så inget av dem gjordes om;
+de står kvar som `waiting_diagnosis` och återupptas inte.
+
+**Leveransen:** `office-aquarium-projection-4` körde samma acceptans med en beskrivning som sade `paused`-regeln och
+prövningsmiljön uttryckligen. Runtime byggde och prövade kandidaten `a4be47d6ad9092f72b53c60d9121857aa02bfb5f`: den
+frysta acceptansen godkände den. Runtimes obligatoriska granskning avbröts vid den fasta gränsen på 180 sekunder utan
+utlåtande och står ofullständig; uppdraget står parkerat i `waiting_review` och ska inte återupptas för att publicera
+samma arbete igen. Kandidaten granskades därefter separat av kedjedrivaren enligt AQUARIUM-V0-SLUTGRANSKNING-20260924,
+av en färsk läsande granskare över hela uppgiften, som godkände den utan blockerande fynd, och integrerades skyddat
+genom den befintliga publiceraren, som körde hela kontorssviten (286 prov) på exakt kandidaten: PR 42, main `cb96867f`, med
+den frysta basen som förälder och kandidatens filträd. Kända begränsningar som granskningen noterade står i PR:ns
+anteckning. De fyra uppdragens underlag är publicerade oförändrade med denna post. Kedjedrivaren bygger sedan dess
+sina prov i en katalog byggd som Runtimes prövningskatalog och kör acceptansen genom den aktiva releasens sandlåda, och
+beskrivningen anger prövningsmiljön och varje ord, tal och tolerans som en acceptans kräver.
+
+**Därtill:** scenmallen, etapp 1 steg 2, publiceras som `tools/aquarium_vy.py` med bara formgivningen: sidan `SCEN` med
+platshållare och listplatser, och färskhetsskriptet `SKRIPT`, som visar sidan färsk bara medan läsningen är yngre än
+den minsta källgränsen. Renderaren läggs till av nästa Runtime-uppdrag, `office-aquarium-scene-1` på grenen
+aquarium/uppdrag-scen, som håller båda konstanterna oförändrade.
+
+**Ersätter:** ingenting. Följer efter AQUARIUM-V0-SLUTGRANSKNING-20260924.

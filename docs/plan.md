@@ -8,12 +8,13 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0 byggs, etapp 1. A levererad och aktiv. Underhållet genomfört
+# Levande plan — Aquarium v0 byggs, etapp 1: projektionen integrerad, scenens renderare näst. A levererad och aktiv
 
 AKTUELLT 2026-09-24, efter ägarbesluten AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 och AQUARIUM-V0-ACCEPT-20260924. AP-11 och modellvalet är
 avslutade och återöppnas inte (historik nedan). Drift nu: aktiv konfiguration `e756fe5b` (runtime `c1cdaf5d`, kontoret
-`df5ed5dc`), AP-10:s schema bundet till den och opausat, nästa ordinarie körning 2026-09-25 07:00Z, inget arbete i
-motorn.
+`df5ed5dc`), AP-10:s schema bundet till den och opausat, nästa ordinarie körning 2026-09-25 07:00Z. I motorn väntar
+`office-aquarium-projection-1`, `-2` och `-3` i `waiting_diagnosis` och `-4` parkerat i `waiting_review`; inget av dem
+återupptas (se B och AQUARIUM-V0-PROJEKTION-20260924).
 
 A. RIKTAD AP-10-RÄTTNING - levererad och aktiv. Det privata steget registrerar nu en
 avslutningssignal och avslutar anropet inom den befintliga stoppmodellen, i stället för att gå vidare till sin
@@ -30,7 +31,7 @@ leverantören inte tar emot analysens anrop (kapacitet); senast granskade besked
 modellvalsfråga skrivs för bevakningen: D030 frågar i utvecklingsvägen, inte i bevakningens privata steg. Bevakningens
 modellval ändras inte inom detta mandat.
 
-B. AQUARIUM V0 - ACCEPTERAT 2026-09-24 (AQUARIUM-V0-ACCEPT-20260924); ETAPP 1 PÅGÅR. Byggbeslutet är
+B. AQUARIUM V0 - ACCEPTERAT 2026-09-24 (AQUARIUM-V0-ACCEPT-20260924); ETAPP 1 PÅGÅR, STEG 1-3 KLARA. Byggbeslutet är
 [evidence/aquarium/byggbeslut.md](../evidence/aquarium/byggbeslut.md) med sina tre skisser, nu med ägarens preciseringar.
 
 Byggväg, läst ur Runtimes faktiska kontorsprofil (`runtime/task.py` och runbookens AP04-avsnitt): ett kontorsuppdrag
@@ -44,7 +45,12 @@ Med samma modellfamilj som författare och granskare är granskningen en separat
 Tar en modell inte emot anrop väntar arbetet enligt den befintliga mekanismen (D030 där den gäller), och modell,
 utförare eller betalväg byts inte utan ägarens beslut.
 
-Etapp 1, första användbara ögonblicksbild:
+Etapp 1, första användbara ögonblicksbild. Läge: steg 1 genomfört 2026-09-24 (varje källa läsbar, privat avläsning); steg 2
+publicerat med denna post (`tools/aquarium_vy.py` med bara sidan `SCEN` och färskhetsskriptet `SKRIPT`); steg 3
+klart: Runtime byggde och prövade kandidaten som `office-aquarium-projection-4` mot den frysta acceptansen, och
+kedjedrivaren granskade den separat och integrerade den skyddat (main `cb96867f`, PR 42) enligt
+AQUARIUM-V0-SLUTGRANSKNING-20260924, sedan `-1`, `-2` och `-3` fallit på luckor i kedjedrivarens egna indata
+(AQUARIUM-V0-PROJEKTION-20260924); steg 4 nästa, som `office-aquarium-scene-1`:
  1. Källprov (kedjedrivaren, läsande): varje uppräknad källa läses med de tillåtna verktygen och en verklig avläsning
     sparas privat. Skäl till den interaktiva vägen: en Runtime-kandidat arbetar i en klon av kontorsrepot, där de privata
     källorna inte finns (de är ospårade), och byggkandidater arbetar med syntetiska data.
@@ -53,13 +59,20 @@ Etapp 1, första användbara ögonblicksbild:
  3. Runtime-uppdrag: läsning och visningssäker projektion, `tools/aquarium.py` med prov och anvisning, mot syntetiska
     fixturer. Byggbeslutets etapp 0 ingår här: provscenarierna och sanningsreglerna fryses i uppdragets acceptans, som
     granskas separat innan uppdraget startas.
- 4. Runtime-uppdrag: återgivning av projektionen i scenmallen, `tools/aquarium_vy.py` med prov.
+ 4. Runtime-uppdrag: återgivning av projektionen i scenmallen, `tools/aquarium_vy.py` med prov; mallens två
+    konstanter hålls oförändrade och prövas mot sina SHA-256.
  5. Kedjedrivaren: den publicerade koden körs mot verkliga källor till en privat sida som prövas i Chrome och visas för
     ägaren. Skäl: körningen läser privata källor och den visuella kontrollen görs i Chrome, båda utanför en kandidat.
 Etapp 2 är fönstret på 127.0.0.1 (ett Runtime-uppdrag), etapp 3 acceptans, mottagarprov, ägarprov, uthållighet och
-leveransbesked. Prognos: byggbeslutets planeringsvärden gäller tills vidare - första användbara vy efter omkring
-2½-3½ arbetsdagar och hela v0 efter omkring 4½-6½ - och uppdateras när de två Runtime-uppdragens verkliga tider är
-kända. Ägarens närvaro behövs för ägarprovet (cirka 15 minuter) och vid en eventuell formgivningsfråga.
+leveransbesked. Prognos, uppdaterad 2026-09-24 när steg 3 nåtts: steg 3 tog omkring två och en halv timme från frysta indata till
+integration, inklusive tre luckor i de egna indata; utförarens del var 12-16 minuter per försök. Första
+användbara vy väntas därför när steg 4 är integrerat, sannolikt 2026-09-24 eller 2026-09-25, och hela v0 omkring en
+till två arbetsdagar därefter, plus ägarprovet och åtta timmars uthållighetsprov. Ägarens närvaro behövs för
+ägarprovet (cirka 15 minuter) och vid en eventuell formgivningsfråga.
+
+Ägarens tur: väntar ett beslut eller en operatörshandling på ägaren skrivs det i denna plan under en rad som bara
+innehåller `ÄGARENS TUR`, som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD` eller `- [operatörshandling] text`; Aquarium
+läser blocket från main. Inget väntar på ägaren nu, så blocket finns inte.
 
 ARBETSFORM FÖR V0:S RUNTIME-UPPDRAG (AQUARIUM-V0-UPPDRAGSGREN-20260924), ett avgränsat undantag från rutinen ovan för
 v0:s koduppgifter genom Runtimes kontorsväg; det behöver inte frågas om på nytt för varje deluppgift. Runtimes kontorsväg
@@ -77,8 +90,17 @@ byts inte, filer återställs inte och uppdraget startas inte om bara för att t
 integration hanteras publiceringen av uppdragsunderlaget enligt befintlig granskning och sekretessgräns; originalens
 identiteter bevaras och acceptansen skrivs aldrig om i efterhand. Därefter återförs ingången till ren main lika med
 origin/main utan att uppdragsgren eller bevis går förlorade, och nästa uppdrag utgår från det då aktuella läget.
-Uppdrag och grenar i v0: `office-aquarium-projection-1` (läsning och projektion) på grenen aquarium/uppdrag-projektion;
-varje senare uppdrag namnges här innan dess bas fryses.
+Uppdrag och grenar i v0: `office-aquarium-projection-1` (läsning och projektion), `-2` (rättad acceptans), `-3`
+(förtydligad beskrivning) och `-4` (prövningsmiljön beskriven; byggt och prövat av Runtime, slutgranskat och
+integrerat av kedjedrivaren, PR 42), alla på grenen aquarium/uppdrag-projektion. De tre första står i
+`waiting_diagnosis`; `-4` står parkerat i `waiting_review` och ska inte återupptas för att publicera samma arbete igen.
+Inget av dem återupptas. Grenen står
+kvar lokalt med namngivet skäl: dess åtta commits är
+uppdragsindatas ursprungliga identiteter, och den integreras inte (indata publicerades byte för byte med denna post);
+den är också arkiverad som git bundle i `evidence/aquarium/local/etapp1/`. `office-aquarium-scene-1` (scenens
+renderare) körs på grenen aquarium/uppdrag-scen, med granskningsvägen planerad före start: Runtime bygger och kör den
+frysta acceptansen, och räcker Runtimes granskningsprofil inte slutgranskar och integrerar kedjedrivaren kandidaten
+enligt AQUARIUM-V0-SLUTGRANSKNING-20260924. Varje senare uppdrag namnges här innan dess bas fryses.
 
 UNDERHÅLL (UNDERHALL-INGANGAR-20260924) - GENOMFÖRT 2026-09-24, efter det samlade beskedet och sedan övergång 15
 aktiverats och lästs tillbaka. Mätt läsande: kontorets ingång stod på main; 33 lokala grenar, varav 12 utan kopia på
@@ -94,7 +116,7 @@ office/aterfunnet-underlag och office/aterfunnet-underlag-r1, den första gransk
 underlaget, med samma träd som det publicerade; bara meddelandet rättades. Kvar med namngivet skäl: aquarium/accept och
 aquarium/accept-r1, registreringens första granskningsrunda (underkänd för två utelämnade ägarinstruktioner), och
 aquarium/arbetsform och aquarium/arbetsform-r1, arbetsformens första granskningsrunda (underkänd för ett försvagat
-publiceringsvillkor och en kvarlämnad motsägelse), samt aquarium/arbetsform-r2, ett ogranskat mellanläg av samma rättelse,
+publiceringsvillkor och en kvarlämnad motsägelse), samt aquarium/arbetsform-r2, ett ogranskat mellanläge av samma rättelse,
 bevarade som historik. Runtimes del står i
 Runtime-planen (dess uppdrag publicerat som Runtime PR 60, dess ingång nu på main). Protokollet står i `AGENTS.md` och
 i rutinen överst i denna plan; startkontrollen är `tools/ingang.py`.
@@ -106,8 +128,8 @@ från tidigare konfigurationer (25 vilande vid registreringen) är ett namngivet
 bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd föreslås. Ingetdera är förkrav för Aquarium.
 
 ÅTERUPPTAGNINGSPUNKT: denna post, AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924, AQUARIUM-V0-BEREDNING-20260924,
-UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924, AQUARIUM-V0-UPPDRAGSGREN-20260924
-och Runtime-planens ingång.
+UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924, AQUARIUM-V0-UPPDRAGSGREN-20260924,
+AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924 och Runtime-planens ingång.
 
 ---
 
