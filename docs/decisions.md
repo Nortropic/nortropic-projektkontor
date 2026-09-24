@@ -913,3 +913,72 @@ valet; valet binds vid aktivering, inte vid uppgiftsfrysning; ingen tillåtlista
 varje driftändring genom kontrollerad, granskad övergång; AP-10 inom sitt mandat; AP-11 återöppnas inte.
 
 **Ersätter:** ingenting raderas. Fortsättning efter AP11-AVSLUT-20260924.
+
+## AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 — riktad AP-10-rättning och beredning av Aquarium v0
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code). Ägarens ord bevaras ordagrant privat i
+`evidence/aquarium/local/owner-words-20260924.md` (SHA256
+`d0a3ad67e751725256719e0ee8ec109ab1e0ba80254b3df32c35a6d2cd984e1b`). Ingen exakt klocktid tillskrivs ägaren.
+
+**Avslutat och inte återöppnat:** AP-11 (AP11-AVSLUT-20260924) och modellvalsförbättringen
+(MODELLVAL-FORTSÄTTNING-20260924) tillgodoräknas inom sina redovisade räckvidder. Modellvalsprovet 2026-09-24 var
+verktygets konfigurationsövergång i drift med samma faktiska modeller; det kvalificerar inga andra modeller, och ingen
+ny modellprovning beställs. Nya arbeten redovisas separat och använder inte AP-11:s identiteter eller återstående
+budget.
+
+**A. Riktad AP-10-rättning.** Avgränsningen är den privata anropsväg där avslutningssignalen enligt mätningen
+2026-09-24 sväljs och anropet går vidare till sin tidsgräns. D026:s lärdom återanvänds där mekanismen är densamma,
+efter kontroll av AP-10:s verkliga process-, signal- och städväg. Rättningen prövas med en riktig process och en
+riktig signal i isolerad miljö genom den berörda körvägen och ska visa att signalen får avsedd verkan inom den
+befintliga stoppmodellen, att rätt process och dess barn hanteras, att avbrutet arbete bevaras som avbrutet och aldrig
+som godkänt, och att normal körning och befintliga tidsgränser fungerar. Ett processprov redovisas inte som genomförd
+omvärldsbevakning. Tillåtet: implementation, prov, separat granskning och skyddad integration av just rättningen och
+dess dokumentation i Runtime och kontoret; driftändring endast genom den etablerade kontrollerade vägen, med
+ombindning av konfigurationshashen men inga andra tysta ändringar av AP-10; vid behov en tillfällig paus av just det
+namngivna AP-10-åtagandet genom dess befintliga kontrollväg, med schema och historik bevarade och återupptagning först
+när förutsättningarna är verifierade. Inte beställt: ny generell signalhanterare, vakthundsplattform, schemaläggare
+eller total omkvalificering av AP-10; ingen ändring av bevakningens sakuppdrag, källor, modellval, resursramar eller
+ordinarie körschema.
+
+**B. Beredning av Aquarium v0.** En läsvy, inte en ny motor: Runtime och kontoret behåller sina sanningskällor, och
+Aquarium skapar ingen konkurrerande uppdragsdatabas, beslutslogg eller tillståndsmaskin. Beredningen utgår från
+befintligt Aquarium-underlag, beslut, sammanställningar och kartläggning och från dagens verkliga Office/Runtime;
+ägarbeslut skiljs från tidigare förslag och aktuellt läge från historik, och saknade källor redovisas som saknade.
+Ingen ny fullständig sweep, omkompilering, bred omvärldsresearch eller omstart av brainstormingen. Resultatet är ett
+samlat byggbeslut för ägarens accept; underlaget skrivs i kontorets befintliga hemvist (`evidence/aquarium/`). Inget
+nytt repo, ingen implementation, installation eller publicering av Aquarium före accepten. Beredningen får ske medan
+AP-10-rättningen färdigställs.
+
+Aquariums första nytta enligt ägaren: att öppna en lugn, visuellt genomarbetad vy och förstå vad kontoret har
+levererat, vad som faktiskt arbetar eller väntar och vad som behöver ägarens uppmärksamhet - med ett sammanhängande
+visuellt uttryck för perifer observation och fördjupning, inte en ny tabell med tekniska kör-id:n och inte en hel
+digital stad. Krav på v0 som byggbeslutet ska uppfylla:
+- Den är läsande: inga godkännandeknappar, inga modellbyten och ingen uppdragsstart från vyn. Privat driftinformation
+  och råhistorik exponeras inte publikt för att visningen ska fungera.
+- Den skiljer leveranser och avslutade åtaganden från pågående arbete; arbete, granskning, väntan och verkligt
+  beslutsbehov; utförare och modeller från tekniska stödkörningar; aktuella observationer från gamla eller saknade.
+  Vilande tjänsteidentiteter är inte arbetande agenter, ett schemalagt intag är inte ett genomfört intag, och en vilande
+  uppgift animeras inte som pågående.
+- Den visar observationstid och källa; en uppdatering som stannar får inte fortsätta se aktuell ut, och en ny
+  renderingstid föryngrar inte gamla data. Provdata för tillstånd som inte finns i miljön är tydligt avskilda och märkta.
+Byggbeslutet ska beskriva den första vyn och dess användning, vad som ingår nu och vad som uttryckligen väntar, vilka
+befintliga läsvägar och komponenter som återanvänds, den faktiska uppdateringsmodellen och dess begränsningar, föreslagen
+repohemvist, lokal drift och publiceringsgräns (projektrepo eller eget Aquarium-repo; ingen presentationskod i Runtime
+för att kringgå dess mål- eller sökvägsprofil), få etapper med när första användbara vy finns och en uppskattning med
+angivna osäkerheter, acceptans som prövar både sanningsenlig visning och faktisk användbarhet, och exakt vilka nya
+befogenheter byggstarten behöver. En begränsad repo-, läs- eller körprofilanpassning ska synas i förslaget; ingen
+generell utvidgning byggs i förväg.
+
+**Vilande poster, utan städkampanj.** `office-watch-policy-1` och `office-assignment-cli-1` lämnas vilande och
+återupptas inte för att pröva ny kod eller modellval; planen anger vad som ska kontrolleras före en eventuell framtida
+fortsättning, och ett avgränsat avslut med bevarad historik får föreslås om de är överspelade. Tjänstens gamla
+identitetskörningar blir ett namngivet underhållsärende: deras användning i bevis, återgång och identitetskontroller
+kontrolleras innan någon åtgärd föreslås. Ingen återställning, radering eller massavslutning ingår nu, och posterna är
+inte förkrav för Aquarium utan en konkret påvisad koppling.
+
+**Gränser:** inga nya abonnemang, betalningsvägar, modeller, organisationsbehörigheter eller valvskrivningar; verktygens
+och den hanterade policyns spärrar kringgås inte; A och B är separata arbeten i samma plan; ingen generell härdnings-
+eller städkampanj. Nästa samlade besked till ägaren ger läget för A och B:s beredda byggbeslut, med endast de
+operatörsåtgärder eller beslut som faktiskt behöver ägaren.
+
+**Ersätter:** ingenting raderas. Följer efter MODELLVAL-FORTSÄTTNING-20260924.

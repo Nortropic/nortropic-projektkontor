@@ -1,4 +1,30 @@
-# Levande plan — AP-11 AVSLUTAT. Modellvalet (steg 3) är levererat och aktivt
+# Levande plan — A: riktad AP-10-rättning. B: beredning av Aquarium v0 (byggbeslut för ägarens accept)
+
+AKTUELLT 2026-09-24, registrerat efter ägarbeslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924. AP-11 och modellvalet
+är avslutade och återöppnas inte (historik nedan). Drift vid registreringen: aktiv konfiguration `145edd45` (runtime
+`221df157`, kontoret `df5ed5dc`), AP-10:s schema bundet till den och opausat, nästa ordinarie körning 2026-09-25
+07:00Z, inget arbete i motorn.
+
+A. RIKTAD AP-10-RÄTTNING (Runtime-kod; Runtime-planen bär stegen). Felet: AP-10:s privata steg sväljer en
+avslutningssignal medan anropet väntar, samma mekanism som D026 rättade i AP-11:s väktare (reproducerat 2026-09-24 med
+den dåvarande releasens egen kod). Ordning: kartlägg stoppvägen, rätta, pröva med riktig process och signal genom den
+berörda vägen, separat granskning, skyddad integration, kontrollerad driftövergång som ägaren aktiverar.
+
+B. AQUARIUM V0 - BEREDNING (kontoret; underlaget i `evidence/aquarium/`). Inventera befintligt underlag och dagens
+läsvägar, skilj ägarbeslut från förslag och nuläge från historik, och lämna ett samlat byggbeslut. Ingen
+implementation före ägarens accept.
+
+VILANDE POSTER, inga åtgärder nu. `office-watch-policy-1` och `office-assignment-cli-1` (DevelopmentTask, vilande sedan
+2026-09-20/21) återupptas inte. Före en eventuell fortsättning ska prövas: verkligt behov i dag, gällande mandat,
+bevarat läge i motor och bevis, och kompatibilitet med den körrevision de då skulle köra. Tjänstens identitetskörningar
+från tidigare konfigurationer (25 vilande vid registreringen) är ett namngivet underhållsärende: deras användning i
+bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd föreslås. Ingetdera är förkrav för Aquarium.
+
+ÅTERUPPTAGNINGSPUNKT: denna post, beslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 och Runtime-planens ingång.
+
+---
+
+# Historik 2026-09-24 — AP-11 avslutat; modellvalet (steg 3) levererat och aktivt
 
 AKTUELLT 2026-09-24. Det ändliga åtagandet AP-11 är **godkänt och avslutat**. `office-ap11-assessment-6`, dess enda
 räknade granskning (anrop 31, resultatets SHA256 `d63221afc0ab1c3008911b49e48af684d64ca6c636bf188d9f31e5eccc756a77`), godkände hela slutacceptansen G1-G10 utan
