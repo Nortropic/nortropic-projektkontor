@@ -4,8 +4,9 @@ AKTUELLT 2026-09-24. Det ändliga åtagandet AP-11 är **godkänt och avslutat**
 räknade granskning (anrop 31, resultatets SHA256 `d63221afc0ab1c3008911b49e48af684d64ca6c636bf188d9f31e5eccc756a77`), godkände hela slutacceptansen G1-G10 utan
 blockerande fynd 2026-09-23T22:59Z; Runtime satte scopet `stopped` och skrev `final.json` (SHA256
 `925d566df223bce280e23e5b6dbeea7bac71bdf4189f78f2cec02dc89a960926`). 31 av 48 anrop, implementationsförsök 1 av 6 per arbetsdel. Vid avslutet var
-aktiv release runtime `2def3667`, kontor `df5ed5dc`, konfiguration `d4f2e63e`; sedan 2026-09-24T07:26Z är den
-`416517ae` (se AKTIVERAT nedan). AP-10 fortsätter inom sitt mandat, dagligen 07:00Z.
+aktiv release runtime `2def3667`, kontor `df5ed5dc`, konfiguration `d4f2e63e`; sedan 2026-09-24T07:26Z kör den nya
+releasen och sedan 11:51Z dess modellbyte, konfiguration `145edd45` (se AKTIVERAT nedan). AP-10 fortsätter inom sitt
+mandat, dagligen 07:00Z.
 
 AP-11 i korthet: A och B integrerades som PR 28 och 29; sex helhetsbedömningar, de fem första inconclusive och bevarade;
 G6-demonstrationen bars av den femte och prövades av den sjätte; två fel i Runtime hittades live och rättades (D026 och
@@ -30,8 +31,9 @@ ombundet och i övrigt oförändrat (nästa körning 2026-09-25 07:00Z), AP-10:s
 
 Modellbyten görs nu med verktyget, som den aktiva releasens egen kopia (Runtime-runbooken, "Changing the model choice"):
 `show` visar valet, `stage` och `check` förbereder och prövar, `activate` är ägarens. Verktygets första verkliga körning
-stegade och kontrollerade ett uttryckligt Codex-val av den nuvarande modellen, som inte ändrar vad som körs; det är inte
-aktiverat, och om bytet ska övas är ägarens beslut. Valet binds vid aktivering: de två vilande utvecklingsuppgifterna
+stegade och kontrollerade ett uttryckligt Codex-val av den nuvarande modellen, som inte ändrar vad som körs, och ägaren
+aktiverade det 11:51Z: konfiguration `145edd45`, tjänsten igång, AP-10:s schema ombundet och i övrigt oförändrat, AP-11
+orört. Bytet har därmed körts i drift. Valet binds vid aktivering: de två vilande utvecklingsuppgifterna
 `office-watch-policy-1` och `office-assignment-cli-1` kör den nya koden om de återupptas. Öppna poster utanför steg 3
 står i Runtime-planens ingång. Nästa: inget kvar inom steg 3.
 
