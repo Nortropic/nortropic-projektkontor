@@ -13,20 +13,27 @@ import stat
 import subprocess
 import sys
 
-SCHEMA = 1
+SCHEMA = 2
 ERROR = 'Ogiltigt underlag för Aquariums projektion.'
 COMMAND_ERROR = 'Kunde inte skapa Aquariums projektion.'
 FAILURES = (OSError, ValueError, TypeError, KeyError, IndexError, OverflowError, RecursionError)
 
-RUNTIME_SOURCES = ('release', 'staffing', 'questions', 'service', 'engine')
+PROBE_SOURCES = ('release', 'staffing', 'questions', 'service', 'engine')
+RUNTIME_SOURCES = PROBE_SOURCES + ('tasks',)
 SOURCES = RUNTIME_SOURCES + ('watch', 'office')
 TITLES = {'release': 'Runtime · aktiv release', 'staffing': 'Runtime · bemanning',
           'questions': 'Runtime · modellfrågor', 'service': 'Runtime · tjänsten',
-          'engine': 'Runtime · motorn', 'watch': 'Runtime · bevakningen',
+          'engine': 'Runtime · motorn', 'tasks': 'Runtime · uppdragsfiler',
+          'watch': 'Runtime · bevakningen',
           'office': 'Kontoret · beslut och leveranser'}
 STALE_RUNTIME = 300
 STALE_OFFICE = 3600
 SERVICE_PARTS = ('daemon', 'engine', 'worker')
+NOT_WORK = ('ServiceIdentity', 'PrivateAssessment')
+IDENTITY_TYPE = 'ServiceIdentity'
+TASK_LIMIT = 32
+TASK_BYTES = 512
+TITLE_LIMIT = 120
 CAPACITY_CAUSE = 'leverantören tog inte emot analysen (kapacitet)'
 DECISIONS = {'retain': 'behåll', 'not_applicable': 'inte tillämpligt',
              'insufficient': 'otillräcklig', 'propose_action': 'förslag till åtgärd'}
@@ -77,7 +84,7 @@ def engine_part():
         rows = []
         async for e in client.list_workflows('ExecutionStatus = "Running"'):
             raw = (await client.get_workflow_handle(e.id, run_id=e.run_id).describe()).raw_description
-            rows.append({'type': e.workflow_type, 'pending_activities': [a.activity_type.name for a in raw.pending_activities],
+            rows.append({'id': e.id, 'type': e.workflow_type, 'pending_activities': [a.activity_type.name for a in raw.pending_activities],
                          'pending_workflow_task': raw.HasField('pending_workflow_task'),
                          'start': e.start_time.isoformat() if e.start_time else None})
         return {'executions': rows}
@@ -102,8 +109,13 @@ _UNSAFE = re.compile(
     r'/Users/\S*|/private/\S*|/home/\S*|\.runtime\S*|evidence/\S*local\S*'
     r'|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
     r'|[^\s@]+@[^\s@]+\.[^\s@]+')
-_DATE = re.compile(r'(\d{4})-(\d{2})-(\d{2})|(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)')
+# A date is `YYYY-MM-DD` with no digit beside it, or `YYYYMMDD` with no letter or digit
+# beside it, so an eight-digit run inside a commit hash or digest is never a date.
+_DATE = re.compile(r'(?<!\d)(\d{4})-(\d{2})-(\d{2})(?!\d)'
+                   r'|(?<![0-9A-Za-z])(\d{4})(\d{2})(\d{2})(?![0-9A-Za-z])')
 _SINCE = re.compile(r'\s*—\s*sedan\s+(\d{4}-\d{2}-\d{2})\s*$')
+_TASK_ID = re.compile(r'[a-z0-9][a-z0-9-]{0,79}')
+_WHITESPACE = re.compile(r'\s+')
 
 
 def _fail():
@@ -239,10 +251,29 @@ def _engine_value(value):
     for item in _list(value.get('executions')):
         item = _dict(item)
         activities = [_string(name) for name in _list(item.get('pending_activities'))]
-        executions.append({'type': _string(item.get('type')), 'pending_activities': activities,
+        executions.append({'id': _string(item.get('id')), 'type': _string(item.get('type')),
+                           'pending_activities': activities,
                            'pending_workflow_task': _flag(item.get('pending_workflow_task')),
                            'start': _optional_iso(item.get('start'))})
     return {'executions': executions}
+
+
+def _tasks_value(value):
+    """One item per asked task id: a title exactly when the brief could be read."""
+    value = _dict(value)
+    items = []
+    for item in _list(value.get('items')):
+        item = _dict(item)
+        status = item.get('status')
+        if status not in ('läst', 'saknas', 'oläslig'):
+            _fail()
+        title = item.get('title')
+        if status == 'läst':
+            _string(title)
+        elif title is not None:
+            _fail()
+        items.append({'id': _string(item.get('id')), 'title': title, 'status': status})
+    return {'items': items}
 
 
 def _watch_value(value):
@@ -298,8 +329,8 @@ def _office_value(value):
 
 
 VALUES = {'release': _release_value, 'staffing': _staffing_value, 'questions': _questions_value,
-          'service': _service_value, 'engine': _engine_value, 'watch': _watch_value,
-          'office': _office_value}
+          'service': _service_value, 'engine': _engine_value, 'tasks': _tasks_value,
+          'watch': _watch_value, 'office': _office_value}
 
 
 def _validated(readings, now):
@@ -336,15 +367,35 @@ def _validated(readings, now):
 # --- the places -------------------------------------------------------------------
 
 
+def _calendar_date(year, month, day):
+    """A real calendar date from 2000-01-01 to 2099-12-31, else None."""
+    if not 2000 <= year <= 2099:
+        return None
+    try:
+        datetime(year, month, day)
+    except ValueError:
+        return None
+    return '%04d-%02d-%02d' % (year, month, day)
+
+
+def _date_in(text):
+    """The first real date in one text; a candidate that is no date is skipped."""
+    if type(text) is not str:
+        return None
+    for found in _DATE.finditer(text):
+        parts = found.groups()
+        year, month, day = parts[0:3] if parts[0] is not None else parts[3:6]
+        date = _calendar_date(int(year), int(month), int(day))
+        if date is not None:
+            return date
+    return None
+
+
 def _first_date(*texts):
     for text in texts:
-        if type(text) is not str:
-            continue
-        found = _DATE.search(text)
-        if found:
-            parts = found.groups()
-            year, month, day = parts[0:3] if parts[0] else parts[3:6]
-            return year + '-' + month + '-' + day
+        date = _date_in(text)
+        if date is not None:
+            return date
     return None
 
 
@@ -383,18 +434,68 @@ def _arkivet(available, office):
     return {'status': 'ok', 'items': dated + [item for item in items if not item['date']]}
 
 
-def _work_items(engine):
-    items = []
+def _short(identity):
+    """The task name without the office's prefix; a bare prefix keeps its own name."""
+    prefix = 'office-'
+    return identity[len(prefix):] if identity.startswith(prefix) and len(identity) > len(prefix) \
+        else identity
+
+
+def _step(pending):
+    """Step, state and executor from the pending activity names only, never from configuration."""
+    if any('review' in name.lower() for name in pending):
+        return 'granskning', 'granskas', None
+    if 'execute_claude' in pending or 'execute_codex' in pending:
+        named = [name for name in ('claude', 'codex') if 'execute_' + name in pending]
+        return 'utförande', 'pågår', named[0] if len(named) == 1 else None
+    if 'publish_candidate' in pending:
+        return 'integration', 'integreras', None
+    if pending:
+        return 'steg', 'pågår', None
+    return 'arbetsflödessteg', 'pågår', None
+
+
+def _is_parked(execution):
+    """A task in the engine that is neither work nor a technical record."""
+    return (execution['type'] not in NOT_WORK and not execution['pending_activities']
+            and not execution['pending_workflow_task'])
+
+
+def _parked_ids(engine):
+    """The parked tasks' ids in engine order, without repetition, at most the first 32."""
+    identities = []
     for execution in engine['executions']:
-        if execution['type'] == 'ServiceIdentity':
-            continue  # A technical identity record is never work.
+        if _is_parked(execution) and execution['id'] not in identities:
+            identities.append(execution['id'])
+    return identities[:TASK_LIMIT]
+
+
+def _work_and_parked(engine, titles_available, tasks):
+    """Work items and parked tasks from one engine reading, in engine order."""
+    titles = {}
+    if titles_available:
+        for item in tasks['items']:
+            titles.setdefault(item['id'], item)
+    work, parked = [], []
+    for execution in engine['executions']:
+        if execution['type'] in NOT_WORK:
+            continue  # A technical identity record and the watch's own round are not work.
+        shared = {'task': execution['id'], 'short': _short(execution['id']),
+                  'type': execution['type'], 'since': execution['start']}
         pending = execution['pending_activities']
-        if not pending and not execution['pending_workflow_task']:
-            continue
-        state = 'granskas' if any('review' in name.lower() for name in pending) else 'pågår'
-        what = execution['type'] + ' · ' + (', '.join(pending) if pending else 'arbetsflödessteg')
-        items.append({'state': state, 'what': what, 'since': execution['start']})
-    return items
+        if pending or execution['pending_workflow_task']:
+            step, state, executor = _step(pending)
+            work.append(dict(shared, step=step, state=state, executor=executor,
+                             executor_basis=None if executor is None
+                             else 'motorns steg execute_' + executor,
+                             activities=list(pending)))
+        elif not titles_available:
+            parked.append(dict(shared, title=None, title_status='okänd'))
+        else:
+            item = titles.get(execution['id'])
+            parked.append(dict(shared, title=None if item is None else item['title'],
+                               title_status='oläslig' if item is None else item['status']))
+    return work, parked
 
 
 def _utkiken(available, watch, staffing_available, staffing, now):
@@ -489,7 +590,7 @@ def _owner_items(available, values):
     return items, len(questions)
 
 
-def _sockeln(available, values):
+def _sockeln(available, values, work, parked):
     if available['service']:
         matches = sum(1 for name in SERVICE_PARTS
                       if values['service']['parts'][name]['identity_matches'])
@@ -507,14 +608,9 @@ def _sockeln(available, values):
         watch_staffing = {'executor': WATCH_EXECUTOR, 'model': values['staffing']['watch_model']}
     idle = identities = busy = None
     if available['engine']:
-        idle = identities = busy = 0
-        for execution in values['engine']['executions']:
-            if execution['type'] == 'ServiceIdentity':
-                identities += 1
-            elif execution['pending_activities'] or execution['pending_workflow_task']:
-                busy += 1
-            else:
-                idle += 1
+        identities = sum(1 for execution in values['engine']['executions']
+                         if execution['type'] == IDENTITY_TYPE)
+        idle, busy = len(parked), len(work)
     return {'service': service, 'staffing': staffing, 'watch_staffing': watch_staffing,
             'idle_tasks': idle, 'identity_records': identities, 'busy': busy}
 
@@ -536,9 +632,10 @@ def project(readings, now):
         'config': values['release']['config_sha256'][:8] if available['release'] else None}
 
     arkivet = _arkivet(available['office'], values['office'])
-    work = _work_items(values['engine']) if available['engine'] else []
+    work, parked = (_work_and_parked(values['engine'], available['tasks'], values['tasks'])
+                    if available['engine'] else ([], []))
     verkstaden = {'status': 'ok' if available['engine'] else 'otillgänglig', 'items': work,
-                  'model_evidence': False}
+                  'parked': parked, 'titles': 'ok' if available['tasks'] else 'otillgänglig'}
     utkiken = _utkiken(available['watch'], values['watch'], available['staffing'],
                        values['staffing'], now)
     owner, questions = _owner_items(available, values)
@@ -558,7 +655,8 @@ def project(readings, now):
                           'read_at': data['read_started_at'], 'sources': sources,
                           'revisions': revisions, 'headline': headline, 'arkivet': arkivet,
                           'verkstaden': verkstaden, 'utkiken': utkiken,
-                          'agarens_bord': agarens_bord, 'sockeln': _sockeln(available, values)})
+                          'agarens_bord': agarens_bord,
+                          'sockeln': _sockeln(available, values, work, parked)})
 
 
 # --- bounded real reading ---------------------------------------------------------
@@ -602,6 +700,63 @@ def runtime_probe(runtime_root):
     if result.returncode != 0:
         _fail()
     return json.loads(result.stdout)
+
+
+def _brief_title(root, identity):
+    """Open only `.runtime/tasks/<id>/brief.md`, component by component, and keep its title line."""
+    descriptors = []
+    try:
+        try:
+            descriptors.append(os.open(str(root), os.O_RDONLY | os.O_DIRECTORY))
+            for name in ('.runtime', 'tasks', identity):
+                descriptors.append(os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                                           dir_fd=descriptors[-1]))
+            descriptors.append(os.open('brief.md', os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+                                       dir_fd=descriptors[-1]))
+        except FileNotFoundError:
+            return None, 'saknas'
+        except OSError:
+            return None, 'oläslig'
+        try:
+            # A directory opens but cannot be read as a file: check before reading or wrapping.
+            if not stat.S_ISREG(os.fstat(descriptors[-1]).st_mode):
+                return None, 'oläslig'
+            raw = b''
+            while len(raw) < TASK_BYTES:  # At most 512 bytes, and no more than the first line.
+                chunk = os.read(descriptors[-1], TASK_BYTES - len(raw))
+                if not chunk:
+                    break
+                raw += chunk
+                if b'\n' in raw:
+                    break
+        except OSError:
+            return None, 'oläslig'
+    finally:
+        for descriptor in descriptors:
+            os.close(descriptor)
+    try:
+        line = raw.split(b'\n', 1)[0].decode('utf-8')
+    except UnicodeDecodeError:
+        return None, 'oläslig'
+    if line.endswith('\r'):
+        line = line[:-1]
+    if not line.startswith('# ') or not line[2:].strip():
+        return None, 'oläslig'
+    title = _WHITESPACE.sub(' ', line[2:]).strip()
+    return (title if len(title) <= TITLE_LIMIT else title[:TITLE_LIMIT - 1] + '…'), 'läst'
+
+
+def task_reader(runtime_root, identities):
+    """The title line of each named task's brief: no listing, no other file, nothing else kept."""
+    root = Path(runtime_root).absolute()
+    items = []
+    for identity in list(identities)[:TASK_LIMIT]:
+        if type(identity) is not str or _TASK_ID.fullmatch(identity) is None:
+            items.append({'id': identity, 'title': None, 'status': 'oläslig'})
+            continue
+        title, status = _brief_title(root, identity)
+        items.append({'id': identity, 'title': title, 'status': status})
+    return {'items': items}
 
 
 def watch_reader(runtime_root):
@@ -706,11 +861,13 @@ def office_reader(office_root):
             'entries': entries, 'notes': notes, 'plan_owner_turn': turns}
 
 
-def collect(runtime_root, office_root, runtime_probe=None, watch_reader=None, office_reader=None):
+def collect(runtime_root, office_root, runtime_probe=None, watch_reader=None, office_reader=None,
+            task_reader=None):
     """Bounded read-only collection. A failing reader makes only its own source unavailable."""
     probe_reader = runtime_probe or globals()['runtime_probe']
     watch = watch_reader or globals()['watch_reader']
     office = office_reader or globals()['office_reader']
+    tasks = task_reader or globals()['task_reader']
     started = _now()
     sources = {name: {'status': 'unavailable', 'read_at': started, 'value': None} for name in SOURCES}
 
@@ -720,7 +877,7 @@ def collect(runtime_root, office_root, runtime_probe=None, watch_reader=None, of
     except Exception:
         parts = {}
     read_at = _now()
-    for name in RUNTIME_SOURCES:
+    for name in PROBE_SOURCES:
         sources[name]['read_at'] = read_at
         try:
             part = _dict(parts.get(name))
@@ -735,6 +892,15 @@ def collect(runtime_root, office_root, runtime_probe=None, watch_reader=None, of
             refusal = bool(_dict(part.get('value')).get('capacity'))
     except FAILURES:
         refusal = None
+
+    # The task files are asked for only by the parked tasks the engine reading itself names.
+    if sources['engine']['status'] == 'ok':
+        sources['tasks']['read_at'] = _now()
+        try:
+            given = _parked_ids(sources['engine']['value'])
+            sources['tasks'].update(status='ok', value=_tasks_value(tasks(runtime_root, given)))
+        except Exception:
+            sources['tasks'].update(status='unavailable', value=None)
 
     sources['watch']['read_at'] = _now()
     try:
