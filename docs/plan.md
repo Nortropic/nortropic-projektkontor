@@ -1,10 +1,11 @@
-# Levande plan — AP-11 AVSLUTAT. Modellvalet (steg 3): del 1-3 integrerade; nästa handling är ägarens aktivering
+# Levande plan — AP-11 AVSLUTAT. Modellvalet (steg 3) är levererat och aktivt
 
 AKTUELLT 2026-09-24. Det ändliga åtagandet AP-11 är **godkänt och avslutat**. `office-ap11-assessment-6`, dess enda
 räknade granskning (anrop 31, resultatets SHA256 `d63221afc0ab1c3008911b49e48af684d64ca6c636bf188d9f31e5eccc756a77`), godkände hela slutacceptansen G1-G10 utan
 blockerande fynd 2026-09-23T22:59Z; Runtime satte scopet `stopped` och skrev `final.json` (SHA256
-`925d566df223bce280e23e5b6dbeea7bac71bdf4189f78f2cec02dc89a960926`). 31 av 48 anrop, implementationsförsök 1 av 6 per arbetsdel. Aktiv release runtime `2def3667`,
-kontor `df5ed5dc`, konfiguration `d4f2e63e`. AP-10 fortsätter inom sitt mandat, dagligen 07:00Z.
+`925d566df223bce280e23e5b6dbeea7bac71bdf4189f78f2cec02dc89a960926`). 31 av 48 anrop, implementationsförsök 1 av 6 per arbetsdel. Vid avslutet var
+aktiv release runtime `2def3667`, kontor `df5ed5dc`, konfiguration `d4f2e63e`; sedan 2026-09-24T07:26Z är den
+`416517ae` (se AKTIVERAT nedan). AP-10 fortsätter inom sitt mandat, dagligen 07:00Z.
 
 AP-11 i korthet: A och B integrerades som PR 28 och 29; sex helhetsbedömningar, de fem första inconclusive och bevarade;
 G6-demonstrationen bars av den femte och prövades av den sjätte; två fel i Runtime hittades live och rättades (D026 och
@@ -23,18 +24,21 @@ CLI-kopia (D023). Byggt och integrerat i Runtime 2026-09-24, varje del med separ
  3. En konkret modellvalsfråga till ägaren när vald modell saknar kapacitet: D030, Runtime PR 54. Värden frågar -
     vänta, eller byt modell med verktyget - och växlar aldrig själv; köp och uppgraderingar är aldrig ett val.
 
-NÄSTA HANDLING ÄR ÄGARENS: aktivera Runtime-releasen som bär del 1-3 (övergång 14). Den är stegad, kontrollerad mot
-den levande värden och separat granskad; den ändrar bara Runtime-koden, bär kontoret, modellvalet och AP-10:s kommando
-oförändrade och har en väg tillbaka. Kör först kontrollen, som inte ändrar något, sedan bytet, i en egen terminal:
+AKTIVERAT: ägaren aktiverade Runtime-releasen som bär del 1-3 (övergång 14) 2026-09-24T07:26Z, konfiguration
+`416517ae` med runtime `221df157` och kontoret oförändrat `df5ed5dc`. Efterkontrollen fann tjänsten igång, AP-10:s schema
+ombundet och i övrigt oförändrat (nästa körning 2026-09-25 07:00Z), AP-10:s kommando oförändrat och AP-11 orört.
 
-    LC_ALL=C "<runtime>/.runtime/temporal-venv/bin/python" -B "<runtime>/.runtime/modellval/transition-14/release-transition-14.py" check
-    LC_ALL=C "<runtime>/.runtime/temporal-venv/bin/python" -B "<runtime>/.runtime/modellval/transition-14/release-transition-14.py" activate
-
-Därefter görs modellbyten med verktyget (Runtime-runbooken, "Changing the model choice").
+Modellbyten görs nu med verktyget, som den aktiva releasens egen kopia (Runtime-runbooken, "Changing the model choice"):
+`show` visar valet, `stage` och `check` förbereder och prövar, `activate` är ägarens. Verktygets första verkliga körning
+stegade och kontrollerade ett uttryckligt Codex-val av den nuvarande modellen, som inte ändrar vad som körs; det är inte
+aktiverat, och om bytet ska övas är ägarens beslut. Valet binds vid aktivering: de två vilande utvecklingsuppgifterna
+`office-watch-policy-1` och `office-assignment-cli-1` kör den nya koden om de återupptas. Öppna poster utanför steg 3
+står i Runtime-planens ingång. Nästa: inget kvar inom steg 3.
 
 Iakttagelse utanför steg 3, inte åtgärdad: AP-10:s privata steg sväljer en avslutningssignal på samma sätt som AP-11:s
-väktare gjorde före Runtime D026 (reproducerat 2026-09-24 med den aktiva releasens egen kod: anropet gick vidare till
-sin tidsgräns). Det hör till AP-10:s mandat och är ägarens att avgöra.
+väktare gjorde före Runtime D026 (reproducerat 2026-09-24 med den då aktiva releasens egen kod, `2def3667`: anropet gick
+vidare till sin tidsgräns; det privata steget är oförändrat i den nya releasen). Det hör till AP-10:s mandat och är
+ägarens att avgöra.
 
 Office-sviten är grön igen på main efter PR 30: ett fall i resultatavstämningens prov kunde aldrig falla som det var
 skrivet (versaler av en fixtur med bara siffror) och ersattes med ett verkligt versalvärde. Ingen kod under prov ändrades.
