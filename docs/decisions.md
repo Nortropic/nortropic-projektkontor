@@ -1170,3 +1170,37 @@ och granskning utan rutinmässiga frågor; informationsbesked är inga godkänna
 befogenheter, ändrade kostnader, ändrad driftrisk eller prioriteringsfrågor går till ägaren.
 
 **Ersätter:** ingenting. Följer efter UNDERHALL-INGANGAR-GENOMFORT-20260924.
+
+## AQUARIUM-V0-UPPDRAGSGREN-20260924 — ägarbeslut: tillfällig, dokumenterad uppdragsgren för v0:s Runtime-uppdrag
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code). Ägarens svar bevaras ordagrant privat i
+`evidence/aquarium/local/owner-words-uppdragsgren-20260924.md` (SHA256
+`31df683e773f0676cfec575c5e4ff1100776c797c7923e321743daef3a2c3d8f`). Ingen exakt klocktid tillskrivs ägaren.
+
+**Bakgrund:** Runtimes kontorsväg (AP04) kräver att uppdragets indata ligger som commit på kontorets ingång när uppdraget
+startar, och Runtimes publicerare vägrar om kontorets main inte står kvar exakt på uppdragets bas (AP04 prövade det
+med flit). Det krockar med UNDERHALL-INGANGAR-GENOMFORT-20260924: ingången på main utan lokala commits. Ägaren valde en
+tillfällig, dokumenterad uppdragsgren framför en interaktiv byggväg.
+
+**Beslutet:** ett avgränsat undantag från "ingången följer main" för Aquarium v0:s koduppgifter genom den befintliga
+AP04-vägen; det behöver inte frågas om på nytt för varje deluppgift inom v0. Main är ingångens normala viloläge; under
+ett accepterat Runtime-uppdrag får ingången stå på en namngiven uppdragsgren med committade indata enligt körvägen.
+Kraven på frusen bas, oförändrad acceptans, separat granskning och skyddad integration är oförändrade. Arbetsformen
+registreras i planen innan uppdragets bas fryses, och ingången gör tydligt vilket uppdrag som pågår, varför grenen
+används och var återupptagningspunkten finns. När basen är fryst integreras inget annat till kontorets main förrän
+uppdragets publicering är hanterad, inte heller plan-, dokumentations- eller indatapublicering; löpande läge bokförs
+genom befintlig återupptagningsväg utan att den frysta fjärrbasen flyttas. En skrivare åt gången. Startkontrollens
+varning behålls, förklaras av undantaget och stängs aldrig av eller kringgås. Uppdragsgren, exakta indata och
+återupptagningsläge bevaras enligt befintlig bevarandeväg, så att arbetet kan överlämnas utan att ägaren minns
+grennamn eller återberättar uppdraget. Tiden är en uppskattning och ingen automatisk återställningsgräns: vid avbrott
+eller kvotbrist bevaras samma arbete, och grenen byts inte, filer återställs inte och uppdraget startas inte om bara
+för att tiden gått. Efter verifierad skyddad integration publiceras uppdragsunderlaget enligt befintlig granskning och
+sekretessgräns, originalens identiteter bevaras och acceptansen skrivs inte om i efterhand. Därefter återförs ingången
+till ren main lika med origin/main utan att uppdragsgren eller bevis går förlorade, och nästa Runtime-uppgift utgår
+från det då aktuella läget.
+
+**Gränser:** ingen Runtime-ändring, ny behörighet, ny kontrollplattform eller återöppning av AP-11; AP-10:s drift och
+schema ändras inte genom detta val.
+
+**Ersätter:** ingenting. Kompletterar UNDERHALL-INGANGAR-GENOMFORT-20260924 för v0:s Runtime-uppdrag. Följer efter
+AQUARIUM-V0-ACCEPT-20260924.
