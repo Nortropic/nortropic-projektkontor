@@ -1,22 +1,37 @@
-"""Aquarium v0's scene: the work world the page is rendered into, held by the chain driver (AQUARIUM-V0-ARBETSVARLD-20260924).
+"""Aquarium v0's scene and its renderer: the work world a display-safe projection is rendered into.
 
 SCEN is the static Swedish page: one continuous workshop floor seen from above with persistent places, Arkivet (delivered
 volumes), Verkstaden (a board of tasks that do not work and three benches), Granskningen (the review desk), Utkiken (the
 watch at the big window), Ägarens bord (letters and a mark only when something waits for the owner), a toned-down
 Maskinrummet (the technical base) and a toned-down frosted room for interactive work that is not observed. Every shown
-value is a {{AQ_...}} placeholder or an <!--AQ:LISTA:...--> list slot that the renderer fills with escaped text from a
-display-safe projection (tools/aquarium.py); every state is a class that the renderer sets through a placeholder: a figure
-is drawn only where a place carries the class aq-figur, which the renderer sets only for work the engine reading
-evidences, and a place carries aq-otillganglig when its source could not be read. PROVDATA is marked once for the whole
-page (body class aq-provdata). The page starts in the stale look (class aq-inaktuell: the world stands still and fades,
-figures become outlines marked as last known, a banner says that this does not mean work has ended); only SKRIPT, placed
-once at <!--AQ:SKRIPT--> and pinned by its SHA-256 in the page's Content-Security-Policy, compares the reading's time with
-the viewer's clock and switches to the fresh look while the reading is younger than the given limit. Decorative motion
-(daylight, plants) runs only in the fresh look and never with reduced motion. Each place links to a panel (:target) with
-its rows and its source line. Nothing here reads, runs or changes anything. The renderer that fills SCEN is a separate
-step (the Runtime task office-aquarium-scene-2) and keeps both constants unchanged; SKRIPT is unchanged from the diorama
-template, byte for byte.
+value is a {{AQ_...}} placeholder or an <!--AQ:LISTA:...--> list slot that `render` fills with escaped text from a schema 2
+projection (tools/aquarium.py); every state is a class that `render` sets through a placeholder. A bench figure and a
+review figure follow the class aq-figur, and the watch figure follows the class aq-kor: `render` sets aq-figur only for
+work whose executor the engine reading itself evidences and aq-kor only while the watch reading shows a round running, so
+configured staffing never becomes an observed figure and an executor that is not evidenced is written out as `ej belagd`.
+A place carries aq-otillganglig when its source could not be read, and its fog says that the state is unknown, not empty.
+PROVDATA is marked once for the whole page (body class aq-provdata). The page starts in the stale look (class
+aq-inaktuell: the world stands still and fades, figures become outlines marked as last known, a banner says that this does
+not mean work has ended); only SKRIPT, placed once at <!--AQ:SKRIPT--> and pinned by its SHA-256 in the page's
+Content-Security-Policy, compares the reading's time with the viewer's clock and switches to the fresh look while the
+reading is younger than the smallest source limit. Decorative motion (daylight, plants) runs only in the fresh look and
+never with reduced motion. Each place links to a panel (:target) with its rows and its source line.
+
+SCEN and SKRIPT are unchanged, byte for byte. `render(projection)` is pure: no file, clock, process or network, the input
+is never mutated and the same input gives the same page; the modules it uses and ZONE are created at import. The command
+reads one projection file and writes one new page, and it collects, serves, starts and changes nothing.
 """
+import base64
+from datetime import datetime
+import hashlib
+import html
+import json
+import os
+from pathlib import Path
+import re
+import stat
+import sys
+from zoneinfo import ZoneInfo
 
 SCEN = '''<!DOCTYPE html>
 <html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="{{AQ_CSP}}"><meta name="color-scheme" content="light"><title>Nortropic · verkstaden</title><style>:root{--ram:#17211f;--black:#2d2a25;--dampad:#6f695e;--barnsten:#e6a445;--gron:#6fae80;--claude:#c97a5d;--codex:#587b9c;--okand:#9b9990;--hy:#f0d4bf;--har:#4b3b33;--prov:#ffd9a0}
@@ -316,3 +331,658 @@ SKRIPT = '''(function () {
   tick();
   setInterval(tick, 30000);
 })();'''
+
+# --- constants and formats --------------------------------------------------------
+
+SCHEMA = 2
+ERROR = 'Ogiltig projektion för Aquariums vy.'
+COMMAND_ERROR = 'Kunde inte skapa Aquariums vy.'
+MAX_BYTES = 1000000
+KEYS = ('schema', 'provdata', 'read_at', 'sources', 'revisions', 'headline', 'arkivet',
+        'verkstaden', 'utkiken', 'agarens_bord', 'sockeln')
+SOURCES = ('release', 'staffing', 'questions', 'service', 'engine', 'tasks', 'watch', 'office')
+MONTHS = ('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
+KINDS = {'beslut': 'Beslut', 'operatörshandling': 'Operatörshandling', 'modellfråga': 'Modellfråga'}
+WAITING = {'beslut': 'ett beslut väntar på dig',
+           'operatörshandling': 'en operatörshandling väntar på dig',
+           'modellfråga': 'en modellfråga väntar på dig'}
+MISSING_TITLE = {'saknas': 'titel saknas i uppdragsfilen', 'oläslig': 'titeln kunde inte läsas',
+                 'okänd': 'uppdragsfilerna kunde inte läsas'}
+NAME_LIMIT = 22
+UNREADABLE_ENGINE = 'Motorn kunde inte läsas; inget visas som noll'
+UNREADABLE_WATCH = 'bevakningen kunde inte läsas'
+NOT_MODEL_CHOICE = ' · följer inte modellvalet'
+
+# The renderer touches no file: the zone and the pinned script digest are made at import, and the
+# zone is asked for both a winter and a summer offset here so that no lookup is left to `render`.
+ZONE = ZoneInfo('Europe/Stockholm')
+ZONE.utcoffset(datetime(2026, 1, 15))
+ZONE.utcoffset(datetime(2026, 7, 15))
+_PLACEHOLDER = re.compile(r'\{\{(AQ_[A-Z0-9_]+)\}\}')
+_SLOT = re.compile(r'<!--AQ:LISTA:([a-z]+)-->')
+_NAMES = frozenset(_PLACEHOLDER.findall(SCEN))
+_SLOTS = frozenset(_SLOT.findall(SCEN))
+_DATE = re.compile(r'\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])')
+_CSP = ("default-src 'none'; style-src 'unsafe-inline'; script-src 'sha256-"
+        + base64.b64encode(hashlib.sha256(SKRIPT.encode('utf-8')).digest()).decode('ascii')
+        + "'; base-uri 'none'; form-action 'none'")
+
+
+def _refuse():
+    raise ValueError(ERROR)
+
+
+def csp():
+    """The page's Content-Security-Policy, pinning SKRIPT by its SHA-256."""
+    return _CSP
+
+
+def _moment(value):
+    """An aware ISO time as Stockholm local time; anything else is not a time."""
+    if type(value) is not str:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed.astimezone(ZONE)
+
+
+def _is_date(value):
+    return type(value) is str and _DATE.fullmatch(value) is not None
+
+
+def TID(value):
+    """`<day> <mon> <HH>:<MM>` in Stockholm local time, never a relative label."""
+    moment = _moment(value)
+    if moment is None:
+        return 'tid okänd'
+    return '%d %s %02d:%02d' % (moment.day, MONTHS[moment.month - 1], moment.hour, moment.minute)
+
+
+def DATUM(value):
+    """`<day> <mon>` for a date, or the Stockholm local date of an ISO time."""
+    if _is_date(value):
+        return '%d %s' % (int(value[8:10]), MONTHS[int(value[5:7]) - 1])
+    moment = _moment(value)
+    if moment is None:
+        return 'datum okänt'
+    return '%d %s' % (moment.day, MONTHS[moment.month - 1])
+
+
+def NÄR(value):
+    """A date keeps its day, a point in time keeps its clock."""
+    return DATUM(value) if _is_date(value) else TID(value)
+
+
+def _LOKALT(value):
+    """The Stockholm local date of an ISO time as `YYYY-MM-DD`."""
+    moment = _moment(value)
+    return None if moment is None else '%04d-%02d-%02d' % (moment.year, moment.month, moment.day)
+
+
+def NAMN(value):
+    text = value if type(value) is str else ''
+    return text if len(text) <= NAME_LIMIT else text[:NAME_LIMIT - 1] + '…'
+
+
+def EXEC(name):
+    if name == 'claude':
+        return 'Claude'
+    if name == 'codex':
+        return 'Codex'
+    return name if type(name) is str else str(name)
+
+
+def MODELL(executor, model):
+    return EXEC(executor) + (' · modell okänd' if model is None else ' ' + model)
+
+
+def SEDAN(item):
+    since = item['since']
+    return 'starttid okänd' if since is None else 'sedan ' + TID(since)
+
+
+def ANTAL(count, singular, plural):
+    """A count with a singular and a plural form; exactly 1 is the singular."""
+    return singular if count == 1 else plural % count
+
+
+def KÄLLA(sources, ids):
+    """`Källa: ` or `Källor: ` and, per source, its title with its read time or its absence."""
+    parts = []
+    for name in ids:
+        source = sources[name]
+        parts.append(source['title'] + ' · läst ' + TID(source['read_at'])
+                     if source['status'] == 'ok' else source['title'] + ' · otillgänglig')
+    return ('Källa: ' if len(ids) == 1 else 'Källor: ') + '; '.join(parts)
+
+
+def VEM(item):
+    """Who the engine reading evidences at this step; an executor it does not show is not filled in."""
+    step = item['step']
+    if step == 'utförande':
+        return (EXEC(item['executor']) + ' · utförare') if item['executor'] else 'utförare ej belagd'
+    if step == 'granskning':
+        return 'granskare ej belagd'
+    if step == 'integration':
+        return 'värdens integration'
+    if step == 'steg':
+        return 'steg pågår'
+    return 'arbetsflödessteg'
+
+
+def STEG(item):
+    return ', '.join(item['activities']) if item['activities'] else 'arbetsflödessteg'
+
+
+def TEKNISK(item):
+    return (item['task'] + ' · ' + item['type'] + ' · ' + STEG(item) + ' · ' + SEDAN(item))
+
+
+def TITEL(item):
+    """A parked task's title, or what the task file could not tell."""
+    if item['title_status'] == 'läst' and type(item['title']) is str:
+        return item['title']
+    return MISSING_TITLE.get(item['title_status'], 'titeln kunde inte läsas')
+
+
+# --- the page ---------------------------------------------------------------------
+
+
+def _escape(value):
+    return html.escape(value, quote=True)
+
+
+def _rad(label, text):
+    return ('<li><span class="aq-etikett">' + _escape(label) + '</span>' + _escape(text) + '</li>')
+
+
+def _validate(projection):
+    """Refuse anything that is not a schema 2 projection, without private values in the message."""
+    if type(projection) is not dict or set(projection) != set(KEYS):
+        _refuse()
+    if type(projection['schema']) is not int or projection['schema'] != SCHEMA:
+        _refuse()
+    if type(projection['provdata']) is not bool:
+        _refuse()
+    if _moment(projection['read_at']) is None:
+        _refuse()
+    sources = projection['sources']
+    if type(sources) is not dict or set(sources) != set(SOURCES):
+        _refuse()
+    for name in SOURCES:
+        source = sources[name]
+        if type(source) is not dict or source.get('status') not in ('ok', 'otillgänglig'):
+            _refuse()
+        if source['status'] == 'ok':
+            if _moment(source.get('read_at')) is None:
+                _refuse()
+            if type(source.get('stale_after_seconds')) is not int:
+                _refuse()
+    headline = projection['headline']
+    if type(headline) is not dict:
+        _refuse()
+    for key in ('pagar', 'vantar', 'behover_dig'):
+        value = headline.get(key)
+        if value is not None and type(value) is not int:
+            _refuse()
+
+
+def _fill(values, rows):
+    """Three passes over SCEN: escaped placeholders, then list rows, then the pinned script."""
+    if set(values) != _NAMES or set(rows) != _SLOTS:
+        _refuse()
+
+    def one(found):
+        return _escape(values[found.group(1)])
+
+    def slot(found):
+        return ''.join(rows[found.group(1)])
+
+    page = _PLACEHOLDER.sub(one, SCEN)
+    page = _SLOT.sub(slot, page)
+    return page.replace('<!--AQ:SKRIPT-->', '<script>' + SKRIPT + '</script>')
+
+
+def _rubrik(projection, waiting):
+    """Work, watch and owner in one line; an unknown count is never spoken of as nothing."""
+    h, U = projection['headline'], projection['utkiken']
+    if h['pagar'] is None:
+        work = 'motorn kunde inte läsas'
+    elif h['pagar'] == 0:
+        work = 'inget uppdrag arbetar i Runtime'
+    elif h['pagar'] == 1:
+        work = 'ett uppdrag arbetar i Runtime'
+    else:
+        work = '%d uppdrag arbetar i Runtime' % h['pagar']
+    if U['status'] != 'ok':
+        watch = 'bevakningen kunde inte läsas'
+    elif U['schedule'] == 'stoppat':
+        watch = 'bevakningen stoppad'
+    elif U['schedule'] == 'pausat':
+        watch = 'bevakningen pausad'
+    elif (U['running'] or 0) > 0:
+        watch = 'bevakningen kör en omgång'
+    elif U['latest'] is not None and U['latest']['cause'] is not None:
+        watch = 'bevakningens senaste omgång otillräcklig'
+    elif U['waiting']:
+        watch = 'bevakningens besked väntar på granskning'
+    else:
+        watch = 'bevakningen i vila'
+    line = work + ' · ' + watch + ' · ' + waiting
+    if projection['headline'].get('lugnt') is True:
+        line = 'Lugnt · ' + line
+    if projection['provdata']:
+        line = 'PROVDATA · ' + line
+    return line[:1].upper() + line[1:]
+
+
+def _agare(B):
+    """What waits for the owner; an unread source makes it unknown, never empty."""
+    items = B['items']
+    if len(items) == 1:
+        known = WAITING.get(items[0]['kind'], 'ett ärende väntar på dig')
+    else:
+        known = '%d ärenden väntar på dig' % len(items)
+    if B['status'] == 'ok':
+        return 'inget väntar på dig' if not items else known
+    return 'okänt om något väntar på dig' if not items else known + ' · fler kan finnas'
+
+
+def _arkivet(A, R, sources, local_date, values, rows):
+    items = A['items']
+    for number in range(1, 17):
+        item = items[number - 1] if len(items) >= number else None
+        if item is None:
+            values['AQ_VOL_%d_CLASS' % number] = 'aq-av'
+            values['AQ_VOL_%d_TITEL' % number] = ''
+        else:
+            values['AQ_VOL_%d_CLASS' % number] = ('aq-pa aq-ny' if item['date'] == local_date
+                                                  else 'aq-pa')
+            values['AQ_VOL_%d_TITEL' % number] = (
+                item['key'] + ' · ' + item['title'] + ' · '
+                + (DATUM(item['date']) if item['date'] else 'odaterad'))
+    values['AQ_ARKIV_STATUS'] = '' if A['status'] == 'ok' else 'aq-otillganglig'
+    values['AQ_ARKIV_FLER'] = '+%d' % (len(items) - 16) if len(items) > 16 else ''
+    if A['status'] != 'ok':
+        values['AQ_ARKIV_UNDER'] = 'kontorets källa kunde inte läsas'
+        rows['arkivet'] = [_rad('Läge', 'Kontorets källa kunde inte läsas; inget visas som tomt')]
+    elif not items:
+        values['AQ_ARKIV_UNDER'] = 'inga leveranser registrerade'
+        rows['arkivet'] = [_rad('Läge', 'Inga leveranser registrerade')]
+    else:
+        under = ANTAL(len(items), '1 leverans', '%d leveranser')
+        dated = next((item for item in items if item['date']), None)
+        values['AQ_ARKIV_UNDER'] = (under if dated is None
+                                    else under + ' · senast ' + DATUM(dated['date']))
+        rows['arkivet'] = [_rad(DATUM(item['date']) if item['date'] else 'odaterad',
+                                item['key'] + ' · ' + item['title'] + ' — ' + item['basis'])
+                           for item in items]
+    values['AQ_KALLA_ARKIVET'] = (KÄLLA(sources, ('office',))
+                                  + ('' if R['office_main'] is None
+                                     else ' · main ' + R['office_main']))
+
+
+def _verkstaden(V, sources, values, rows):
+    """The benches take the work in progress; the board takes the tasks that do not work."""
+    bench = [item for item in V['items'] if item['state'] == 'pågår']
+    desk = [item for item in V['items'] if item['state'] in ('granskas', 'integreras')]
+    parked = V['parked']
+    values['AQ_VERK_STATUS'] = values['AQ_GRANSK_STATUS'] = ('' if V['status'] == 'ok'
+                                                             else 'aq-otillganglig')
+    for number in range(1, 4):
+        item = bench[number - 1] if len(bench) >= number else None
+        if item is None:
+            values['AQ_BANK_%d_CLASS' % number] = 'aq-vilar'
+            values['AQ_BANK_%d_NAMN' % number] = ''
+            values['AQ_BANK_%d_VEM' % number] = ''
+            values['AQ_BANK_%d_VAD' % number] = ''
+            values['AQ_BANK_%d_TITEL' % number] = 'ledig bänk'
+            continue
+        # A figure is drawn only where the engine reading itself evidences an executor step.
+        klass = 'aq-pagar'
+        if item['step'] == 'utförande':
+            klass += (' aq-figur aq-claude' if item['executor'] == 'claude' else
+                      ' aq-figur aq-codex' if item['executor'] == 'codex' else
+                      ' aq-figur aq-okand')
+        values['AQ_BANK_%d_CLASS' % number] = klass
+        values['AQ_BANK_%d_NAMN' % number] = NAMN(item['short'])
+        values['AQ_BANK_%d_VEM' % number] = VEM(item)
+        values['AQ_BANK_%d_VAD' % number] = SEDAN(item)
+        values['AQ_BANK_%d_TITEL' % number] = TEKNISK(item)
+    values['AQ_VERK_FLER'] = '+%d' % (len(bench) - 3) if len(bench) > 3 else ''
+    for number in range(1, 9):
+        item = parked[number - 1] if len(parked) >= number else None
+        if item is None:
+            values['AQ_PARK_%d_CLASS' % number] = 'aq-av'
+            values['AQ_PARK_%d_NAMN' % number] = ''
+            values['AQ_PARK_%d_TITEL' % number] = ''
+            continue
+        values['AQ_PARK_%d_CLASS' % number] = ('aq-pa' if item['title_status'] == 'läst'
+                                               else 'aq-pa aq-titel-saknas')
+        values['AQ_PARK_%d_NAMN' % number] = NAMN(item['short'])
+        values['AQ_PARK_%d_TITEL' % number] = (TITEL(item) + ' · ' + item['task'] + ' · '
+                                               + SEDAN(item))
+    values['AQ_PARK_FLER'] = '+%d' % (len(parked) - 8) if len(parked) > 8 else ''
+
+    if V['status'] != 'ok':
+        values['AQ_TAVLA_UNDER'] = 'okänt'
+        values['AQ_VERK_UNDER'] = 'motorn kunde inte läsas'
+        rows['verkstaden'] = [_rad('Läge', UNREADABLE_ENGINE)]
+    else:
+        values['AQ_TAVLA_UNDER'] = ('inga' if not parked
+                                    else ANTAL(len(parked), '1 uppdrag', '%d uppdrag'))
+        values['AQ_VERK_UNDER'] = (
+            ('inget arbete observerat i motorn' if not bench
+             else ANTAL(len(bench), '1 i arbete', '%d i arbete'))
+            + ' · ' + ANTAL(len(parked), '1 uppdrag arbetar inte', '%d uppdrag arbetar inte'))
+        listed = [_rad('Pågår', item['task'] + ' · ' + VEM(item) + ' · ' + SEDAN(item)
+                       + ' · steg ' + STEG(item)) for item in bench]
+        if not listed:
+            listed = [_rad('Läge', 'Inget arbete pågår i motorn')]
+        if parked:
+            listed += [_rad('Arbetar inte', item['task'] + ' · ' + TITEL(item) + ' · '
+                            + SEDAN(item)) for item in parked]
+        else:
+            listed.append(_rad('Arbetar inte', 'inga uppdrag'))
+        if V['titles'] != 'ok':
+            listed.append(_rad('Uppdragsfiler',
+                               'kunde inte läsas; titlarna är okända men uppdragen visas'))
+        rows['verkstaden'] = listed
+    values['AQ_KALLA_VERKSTADEN'] = KÄLLA(sources, ('engine', 'tasks'))
+
+    first = desk[0] if desk else None
+    if first is None:
+        values['AQ_GRANSK_CLASS'] = 'aq-vilar'
+        values['AQ_GRANSK_NAMN'] = ''
+        values['AQ_GRANSK_VEM'] = ''
+        values['AQ_GRANSK_VAD'] = ''
+        values['AQ_GRANSK_TITEL'] = 'ingen granskning'
+    else:
+        values['AQ_GRANSK_CLASS'] = ('aq-granskas aq-figur aq-okand'
+                                     if first['state'] == 'granskas' else 'aq-integreras')
+        values['AQ_GRANSK_NAMN'] = NAMN(first['short'])
+        values['AQ_GRANSK_VEM'] = VEM(first)
+        values['AQ_GRANSK_VAD'] = SEDAN(first)
+        values['AQ_GRANSK_TITEL'] = TEKNISK(first)
+    values['AQ_GRANSK_FLER'] = '+%d' % (len(desk) - 1) if len(desk) > 1 else ''
+    if V['status'] != 'ok':
+        values['AQ_GRANSK_UNDER'] = 'motorn kunde inte läsas'
+        rows['granskningen'] = [_rad('Läge', UNREADABLE_ENGINE)]
+    elif not desk:
+        values['AQ_GRANSK_UNDER'] = 'ingen granskning observerad'
+        rows['granskningen'] = [_rad('Läge',
+                                     'Ingen granskning eller integration pågår i motorn')]
+    else:
+        reviewing = sum(1 for item in desk if item['state'] == 'granskas')
+        integrating = sum(1 for item in desk if item['state'] == 'integreras')
+        parts = ([('%d granskas' % reviewing)] if reviewing else [])
+        parts += ([('%d integreras' % integrating)] if integrating else [])
+        values['AQ_GRANSK_UNDER'] = ' · '.join(parts)
+        rows['granskningen'] = [
+            _rad('Granskas' if item['state'] == 'granskas' else 'Integreras',
+                 item['task'] + ' · ' + VEM(item) + ' · ' + SEDAN(item) + ' · steg ' + STEG(item))
+            for item in desk]
+    values['AQ_KALLA_GRANSKNINGEN'] = KÄLLA(sources, ('engine',))
+
+
+def _utkiken(U, sources, values, rows):
+    """The watch's own place: a planned round is not a performed round."""
+    model = MODELL(U['model']['executor'], U['model']['model'])
+    values['AQ_UTK_PLATS'] = 'bevakningens plats · konfigurerad: ' + model
+    values['AQ_KALLA_UTKIKEN'] = KÄLLA(sources, ('watch', 'staffing'))
+    if U['status'] != 'ok':
+        values.update({'AQ_UTK_STATUS': 'aq-otillganglig', 'AQ_UTK_CLASS': '',
+                       'AQ_UTK_DAG': '–', 'AQ_UTK_DAG_TITEL': UNREADABLE_WATCH,
+                       'AQ_UTK_GRANSKAT': '–', 'AQ_UTK_GRANSKAT_TITEL': UNREADABLE_WATCH,
+                       'AQ_UTK_RAPPORT_TITEL': UNREADABLE_WATCH, 'AQ_UTK_NAMN': '',
+                       'AQ_UTK_VEM': '', 'AQ_UTK_VAD': '', 'AQ_UTK_UNDER': UNREADABLE_WATCH})
+        rows['utkiken'] = [_rad('Läge', 'Bevakningen kunde inte läsas; inget visas som lugnt'),
+                           _rad('Konfigurerad utförare', model + NOT_MODEL_CHOICE)]
+        return
+    running = U['running'] or 0
+    planned, starts = U['next_planned'], U['starts']
+    values['AQ_UTK_STATUS'] = ''
+    values['AQ_UTK_CLASS'] = ('aq-kor' if running > 0 else
+                              'aq-vantar' if U['waiting'] else 'aq-lugn')
+    values['AQ_UTK_DAG'] = DATUM(planned).split(' ')[0] if planned else '–'
+    values['AQ_UTK_DAG_TITEL'] = ('nästa omgång planerad ' + TID(planned) + ' · inte genomförd'
+                                  if planned else 'ingen planerad omgång känd')
+    reviewed = U['reviewed']
+    if reviewed is None:
+        values['AQ_UTK_GRANSKAT'] = 'inget'
+        values['AQ_UTK_GRANSKAT_TITEL'] = granskat = 'inget granskat besked'
+    else:
+        decision = reviewed['decision'] if reviewed['decision'] is not None else 'beslut okänt'
+        granskat = (TID(reviewed['at']) + ' · ' + decision
+                    + (' · äldre än ett dygn' if reviewed['older_than_a_day'] else ''))
+        values['AQ_UTK_GRANSKAT'] = DATUM(reviewed['at'])
+        values['AQ_UTK_GRANSKAT_TITEL'] = 'senast granskade besked ' + granskat
+    latest = U['latest']
+    if latest is None:
+        report = 'ingen rapport'
+        values['AQ_UTK_RAPPORT_TITEL'] = 'ingen rapport'
+    else:
+        report = ((TID(latest['at']) if latest['at'] is not None else 'tid okänd') + ' · '
+                  + latest['outcome'] + ('' if latest['cause'] is None
+                                         else ' · ' + latest['cause']))
+        values['AQ_UTK_RAPPORT_TITEL'] = 'senaste rapport ' + report
+    if running > 0:
+        values['AQ_UTK_NAMN'] = 'Bevakningen'
+        values['AQ_UTK_VEM'] = 'utförare ej belagd'
+        values['AQ_UTK_VAD'] = ('omgång startad ' + TID(starts[0]) if starts
+                                else 'omgång pågår · starttid okänd')
+    else:
+        values['AQ_UTK_NAMN'] = values['AQ_UTK_VEM'] = values['AQ_UTK_VAD'] = ''
+    if U['schedule'] == 'stoppat':
+        under = 'stoppad'
+    elif U['schedule'] == 'pausat':
+        under = 'pausad'
+    elif U['schedule'] == 'okänt':
+        under = 'schemat är okänt'
+    elif running > 0:
+        under = 'omgång pågår'
+    elif latest is not None and latest['cause'] is not None:
+        under = 'senaste omgången otillräcklig' + ('' if not planned
+                                                   else ' · nästa ' + TID(planned))
+    elif U['waiting']:
+        under = 'besked väntar på granskning'
+    elif planned:
+        under = 'nästa omgång ' + TID(planned)
+    else:
+        under = 'ingen planerad omgång känd'
+    values['AQ_UTK_UNDER'] = under
+    listed = [_rad('Schema', U['schedule']),
+              _rad('Nästa omgång', 'planerad ' + TID(planned) + ' · inte genomförd' if planned
+                   else 'ingen planerad tid känd'),
+              _rad('Senaste starter', ', '.join(TID(start) for start in starts) if starts
+                   else 'inga kända')]
+    if running > 0:
+        listed.append(_rad('Igång vid läsningen', ANTAL(running, '1 omgång', '%d omgångar')))
+    listed.append(_rad('Senaste rapport', report))
+    listed.append(_rad('Senast granskade besked', granskat))
+    listed.append(_rad('Konfigurerad utförare', model + NOT_MODEL_CHOICE))
+    rows['utkiken'] = listed
+
+
+def _bordet(B, sources, waiting, values, rows):
+    items = B['items']
+    marks = (['aq-harbord'] if items else []) + ([] if B['status'] == 'ok'
+                                                 else ['aq-ofullstandig'])
+    values['AQ_BORD_STATUS'] = ' '.join(marks)
+    for number in range(1, 5):
+        item = items[number - 1] if len(items) >= number else None
+        if item is None:
+            values['AQ_BREV_%d_CLASS' % number] = 'aq-av'
+            values['AQ_BREV_%d_TITEL' % number] = ''
+            continue
+        values['AQ_BREV_%d_CLASS' % number] = 'aq-pa'
+        values['AQ_BREV_%d_TITEL' % number] = (
+            KINDS.get(item['kind'], item['kind']) + ': ' + item['text']
+            + ('' if item['since'] is None else ' · sedan ' + NÄR(item['since'])))
+    values['AQ_BORD_ANTAL'] = str(len(items)) if items else ''
+    values['AQ_BORD_FLER'] = '+%d' % (len(items) - 4) if len(items) > 4 else ''
+    values['AQ_BORD_UNDER'] = waiting
+    listed = [_rad(KINDS.get(item['kind'], item['kind'])
+                   + ('' if item['since'] is None else ' · sedan ' + NÄR(item['since'])),
+                   item['text'] + ' — ' + item['basis']) for item in items]
+    if B['status'] != 'ok':
+        listed.append(_rad('Läge', 'En källa kunde inte läsas; fler ärenden kan finnas'))
+    elif not items:
+        listed = [_rad('Läge', 'Inga ärenden väntar på dig')]
+    rows['bordet'] = listed
+    values['AQ_KALLA_BORDET'] = KÄLLA(sources, ('office', 'questions', 'watch'))
+
+
+def _maskinrummet(S, R, sources, values, rows):
+    """Configuration is never observed work: the technical records are named as records."""
+    service = S['service']
+    verified = service['verified']
+    if service['state'] == 'igång':
+        tjanst = 'tjänsten igång · %s av 3 verifierade' % verified
+    elif service['state'] == 'delvis':
+        tjanst = 'tjänsten delvis igång · %s av 3 verifierade' % verified
+    elif verified == 0:
+        tjanst = 'tjänsten okänd · ingen verifierad'
+    else:
+        tjanst = 'tjänsten kunde inte läsas'
+    records = S['identity_records']
+    tekniskt = ('tekniska poster okända' if records is None
+                else ANTAL(records, '1 teknisk post, inte en agent',
+                           '%d tekniska poster, inte agenter'))
+    values['AQ_SOCKEL_CLASS'] = ('aq-igang' if service['state'] == 'igång' else
+                                 'aq-delvis' if service['state'] == 'delvis' else 'aq-okand')
+    values['AQ_SOCKEL_UNDER'] = tjanst + ' · ' + tekniskt
+    values['AQ_SOCKEL_TITEL'] = tekniskt
+    listed = [_rad('Tjänsten', tjanst + ('' if not service['config']
+                                         else ' · konfiguration ' + service['config']))]
+    if S['staffing']:
+        listed += [_rad('Konfigurerad · ' + entry['role'],
+                        MODELL(entry['executor'], entry['model'])) for entry in S['staffing']]
+    else:
+        listed.append(_rad('Konfigurerad bemanning', 'okänd'))
+    listed.append(_rad('Konfigurerad · bevakningen',
+                       MODELL(S['watch_staffing']['executor'], S['watch_staffing']['model'])
+                       + NOT_MODEL_CHOICE))
+    listed.append(_rad('Arbetar inte', 'okänt' if S['idle_tasks'] is None
+                       else ANTAL(S['idle_tasks'], '1 uppdrag', '%d uppdrag')))
+    listed.append(_rad('Pågår', 'okänt' if S['busy'] is None else
+                       'inget' if S['busy'] == 0 else
+                       ANTAL(S['busy'], '1 uppdrag', '%d uppdrag')))
+    listed.append(_rad('Identitetsposter', tekniskt))
+    listed.append(_rad('Revision', _revision(R)))
+    rows['maskinrummet'] = listed
+    values['AQ_KALLA_MASKINRUMMET'] = KÄLLA(sources, ('service', 'staffing', 'engine', 'release'))
+
+
+def _revision(R):
+    return ('okänd' if R['runtime'] is None
+            else 'Runtime ' + R['runtime'] + ' · konfiguration ' + str(R['config']))
+
+
+def _kallor(sources, R, rows):
+    """When each source was read and when it becomes stale; the times are read times."""
+    listed = []
+    for name in SOURCES:
+        source = sources[name]
+        label = '<span class="aq-etikett">' + _escape(source['title']) + '</span>'
+        if source['status'] == 'ok':
+            listed.append('<li data-read-at="' + _escape(source['read_at'])
+                          + '" data-stale-after="' + str(source['stale_after_seconds']) + '">'
+                          + label + 'läst ' + _escape(TID(source['read_at']))
+                          + ' · inaktuell efter ' + str(source['stale_after_seconds'] // 60)
+                          + ' min</li>')
+        else:
+            listed.append('<li class="aq-otillganglig-kalla">' + label
+                          + 'otillgänglig vid läsningen</li>')
+    listed.append(_rad('Kontoret · revision', 'okänd' if R['office_main'] is None
+                       else 'main ' + R['office_main'] + ' · ' + TID(R['office_main_date'])))
+    listed.append(_rad('Runtime · revision', _revision(R)))
+    rows['kallor'] = listed
+
+
+def render(projection):
+    """Fill SCEN from one projection. Pure: no file, clock, process or network, nothing mutated."""
+    _validate(projection)
+    sources, R = projection['sources'], projection['revisions']
+    read_at = projection['read_at']
+    limits = [sources[name]['stale_after_seconds'] for name in SOURCES
+              if sources[name]['status'] == 'ok']
+    waiting = _agare(projection['agarens_bord'])
+    values = {'AQ_CSP': csp(),
+              'AQ_BODY_CLASS': 'aq-provdata' if projection['provdata'] else '',
+              'AQ_READ_AT': read_at,
+              'AQ_STALE_AFTER': str(min(limits)) if limits else '0',
+              'AQ_OBSERVERAT': TID(read_at), 'AQ_SENAST': TID(read_at),
+              'AQ_ALDER_UTAN_SKRIPT': 'ålder okänd',
+              'AQ_RUBRIK': _rubrik(projection, waiting)}
+    values['AQ_ARIA'] = ('Aquarium' + (' med PROVDATA' if projection['provdata'] else '') + ': '
+                         + values['AQ_RUBRIK'] + ', läst ' + TID(read_at))
+    rows = {}
+    _arkivet(projection['arkivet'], R, sources, _LOKALT(read_at), values, rows)
+    _verkstaden(projection['verkstaden'], sources, values, rows)
+    _utkiken(projection['utkiken'], sources, values, rows)
+    _bordet(projection['agarens_bord'], sources, waiting, values, rows)
+    _maskinrummet(projection['sockeln'], R, sources, values, rows)
+    _kallor(sources, R, rows)
+    return _fill(values, rows)
+
+
+# --- command ----------------------------------------------------------------------
+
+
+def _read(source):
+    """Read one regular projection file through a no-follow open, bounded, as UTF-8 JSON."""
+    fd = os.open(str(Path(source).absolute()), os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    try:
+        # A directory opens but is no projection: check before anything is read.
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            _refuse()
+        parts, size = [], 0
+        while size <= MAX_BYTES:
+            chunk = os.read(fd, 65536)
+            if not chunk:
+                break
+            parts.append(chunk)
+            size += len(chunk)
+    finally:
+        os.close(fd)
+    if size > MAX_BYTES:
+        _refuse()
+    return json.loads(b''.join(parts).decode('utf-8'))
+
+
+def _write(target, page):
+    """Write one new page through an exclusive, no-follow open with mode 0600."""
+    path = Path(target).absolute()
+    if path.name in ('', '.', '..'):
+        _refuse()
+    parent = os.open(str(path.parent), os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        fd = os.open(path.name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600,
+                     dir_fd=parent)
+        with os.fdopen(fd, 'wb') as stream:
+            os.fchmod(stream.fileno(), 0o600)
+            stream.write(page.encode('utf-8'))
+    finally:
+        os.close(parent)
+
+
+def main(argv=None):
+    arguments = sys.argv[1:] if argv is None else argv
+    try:
+        if len(arguments) != 2:
+            _refuse()
+        page = render(_read(arguments[0]))
+        _write(arguments[1], page)
+        return 0
+    except Exception:
+        print(COMMAND_ERROR, file=sys.stderr)
+        return 2
+
+
+if __name__ == '__main__':
+    sys.exit(main())

@@ -32,6 +32,7 @@ def values():
                               'engine': {'identity_matches': True},
                               'worker': {'identity_matches': True}}},
         'engine': {'executions': []},
+        'tasks': {'items': []},
         'watch': {'native': {'paused': False, 'note': '', 'next_action_times': [],
                              'running': [], 'recent': []},
                   'latest': None, 'reviewed': None, 'refused_for_capacity': False,
@@ -49,27 +50,35 @@ def readings(unavailable=(), **overrides):
             sources[name] = {'status': 'unavailable', 'read_at': READ_AT, 'value': None}
         else:
             sources[name] = {'status': 'ok', 'read_at': READ_AT, 'value': base[name]}
-    return {'schema': 1, 'provdata': False, 'read_started_at': READ_AT, 'sources': sources}
+    return {'schema': 2, 'provdata': False, 'read_started_at': READ_AT, 'sources': sources}
 
 
 def entry(identity, title, text=''):
     return {'id': identity, 'title': title, 'text': text}
 
 
-def execution(kind, activities=(), workflow_task=False, start=None):
-    return {'type': kind, 'pending_activities': list(activities),
+def execution(kind, activities=(), workflow_task=False, start=None, task='office-uppdrag'):
+    """One engine execution; Runtime starts each task's workflow with the task id."""
+    return {'id': task, 'type': kind, 'pending_activities': list(activities),
             'pending_workflow_task': workflow_task, 'start': start}
+
+
+def task_item(identity, status='läst', title='En rubrik'):
+    return {'id': identity, 'title': title if status == 'läst' else None, 'status': status}
 
 
 class Envelope(unittest.TestCase):
     def test_sources_titles_and_staleness(self):
         result = aquarium.project(readings(), NOW)
-        self.assertEqual(result['schema'], 1)
+        self.assertEqual(result['schema'], 2)
         self.assertIs(result['provdata'], False)
         self.assertEqual(result['read_at'], READ_AT)
+        self.assertEqual(aquarium.SOURCES, ('release', 'staffing', 'questions', 'service',
+                                            'engine', 'tasks', 'watch', 'office'))
         self.assertEqual(set(result['sources']), set(aquarium.SOURCES))
         self.assertEqual(result['sources']['office']['title'], 'Kontoret · beslut och leveranser')
         self.assertEqual(result['sources']['watch']['title'], 'Runtime · bevakningen')
+        self.assertEqual(result['sources']['tasks']['title'], 'Runtime · uppdragsfiler')
         self.assertEqual(result['sources']['office']['stale_after_seconds'], 3600)
         for name in aquarium.RUNTIME_SOURCES + ('watch',):
             self.assertEqual(result['sources'][name]['stale_after_seconds'], 300)
@@ -86,6 +95,7 @@ class Envelope(unittest.TestCase):
         self.assertEqual(set(result['headline']), {'pagar', 'vantar', 'behover_dig', 'lugnt'})
         self.assertEqual(set(result['sockeln']), {'service', 'staffing', 'watch_staffing',
                                                   'idle_tasks', 'identity_records', 'busy'})
+        self.assertEqual(set(result['verkstaden']), {'status', 'items', 'parked', 'titles'})
 
     def test_revisions_are_shortened(self):
         result = aquarium.project(readings(), NOW)['revisions']
@@ -101,7 +111,7 @@ class Envelope(unittest.TestCase):
         self.assertEqual(given, untouched)
 
     def test_invalid_input_is_refused_without_private_values(self):
-        for broken in (None, {}, {'schema': 2}, 'text'):
+        for broken in (None, {}, {'schema': 2}, 'text', dict(readings(), schema=1)):
             with self.assertRaises(ValueError):
                 aquarium.project(broken, NOW)
         missing = readings()
@@ -109,6 +119,10 @@ class Envelope(unittest.TestCase):
         with self.assertRaises(ValueError) as caught:
             aquarium.project(missing, NOW)
         self.assertEqual(str(caught.exception), aquarium.ERROR)
+        without_tasks = readings()  # A reading must carry all eight sources.
+        del without_tasks['sources']['tasks']
+        with self.assertRaises(ValueError):
+            aquarium.project(without_tasks, NOW)
         naive = readings()
         with self.assertRaises(ValueError):
             aquarium.project(naive, datetime(2026, 9, 24, 12, 0))
@@ -134,10 +148,26 @@ class UnavailableSources(unittest.TestCase):
     def test_engine_unavailable(self):
         result = aquarium.project(readings(unavailable=('engine',)), NOW)
         self.assertEqual(result['verkstaden'], {'status': 'otillgänglig', 'items': [],
-                                                'model_evidence': False})
+                                                'parked': [], 'titles': 'ok'})
         self.assertIsNone(result['headline']['pagar'])
         for key in ('idle_tasks', 'identity_records', 'busy'):
             self.assertIsNone(result['sockeln'][key])
+        # The real reading never asks for task files without the engine, so both are unavailable.
+        both = aquarium.project(readings(unavailable=('engine', 'tasks')), NOW)
+        self.assertEqual(both['verkstaden'], {'status': 'otillgänglig', 'items': [],
+                                             'parked': [], 'titles': 'otillgänglig'})
+
+    def test_task_files_unavailable_beside_a_read_engine(self):
+        given = readings(unavailable=('tasks',),
+                         engine={'executions': [execution('Vilande', task='office-vilar')]})
+        result = aquarium.project(given, NOW)
+        self.assertEqual(result['verkstaden']['titles'], 'otillgänglig')
+        self.assertEqual(result['verkstaden']['status'], 'ok')
+        parked = result['verkstaden']['parked']
+        self.assertEqual([(item['title'], item['title_status']) for item in parked],
+                         [(None, 'okänd')])
+        self.assertEqual(result['sockeln']['idle_tasks'], 1)
+        self.assertIs(result['headline']['lugnt'], False)
 
     def test_watch_unavailable(self):
         result = aquarium.project(readings(unavailable=('watch',)), NOW)
@@ -221,36 +251,155 @@ class Arkivet(unittest.TestCase):
                   'entries': [entry('AP15-LEVERANS', 'Datum i texten', 'Levererat 20260812.')]}
         self.assertEqual(self.project(office)['items'][0]['date'], '2026-08-12')
 
+    def test_a_commit_hash_is_never_a_date(self):
+        # The first real reading dated three deliveries from digit runs inside commit hashes.
+        office = {'main': '1a' * 20, 'main_date': READ_AT, 'notes': [], 'plan_owner_turn': [],
+                  'entries': [
+                      entry('AP20-LEVERANS', 'Bara en hash',
+                            'Publicerad som 3510182456789abc0778277412345def.'),
+                      entry('AP21-LEVERANS', 'Hash och datum',
+                            'main 0151714312ab34cd — levererad 2026-09-12.')]}
+        items = self.project(office)['items']
+        dates = {item['key']: item['date'] for item in items}
+        self.assertIsNone(dates['AP20'])
+        self.assertEqual(dates['AP21'], '2026-09-12')
+
+
+class DateRule(unittest.TestCase):
+    def test_written_dates_are_read(self):
+        self.assertEqual(aquarium._first_date('AP10-LEVERANS-20260924'), '2026-09-24')
+        self.assertEqual(aquarium._first_date('levererad 2026-09-24 kl 12'), '2026-09-24')
+        self.assertEqual(aquarium._first_date('20000101'), '2000-01-01')
+        self.assertEqual(aquarium._first_date('2099-12-31'), '2099-12-31')
+
+    def test_candidates_that_are_no_dates_are_skipped(self):
+        for text in ('2026-13-45', '20260231', '1999-01-01', '2100-01-01', '2026-02-30',
+                     'a20260924', '20260924b', '120260924', '202609241', '2026-09-241',
+                     '12026-09-24', 'inget datum alls'):
+            self.assertIsNone(aquarium._first_date(text), text)
+
+    def test_the_search_goes_on_past_a_broken_candidate(self):
+        self.assertEqual(aquarium._first_date('2026-13-45 men 2026-09-24'), '2026-09-24')
+        self.assertEqual(aquarium._first_date('20260231 och 20260301'), '2026-03-01')
+        self.assertEqual(aquarium._first_date('sha 4f8920260931ab, datum 2026-09-30'),
+                         '2026-09-30')
+
+    def test_the_id_comes_before_the_text(self):
+        self.assertEqual(aquarium._first_date('AP-20260901', 'texten 20260902'), '2026-09-01')
+        self.assertEqual(aquarium._first_date('AP-utan-datum', 'texten 20260902'), '2026-09-02')
+        self.assertIsNone(aquarium._first_date(None, 17, 'ingenting'))
+
+    def test_the_same_rule_holds_for_an_open_proposal(self):
+        office = {'main': '1a' * 20, 'main_date': READ_AT, 'notes': [], 'plan_owner_turn': [],
+                  'entries': [entry('AP22-BEREDNING-abc35101824', 'AP22',
+                                    'Ett förslag, skrivet 2026-09-19.')]}
+        items = aquarium.project(readings(office=office), NOW)['agarens_bord']['items']
+        self.assertEqual(items[0]['since'], '2026-09-19')
+
 
 class Verkstaden(unittest.TestCase):
-    def project(self, executions):
-        return aquarium.project(readings(engine={'executions': executions}), NOW)
+    def project(self, executions, tasks=None):
+        given = readings(engine={'executions': executions})
+        if tasks is not None:
+            given['sources']['tasks']['value'] = {'items': tasks}
+        return aquarium.project(given, NOW)
 
     def test_identity_idle_busy_and_workflow_task(self):
         result = self.project([
-            execution('ServiceIdentity', ['Ping'], True, '2026-09-24T09:00:00+00:00'),
-            execution('Vilande', [], False, '2026-09-24T09:10:00+00:00'),
-            execution('Bygge', ['Kompilera', 'Prova'], False, '2026-09-24T09:20:00+00:00'),
-            execution('Kedja', [], True, '2026-09-24T09:30:00+00:00')])
+            execution('ServiceIdentity', ['Ping'], True, '2026-09-24T09:00:00+00:00',
+                      task='identitet-1'),
+            execution('Vilande', [], False, '2026-09-24T09:10:00+00:00', task='office-vilar'),
+            execution('Bygge', ['Kompilera', 'Prova'], False, '2026-09-24T09:20:00+00:00',
+                      task='office-bygge'),
+            execution('Kedja', [], True, '2026-09-24T09:30:00+00:00', task='office-kedja')],
+            tasks=[task_item('office-vilar', title='Vilande uppdrag')])
         verkstaden = result['verkstaden']
         self.assertEqual(verkstaden['status'], 'ok')
+        self.assertEqual(verkstaden['titles'], 'ok')
         self.assertEqual(verkstaden['items'], [
-            {'state': 'pågår', 'what': 'Bygge · Kompilera, Prova',
-             'since': '2026-09-24T09:20:00+00:00'},
-            {'state': 'pågår', 'what': 'Kedja · arbetsflödessteg',
-             'since': '2026-09-24T09:30:00+00:00'}])
-        self.assertIs(verkstaden['model_evidence'], False)
+            {'task': 'office-bygge', 'short': 'bygge', 'type': 'Bygge',
+             'since': '2026-09-24T09:20:00+00:00', 'step': 'steg', 'state': 'pågår',
+             'executor': None, 'executor_basis': None,
+             'activities': ['Kompilera', 'Prova']},
+            {'task': 'office-kedja', 'short': 'kedja', 'type': 'Kedja',
+             'since': '2026-09-24T09:30:00+00:00', 'step': 'arbetsflödessteg', 'state': 'pågår',
+             'executor': None, 'executor_basis': None, 'activities': []}])
+        self.assertEqual(verkstaden['parked'], [
+            {'task': 'office-vilar', 'short': 'vilar', 'type': 'Vilande',
+             'since': '2026-09-24T09:10:00+00:00', 'title': 'Vilande uppdrag',
+             'title_status': 'läst'}])
         self.assertEqual(result['headline']['pagar'], 2)
         self.assertEqual(result['sockeln']['identity_records'], 1)
         self.assertEqual(result['sockeln']['idle_tasks'], 1)
         self.assertEqual(result['sockeln']['busy'], 2)
 
     def test_review_activity_is_under_review(self):
-        result = self.project([execution('Granskning', ['SeparateReviewStep'], True)])
-        self.assertEqual(result['verkstaden']['items'][0]['state'], 'granskas')
-        self.assertEqual(result['verkstaden']['items'][0]['what'],
-                         'Granskning · SeparateReviewStep')
-        self.assertIsNone(result['verkstaden']['items'][0]['since'])
+        result = self.project([execution('Granskning', ['SeparateReviewStep'], True,
+                                         task='office-granskning')])
+        item = result['verkstaden']['items'][0]
+        self.assertEqual(item['state'], 'granskas')
+        self.assertEqual(item['step'], 'granskning')
+        self.assertIsNone(item['executor'])
+        self.assertIsNone(item['executor_basis'])
+        self.assertEqual(item['activities'], ['SeparateReviewStep'])
+        self.assertEqual(item['type'], 'Granskning')
+        self.assertIsNone(item['since'])
+
+    def test_every_step_rule_in_order(self):
+        result = self.project([
+            execution('A', ['execute_claude', 'review_candidate'], task='office-a'),
+            execution('B', ['execute_claude'], task='office-b'),
+            execution('C', ['execute_codex'], task='office-c'),
+            execution('D', ['execute_claude', 'execute_codex'], task='office-d'),
+            execution('E', ['publish_candidate'], task='office-e'),
+            execution('F', ['prepare'], task='office-f'),
+            execution('G', [], True, task='office-g')])
+        items = result['verkstaden']['items']
+        self.assertEqual([(item['step'], item['state'], item['executor'], item['executor_basis'])
+                          for item in items],
+                         [('granskning', 'granskas', None, None),
+                          ('utförande', 'pågår', 'claude', 'motorns steg execute_claude'),
+                          ('utförande', 'pågår', 'codex', 'motorns steg execute_codex'),
+                          ('utförande', 'pågår', None, None),
+                          ('integration', 'integreras', None, None),
+                          ('steg', 'pågår', None, None),
+                          ('arbetsflödessteg', 'pågår', None, None)])
+        self.assertEqual(result['sockeln']['busy'], 7)
+        self.assertEqual(result['sockeln']['idle_tasks'], 0)
+
+    def test_the_watch_round_and_technical_records_are_not_work(self):
+        result = self.project([
+            execution('PrivateAssessment', ['assess'], task='bevakning-1'),
+            execution('PrivateAssessment', [], task='bevakning-2'),
+            execution('ServiceIdentity', [], task='identitet-1')])
+        self.assertEqual(result['verkstaden']['items'], [])
+        self.assertEqual(result['verkstaden']['parked'], [])
+        self.assertEqual(result['headline']['pagar'], 0)
+        self.assertEqual(result['sockeln']['identity_records'], 1)
+        self.assertEqual(result['sockeln']['idle_tasks'], 0)
+
+    def test_short_names_and_parked_titles_in_every_status(self):
+        result = self.project([execution('T', task='office-ett'), execution('T', task='office-'),
+                              execution('T', task='utan-prefix'), execution('T', task='office-fyra')],
+                              tasks=[task_item('office-ett', title='Rubrik ett'),
+                                     task_item('office-', 'saknas'),
+                                     task_item('utan-prefix', 'oläslig')])
+        parked = result['verkstaden']['parked']
+        self.assertEqual([item['short'] for item in parked],
+                         ['ett', 'office-', 'utan-prefix', 'fyra'])
+        self.assertEqual([(item['title'], item['title_status']) for item in parked],
+                         [('Rubrik ett', 'läst'), (None, 'saknas'), (None, 'oläslig'),
+                          (None, 'oläslig')])
+
+    def test_a_malformed_task_value_is_refused(self):
+        for broken in ({'items': [{'id': 'a', 'title': 'x', 'status': 'saknas'}]},
+                       {'items': [{'id': 'a', 'title': None, 'status': 'läst'}]},
+                       {'items': [{'id': 'a', 'title': None, 'status': 'annat'}]},
+                       {'items': 'inte en lista'}):
+            given = readings()
+            given['sources']['tasks']['value'] = broken
+            with self.assertRaises(ValueError):
+                aquarium.project(given, NOW)
 
 
 class Utkiken(unittest.TestCase):
@@ -487,16 +636,25 @@ class Collect(unittest.TestCase):
     def office(self):
         return lambda office_root: values()['office']
 
+    def tasks(self, items=()):
+        self.asked = None
+
+        def reader(runtime_root, identities):
+            self.asked = list(identities)
+            return {'items': list(items)}
+
+        return reader
+
     def collect(self, **overrides):
         arguments = {'runtime_probe': self.probe(), 'watch_reader': self.watch(),
-                     'office_reader': self.office()}
+                     'office_reader': self.office(), 'task_reader': self.tasks()}
         arguments.update(overrides)
         return aquarium.collect('/finns/inte/runtime', '/finns/inte/kontor', **arguments)
 
     def test_a_full_reading_projects(self):
         result = self.collect()
         self.assertIs(result['provdata'], False)
-        self.assertEqual(result['schema'], 1)
+        self.assertEqual(result['schema'], 2)
         aquarium._aware(result['read_started_at'])
         for name in aquarium.SOURCES:
             self.assertEqual(result['sources'][name]['status'], 'ok', name)
@@ -520,11 +678,43 @@ class Collect(unittest.TestCase):
         def broken(root):
             raise RuntimeError('probe')
 
-        result = self.collect(runtime_probe=broken)
+        reader = self.tasks()
+        result = self.collect(runtime_probe=broken, task_reader=reader)
         for name in aquarium.RUNTIME_SOURCES:
             self.assertEqual(result['sources'][name]['status'], 'unavailable', name)
         self.assertEqual(result['sources']['office']['status'], 'ok')
         self.assertIsNone(result['sources']['watch']['value']['refused_for_capacity'])
+        self.assertIsNone(self.asked)  # Without the engine no task file is asked for.
+
+    def test_the_task_reader_is_asked_only_for_the_parked_tasks(self):
+        executions = [execution('Bygge', ['execute_claude'], task='office-arbetar'),
+                      execution('Vilande', task='office-vilar'),
+                      execution('Vilande', task='office-vilar'),
+                      execution('ServiceIdentity', task='identitet-1'),
+                      execution('PrivateAssessment', task='bevakning-1')]
+        reader = self.tasks([task_item('office-vilar', title='Vilar')])
+        result = self.collect(runtime_probe=self.probe(
+            engine={'ok': True, 'value': {'executions': executions}}), task_reader=reader)
+        self.assertEqual(self.asked, ['office-vilar'])
+        self.assertEqual(result['sources']['tasks']['status'], 'ok')
+        self.assertEqual(result['sources']['tasks']['value'],
+                         {'items': [{'id': 'office-vilar', 'title': 'Vilar', 'status': 'läst'}]})
+        aquarium._aware(result['sources']['tasks']['read_at'])
+        projection = aquarium.project(result, NOW)
+        self.assertEqual(projection['verkstaden']['parked'][0]['title'], 'Vilar')
+        self.assertEqual(projection['verkstaden']['items'][0]['executor'], 'claude')
+
+    def test_a_failing_task_reader_is_only_its_own_source(self):
+        def broken(runtime_root, identities):
+            raise OSError('/Users/agaren/privat')
+
+        result = self.collect(task_reader=broken)
+        self.assertEqual(result['sources']['tasks']['status'], 'unavailable')
+        self.assertIsNone(result['sources']['tasks']['value'])
+        self.assertEqual(result['sources']['engine']['status'], 'ok')
+        self.assertEqual(result['sources']['office']['status'], 'ok')
+        malformed = self.collect(task_reader=lambda root, ids: {'items': [{'id': 1}]})
+        self.assertEqual(malformed['sources']['tasks']['status'], 'unavailable')
 
     def test_a_malformed_part_is_only_its_own_source(self):
         result = self.collect(runtime_probe=self.probe(
@@ -556,6 +746,100 @@ class Collect(unittest.TestCase):
         damaged = self.collect(watch_reader=self.watch(
             latest={'report': None, 'packet': None, 'integrity': 'unavailable', 'locator': 'x'}))
         self.assertEqual(damaged['sources']['watch']['status'], 'unavailable')
+
+
+class TaskReader(unittest.TestCase):
+    """The default reader, on its own temporary runtime root under the existing `.scratch`."""
+
+    def setUp(self):
+        self.assertTrue(SCRATCH.is_dir(), 'the repository keeps an existing .scratch')
+        self.temporary = tempfile.TemporaryDirectory(dir=str(SCRATCH))
+        self.addCleanup(self.temporary.cleanup)
+        self.base = Path(self.temporary.name)
+        self.root = self.base / 'runtime'
+        (self.root / '.runtime' / 'tasks').mkdir(parents=True)
+
+    def brief(self, identity, raw):
+        place = self.root / '.runtime' / 'tasks' / identity
+        place.mkdir(parents=True, exist_ok=True)
+        (place / 'brief.md').write_bytes(raw)
+
+    def read(self, *identities):
+        items = aquarium.task_reader(str(self.root), list(identities))['items']
+        return {item['id']: (item['title'], item['status']) for item in items}
+
+    def test_a_title_is_read_and_nothing_else_is_kept(self):
+        self.brief('ok-uppdrag',
+                   '# En  rubrik\tmed mellanrum \nandra raden med hemligheter\n'.encode('utf-8'))
+        result = self.read('ok-uppdrag')
+        self.assertEqual(result['ok-uppdrag'], ('En rubrik med mellanrum', 'läst'))
+        self.assertNotIn('hemligheter', json.dumps(result, ensure_ascii=False))
+
+    def test_a_carriage_return_and_a_file_without_a_newline(self):
+        self.brief('crlf', b'# Rubrik\r\nnasta\r\n')
+        self.brief('utan-radslut', b'# Bara en rad')
+        result = self.read('crlf', 'utan-radslut')
+        self.assertEqual(result['crlf'], ('Rubrik', 'läst'))
+        self.assertEqual(result['utan-radslut'], ('Bara en rad', 'läst'))
+
+    def test_a_missing_brief_and_a_missing_task(self):
+        (self.root / '.runtime' / 'tasks' / 'tom-katalog').mkdir()
+        result = self.read('tom-katalog', 'finns-inte')
+        self.assertEqual(result['tom-katalog'], (None, 'saknas'))
+        self.assertEqual(result['finns-inte'], (None, 'saknas'))
+
+    def test_symlinks_and_a_directory_are_unreadable(self):
+        tasks = self.root / '.runtime' / 'tasks'
+        self.brief('riktigt', b'# Riktig rubrik\n')
+        (tasks / 'lankad-brief').mkdir()
+        (tasks / 'lankad-brief' / 'brief.md').symlink_to(tasks / 'riktigt' / 'brief.md')
+        (tasks / 'lankad-katalog').symlink_to(tasks / 'riktigt')
+        (tasks / 'katalog-brief' / 'brief.md').mkdir(parents=True)
+        result = self.read('lankad-brief', 'lankad-katalog', 'katalog-brief', 'riktigt')
+        self.assertEqual(result['lankad-brief'], (None, 'oläslig'))
+        self.assertEqual(result['lankad-katalog'], (None, 'oläslig'))
+        self.assertEqual(result['katalog-brief'], (None, 'oläslig'))
+        self.assertEqual(result['riktigt'], ('Riktig rubrik', 'läst'))
+
+    def test_a_symlinked_component_above_the_task(self):
+        other = self.base / 'annat' / 'tasks' / 'uppdrag'
+        other.mkdir(parents=True)
+        (other / 'brief.md').write_bytes(b'# Genom en lank\n')
+        root = self.base / 'lankad-runtime'
+        (root / '.runtime').mkdir(parents=True)
+        (root / '.runtime' / 'tasks').symlink_to(self.base / 'annat' / 'tasks')
+        self.assertEqual(aquarium.task_reader(str(root), ['uppdrag'])['items'],
+                         [{'id': 'uppdrag', 'title': None, 'status': 'oläslig'}])
+
+    def test_no_heading_and_broken_utf8(self):
+        self.brief('ingen-rubrik', b'Ingen rubrik alls\n')
+        self.brief('tom-rubrik', b'#    \nnasta\n')
+        self.brief('utan-mellanslag', b'#Rubrik\n')
+        self.brief('trasig', b'# \xff\xfe rubrik\n')
+        result = self.read('ingen-rubrik', 'tom-rubrik', 'utan-mellanslag', 'trasig')
+        for identity, seen in result.items():
+            self.assertEqual(seen, (None, 'oläslig'), identity)
+
+    def test_a_long_title_is_shortened(self):
+        self.brief('lang', ('# ' + 'a' * 200 + '\n').encode('utf-8'))
+        title, status = self.read('lang')['lang']
+        self.assertEqual(status, 'läst')
+        self.assertEqual(title, 'a' * 119 + '…')
+        self.assertEqual(len(title), 120)
+        self.brief('jamnt', ('# ' + 'b' * 120 + '\n').encode('utf-8'))
+        self.assertEqual(self.read('jamnt')['jamnt'], ('b' * 120, 'läst'))
+
+    def test_an_invalid_id_never_touches_a_file(self):
+        self.brief('riktigt', b'# Rubrik\n')
+        for identity in ('Stora', '../riktigt', 'med mellanslag', '-bindestreck', '', 'a' * 81,
+                         'riktigt/brief.md'):
+            self.assertEqual(aquarium.task_reader(str(self.root), [identity])['items'],
+                             [{'id': identity, 'title': None, 'status': 'oläslig'}], identity)
+
+    def test_at_most_thirty_two_ids(self):
+        items = aquarium.task_reader(str(self.root), ['u%d' % number for number in range(40)])
+        self.assertEqual(len(items['items']), 32)
+        self.assertEqual(items['items'][0]['id'], 'u0')
 
 
 class Command(unittest.TestCase):
