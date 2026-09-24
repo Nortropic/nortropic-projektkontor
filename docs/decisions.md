@@ -458,3 +458,458 @@ AP10-ACCEPT medger fortsatt lokal drift endast av office-python-temporal tills
 paus/stopp. Ingen åtgärdsberedning ger uppgraderings-, kod- eller valvmandat.
 Tidigare sakbeslut, bevisluckor och auditstatus består. Byggfasen avslutas;
 planen äger nästa ordinarie handling och privat återupptagningspunkt.
+
+
+## AP11-BEREDNING — ändligt utvecklingsansvar, endast förslag
+
+**Registrerat 2026-09-21T11:10:58.592382+00:00.** Ny ägarorder efter AP10:s leverans tillåter beredning av
+nästa sammanhängande verksamhetsbygge ur befintlig definition/intervju/byggordning.
+Exakt avskrift privat `evidence/ap11/local/order.md`, SHA256
+`ff119e365266b47fd348a74c7ee4784a2f4e661ecb0b5ed22771816d0dacf630`.
+Detta är beredningsidentitet, inte ägaraccept av vårt rekommenderade mål.
+
+AP10 tillgodoräknas inom slutkvittot; endast dess namngivna Python-/Temporaldrift
+fortsätter enligt dokumenterad konfiguration. Ingen ny generell driftkvalificering,
+ny intagsomgång eller rättning beställs. Aktiv drift lämnas orörd under beredning.
+
+Kedjedrivarens härledning: föreslå ett ändligt utvecklingsansvar som fortsätter
+mellan Runtime-uppgifter efter att interaktiv drivarsession avslutats. Befintlig
+agent/verktyg kan redan driva beroende uppgifter under aktiv session; detta är
+inte ett nytt produktbehov. Ny beständig profil, avgränsad värdbefogenhet och
+kontrollerat revisionsbyte är däremot nya förslag, inte följder av AP10-ACCEPT.
+
+Status FÖRSLAG. Fem delmål, omfattning och resurs-/publiceringstillstånd i
+`evidence/ap11/byggbeslut.md` ska accepteras uttryckligen före genomförande.
+AP07 ANPASSA frivilligt; kartspår, AP09-sakbeslut/luckor och auditstatus oförändrade.
+
+
+## AP11-ACCEPT — genomförande av hela femdelade paketet
+
+Ägarens faktiska skriftliga accept registrerad 2026-09-21T11:27:45.721029+00:00. Full text privat
+`evidence/ap11/local/accepted-mandate.md`, SHA256 `a2b3f143ed9cbb332d5c57634a84bae9dcb7ead90ddcbd227f2d221dcb4692b2`.
+Accepterat förslag SHA256 `a04ab5fd1b07911091a8195ae31b95682b11763b5b37f412028072e5870ec993`.
+AP11-BEREDNING är avslutad som beredningssteg; bevis och utkast bevaras.
+
+Tillåtet: nödvändig Office-/Runtimeimplementation, separat review, skyddad
+integration, kontrollerat revisionsbyte och ändlig aktivering. Resursram48
+modellprocesser/siximplementation per logiskt underarbete består över omstart
+och namnbyte; bygget redovisas separat. Ingen självutökning av mandat/acceptans.
+Genererade prov får inte automatiskt köras som betrodd värdkod. AP10:s schema,
+rättigheter/historik och tidsutrymme ska bevaras. Verkligt sessionsslut→ny
+beredning/start, omotiverat uppdrag avvisat, inget dubbelt publish och separat
+helhetsaccept krävs. Paus/stopp/kvot består. Offentligt endast kontrollerad kod,
+syntetiska prov/anvisningar/begränsade bevis. Tidigare begränsningar kvarstår.
+
+Aquarium: ägarens intresse bevaras som nära möjlig separat nästa fas; inte
+berett/byggt som del av AP11. Ingen ny fas startas automatiskt.
+
+
+## AP11-UTFÖRARNEUTRAL — ägarbesked 2026-09-21: arbetsmodellen ska inte spela roll
+
+**Status:** uttryckligt ändrat ägarmandat inom AP11-ACCEPT, registrerat
+2026-09-21T14:04:10+00:00 av mottagande kedjedrivare (Claude Code). Ägarens ord
+bevaras ordagrant privat i
+`evidence/ap11/local/handover-claude-20260921/owner-words.md`, SHA256
+`d93285666a8ecb8f3d897fda3d4bad582d430fc3c8c79eb46358aa1d21779437`. Ingen exakt
+klocktid tillskrivs ägaren. Följande är byggarens avgränsade återgivning.
+
+**Bakgrund:** Codex användningsgräns nåddes 13:17Z mitt i tillämpningens tredje
+anrop. Kontorsmålet har sedan AP04 endast Codex som kvalificerad utförare och
+granskare; Runtimes runbook anger att Claude för kontoret väntar på "a separately
+accepted qualification". Runtime-uppdraget anger redan att Claude Code får ta
+över kedjedrivarens arbete och att samma uppdrag ska kunna fortsätta mellan
+utförarna.
+
+**Innebörd:** (1) både Claude och Codex ska kunna driva allt, som kedjedrivare
+och som Runtime-startad utförare/granskare; den som har användning kvar ska kunna
+användas. (2) Detta är den accept runbookens kvalificering väntade på.
+(3) Den frysta helhetsacceptansens G4 "no other … model" och G5 "fallback" läses
+framåt så att de två redan auktoriserade abonnemangen bär samma befintliga
+agentroll. Inget nytt abonnemang, ingen ny modellanslutning, API-debitering
+eller kostnad ingår.
+
+**Gränser som består:** ingen automatisk växling vid kvot-/åtkomstbortfall —
+bortfall förblir paus, och utförarval är en explicit, separat granskad
+operatörshandling bunden i fryst config. Taken 48 modellprocesser och sex
+implementationsförsök, redan förbrukade 3 anrop, kravet på konkret diagnos och
+ändrad förutsättning före omtag, oberoende granskarkörning, kandidaters
+skrivgränser, kontrollerat revisionsbyte och AP10:s oförändrade schema/villkor
+gäller som förut. `overall-acceptance-v1.md` skrivs inte om; tillägget får egen
+separat granskning före återupptagen tillämpning. Byggarbetet redovisas skilt
+från tillämpningens budget.
+
+**Påverkar:** README:s och AP04-leveransens uppgift att kontorets kvalificerade
+utförarprofil är enbart Codex gäller tills respektive kvalificering är skyddat
+integrerad och aktiverad; de markeras då SUPERSEDED med pekare hit. Planen äger
+ordningen. A3/A6/FIND-004, AP09:s sakbeslut/luckor, AP07 ANPASSA, Aquarium som
+möjlig nästa fas och övrig auditstatus är oförändrade. **Ersätter:** ingenting
+raderas; preciserar AP11-ACCEPT framåt.
+
+## AP11-UTFÖRARNEUTRAL-2 — 2026-09-21: ägarens senare ord och det granskade acceptanstillägget
+
+**Status:** registrerat 2026-09-21T17:14:09+00:00 av kedjedrivaren (Claude Code). Ägarens senare ord
+samma dag (genomförandebeskedet, beskedet inför publiceringen och de korta beskeden
+om full autonomi i dessa repon) bevaras ordagrant privat i
+`evidence/ap11/local/handover-claude-20260921/owner-words-2.md`, SHA256
+`016917141002dcbc331fb270a7e13921e8928ea349bcb70678024eb4b1471eff`; de tidigare orden i
+`owner-words.md`, SHA256 `d93285666a8ecb8f3d897fda3d4bad582d430fc3c8c79eb46358aa1d21779437`.
+Avskrifterna är gjorda av operatörssessionen. Ingen exakt klocktid tillskrivs ägaren.
+
+**Tillägget:** `evidence/ap11/local/overall-acceptance-v1-amendment-a-r2.md`, SHA256
+`3341094c17309975cf95ea5e1ed140bbc669a0c7dbc0afd0ac9afa1077451767`, ändrar exakt tre
+formuleringar i den frysta helhetsacceptansen (SHA256 `21cff4b7…0217`, oförändrad och
+fortsatt kontraktets `goal.md`): G4 "or model" snävas till de två redan använda
+utförarnas pinnade kvalificerade modell; G5 "fallback" snävas till förbud mot
+automatisk växling; G5:s särredovisning av byggarbete gäller även efter aktivering och
+begränsas till syntetiska/isolerade underlag. Allt annat i G1–G10 står kvar. Revision 1
+(`d7e24f4b…`) granskades och godkändes INTE; den är bevarad som historik.
+
+**Granskning:** extern post
+`evidence/ap11/local/overall-acceptance-v1-amendment-a-r2-review.json`, SHA256
+`12e5386d0d69e4082c1cb4d6890640b0b959390b95b3fec14794af383492fb9c`, sparad ordagrant
+ur granskarens återlämning: godkänt för exakt dessa byte med åtta bindande läsningar
+(C1–C8) i sträng riktning. Granskaren är en separat kontext i operatörssessionen,
+samma modellfamilj som författaren, operatören och den utförare tillägget möjliggör:
+en separat läsning, INTE ett oberoende omdöme. Avskrifternas trohet mot vad ägaren
+skrev har granskaren inte kunnat pröva.
+
+**Verkan (C1):** tillägget har ingen verkan, och ingen modellstart i tillämpningen
+får ske, förrän en AKTIV fryst release binder tilläggets och postens hashar under
+`development.amendments` och faktiskt levererar båda intill `goal.md` och
+`authority.md` till varje modellroll inklusive helhetsgranskningen, genom separat
+granskad, skyddat integrerad kod och ett revisionsbyte som uppfyller hela G7.
+`contract.json` och dess hash ändras inte. Ägaren får tilläggets hash och en kort
+sammanfattning i nästa ordinarie redovisning.
+
+**Ersätter:** ingenting raderas; kompletterar AP11-UTFÖRARNEUTRAL.
+
+## AP11-UPPTÄCKBARHET — 2026-09-22: en levererad fil som läsaren inte kan hitta är inte levererad
+
+**Status:** genomförande av ett avgränsat ägarmandat 2026-09-22 (bevarat ordagrant och
+privat i `evidence/ap11/local/owner-decision-interactive-start-5-20260922.md`, SHA256
+`c96587725ba421f5c48cfd42b4239e6f58651ca01698bcf0346cc0144d2c7a77`). Registrerat av
+kedjedrivaren (Claude Code). Ingen exakt klocktid tillskrivs ägaren.
+
+**Utfallet som klassificeras:** AP11:s tredje interaktiva omstart (`interactive-retry-3`)
+genomfördes som verklig session under den aktiva releasen 52ee556a…-3c1c992a… och
+avslutades korrekt (verifierat processavslut, anrop 4 av 48 förbrukat) med svaret `hold`:
+drivaren uppgav att verifieringsreceptet, Runtime-läsarna och kontorskällorna saknades.
+De fanns: `VERIFICATION_RECIPE.py`, `tools/kontor_result.py`, `tools/agarbild.py` och
+`AGENTS.md` var levererade och hashbundna av värden, men ingen text läsaren såg namngav
+dem, och den begränsade Claude-profilen (Read, Write, en svarsfil) kan inte lista
+kataloger. Sessionsspåret visar de sju namngivna filerna lästa och ett femtiotal gissade
+namn. Codex-drivaren i den första omstarten hade samma arbetsyta och listade den med
+shell. Föräldern stannade kontrollerat i väntan på värddiagnos. Orsaken är värdens
+kontextleverans och dess passform mot profilen — inte ett saknat verksamhetsmandat och
+inte ett kandidatfel i A. Retry-3 bevaras som genomförd: resultat, svar, spår och
+förbrukning skrivs aldrig om. Förälderns upptäckt av sessionsslutet är visad; beredning
+och genomförande av A/B är inte visade.
+
+**Beslut (kontorets del):** de gemensamma rollinstruktionerna i
+`tools/development_policy.py` säger att `CONTEXT.json` bär den fullständiga
+filinventeringen (`delivered_files`: exakt arbetsyterelativ sökväg, SHA256, storlek),
+att verktygen inte kan lista kataloger och att inga namn får gissas, och namnger
+verifieringsreceptet, resultatläsarna, instruktionsfilen och svarsschemat. Inventering
+är en hittahjälp, inte auktoritet: betydelsen av auktoritet, mål, tillägg och observation
+kommer som förut från `sources` och `goal_amendments`, och en kodfil är evidens, aldrig
+beslut eller mandat. `hold` förblir rätt svar när underlag eller befogenhet faktiskt
+saknas; modellen instrueras inte att alltid lämna ett uppgiftsförslag. Inventeringen
+själv byggs i Runtimes enda leveranspunkt (Runtime-beslut AP11-DISCOVERABILITY i Runtime-kandidaten ef65114) och
+når därmed drivare, beredningsgranskare, diagnos och slutgranskning. Inga nya verktyg,
+shell, nät eller skrivrättigheter.
+
+**Prövat med de faktiska profilerna** (kvalificeringsförbrukning, särredovisad; syntetisk
+arbetsyta med de riktiga filnamnen och slumpmarkörer; inget A-utkast, inget facit): den
+interaktiva profilen öppnade alla tio inventerade filer och rapporterade varje markör i
+två körningar (den andra genom den enda skrivbara svarsfilen); `-p`-profilen (Read +
+strukturerat svar) rapporterade varje markör; med receptet listat men borttaget
+rapporterades sökvägen som oläsbar utan påhittad markör. Värdens egen bindning vägrar en
+saknad eller ändrad levererad fil före varje modellanrop, som förut.
+
+**Gränser:** verkligt A-utkast är fortfarande oprövat; nästa session är en verklig
+körning. Se AP11-INTERAKTIV-START-5.
+
+## AP11-INTERAKTIV-START-5 — 2026-09-22: en enda ytterligare interaktiv start, bunden
+
+**Status:** ägarbeslut 2026-09-22 (samma privata post som ovan). Framåtriktat, separat
+granskat tillägg för just detta AP11-åtagande.
+
+**Innebörd:** totalt fem interaktiva starter: de fyra förbrukade
+(`interactive-start`, `interactive-retry-1…3`) och en ytterligare (`interactive-retry-4`).
+De fyra förbrukade anropen består. Taket 48 modellprocessanrop och högst sex
+implementationsförsök per underuppgift består. Inga identiteter, journaler eller räknare
+nollställs. Den föregående sessionen avslutades korrekt men gav `hold`; återhämtningsvägen
+kräver inte att dess resultat eller svar skrivs om — tvärtom binds fortsättningen till
+SHA256 av retry-3:s verkliga `result.json` och `answer.json`, till diagnosen, till det
+rättade underlaget (Runtime- och kontorsändringarna ovan, i aktiv release) och till detta
+beslut med dess separata granskningspost (Runtime-config `development.interactive_extension`).
+Ett annat beslut passar inte bindningen. Det är inte en generell återförsöksrätt: ingen
+femte start finns; stannar även nästa tillämpning bevaras det faktiska utfallet och
+ingen ytterligare plats eller höjd budget följer automatiskt.
+
+**Ordning:** rättning → separat granskning → skyddad integration i båda repona →
+kontrollerat revisionsbyte (ägarens aktivering) → den enda nya platsen genom den
+granskade återhämtningsvägen (explicit paus, diagnos, resume, verklig session) → därefter
+ska föräldern själv fortsätta: A bereds och levereras, B bereds från A:s verkliga
+integration; ingen manuell teknisk instruktion fyller G2-övergången. Helhetsgranskningen
+ser även de tidigare misslyckandena och detta tillägg. **Ersätter:** ingenting raderas;
+kompletterar AP11-UTFÖRARNEUTRAL-2. Planen äger ordningen.
+
+## AP11-KOMPLETTERING-20260923 — ägarbeslut efter helhetsgranskningens inconclusive
+
+Helhetsgranskningen (anrop 25, `claude-opus-5`, 218,9 s) lämnade **inconclusive** med tio blockerande
+fynd. Grinden pausade scopet och föräldern returnerade `whole_goal_not_approved`. AP-11 är **inte**
+slutgodkänt; A:s och B:s giltiga leveranser tillgodoräknas ändå, och ett otillräckligt helhetsbevis är
+inte automatiskt ett kandidatfel i de levererade delarna. Inget retroaktivt PASS.
+
+Ägaren beslutar (2026-09-23):
+
+1. **Två fyndomgångar hålls åtskilda.** Övergång 7:s tio fynd är inte slutgranskarens tio. De verifierade
+   rättningarna tillgodoräknas, inklusive skyddet av `qualification/` över stoppet, skillnaden mellan
+   kontrollerad vägran före stopp och fullständig efterkontroll, och att kontorsreleasen omfattar A:s och
+   B:s fyra levererade filer. Retentionsluckan var uttryckligen kvarstående. Stängda fynd återöppnas inte
+   utan nya belägg. Varje av slutgranskarens tio fynd binds till exakt krav, faktiskt levererat underlag,
+   vad som saknas och avgränsad åtgärd, i befintlig fyndliggare.
+
+2. **Hela bevisleveransen rättas.** Historiken ska levereras så att granskarens verkliga begränsade
+   läsverktyg kan öppna och navigera den; radbrytningar ensamma är inte acceptansprovet. Provet ska ske med
+   samma läsverktyg och profil: ingång → index → namngiven del → händelser och tidsintervall, inklusive
+   långa rader och verktygets returbegränsningar. Levererad täckning skiljs från faktisk läsbarhet; original
+   bevaras och läskopior binds till dem med egna identiteter. Saknade underlag tillförs: recept och läsare,
+   konfiguration och beslut, utlösnings- och sessionsbundna operatörsposter, frysta uppgifter och deras
+   beredningsgranskningar — inklusive sökvägsrättelsen `tests/` mot `tools/`. Inga credentials, orelaterade
+   värdinställningar eller privata värdsökvägar i modellens arbetsyta.
+
+3. **Arkivläsningsväg godkänd** för AP-11:s namngivna, redan bevarade historiker, som del av denna rättning.
+   Ingen generell arkivplattform och ingen ändrad retention. Levande och arkiverad historik hålls isär;
+   workflow-id, run-id, hash, ordning och täckning verifieras. En historik tagen före avslut får inte
+   presenteras som fullständig sluthistorik. Arkiv belägger historiska händelser, aldrig aktuell observation
+   av scope, budget, tjänst eller AP-10. Verklig inläsning och ett negativt fall ska prövas.
+
+4. **G6: ett verkligt mottagarövertagande godkänns** inom återstående AP-11 — färsk behörig mottagare som
+   faktiskt fortsätter kvarvarande arbete ur bevarat läge. Kvotpauser och utförarbyten får inte ersätta det
+   tillägg A-r2 §6 uttryckligen utesluter. Enbart återläsning eller sammanfattning räcker inte, och ingen
+   konstgjord ombyggnad av A/B får skapas för att få något att lämna över. Kräver G6 ett annat slags arbete
+   än vad som kan visas, ska den exakta skillnaden redovisas före provet.
+
+5. **G7/G8: kraven prövas, budgeten förbrukas inte för synens skull.** Inga 23 extra modellanrop eller fem
+   extra implementationer bara för att tömma budgeten; taken 48/6 höjs inte. G8:s spärrar ligger före
+   modellstart och prövas i isolerad provmiljö med samma gränser och de riktiga reservations- och
+   startkontrollerna — både tillåtelse strax under gränsen och avslag vid överskridande, av rätt skäl.
+   Provjournaler är syntetiska och åtskilda från verkligt scope. Kräver den frysta acceptansen ett levande
+   förbrukningsprov lämnas enbart tolkningsfrågan till ägaren. För G7 bedöms det tidigare kapacitetsprovets
+   räckvidd mot exakt kriterium; ålder eller etikett gör det inte automatiskt irrelevant.
+
+6. **Vägen till ny slutbedömning ska kontrolleras i motorn**, inte i returtexten. Tidigare `continue`-väg för
+   `waiting_host_diagnosis` antas inte gälla. Saknas en stödd återbedömningsväg ska det redovisas före något
+   återställningsingrepp. Ingen reset och ingen ny köridentitet för att sudda ut avslaget eller budgeten.
+
+7. **Kompletteringen samlas** före nästa nödvändiga revisionsbyte; ingen aktivering per saknat fält. Det
+   exakta paketet ska ha prövats med den verkliga läsvägen innan ny helhetsgranskning. Byggarbete och
+   tillämpningens anrop bokförs enligt befintlig ordning; verkligt AP-11-arbete flyttas inte utanför de 48.
+
+MÄTT SAMMA DAG: föräldern `office-ap11` har **COMPLETED** 05:25:49Z med `whole_goal_not_approved`.
+Slutgranskningen nås endast som sista steg i `run()`, som inte har någon återgång; starten använder
+`REJECT_DUPLICATE` på fast id; kontrollkommandot saknar omprövningsåtgärd. **Ingen stödd återbedömningsväg
+finns i aktiv release** — det redovisas till ägaren före varje ingrepp, enligt punkt 6.
+
+## AP11-ANDRA-BEDOMNING-20260923 — ägaren godkänner en andra helhetsbedömning
+
+Den tekniskt avslutade föräldrakörningen och den icke godkända första domen **förbjuder inte** en ny
+bedömning av det fortfarande ej slutgodkända åtagandet. Beslutet är inget godkännande av leveransen,
+ingen sänkning av G1–G10 och inget nytt verksamhetsmål. Domen `inconclusive` och samtliga tio fynd
+förblir oförändrad historik; inget retroaktivt PASS.
+
+Godkänt: att bygga, pröva, separat granska och skyddat integrera den **minsta** stödda
+återbedömningsvägen i de två befintliga repona, genom återanvändning av befintlig slutgransknings- och
+avslutsmekanism. Ingen generell omprövningsplattform.
+
+Bindande villkor:
+- Den gamla `office-ap11`-körningen lämnas COMPLETED med sitt verkliga `whole_goal_not_approved`. Ingen
+  reset, ingen omsättning till positivt resultat, ingen radering av historik.
+- En ny teknisk bedömningskörning med **egen identitet** tillåts, bunden till samma åtagande, tidigare
+  körning, tidigare dom och de kompletterade bevisen. Det är en ny bedömningsomgång, inte en omstart av
+  A→B-bygget.
+- Skyddet mot dubbla starter behålls. `REJECT_DUPLICATE` tas inte bort generellt och redan levererade
+  arbetsdelar får inte köras om.
+- **Samma ram 48/6.** Alla fortsatta tillämpningsanrop, inklusive den nya helhetsgranskningen, räknas mot
+  den befintliga budgeten. Ny köridentitet ger ingen ny budget och inga återbetalda anrop. Senast
+  rapporterat 25/48; aktuellt läge läses före ändring.
+- Vägen får efter granskade förkontroller återuppta **endast** återstående komplettering och bedömning.
+  Den får inte starta A eller B på nytt, återpublicera dem eller ändra deras frysta underlag.
+- Tidigare modeller, försök, ingripanden och domar behåller sina verkliga identiteter. Inga nya
+  interaktiva platser eller betalningsvägar.
+- Den nya granskaren får ursprunglig acceptans med tillägg, hela första domen, fyndens disposition och
+  de konkreta kompletteringarna, var och en spårbar till sitt fynd och krav. Giltiga tidigare belägg
+  tillgodoräknas; tidigare bevisluckor får inte döljas av en ny sammanfattning.
+- Godkänt, underkänt och otillräckligt underlag förblir möjliga utfall. Medgivandet gäller **denna**
+  andra bedömning och beställer ingen loop tills någon godkänner.
+- Vid godkännande avslutas samma åtagande genom den granskade avslutsvägen; slutkvittot visar tydligt
+  den senare godkända bedömningen och sambandet till den första negativa. Vid ny icke godkänd dom
+  bevaras den och de konkreta luckorna, utan automatisk upprepning med samma underlag.
+
+MÄTT SAMMA DAG, och det formar arkivvägen: alla tre körningarna är nu stängda och säkrade i
+`closed-histories-preserved-20260923T055116Z` (föräldern 1 980 händelser, barnen 53 och 23), tagna medan
+var och en fortfarande låg i motorn. Föräldern visade sig vara en **återställd** körning: dess
+`firstExecutionRunId` är `01a0c40b`, som motorn redan rensat, medan den bevarade körningen är `902d57a1`.
+En Temporal-historik innehåller inte sitt eget run-id, bara kedjans ursprung — den befintliga
+arkividentitetsregeln passerade för barnen enbart för att de aldrig återställts, och hade underkänt ett
+fullt giltigt föräldraarkiv. Regeln som gäller framåt är bokförd i
+`.runtime/ap11/claude-path/archive-read-20260923/identity-measurement.json`: workflow-id och kedjeursprung
+läses inifrån bytena, run-id vid fångsten bokförs mot den levande motorn, innehållshash binder bytena och
+en terminal slutändelse binder täckningen. Oeniga arkiv ger aldrig PASS, och arkiv är aldrig en aktuell
+driftobservation.
+
+## AP11-ROLLGRANS-FINAL-REVIEW-20260923 — ägarbeslut om leveransgräns för slutgranskningsrollen
+
+Ägaren godkänner uttryckligen att rollen `final-review` får en total leveransgräns på **3 MiB
+(3 145 728 byte)** för AP-11:s redan accepterade andra helhetsbedömning. Övriga roller behåller
+**2 MiB (2 097 152 byte)**. Per-filgränsen ändras inte.
+
+Skäl, uppmätt: det nödvändiga slutgranskningsunderlaget väger **2 111 037 byte**, alltså 13 885 byte över
+det gamla pakettaket. Nödvändiga bevis ska inte avkortas eller utelämnas för att passa en gräns som sattes
+innan det verkliga helmålsunderlaget var känt.
+
+Villkor:
+- Gränsen avgörs av **värdens rollval**. Modellen eller bevispaketets innehåll får aldrig kunna välja en
+  större ram.
+- Ingen automatisk vidare höjning. Kan nödvändigt material ändå inte levereras blir det en uttrycklig lucka
+  eller en vägran — aldrig tyst avkortning eller falsk fullständighetsmarkering.
+- Ändringen gäller **bevisleveransens bytebudget**. Den höjer inte modellprocessramen 48,
+  implementationsgränsen 6, anropstidsgränser, verktygsrättigheter eller betalningsutrymme, och byteantalet
+  är ingen kostnadsgaranti.
+- Tystnad eller utebliven invändning räknas inte som godkännande av ytterligare spärrändringar.
+
+Bevarat: råhistorik och tidigare paket är oförändrade. Originaldelarnas byteidentitet och läskopiornas
+härledning redovisas var för sig; varje läskopia är bunden till rätt arbetsflöde, körning, händelse och
+original och är uttryckligen en **härledd läskopia med egen identitet**, inte ett påstått byteidentiskt
+original och ingen ny källa till befogenhet. `complete` beskriver redovisad täckning — inte läsbarhet,
+korrekt tolkning eller tillräckligt stöd för G1–G10. Första slutgranskningens `inconclusive` och samtliga
+tio fynd står oförändrade; att paketet nu går att läsa stänger inte de krav som saknade demonstration.
+
+## AP11-TREDJE-BEDOMNING-20260923 — ägarbeslut efter den andra helhetsbedömningens inconclusive
+
+**Status:** registrerat 2026-09-23 av kedjedrivaren (Claude Code). Ägarens ord bevaras ordagrant privat i
+`evidence/ap11/local/owner-words-20260923.md` (avsnitt 1, textens SHA256
+`c107fd38383ecc34b892a681fedc56eb56eed29e491bc490d8be3fbd0b2d8dd0`, mottaget 2026-09-23T17:00:51Z).
+
+Den andra helhetsbedömningen (`office-ap11-assessment-2`, anrop 26, `claude-opus-5`, 268 s) gav
+**inconclusive** med sex blockerande fynd; scopet pausades av grinden. Ägaren valde att komplettera
+samma AP-11 och förbereda en tredje, separat helhetsbedömning. Beslutet är inget godkännande, ingen
+acceptanslättnad och ingen automatisk loop. Båda domarna, alla fynd och ingripanden bevaras. Den andra
+granskningens stöd för G1, G2, G5 och G9 och dess icke-blockerande disposition av G7 tillgodoräknas inom
+respektive räckvidd; den tredje granskningen avgör ändå hela slutacceptansen. Leveransluckorna (G8-provens
+körresultat, C1-beslutsposten ur dess exakta källa, läsbar scopejournal) stängs som en sammanhängande
+ändring och prövas med granskarens verkliga läsverktyg. G6/R3-provformen fastställs mot originaltexterna
+före genomförandet; terminalt stopp, återkallelse eller uttömning prövas inte på det verkliga huvudscopet
+så att det inte kan återöppnas. 48/6 består.
+
+**Ersätter:** ingenting raderas. Beslutets krav på separat ägaraccept för ordningen mellan tekniska
+delsteg ersätts av AP11-DELEGERING-20260923 nedan; dess sakkrav står kvar.
+
+## AP11-DELEGERING-20260923 — ägaren delegerar teknisk ledning av AP-11 till verifierat avslut
+
+**Status:** registrerat 2026-09-23 av kedjedrivaren (Claude Code). Ägarens ord bevaras ordagrant privat i
+`evidence/ap11/local/owner-words-20260923.md` (avsnitt 2, textens SHA256
+`9062647350c69d98cadf22460969ddd05b0855e2bc232563fc165a0f112f7d6c`, mottaget 2026-09-23T17:40:24Z;
+filens SHA256 `e908c6e41a34f032fe960972c9b846a4ccb64151e82a5665e76b561aa4540c16`).
+
+**Delegerat:** den tekniska ledningen och färdigställandet av AP-11 inom Nortropic/nortropic-runtime och
+Nortropic/nortropic-projektkontor: diagnos, metodval, rättning av kod och underlag, prov, separata
+granskare, fyndhantering, publicering genom skyddad integration och förberedelse och genomförande av
+tillåtna, granskade driftövergångar. Mandatet ersätter tidigare krav på rutinmässiga körbesked och
+separat ägaraccept för varje tekniskt delsteg eller ny bedömningsomgång inom samma mål.
+
+**Ytterligare helhetsbedömningar:** nödvändiga ytterligare bedömningar av samma AP-11 efter konkreta
+kompletteringar ingår. Var och en binds till detta mandat, rätt föregångare, bevisversion och den
+gemensamma förbrukningen genom den granskade vägen. En ny bedömningsidentitet ger ingen rätt att börja om
+A/B, återställa budget eller försöka med oförändrat underlag tills en granskare råkar godkänna.
+
+**Oförändrat:** slutkraven G1–G10 med tillägg A-r2, resursramarna 48/6 (läses ur journalen; inget
+nollställs, ny köridentitet ger ingen ny budget), sekretessen, verktygens behörighetsregler och hanterad
+policy. Inga nya kostnader eller utökade behörigheter. Terminala tillstånd respekteras; inget stopp- eller
+återkallelseprov får förstöra möjligheten att slutföra huvudåtagandet. AP-10 ligger kvar inom sitt
+separata mandat. Ägaren kontaktas endast vid verklig konflikt om verksamhetsmål, acceptans, resursram,
+kostnad, behörighet eller driftrisk, eller när ett verktyg kräver ägarens personliga handling.
+
+**Slutmål:** AP-11 är färdigt när slutacceptansen är belagd, en behörig separat helhetsbedömning godkänner
+det och det ändliga åtagandet avslutas och återläses korrekt. Äldre Bootstrap-, Kernel- och
+researchplaner är ingen instruktion att återstarta de projekten. Ingen ny generell projektmotor eller
+granskningsplattform byggs.
+
+**Ersätter:** ingenting raderas; kompletterar AP11-ACCEPT, AP11-KOMPLETTERING-20260923,
+AP11-ANDRA-BEDOMNING-20260923 och AP11-TREDJE-BEDOMNING-20260923.
+
+## AP11-AVSLUT-20260924 — AP-11 godkänt av en separat helhetsbedömning och avslutat
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code) under AP11-DELEGERING-20260923. Slutmålet i
+den delegeringen är uppfyllt: slutacceptansen är belagd, en separat helhetsbedömning godkände den och det ändliga
+åtagandet avslutades och återlästes.
+
+**Godkännandet:** `office-ap11-assessment-6`, dess enda räknade granskning, anrop 31
+(`office-ap11-assessment-6-step-2`, resultatets SHA256 `d63221afc0ab1c3008911b49e48af684d64ca6c636bf188d9f31e5eccc756a77`), svarade
+`approved` utan blockerande fynd 2026-09-23T22:59Z. Granskaren var en färsk session utan del i det granskade
+arbetet och varken det avbrutna eller det fortsatta anropet. Den bedömde uttryckligen att G6-demonstrationen i
+`office-ap11-assessment-5` håller: anrop 29 avbröts mitt i arbetet av en enda verifierad SIGTERM, väktaren tog
+själv bort leverantörsgruppen och skrev sitt ofullständiga resultat, körningen parkerades, en fortsättning
+vägrades medan scopet var pausat, och efter återupptagning och värdsvar utförde en färsk räknad session
+(anrop 30) den återstående granskningen ur bevarat läge.
+
+**Avslutet:** Runtimes `close()` satte scopet till `stopped` (journalrad 144, "Independent whole-goal review
+approved; AP11 finite application closed") och skrev `final.json` (SHA256 `925d566df223bce280e23e5b6dbeea7bac71bdf4189f78f2cec02dc89a960926`),
+release runtime `2def3667` / kontor `df5ed5dc`, konfiguration `d4f2e63e`. Återläst 2026-09-23T23:00Z: körningen
+`completed`, `whole_goal_complete: true`, ingen AP11-modellprocess kvar. **31 av 48** modellprocesser förbrukade,
+implementationsförsök 1 av 6 för vardera arbetsdel. AP-10 orört: schemat opausat, nästa körning 07:00Z,
+bundet till den aktiva releasen.
+
+**Vägen dit, i korthet:** sex helhetsbedömningar. De fem första var inconclusive och står kvar oförändrade. Två
+Runtime-fel hittades och rättades på vägen, båda separat granskade och publicerade genom skyddad integration:
+väktarens avbrottshantering svalde signalen (D026, PR 49) och slutgranskningens leveransgräns räckte inte till
+hela underlaget (D027, PR 50; höjd till 4 MiB under ägarens ord 2026-09-24, bevarade ordagrant privat i
+`evidence/ap11/local/owner-words-20260924.md`, textens SHA256
+`52dba1f501e5cf6c867e3967073eeb6767ea3d7ef4ed406a801be84837682b4d`).
+
+**Begränsningar som godkännandet gavs under:** G6:s terminala klausuler (stopp, återkallelse, uttömning) är
+belagda i isolerade prov, inte på det verkliga scopet, enligt ägarbeslutet 2026-09-23. Varje roll och varje
+granskning i kedjan är Claude-utföraren, samma modellfamilj som författaren: separata läsningar, inte oberoende
+omdömen. Operatörssessionen utförde de dokumenterade värdåtgärderna själv; varje är redovisad.
+
+**Ersätter:** ingenting raderas. Avslutar AP-11 enligt AP11-ACCEPT och AP11-DELEGERING-20260923.
+
+## MODELLVAL-FORTSÄTTNING-20260924 — efter AP-11: det accepterade återanvändbara modellvalet för Claude Code och Codex
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code). Ägarbeslutet fattades 2026-09-22 och bokfördes
+i planen samma dag: *slutför AP-11 först med minsta nödvändiga modellbyte; gör därefter ett återanvändbart modellval
+för både Claude och Codex.* Runtime återger samma beslut i sin post D022. Ägaren bekräftade 2026-09-24, efter
+AP-11:s avslut, att den accepterade modellvalsförbättringen för Claude Code och Codex följer och att redan byggda
+delar tillgodoräknas och inte börjas om. Orden bevaras ordagrant privat i
+`evidence/ap11/local/owner-words-20260924-2.md` (textens SHA256
+`84c3e4cf8c99417e6d2bab00d50397dee58ca30e6e07df0c0ee7081a782b8c2e`).
+
+**Innehåll**, så som det bokfördes 2026-09-22 (planens "steg 3"): modellvalet görs till en normal funktion för båda
+utförarna - en enkel befintlig ingång utan källkodsredigering, Codex-startkedjan kopplad till valet, och en konkret
+modellvalsfråga när vald modell saknar kapacitet. Ingen automatisk växling. Arbetet redovisas skilt från AP-11.
+
+**Tillgodoräknat, redan byggt och integrerat, börjas inte om:**
+- Runtime D022 (PR 41, `bbd4d237`): modellvalet är en uttrycklig del av den frysta releasekonfigurationen,
+  `development.models.{claude,codex}`, löst av `models(config)` som speglar utförarvalet och vägrar i stället för att
+  falla tillbaka; identitetskontrollen jämför leverantörens rapporterade modell med den valda; körposten anger både
+  startad och rapporterad modell; den interaktiva vägen kontrolleras mot valet; ett Codex-val som inte kan nå Codex
+  startkedja vägras i stället för att tyst inte köras.
+- Kvalificeringen av `claude-opus-5` på den verkliga icke-interaktiva vägen i läsande och skrivande profil.
+- Runtime D023: Runtimes egen kopia av den kvalificerade Claude-CLI:n, så att en uppdatering av ägarens globala CLI
+  inte bryter kvalificeringen.
+- Uppmätt: kapaciteten är modellspecifik. Bortfall av kvot eller åtkomst pausar i dag utan att byta utförare.
+
+**Kvar, i steg 3:** (1) en enkel befintlig ingång för att byta modell utan källkodsredigering - i dag kräver ett byte
+en egen härledd och granskad releaseövergång; (2) Codex-startkedjan kopplad till valet - i dag anger
+`worker_command()` sin egen modell (`gpt-6-astra`, `high`); (3) en konkret modellvalsfråga till ägaren när vald modell
+saknar kapacitet, utan automatisk växling.
+
+**Öppna poster, inte del av steg 3 om inte ägaren beslutar det:** `--effort` är pinnad till medium och ingår inte i
+valet; valet binds vid aktivering, inte vid uppgiftsfrysning; ingen tillåtlista över kvalificerade modeller finns.
+
+**Gränser:** inga nya abonnemang, modeller, kostnader eller behörigheter; separat granskning och skyddad integration;
+varje driftändring genom kontrollerad, granskad övergång; AP-10 inom sitt mandat; AP-11 återöppnas inte.
+
+**Ersätter:** ingenting raderas. Fortsättning efter AP11-AVSLUT-20260924.
