@@ -1,3 +1,33 @@
+# Levande plan — AP-11 AVSLUTAT. Nästa: det accepterade modellvalet för Claude Code och Codex (steg 3)
+
+AKTUELLT 2026-09-24. Det ändliga åtagandet AP-11 är **godkänt och avslutat**. `office-ap11-assessment-6`, dess enda
+räknade granskning (anrop 31, resultatets SHA256 `d63221afc0ab1c3008911b49e48af684d64ca6c636bf188d9f31e5eccc756a77`), godkände hela slutacceptansen G1-G10 utan
+blockerande fynd 2026-09-23T22:59Z; Runtime satte scopet `stopped` och skrev `final.json` (SHA256
+`925d566df223bce280e23e5b6dbeea7bac71bdf4189f78f2cec02dc89a960926`). 31 av 48 anrop, implementationsförsök 1 av 6 per arbetsdel. Aktiv release runtime `2def3667`,
+kontor `df5ed5dc`, konfiguration `d4f2e63e`. AP-10 fortsätter inom sitt mandat, dagligen 07:00Z.
+
+AP-11 i korthet: A och B integrerades som PR 28 och 29; sex helhetsbedömningar, de fem första inconclusive och bevarade;
+G6-demonstrationen bars av den femte och prövades av den sjätte; två fel i Runtime hittades live och rättades (D026 och
+D027). Hela beslutskedjan står i beslutsloggen under AP11-BEREDNING till AP11-AVSLUT-20260924; värdens eget
+stängningskvitto ligger i Runtime under `.runtime/ap11/claude-path/sixth-assessment-20260924/CLOSURE-READBACK.json`.
+
+NÄSTA: det accepterade återanvändbara modellvalet för Claude Code och Codex, planens steg 3 från 2026-09-22 (se
+MODELLVAL-FORTSÄTTNING-20260924). Tillgodoräknat och inte att börja om: modellvalet i den frysta releasekonfigurationen
+med vägran i stället för reserv (D022), identitetskontrollen mot valt modellnamn, kvalificeringen av `claude-opus-5`
+och Runtimes egen CLI-kopia (D023). Kvar, i denna ordning:
+ 1. Codex-startkedjan kopplad till valet (`worker_command()` anger i dag `gpt-6-astra`/`high` själv).
+ 2. En enkel befintlig ingång för modellbyte utan källkodsredigering (i dag en egen härledd releaseövergång).
+ 3. En konkret modellvalsfråga till ägaren när vald modell saknar kapacitet - ingen automatisk växling.
+Varje del som Runtime-ändring med separat granskning och skyddad integration; varje driftbyte genom kontrollerad,
+granskad övergång. Redovisas skilt från AP-11. AP-11 återöppnas inte.
+
+Office-sviten är grön igen på main efter PR 30: ett fall i resultatavstämningens prov kunde aldrig falla som det var
+skrivet (versaler av en fixtur med bara siffror) och ersattes med ett verkligt versalvärde. Ingen kod under prov ändrades.
+
+ÅTERUPPTAGNINGSPUNKT: denna post och MODELLVAL-FORTSÄTTNING-20260924. Ingen lokal gren behöver kännas till.
+
+---
+
 # Levande plan — AP10 levererad; endast namngiven dygnsdrift fortsätter
 
 2026-09-21. AP10:s fem delmål är verifierade inom [slutredovisningens](../evidence/ap10/leverans.md)

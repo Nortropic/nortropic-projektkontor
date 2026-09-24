@@ -1,3 +1,60 @@
+# GÄLLANDE: det accepterade modellvalet för Claude Code och Codex (efter AP-11)
+
+AP-11 är avslutat 2026-09-23 (se AP11-AVSLUT-20260924). Gällande uppdrag är fortsättningen som ägaren beslutade
+2026-09-22 och bekräftade 2026-09-24: ett återanvändbart modellval för både Claude och Codex, i befintliga
+Office/Runtime, med separat granskning och skyddad integration. Det som redan är byggt tillgodoräknas och börjas inte
+om; kvar är en enkel ingång utan källkodsredigering, Codex-startkedjan kopplad till valet och en konkret
+modellvalsfråga när vald modell saknar kapacitet. Ingen automatisk växling, inga nya abonnemang, modeller, kostnader
+eller behörigheter. Se MODELLVAL-FORTSÄTTNING-20260924 i beslutsloggen. Planen äger aktuellt steg.
+
+---
+
+# AP11 — avslutat 2026-09-23; avsnitten nedan är historik
+
+# AP11 — ägarbesked 2026-09-21: utförarneutralt genomförande
+
+Ägaren har uttryckligt preciserat AP11-ACCEPT: arbetsmodellen ska inte spela
+roll; både Claude och Codex ska kunna driva allt. Se AP11-UTFÖRARNEUTRAL i
+beslutsloggen; ordalydelsen är privat bevarad. Nödvändig Runtime-koppling
+omfattar därför kvalificerad utförare/granskare för båda befintliga abonnemang.
+Ingen automatisk växling vid kvotbrist, inga nya kostnader/modeller/tjänster,
+oförändrade tak 48/6 och oförändrad övrig acceptans. Planen äger aktuellt steg.
+Uppdraget nedan gäller i övrigt oförändrat.
+
+---
+
+# AP11 — accepterat ändligt utvecklingsåtagande
+
+AP11-ACCEPT ger mandat till femdelade paketet och ägarens preciseringar i
+privata accepted-mandate.md; acceptance-start.json binder identiteten.
+Genomför i befintliga Office/Runtime, separat granskning och skyddad integration,
+kontrollerat revisionsbyte med bevarad AP10-drift. Inga nya abonnemang/modeller/
+tjänster/repon/uppgraderingar/valvskrivningar. Planen äger aktuellt steg.
+
+48 modellprocessanrop för den självständiga tillämpningen, högst sex försök per
+logiskt underarbete tvärs namnbyten; byggets resursmått separat. Övergripande
+mål/acceptans/behörigheter får inte ändras av drivare/kandidat. Genererad
+acceptanskod är förslag, inte betrodd värdkod. Verklig beredning/start efter
+interaktivt sessionsslut krävs; manuella ingripanden räknas inte som autonomi.
+Vid avslut stoppas AP11-åtagandet och AP10 fortsätter. Aquarium en möjlig nästa
+fas i planen, inte ett extra delprojekt. Tidigare leveranser/auditstatus bevaras.
+
+---
+
+# AP11 — endast beredning av nästa sammanhängande verksamhetsbygge
+
+Aktuellt nytt mandat är AP11-BEREDNING, ägarens ord privat i
+`evidence/ap11/local/order.md`. Bered ett samlat byggbeslut med befintliga
+verktyg, källunderlag och plan. Ingen ny implementation, publicering eller
+Runtime-/driftändring är tillåten genom detta mandat. Planen äger nästa handling.
+
+AP10 är tillgodoräknad som levererad. Endast det accepterade namngivna Python-/
+Temporalåtagandet har fortsatt driftmandat enligt fryst konfiguration. Det
+ändras inte under beredningen. Tidigare genomförandemandat nedan är historik
+utöver just denna uttryckliga fortsatta drift; de utvidgas inte till AP11.
+
+---
+
 # AP10 — accepterat genomförande och avgränsad fortsatt drift
 
 Gällande mandat AP10-ACCEPT: fem beroende delmål i det redan beredda paketet,
