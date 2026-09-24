@@ -1,19 +1,19 @@
-# Levande plan — A: AP-10-rättningen väntar på ägarens aktivering. B: Aquarium v0:s byggbeslut väntar på ägarens accept
+# Levande plan — A levererad och aktiv. B: Aquarium v0:s byggbeslut väntar på ägarens accept. Nästa: underhållsärendet
 
-AKTUELLT 2026-09-24, efter ägarbeslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924. AP-11 och modellvalet är avslutade
-och återöppnas inte (historik nedan). Drift nu: aktiv konfiguration `145edd45` (runtime `221df157`, kontoret
+AKTUELLT 2026-09-24 13:40Z, efter ägarbeslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924. AP-11 och modellvalet är
+avslutade och återöppnas inte (historik nedan). Drift nu: aktiv konfiguration `e756fe5b` (runtime `c1cdaf5d`, kontoret
 `df5ed5dc`), AP-10:s schema bundet till den och opausat, nästa ordinarie körning 2026-09-25 07:00Z, inget arbete i
 motorn.
 
-A. RIKTAD AP-10-RÄTTNING - integrerad, väntar på ägarens aktivering. Det privata steget registrerar nu en
+A. RIKTAD AP-10-RÄTTNING - levererad och aktiv. Det privata steget registrerar nu en
 avslutningssignal och avslutar anropet inom den befintliga stoppmodellen, i stället för att gå vidare till sin
 tidsgräns (Runtime D031, PR 58): prövat med riktig process och riktig signal genom den berörda vägen, separat granskat
 och skyddat integrerat. Stoppförmågan före rättningen räckte för nästa ordinarie omgång, eftersom aktivitetens egen
 städning stängde hela processgruppen inom omkring åtta sekunder utan kvarlämnade processer; ingen paus behövdes.
-Övergång 15 är stegad, kontrollerad och separat granskad: konfiguration `e756fe5b` ersätter `145edd45`, runtime
-`c1cdaf5d`, kontoret oförändrat `df5ed5dc`, och bara `runtime/private_stage.py` och dess prov ändras. NÄSTA: ägaren kör
-övergångens `check` och `activate` (kommandot står i det samlade beskedet), därefter återläsning och planernas
-uppdatering. Inget publiceras till Runtime-main före aktiveringen.
+Ägaren aktiverade övergång 15 2026-09-24T13:39Z: konfiguration `e756fe5b` ersätter `145edd45`, runtime `c1cdaf5d`,
+kontoret oförändrat `df5ed5dc`, och bara `runtime/private_stage.py` och dess prov ändrades. Återläst 13:40Z: tjänsten
+igång med rätt identiteter, AP-10:s schema ombundet och i övrigt oförändrat, AP-10:s kommando oförändrat, AP-11 orört.
+Runtime-planens ingång bär detaljerna.
 
 Iakttagelse, inte beställd åtgärd: bevakningens omgångar sedan 2026-09-22 slutar korrekt som otillräckliga, eftersom
 leverantören inte tar emot analysens anrop (kapacitet); senast granskade besked är från 2026-09-21. Ingen
@@ -25,10 +25,10 @@ B. AQUARIUM V0 - byggbeslutet är berett och väntar på ägarens accept:
 privat bilaga om dagens verkliga läge (`evidence/aquarium/local/`). Se AQUARIUM-V0-BEREDNING-20260924. Ingen
 implementation, installation, publicering av vyn eller nytt repo före accepten.
 
-UNDERHÅLL, namngivet ärende (UNDERHALL-INGANGAR-20260924): kontorets och Runtimes ingångar ska följa main, och inget
-arbete ska ligga bara lokalt. Görs efter nästa samlade besked om A och B, utan konkurrerande skrivare: först läsande
-mätning, sedan avgränsad åtgärd, sedan protokoll i båda repos ingångar. Runtimes primärutcheckning rörs inte, och inget
-publiceras till Runtime-main, förrän övergång 15 är aktiverad och återläst. Blockerar varken A eller B.
+UNDERHÅLL, namngivet ärende (UNDERHALL-INGANGAR-20260924) - NÄSTA: kontorets och Runtimes ingångar ska följa main, och
+inget arbete ska ligga bara lokalt. Det samlade beskedet om A och B är lämnat och övergång 15 är aktiverad och återläst,
+så ärendet börjar nu, utan konkurrerande skrivare: först läsande mätning, sedan avgränsad åtgärd, sedan protokoll i
+båda repos ingångar. Blockerar inte B.
 
 VILANDE POSTER, inga åtgärder nu. `office-watch-policy-1` och `office-assignment-cli-1` (DevelopmentTask, vilande sedan
 2026-09-20/21) återupptas inte. Före en eventuell fortsättning ska prövas: verkligt behov i dag, gällande mandat,
