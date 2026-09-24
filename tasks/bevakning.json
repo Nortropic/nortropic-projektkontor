@@ -1,0 +1,24 @@
+{
+  "id": "office-watch-policy-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "f9c41f6e7de6b8a445908b7cdd266ef72189d977",
+  "runtime_revision": "22aedb0781e30593cca5ea1778f23949bbc4b2ee",
+  "allowed_paths": [
+    "tools/bevakning.py",
+    "tools/test_bevakning.py",
+    "tools/BEVAKNING.md",
+    "tools/bevakningsunderlag.py",
+    "tools/test_bevakningsunderlag.py"
+  ],
+  "attempt_seconds": 1200,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md and implement the bounded Office private assessment policy, the exact named intake-file extension and dated Python-index label repair. Use synthetic fixtures only and .scratch for tests. No real network/private input, commands for host operations, activation or publication. Runtime owns frozen acceptance, independent review and protected integration."
+    }
+  ],
+  "brief": "tasks/bevakning.md",
+  "acceptance": "acceptance/bevakning.py",
+  "acceptance_sha256": "d51cba5036fcc47b317a621653714cc9d6d780b10a20bc93bec039d6ad87a098"
+}

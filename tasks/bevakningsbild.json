@@ -1,0 +1,22 @@
+{
+  "id": "office-watch-picture-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "78f765d94a6b1e769004aa5d2773b3b525a3ee11",
+  "runtime_revision": "ac62629983805015e8c0c040098c2d5287dbc41e",
+  "allowed_paths": [
+    "tools/bevakningsbild.py",
+    "tools/test_bevakningsbild.py",
+    "tools/BEVAKNINGSBILD.md"
+  ],
+  "attempt_seconds": 1200,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md and implement only the dated read-only AP08 watch projection, reusing agarbild. Use synthetic fixtures and .scratch only. No real native query, private sources, network, model calls, operational controls or publication. Runtime owns frozen acceptance, independent review and protected integration."
+    }
+  ],
+  "brief": "tasks/bevakningsbild.md",
+  "acceptance": "acceptance/bevakningsbild.py",
+  "acceptance_sha256": "85ce30e602dd7978b52ca9930fe695bd87876dca9d308ad6bd4eae68ada613b6"
+}

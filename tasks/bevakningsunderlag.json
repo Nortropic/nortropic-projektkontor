@@ -1,0 +1,22 @@
+{
+  "id": "office-watch-intake-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "10875f8f731a056ab9c50ccf614ef3a4d0d5555b",
+  "runtime_revision": "22aedb0781e30593cca5ea1778f23949bbc4b2ee",
+  "allowed_paths": [
+    "tools/bevakningsunderlag.py",
+    "tools/test_bevakningsunderlag.py",
+    "tools/BEVAKNINGSUNDERLAG.md"
+  ],
+  "attempt_seconds": 1200,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md. Implement the bounded official intake and local observations exactly, with synthetic tests. No actual network/private reads in this build. Use .scratch for fixtures. Host owns independent acceptance, review and protected integration."
+    }
+  ],
+  "brief": "tasks/bevakningsunderlag.md",
+  "acceptance": "acceptance/bevakningsunderlag.py",
+  "acceptance_sha256": "9afab4f35852dfcb9eedac077706aca43fcfe9bdac7a0f1418462958b6d3b0a4"
+}

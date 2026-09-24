@@ -1,0 +1,22 @@
+{
+  "id": "office-watch-transport-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "9ca655e93c76e1b9092787cf81d4eee1b9a3f25d",
+  "runtime_revision": "4bcac4850dc8aa7a7d640ffade7e9a220e59a1ae",
+  "allowed_paths": [
+    "tools/bevakningsunderlag.py",
+    "tools/test_bevakningsunderlag.py",
+    "tools/BEVAKNINGSUNDERLAG.md"
+  ],
+  "attempt_seconds": 900,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md. Repair only bounded HTTP content decoding in the existing intake and update synthetic tests/documentation. Preserve prior checks and immutable earlier packets. No actual network/private data, model calls, host control, activation or publication. Use .scratch for synthetic fixtures; the host owns frozen acceptance and independent review."
+    }
+  ],
+  "brief": "tasks/bevakningstransport.md",
+  "acceptance": "acceptance/bevakningstransport.py",
+  "acceptance_sha256": "04c7ad51c044e88828a38ac130883c2e0211ab2a76ea192cbfe6d945d86176ec"
+}
