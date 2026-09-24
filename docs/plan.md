@@ -1,18 +1,34 @@
-# Levande plan — A: riktad AP-10-rättning. B: beredning av Aquarium v0 (byggbeslut för ägarens accept)
+# Levande plan — A: AP-10-rättningen väntar på ägarens aktivering. B: Aquarium v0:s byggbeslut väntar på ägarens accept
 
-AKTUELLT 2026-09-24, registrerat efter ägarbeslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924. AP-11 och modellvalet
-är avslutade och återöppnas inte (historik nedan). Drift vid registreringen: aktiv konfiguration `145edd45` (runtime
-`221df157`, kontoret `df5ed5dc`), AP-10:s schema bundet till den och opausat, nästa ordinarie körning 2026-09-25
-07:00Z, inget arbete i motorn.
+AKTUELLT 2026-09-24, efter ägarbeslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924. AP-11 och modellvalet är avslutade
+och återöppnas inte (historik nedan). Drift nu: aktiv konfiguration `145edd45` (runtime `221df157`, kontoret
+`df5ed5dc`), AP-10:s schema bundet till den och opausat, nästa ordinarie körning 2026-09-25 07:00Z, inget arbete i
+motorn.
 
-A. RIKTAD AP-10-RÄTTNING (Runtime-kod; Runtime-planen bär stegen). Felet: AP-10:s privata steg sväljer en
-avslutningssignal medan anropet väntar, samma mekanism som D026 rättade i AP-11:s väktare (reproducerat 2026-09-24 med
-den dåvarande releasens egen kod). Ordning: kartlägg stoppvägen, rätta, pröva med riktig process och signal genom den
-berörda vägen, separat granskning, skyddad integration, kontrollerad driftövergång som ägaren aktiverar.
+A. RIKTAD AP-10-RÄTTNING - integrerad, väntar på ägarens aktivering. Det privata steget registrerar nu en
+avslutningssignal och avslutar anropet inom den befintliga stoppmodellen, i stället för att gå vidare till sin
+tidsgräns (Runtime D031, PR 58): prövat med riktig process och riktig signal genom den berörda vägen, separat granskat
+och skyddat integrerat. Stoppförmågan före rättningen räckte för nästa ordinarie omgång, eftersom aktivitetens egen
+städning stängde hela processgruppen inom omkring åtta sekunder utan kvarlämnade processer; ingen paus behövdes.
+Övergång 15 är stegad, kontrollerad och separat granskad: konfiguration `e756fe5b` ersätter `145edd45`, runtime
+`c1cdaf5d`, kontoret oförändrat `df5ed5dc`, och bara `runtime/private_stage.py` och dess prov ändras. NÄSTA: ägaren kör
+övergångens `check` och `activate` (kommandot står i det samlade beskedet), därefter återläsning och planernas
+uppdatering. Inget publiceras till Runtime-main före aktiveringen.
 
-B. AQUARIUM V0 - BEREDNING (kontoret; underlaget i `evidence/aquarium/`). Inventera befintligt underlag och dagens
-läsvägar, skilj ägarbeslut från förslag och nuläge från historik, och lämna ett samlat byggbeslut. Ingen
-implementation före ägarens accept.
+Iakttagelse, inte beställd åtgärd: bevakningens omgångar sedan 2026-09-22 slutar korrekt som otillräckliga, eftersom
+leverantören inte tar emot analysens anrop (kapacitet); senast granskade besked är från 2026-09-21. Ingen
+modellvalsfråga skrivs för bevakningen: D030 frågar i utvecklingsvägen, inte i bevakningens privata steg. Bevakningens
+modellval ändras inte inom detta mandat.
+
+B. AQUARIUM V0 - byggbeslutet är berett och väntar på ägarens accept:
+[evidence/aquarium/byggbeslut.md](../evidence/aquarium/byggbeslut.md), med tre kompositionsskisser med provdata och en
+privat bilaga om dagens verkliga läge (`evidence/aquarium/local/`). Se AQUARIUM-V0-BEREDNING-20260924. Ingen
+implementation, installation, publicering av vyn eller nytt repo före accepten.
+
+UNDERHÅLL, namngivet ärende (UNDERHALL-INGANGAR-20260924): kontorets och Runtimes ingångar ska följa main, och inget
+arbete ska ligga bara lokalt. Görs efter nästa samlade besked om A och B, utan konkurrerande skrivare: först läsande
+mätning, sedan avgränsad åtgärd, sedan protokoll i båda repos ingångar. Runtimes primärutcheckning rörs inte, och inget
+publiceras till Runtime-main, förrän övergång 15 är aktiverad och återläst. Blockerar varken A eller B.
 
 VILANDE POSTER, inga åtgärder nu. `office-watch-policy-1` och `office-assignment-cli-1` (DevelopmentTask, vilande sedan
 2026-09-20/21) återupptas inte. Före en eventuell fortsättning ska prövas: verkligt behov i dag, gällande mandat,
@@ -20,7 +36,8 @@ bevarat läge i motor och bevis, och kompatibilitet med den körrevision de då 
 från tidigare konfigurationer (25 vilande vid registreringen) är ett namngivet underhållsärende: deras användning i
 bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd föreslås. Ingetdera är förkrav för Aquarium.
 
-ÅTERUPPTAGNINGSPUNKT: denna post, beslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 och Runtime-planens ingång.
+ÅTERUPPTAGNINGSPUNKT: denna post, AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924, AQUARIUM-V0-BEREDNING-20260924,
+UNDERHALL-INGANGAR-20260924 och Runtime-planens ingång.
 
 ---
 

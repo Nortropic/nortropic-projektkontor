@@ -11,6 +11,9 @@ B. Bered Aquarium v0 - en lugn läsvy över vad kontoret levererat, vad som arbe
    ägaren - ur befintligt underlag och dagens verkliga Office/Runtime, och lämna ett samlat byggbeslut för ägarens
    accept. Ingen implementation, installation, publicering eller nytt repo före accepten.
 
+Därefter, som namngivet underhållsärende i samma plan och utan att blockera A eller B: kontorets och Runtimes ingångar
+följer main, och inget arbete ligger bara lokalt (UNDERHALL-INGANGAR-20260924). Det görs efter nästa samlade besked.
+
 Inga nya abonnemang, betalningsvägar, modeller, organisationsbehörigheter eller valvskrivningar. Ingen generell
 härdnings- eller städkampanj. Planen äger aktuellt steg.
 
