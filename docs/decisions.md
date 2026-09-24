@@ -1046,3 +1046,19 @@ unikt, vad som publicerats respektive arkiverats och att protokollet är på pla
 unikt innehåll där ägaren behöver avgöra publicering, tas till ägaren.
 
 **Ersätter:** ingenting raderas. Följer efter AQUARIUM-V0-BEREDNING-20260924.
+
+## AP10-SIGNALRATTNING-LEVERANS-20260924 — del A levererad och aktiv
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code). Del A av AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924
+är levererad: Runtime D031 (PR 58, merge `c1cdaf5d`) låter AP-10:s privata steg ta emot en avslutningssignal och avsluta
+anropet inom den befintliga stoppmodellen, i stället för att gå vidare till sin tidsgräns. Prövat med riktig process och
+riktig signal genom den berörda vägen (före: 8,4 s och inget eget avbrottsbesked; efter: 0,34 s och avbrottet
+registrerat, aldrig som godkänt), med normal körning och befintliga tidsgränser oförändrade; separat granskat och
+skyddat integrerat. Ägaren aktiverade övergång 15 2026-09-24T13:39Z (konfiguration `e756fe5b`); återläst utan avvikelser.
+
+**Räckvidd:** endast det privata stegets signalväg. Bevakningens sakuppdrag, källor, modellval, resursramar och
+körschema är oförändrade, och ingen paus behövdes. Processproven är inte genomförd omvärldsbevakning. Kvar som
+namngivet ärende utanför leveransen: väktarens registrerade identitet stämmer inte med en levande väktare efter
+macOS omstart av Python (D031).
+
+**Ersätter:** ingenting. Följer efter UNDERHALL-INGANGAR-20260924.
