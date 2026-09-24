@@ -1,5 +1,9 @@
 # Aquarium v0 — kontorets lugna fönster
 
+**ACCEPTERAT 2026-09-24 med ägarens preciseringar (AQUARIUM-V0-ACCEPT-20260924).** Byggvägen i avsnitt 5 är ersatt
+av ägarens precisering: befintlig Runtime bär de avgränsade koduppgifter som dess kontorsprofil faktiskt kan bära;
+planen visar den gällande uppdelningen. Texten nedan är i övrigt det accepterade förslaget.
+
 2026-09-24. **Samlat FÖRSLAG till byggbeslut för ägarens accept, inte ett accepterat bygge.** Beredningen beställdes i
 beslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924. Planen i `docs/plan.md` äger aktuellt steg; detta dokument är
 det beredda beslutspaketet, ingen parallell masterplan. Ingen Aquarium-kod, installation eller publicering av vyn och

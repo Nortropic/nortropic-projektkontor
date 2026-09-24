@@ -1,4 +1,29 @@
-# GÄLLANDE: riktad AP-10-rättning (A) och beredning av Aquarium v0 (B)
+# GÄLLANDE: bygg Aquarium v0 (accepterat byggbeslut)
+
+Ägarbeslut 2026-09-24, se AQUARIUM-V0-ACCEPT-20260924 i beslutsloggen; orden bevaras ordagrant privat. Ägaren
+accepterade byggbeslutet AQUARIUM-V0-BEREDNING-20260924 (PR 36) med preciseringar. Bygg den första privata, lokala
+Aquarium-vyn på svenska - lugn, visuellt genomarbetad, för helskärm i webbläsaren eller spegling till tv - med
+byggbeslutets fem fasta platser (Arkivet, Verkstaden, Utkiken, Ägarens bord, Sockeln), med fördjupning och underlag,
+och med de tre skisserna som formgivningsunderlag. Skissernas provdata presenteras aldrig som verklig drift. V0 är en
+läsvy: den skapar ingen konkurrerande uppdragsdatabas, beslutslogg eller tillståndsmaskin, och den startar, godkänner,
+byter eller ändrar ingenting.
+
+Byggvägen återanvänder det som finns: befintlig Runtime bär de avgränsade koduppgifter som dess nuvarande
+kontorsprofil faktiskt kan bära, och kedjedrivaren håller ihop formgivning, visuella kontroller, mottagarprov och
+ägarens återkoppling och redovisar skälet när en del går den interaktiva vägen. Separat granskning och skyddad
+integration gäller allt. Etapp 1 börjar med en liten sammanhängande väg från verklig tillåten läsning till en faktisk
+vy i Chrome, och ägaren får se den första verkliga vyn när den är användbar.
+
+Accepten omfattar implementation, prov, dokumentation, separat granskning och skyddad publicering i kontorsrepot;
+läsning av byggbeslutets uppräknade källor utan skrivning; en lokal läsprocess på 127.0.0.1 medan vyn används; visuell
+kontroll och mottagarprov i Chrome; och ett samordnat ägarprov på cirka 15 minuter. Ingen ny databas, körmotor, repo,
+permanent bakgrundstjänst, extern nätexponering eller valvskrivning; inga nya abonnemang, modeller, betalningsvägar
+eller organisationsbehörigheter; verktygens behörighetskontroller och hanterad policy kringgås inte. Aktuella revisioner
+och driftbindningar läses före varje åtgärd. Planen äger aktuellt steg.
+
+---
+
+# Riktad AP-10-rättning (A) och beredning av Aquarium v0 (B) — A levererad och aktiv, B accepterad; avsnittet är historik
 
 Ägarbeslut 2026-09-24, se AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 i beslutsloggen; orden bevaras ordagrant privat.
 AP-11 och modellvalsförbättringen är avslutade inom sina redovisade räckvidder och återöppnas inte. Två avgränsade,

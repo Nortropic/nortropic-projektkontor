@@ -1095,3 +1095,78 @@ aktiva releasen, och en ändring där stoppar varje nytt modellanrop, även beva
 bindningarna är aktiv (Runtime D032). Att ändå föra in rutinen där kräver en kontrollerad övergång och är ägarens beslut.
 
 **Ersätter:** ingenting. Följer efter AP10-SIGNALRATTNING-LEVERANS-20260924.
+
+## AQUARIUM-V0-ACCEPT-20260924 — ägaren accepterar byggbeslutet för Aquarium v0, med preciseringar
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code). Ägarens ord bevaras ordagrant privat i
+`evidence/aquarium/local/owner-words-accept-20260924.md` (SHA256
+`f973542417b1eadc1f1fc6fd7a0484af652bd95a55c422250a1587d9209bc5ce`). Ingen exakt klocktid tillskrivs ägaren.
+
+**Accepten:** Aquarium v0 enligt AQUARIUM-V0-BEREDNING-20260924 (PR 36) är ett samlat byggmandat, inte en ny
+brainstorm, förstudie eller arkitekturprocess. Ordning: underhållsärendet UNDERHALL-INGANGAR-20260924 avslutades först
+(UNDERHALL-INGANGAR-GENOMFORT-20260924); därefter denna registrering och etapp 1. En skrivare åt gången; redan
+slutförda moment tillgodoräknas. AP-10-rättningen är levererad och aktiv och återöppnas inte; AP-11 och modellvalet
+förblir avslutade, och Aquarium använder varken AP-11:s stängda scope eller dess budget. Aktuella revisioner och
+driftbindningar läses före varje åtgärd; rapporterade revisioner och tider är observationer, inte värden som ska
+återställas. Runtimes `AGENTS.md` är bunden i releasen och ändras inte nu; nödvändigt protokoll läggs i befintlig plan
+och runbook genom deras ordinarie ändringsväg (för ingången redan gjort, UNDERHALL-INGANGAR-GENOMFORT-20260924), och
+frysta releasekopior ändras aldrig.
+
+**Det ägaren ska få:** den första privata, lokala vyn på svenska, lugn och visuellt genomarbetad för helskärm eller
+spegling till tv, med de fem fasta platserna (Arkivet: det levererade; Verkstaden: arbete och granskning; Utkiken:
+bevakningen; Ägarens bord: det som faktiskt behöver ägaren; Sockeln: tjänst, bemanning och tekniska poster), en
+begriplig helhet med fördjupning och underlag, inte en tabell med kör-id:n. Det accepterade visuella konceptet behålls
+och de tre skisserna är formgivningsunderlag; deras provdata presenteras aldrig som verklig drift. V0 är ingen digital
+stad, ingen generell digital tvilling och ingen ny organisationsmotor.
+
+**Byggvägen:** befintlig Runtime bär de avgränsade koduppgifter som dess nuvarande profil faktiskt kan bära, läst ur
+den faktiska uppdrags- och exekveringsprofilen och utan att AP-11-specifika gränser förs över som allmänna regler;
+visuell iteration ensam är inget skäl att välja bort Runtime, och ingen del tvingas genom Runtime till priset av en ny
+generell förmåga eller omfattande profilanpassning. Kedjedrivaren bär formgivning, visuella kontroller, mottagarprov,
+ägarens återkoppling och den tekniska uppdelningen, och redovisar det konkreta skälet när en del går den interaktiva
+vägen. Separat granskning och skyddad integration gäller. Kräver vägen en kontrollerad övergång samlas relaterade
+ändringar till så få övergångar som möjligt; aktiv drift ändras aldrig från en arbetsgren, och ägarens operatörshandling
+får ett komplett kommando med `LC_ALL=C`, färsk kontroll, exakta bindningar, driftpåverkan och återhämtningsväg. Vid kvot-
+eller åtkomstbrist bevaras arbetet och den befintliga fråge- och väntemekanismen (D030) används där den gäller; modell,
+utförare eller betalväg byts inte utan ägarens beslut och inga blinda omtag görs.
+
+**Sanningskraven:** Runtime och kontoret behåller sina sanningskällor och Aquarium projicerar dem genom byggbeslutets
+läsvägar. Tre saker hålls isär: när Aquarium senast läste, vad som då faktiskt pågick eller väntade, och när senaste
+användbara eller granskade resultat skapades. En färsk avläsning gör inte en blockerad bevakning frisk eller dess gamla
+besked aktuellt; AP-10:s senaste granskade besked behåller sitt datum. Running eller en väntande aktivitet visas inte
+ensamt som att en modell arbetar; köat, startat, granskat, väntande, avslutat och okänt skiljs så långt observationerna
+medger. Vilande tjänsteidentiteter är tekniska poster, ett schemalagt intag är inte ett genomfört, och en vilande uppgift
+animeras inte. Vattnets ljus betyder färsk läsning, inte frisk drift; blir läsningen inaktuell stannar rörelsen och
+uppgifterna märks senast kända, utan att arbete, tjänst eller ägarärende därmed påstås ha upphört. Aktualitet hanteras per
+källa: en oläsbar källa blir aldrig tom och gör inte andra källor okända, och ett nytt renderingsdatum föryngrar aldrig
+gammal information. Väktarens registrerade processidentitet (D031:s kvarstående fynd) används inte som driftbevis;
+tjänstens verifierade identiteter får användas inom sin kontrollerade räckvidd. Bevakningens begränsade modellval visas
+korrekt, och Aquarium hittar inte på en modellvalsfråga som bevakningsvägen inte har producerat. Läsande navigation och
+fördjupning är tillåten; v0 startar inga uppdrag, godkänner inga leveranser, byter inga modeller och utför inga
+driftåtgärder.
+
+**Tidig verklig vy:** etapp 1 börjar med verklig tillåten läsning, korrekt klassning och observationstid och en faktisk
+vy i Chrome; fixturer eller filkontroller ersätter inte den kopplingen. Den första användbara ögonblicksbilden kommer före
+det återkommande läsfönstret, och ägaren får se den första verkliga vyn när den är användbar. Provdata för tillstånd som
+inte finns i miljön förblir märkta. Befintliga läsare, prov och kvalificeringar tillgodoräknas; ingen ny generell
+kontrollplattform, totalrevision eller bred mutationskampanj. Formgivningen får högst två varv av ändrad visuell
+inriktning; rättning av fel mot funktion, sanningsenlighet eller läsbarhet är inget extra varv. Ägarprovet på cirka
+15 minuter samordnas med ägaren; en modellmottagares prov bevisar inte ägarens personliga begriplighet. Uppskattningen
+är ett planeringsvärde som uppdateras efter faktisk byggväg, med agentarbete skilt från tid som kräver ägaren.
+
+**Befogenheter:** implementation, prov, dokumentation, separat granskning och skyddad publicering i kontorsrepot;
+läsning av byggbeslutets uppräknade källor utan skrivning; en lokal läsprocess som bara lyssnar på 127.0.0.1 medan vyn
+används; visuell kontroll och mottagarprov i Chrome; det samordnade ägarprovet. Verkliga driftuppgifter, råhistorik och
+privata bilagor förblir privata; publikt blir bara innehållskontrollerad kod, anvisningar, syntetiska exempel och
+begränsade leveransbevis. Ingen ny databas, körmotor, repo, permanent bakgrundstjänst, extern nätexponering eller
+valvskrivning; inga nya abonnemang, modeller, betalningsvägar eller organisationsbehörigheter, och verktygens
+behörighetskontroller eller hanterad policy kringgås inte. Ingen presentationskod i Runtime för att kringgå dess
+gränser; en verkligt nödvändig utökning beskrivs konkret och genomförs inte tyst.
+
+**Samma mandat till slut:** allt hålls i befintlig plan och beslutshemvist; tidigare leveranser, auditstatus och kända
+begränsningar bevaras. Övriga underhållsärenden - gamla identitetskörningar och D031:s kvarstående identitetsfel -
+ligger separat och blir inga Aquarium-förkrav utan påvisad koppling. Kedjedrivaren bär samordning, deluppgifter, omtag
+och granskning utan rutinmässiga frågor; informationsbesked är inga godkännandepunkter, och bara verkligt saknade
+befogenheter, ändrade kostnader, ändrad driftrisk eller prioriteringsfrågor går till ägaren.
+
+**Ersätter:** ingenting. Följer efter UNDERHALL-INGANGAR-GENOMFORT-20260924.

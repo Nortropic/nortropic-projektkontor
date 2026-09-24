@@ -8,9 +8,9 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — A levererad och aktiv. B: Aquarium v0:s byggbeslut väntar på ägarens accept. Underhållet genomfört
+# Levande plan — Aquarium v0 byggs, etapp 1. A levererad och aktiv. Underhållet genomfört
 
-AKTUELLT 2026-09-24 13:40Z, efter ägarbeslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924. AP-11 och modellvalet är
+AKTUELLT 2026-09-24, efter ägarbesluten AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 och AQUARIUM-V0-ACCEPT-20260924. AP-11 och modellvalet är
 avslutade och återöppnas inte (historik nedan). Drift nu: aktiv konfiguration `e756fe5b` (runtime `c1cdaf5d`, kontoret
 `df5ed5dc`), AP-10:s schema bundet till den och opausat, nästa ordinarie körning 2026-09-25 07:00Z, inget arbete i
 motorn.
@@ -30,10 +30,36 @@ leverantören inte tar emot analysens anrop (kapacitet); senast granskade besked
 modellvalsfråga skrivs för bevakningen: D030 frågar i utvecklingsvägen, inte i bevakningens privata steg. Bevakningens
 modellval ändras inte inom detta mandat.
 
-B. AQUARIUM V0 - byggbeslutet är berett och väntar på ägarens accept:
-[evidence/aquarium/byggbeslut.md](../evidence/aquarium/byggbeslut.md), med tre kompositionsskisser med provdata och en
-privat bilaga om dagens verkliga läge (`evidence/aquarium/local/`). Se AQUARIUM-V0-BEREDNING-20260924. Ingen
-implementation, installation, publicering av vyn eller nytt repo före accepten.
+B. AQUARIUM V0 - ACCEPTERAT 2026-09-24 (AQUARIUM-V0-ACCEPT-20260924); ETAPP 1 PÅGÅR. Byggbeslutet är
+[evidence/aquarium/byggbeslut.md](../evidence/aquarium/byggbeslut.md) med sina tre skisser, nu med ägarens preciseringar.
+
+Byggväg, läst ur Runtimes faktiska kontorsprofil (`runtime/task.py` och runbookens AP04-avsnitt): ett kontorsuppdrag
+får skriva uttryckligt uppräknade filer under `tools/` (aldrig `tools/kontor.py`), varje anrop får 1-3600 modellsekunder,
+inga automatiska omtag, frusen acceptans som värden kör i sin sandlåda, utförare och granskare namngivna i uppdraget,
+och uppdragets indata måste ligga committade på den rena ingången innan `tools/kontor.py start`; enligt rutinen ovan
+står ingången på main, så indata publiceras först. Gränsen två filer och 480 sekunder gäller bara AP-11:s ändliga
+utvecklingsbindning och tillämpas inte här. Uppdragen namnger Claude (`claude-opus-5`) som utförare och granskare, som
+den aktiva konfigurationens utförarval redan gör för alla utvecklingsroller; inget modellval eller utförarval ändras.
+Med samma modellfamilj som författare och granskare är granskningen en separat läsning, inte en oberoende bedömning.
+Tar en modell inte emot anrop väntar arbetet enligt den befintliga mekanismen (D030 där den gäller), och modell,
+utförare eller betalväg byts inte utan ägarens beslut.
+
+Etapp 1, första användbara ögonblicksbild:
+ 1. Källprov (kedjedrivaren, läsande): varje uppräknad källa läses med de tillåtna verktygen och en verklig avläsning
+    sparas privat. Skäl till den interaktiva vägen: en Runtime-kandidat arbetar i en klon av kontorsrepot, där de privata
+    källorna inte finns (de är ospårade), och byggkandidater arbetar med syntetiska data.
+ 2. Scenmall (kedjedrivaren): de fem platserna, vattnets ljus och vyns tre lägen ur skisserna som en statisk mall
+    under `tools/`. Skäl: formgivningen prövas visuellt i Chrome i korta varv; mallen är formgivning, inte logik.
+ 3. Runtime-uppdrag: läsning och visningssäker projektion, `tools/aquarium.py` med prov och anvisning, mot syntetiska
+    fixturer. Byggbeslutets etapp 0 ingår här: provscenarierna och sanningsreglerna fryses i uppdragets acceptans, som
+    granskas separat innan uppdraget startas.
+ 4. Runtime-uppdrag: återgivning av projektionen i scenmallen, `tools/aquarium_vy.py` med prov.
+ 5. Kedjedrivaren: den publicerade koden körs mot verkliga källor till en privat sida som prövas i Chrome och visas för
+    ägaren. Skäl: körningen läser privata källor och den visuella kontrollen görs i Chrome, båda utanför en kandidat.
+Etapp 2 är fönstret på 127.0.0.1 (ett Runtime-uppdrag), etapp 3 acceptans, mottagarprov, ägarprov, uthållighet och
+leveransbesked. Prognos: byggbeslutets planeringsvärden gäller tills vidare - första användbara vy efter omkring
+2½-3½ arbetsdagar och hela v0 efter omkring 4½-6½ - och uppdateras när de två Runtime-uppdragens verkliga tider är
+kända. Ägarens närvaro behövs för ägarprovet (cirka 15 minuter) och vid en eventuell formgivningsfråga.
 
 UNDERHÅLL (UNDERHALL-INGANGAR-20260924) - GENOMFÖRT 2026-09-24, efter det samlade beskedet och sedan övergång 15
 aktiverats och lästs tillbaka. Mätt läsande: kontorets ingång stod på main; 33 lokala grenar, varav 12 utan kopia på
@@ -57,7 +83,8 @@ från tidigare konfigurationer (25 vilande vid registreringen) är ett namngivet
 bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd föreslås. Ingetdera är förkrav för Aquarium.
 
 ÅTERUPPTAGNINGSPUNKT: denna post, AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924, AQUARIUM-V0-BEREDNING-20260924,
-UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924 och Runtime-planens ingång.
+UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924 och Runtime-planens
+ingång.
 
 ---
 
