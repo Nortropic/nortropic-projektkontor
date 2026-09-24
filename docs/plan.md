@@ -8,13 +8,53 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0 byggs, etapp 1: projektionen integrerad, scenens renderare näst. A levererad och aktiv
+# Levande plan — Aquarium v0: gestaltningen korrigeras, prototyp först. A levererad och aktiv
 
-AKTUELLT 2026-09-24, efter ägarbesluten AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 och AQUARIUM-V0-ACCEPT-20260924. AP-11 och modellvalet är
-avslutade och återöppnas inte (historik nedan). Drift nu: aktiv konfiguration `e756fe5b` (runtime `c1cdaf5d`, kontoret
-`df5ed5dc`), AP-10:s schema bundet till den och opausat, nästa ordinarie körning 2026-09-25 07:00Z. I motorn väntar
-`office-aquarium-projection-1`, `-2` och `-3` i `waiting_diagnosis` och `-4` parkerat i `waiting_review`; inget av dem
-återupptas (se B och AQUARIUM-V0-PROJEKTION-20260924).
+KORRIGERAD GESTALTNING (AQUARIUM-V0-GESTALTNING-20260924). Ägaren såg den första verkliga vyn i ägarprovet: den är en
+användbar statusvy med illustrerade byggnader och textpaneler, men inte den Aquarium-upplevelse som avsågs med
+Gather, Munder Difflin och de andra rumsliga arbetsvärldarna. Dioramat med fem symbolbyggnader byggdes enligt den
+senaste avgränsningen och missar ändå upplevelsen; det är en korrigering av riktningen, inte ett underkännande av
+dataläsning, prov eller integration. Riktningen nu: ett fönster in i en liten, sammanhängande arbetsvärld, till exempel
+ett verkstads- eller kontorsgolv, där arbetet är huvudpersonen: igenkännbara utförare vid begripliga arbetsplatser,
+synliga arbetsobjekt, tydlig skillnad mellan arbete, granskning, väntan och leverans, överlämningar bara när underlaget
+visar dem, och beständiga platser. En figur har en verklig motsvarighet; en konfigurerad roll blir inte en figur.
+Dekorativ rörelse, gestaltning av ett observerat tillstånd och en belagd övergång hålls isär, och en animation är aldrig
+en ny faktauppgift. Vyn visar sin täckning: interaktivt arbete som inte observeras varken uppfinns eller göms bakom en
+för bred räknare. Miljön ska kunna växa senare med verkliga förmågor och verksamheter, men ingen tillväxtmotor byggs
+nu och inga påhittade avdelningar eller framtida arbete visas.
+
+Vägen dit: referenserna Gather, Munder Difflin och Bot Crossing granskas i sina faktiska visuella miljöer, skärmbilder
+och demonstrationer, inte bara README-texter; det som inte går att se redovisas i stället för att gissas, och ingen bred
+ny inspirationssökning görs. Därifrån hämtas rumslighet, igenkänning, synliga utförare, begripligt arbete och känslan
+av en sammanhängande arbetsplats, inte motorer, sociala funktioner, licensierad grafik eller produktomfång. Sedan tas
+EN rekommenderad riktning fram som öppningsbar prototyp i tre lägen: verkligt lugnt läge, aktivt förlopp med märkta
+PROVDATA och gammalt eller otillgängligt underlag. Provdata blandas aldrig med den verkliga driftvyn, och ingen modell
+startas för att skapa aktivitet åt demonstrationen. Beskedet visar prototypen och förklarar kort vad som hämtats från
+referenserna, hur världen visar verkligt arbete och vilken avgränsad ändring som behövs jämfört med nuvarande
+implementation; ägaren bedömer upplevelsen och tar ställning innan den integrerade vyn ändras mer. Kräver riktningen en
+ny datakälla eller ett utökat mandat redovisas den skillnaden innan den genomförs. Läge 2026-09-24: referenserna är
+granskade och prototypen är byggd privat i `evidence/aquarium/local/prototyp-arbetsvarld-20260924/`; den visas för
+ägaren i beskedet som följer denna post, och därefter väntar riktningen på ägarens ställningstagande (ägarens tur nedan).
+
+Ändras från accepterad v0: scenen (mallen `SCEN`, platsernas form och placering, rubrikens och platsernas texter,
+reglerna för figurer och rörelse); undervattenstemat är inte längre bärande. Återanvänds: läsarna och den
+visningssäkra projektionen (`tools/aquarium.py`), källbindningar, observationstider, integritetsskydd,
+färskhetsprincipen (sidan inaktuell tills skriptet visar en ung läsning) och den lokala driften; dioramat och dess
+förhandsvisning bevaras som jämförelsepunkt. Den separata Runtime-förbättringen ligger fortsatt efter Aquarium och är
+inget skäl att låta vyn förbli en statisk statuspanel. Prognosen ändras och ersätter prognosen i B nedan: första
+levererade vyn kommer efter ägarens besked om riktningen, med renderaren för den nya världen och datumregelns rättning
+som en koduppgift, uppskattningsvis omkring en arbetsdag efter beskedet om ändringen bara gäller presentationen; en ny
+datakälla blir ett eget uppdrag. Hela v0 uppskattas som förut till omkring en till två arbetsdagar därefter, plus
+ägarprovet och åtta timmars uthållighetsprov. Det är uppskattningar, inga gränser. Återkopplingen står ordagrant privat
+i `evidence/aquarium/local/owner-words-aterkoppling-gestaltning-20260924.md`.
+
+AKTUELLT 2026-09-24, efter ägarbesluten AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 och AQUARIUM-V0-ACCEPT-20260924
+och ägarens återkoppling AQUARIUM-V0-GESTALTNING-20260924. AP-11 och modellvalet är avslutade och återöppnas inte
+(historik nedan). Drift nu: aktiv konfiguration `e756fe5b` (runtime `c1cdaf5d`, kontoret `df5ed5dc`), AP-10:s schema
+bundet till den och opausat, nästa ordinarie körning 2026-09-25 07:00Z. I motorn väntar `office-aquarium-projection-1`,
+`-2` och `-3` i `waiting_diagnosis`, `-4` parkerat i `waiting_review` och `office-aquarium-scene-1` parkerat i
+`waiting_diagnosis`; inget av dem återupptas (se B, AQUARIUM-V0-PROJEKTION-20260924 och
+AQUARIUM-V0-GESTALTNING-20260924).
 
 A. RIKTAD AP-10-RÄTTNING - levererad och aktiv. Det privata steget registrerar nu en
 avslutningssignal och avslutar anropet inom den befintliga stoppmodellen, i stället för att gå vidare till sin
@@ -31,7 +71,7 @@ leverantören inte tar emot analysens anrop (kapacitet); senast granskade besked
 modellvalsfråga skrivs för bevakningen: D030 frågar i utvecklingsvägen, inte i bevakningens privata steg. Bevakningens
 modellval ändras inte inom detta mandat.
 
-B. AQUARIUM V0 - ACCEPTERAT 2026-09-24 (AQUARIUM-V0-ACCEPT-20260924); ETAPP 1 PÅGÅR, STEG 1-3 KLARA. Byggbeslutet är
+B. AQUARIUM V0 - ACCEPTERAT 2026-09-24 (AQUARIUM-V0-ACCEPT-20260924); ETAPP 1 PÅGÅR, STEG 1-3 KLARA, STEG 4 ERSATT. Byggbeslutet är
 [evidence/aquarium/byggbeslut.md](../evidence/aquarium/byggbeslut.md) med sina tre skisser, nu med ägarens preciseringar.
 
 Byggväg, läst ur Runtimes faktiska kontorsprofil (`runtime/task.py` och runbookens AP04-avsnitt): ett kontorsuppdrag
@@ -46,11 +86,13 @@ Tar en modell inte emot anrop väntar arbetet enligt den befintliga mekanismen (
 utförare eller betalväg byts inte utan ägarens beslut.
 
 Etapp 1, första användbara ögonblicksbild. Läge: steg 1 genomfört 2026-09-24 (varje källa läsbar, privat avläsning); steg 2
-publicerat med denna post (`tools/aquarium_vy.py` med bara sidan `SCEN` och färskhetsskriptet `SKRIPT`); steg 3
+publicerat i PR 43 (`tools/aquarium_vy.py` med bara sidan `SCEN` och färskhetsskriptet `SKRIPT`); steg 3
 klart: Runtime byggde och prövade kandidaten som `office-aquarium-projection-4` mot den frysta acceptansen, och
 kedjedrivaren granskade den separat och integrerade den skyddat (main `cb96867f`, PR 42) enligt
 AQUARIUM-V0-SLUTGRANSKNING-20260924, sedan `-1`, `-2` och `-3` fallit på luckor i kedjedrivarens egna indata
-(AQUARIUM-V0-PROJEKTION-20260924); steg 4 nästa, som `office-aquarium-scene-1`:
+(AQUARIUM-V0-PROJEKTION-20260924); steg 4 är ersatt av den korrigerade gestaltningen, och dess uppdrag
+`office-aquarium-scene-1` är parkerat och återupptas inte (arbetsformen nedan). Nästa steg står i posten överst.
+De ursprungliga stegen:
  1. Källprov (kedjedrivaren, läsande): varje uppräknad källa läses med de tillåtna verktygen och en verklig avläsning
     sparas privat. Skäl till den interaktiva vägen: en Runtime-kandidat arbetar i en klon av kontorsrepot, där de privata
     källorna inte finns (de är ospårade), och byggkandidater arbetar med syntetiska data.
@@ -59,20 +101,26 @@ AQUARIUM-V0-SLUTGRANSKNING-20260924, sedan `-1`, `-2` och `-3` fallit på luckor
  3. Runtime-uppdrag: läsning och visningssäker projektion, `tools/aquarium.py` med prov och anvisning, mot syntetiska
     fixturer. Byggbeslutets etapp 0 ingår här: provscenarierna och sanningsreglerna fryses i uppdragets acceptans, som
     granskas separat innan uppdraget startas.
- 4. Runtime-uppdrag: återgivning av projektionen i scenmallen, `tools/aquarium_vy.py` med prov; mallens två
-    konstanter hålls oförändrade och prövas mot sina SHA-256.
+ 4. Runtime-uppdrag: återgivning av projektionen i scenmallen, `tools/aquarium_vy.py` med prov. Ersatt 2026-09-24 av den
+    korrigerade gestaltningen (AQUARIUM-V0-GESTALTNING-20260924): först prototyp och ägarens besked, sedan en renderare för
+    den nya arbetsvärlden tillsammans med datumregelns rättning.
  5. Kedjedrivaren: den publicerade koden körs mot verkliga källor till en privat sida som prövas i Chrome och visas för
     ägaren. Skäl: körningen läser privata källor och den visuella kontrollen görs i Chrome, båda utanför en kandidat.
 Etapp 2 är fönstret på 127.0.0.1 (ett Runtime-uppdrag), etapp 3 acceptans, mottagarprov, ägarprov, uthållighet och
-leveransbesked. Prognos, uppdaterad 2026-09-24 när steg 3 nåtts: steg 3 tog omkring två och en halv timme från frysta indata till
+leveransbesked. Prognos, uppdaterad 2026-09-24 när steg 3 nåtts (ersatt av prognosen i posten överst, bevarad som
+historik): steg 3 tog omkring två och en halv timme från frysta indata till
 integration, inklusive tre luckor i de egna indata; utförarens del var 12-16 minuter per försök. Första
 användbara vy väntas därför när steg 4 är integrerat, sannolikt 2026-09-24 eller 2026-09-25, och hela v0 omkring en
 till två arbetsdagar därefter, plus ägarprovet och åtta timmars uthållighetsprov. Ägarens närvaro behövs för
 ägarprovet (cirka 15 minuter) och vid en eventuell formgivningsfråga.
 
-Ägarens tur: väntar ett beslut eller en operatörshandling på ägaren skrivs det i denna plan under en rad som bara
-innehåller `ÄGARENS TUR`, som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD` eller `- [operatörshandling] text`; Aquarium
-läser blocket från main. Inget väntar på ägaren nu, så blocket finns inte.
+Ägarens tur: väntar ett beslut eller en operatörshandling på ägaren skrivs det i denna plan under en egen rad med
+blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD`
+eller `- [operatörshandling] text`; Aquarium läser blocket från main. Ett beslut väntar på ägaren när prototypen
+visats i beskedet som följer denna post:
+
+ÄGARENS TUR
+- [beslut] Ta ställning till den rekommenderade riktningen för Aquarium, prototypen av arbetsvärlden i tre lägen — sedan 2026-09-24
 
 ARBETSFORM FÖR V0:S RUNTIME-UPPDRAG (AQUARIUM-V0-UPPDRAGSGREN-20260924), ett avgränsat undantag från rutinen ovan för
 v0:s koduppgifter genom Runtimes kontorsväg; det behöver inte frågas om på nytt för varje deluppgift. Runtimes kontorsväg
@@ -96,11 +144,12 @@ integrerat av kedjedrivaren, PR 42), alla på grenen aquarium/uppdrag-projektion
 `waiting_diagnosis`; `-4` står parkerat i `waiting_review` och ska inte återupptas för att publicera samma arbete igen.
 Inget av dem återupptas. Grenen står
 kvar lokalt med namngivet skäl: dess åtta commits är
-uppdragsindatas ursprungliga identiteter, och den integreras inte (indata publicerades byte för byte med denna post);
+uppdragsindatas ursprungliga identiteter, och den integreras inte (indata publicerades byte för byte i PR 43);
 den är också arkiverad som git bundle i `evidence/aquarium/local/etapp1/`. `office-aquarium-scene-1` (scenens
-renderare) körs på grenen aquarium/uppdrag-scen, med granskningsvägen planerad före start: Runtime bygger och kör den
-frysta acceptansen, och räcker Runtimes granskningsprofil inte slutgranskar och integrerar kedjedrivaren kandidaten
-enligt AQUARIUM-V0-SLUTGRANSKNING-20260924. Varje senare uppdrag namnges här innan dess bas fryses.
+renderare för dioramat och datumregelns rättning) kördes på grenen aquarium/uppdrag-scen och står i `waiting_diagnosis`;
+det parkerades efter den korrigerade gestaltningen, återupptas inte och publiceras inte. Grenen står kvar lokalt med det
+skälet och är arkiverad som git bundle i `evidence/aquarium/local/etapp1/`. Varje senare uppdrag namnges här innan dess
+bas fryses, med granskningsvägen planerad före start enligt AQUARIUM-V0-SLUTGRANSKNING-20260924.
 
 UNDERHÅLL (UNDERHALL-INGANGAR-20260924) - GENOMFÖRT 2026-09-24, efter det samlade beskedet och sedan övergång 15
 aktiverats och lästs tillbaka. Mätt läsande: kontorets ingång stod på main; 33 lokala grenar, varav 12 utan kopia på
@@ -117,7 +166,9 @@ underlaget, med samma träd som det publicerade; bara meddelandet rättades. Kva
 aquarium/accept-r1, registreringens första granskningsrunda (underkänd för två utelämnade ägarinstruktioner), och
 aquarium/arbetsform och aquarium/arbetsform-r1, arbetsformens första granskningsrunda (underkänd för ett försvagat
 publiceringsvillkor och en kvarlämnad motsägelse), samt aquarium/arbetsform-r2, ett ogranskat mellanläge av samma rättelse,
-bevarade som historik. Runtimes del står i
+bevarade som historik. Kvar med namngivet skäl: aquarium/gestaltning-r1, gestaltningsregistreringens första
+granskningsrunda (underkänd för en kvarlämnad nästa-steg-mening om det parkerade uppdraget och en ofullständig
+förteckning över motorns väntande uppdrag), bevarad som historik. Runtimes del står i
 Runtime-planen (dess uppdrag publicerat som Runtime PR 60, dess ingång nu på main). Protokollet står i `AGENTS.md` och
 i rutinen överst i denna plan; startkontrollen är `tools/ingang.py`.
 
@@ -129,7 +180,7 @@ bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd f�
 
 ÅTERUPPTAGNINGSPUNKT: denna post, AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924, AQUARIUM-V0-BEREDNING-20260924,
 UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924, AQUARIUM-V0-UPPDRAGSGREN-20260924,
-AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924 och Runtime-planens ingång.
+AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924 och Runtime-planens ingång.
 
 ---
 

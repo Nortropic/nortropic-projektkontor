@@ -1271,3 +1271,50 @@ den minsta källgränsen. Renderaren läggs till av nästa Runtime-uppdrag, `off
 aquarium/uppdrag-scen, som håller båda konstanterna oförändrade.
 
 **Ersätter:** ingenting. Följer efter AQUARIUM-V0-SLUTGRANSKNING-20260924.
+
+## AQUARIUM-V0-GESTALTNING-20260924 — ägaråterkoppling i ägarprovet: korrigerad visuell riktning för Aquarium
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code). Ägarens återkoppling bevaras ordagrant privat i
+`evidence/aquarium/local/owner-words-aterkoppling-gestaltning-20260924.md` (SHA256
+`3cfc0d22a5c70788eb2da519713187d8bbf81f7aea033ad00ce1f88ec43842d1`). Ingen exakt klocktid tillskrivs ägaren.
+
+**Bakgrund:** ägaren såg den första verkliga vyn, en privat förhandsvisning av dioramat med fem platser renderad ur
+verkliga källor. Den motsvarar inte den upplevelse som avsågs med Gather, Munder Difflin och Bot Crossing: den läses som
+en statusvy med illustrerade byggnader och textpaneler, inte som en blick in i en levande organisation. Avgränsningen till
+ett diorama med fem platser gjordes gemensamt; återkopplingen korrigerar riktningen och underkänner inte dataläsning,
+prov eller gjord integration.
+
+**Beslutet:** Aquarium blir ett fönster in i en liten, sammanhängande rumslig arbetsvärld, lugn att ha öppen länge och
+möjlig att fördjupa sig i. Arbetet är huvudpersonen: igenkännbara utförare vid begripliga arbetsplatser, synliga
+arbetsobjekt, tydlig skillnad mellan arbete, granskning, väntan och leverans, relationer och överlämningar när underlaget
+visar dem, och beständiga platser. Utförare, roller, uppdrag och tekniska processer hålls isär, och en figur har en
+tydlig verklig motsvarighet. Grundläget ska kunna förstås genom att titta; fördjupning och bevis är nästa nivå. En liten
+version ska bära karaktären med få saker; de fem informationsområdena får återanvändas men deras form, placering och
+undervattenstemat är inte låsta; inga påhittade avdelningar eller framtida arbete visas, och den lugna versionen är samma
+värld. Miljön ska kunna växa senare med verkliga förmågor och verksamheter, men ingen tillväxtmotor byggs nu.
+Sanningen gäller oförändrat: dekorativ rörelse, gestaltning av ett observerat tillstånd och en belagd övergång
+hålls isär; ett nyligen observerat arbete kan visas som arbete, men ingen transport, dialog eller överlämning visas utan
+belägg, och en animation hittar inte på framsteg, samarbete eller resultat. Gammalt eller saknat underlag syns som
+osäkerhet utan att se ut som att verksamheten upphört, och täckningen visas så att "0 pågår" inte betyder att ingenting
+görs i Nortropic. Kräver en viktig del en ny datakälla skiljs den från en ren presentationsändring och redovisas; ingen ny
+övervakningsmotor byggs. Nästa steg är ett avgränsat visuellt omtag. Referenserna Gather, Munder Difflin och Bot
+Crossing granskas i sina faktiska visuella miljöer, skärmbilder och demonstrationer, inte bara README-texter; det som
+inte går att se redovisas i stället för att gissas, och ingen bred ny inspirationssökning görs. Därifrån hämtas
+rumslighet, igenkänning, synliga utförare, begripligt arbete och känslan av en sammanhängande arbetsplats, inte motorer,
+sociala funktioner, licensierad grafik eller produktomfång. En rekommenderad riktning visas som öppningsbar prototyp i
+tre lägen (verkligt lugnt, aktivt förlopp med märkta PROVDATA, gammalt eller otillgängligt underlag); provdata blandas
+aldrig med den verkliga driftvyn, och ingen modell startas för att skapa aktivitet åt demonstrationen. Beskedet visar
+prototypen och förklarar kort vad som hämtats från referenserna, hur världen visar verkligt arbete och vilken avgränsad
+ändring som behövs jämfört med nuvarande implementation. Ägaren bedömer upplevelsen, inte bibliotek, koordinater eller
+teknisk uppdelning, och tar ställning innan den integrerade vyn ändras mer.
+
+**Gränser:** befintliga läsare, visningssäker projektion, källbindningar, integritetsskydd och lokal drift återanvänds;
+nuvarande vy och bevis bevaras som jämförelsepunkt. Aquarium förblir läsande; ingen ny uppdragsmotor, databas,
+godkännandefunktion, modellväxling, social plattform eller extern exponering. AP-11 återöppnas inte; den separata
+Runtime-förbättringen ligger fortsatt efter Aquarium och är inget skäl att låta vyn förbli en statisk statuspanel.
+Utökat mandat redovisas som en skillnad innan det genomförs; omfattning och prognos ändras inte tyst, och planen
+redovisar den ändrade prognosen.
+
+**Ersätter:** gestaltningsdelen av AQUARIUM-V0-BEREDNING-20260924 (dioramat och dess fem platser) så som
+AQUARIUM-V0-ACCEPT-20260924 accepterade den; allt annat i dem står kvar. `office-aquarium-scene-1` parkerades därför och
+återupptas inte.
