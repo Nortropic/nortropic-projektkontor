@@ -8,7 +8,7 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0: arbetsvärlden byggs (ägarens ja 2026-09-24). A levererad och aktiv
+# Levande plan — Aquarium v0: arbetsvärlden integrerad, verklig vy nästa (ägarens ja 2026-09-24). A levererad och aktiv
 
 ARBETSVÄRLDEN BYGGS (AQUARIUM-V0-ARBETSVARLD-20260924). Ägaren såg prototypen och godkände den sammanhängande rumsliga
 arbetsvärlden som gestaltningsriktning, med de fyra redovisade tilläggen och två finjusteringar; det är ett godkännande
@@ -33,9 +33,14 @@ varje plats. Byggvägen, med en skrivare åt gången:
     uppdragets id även för parkerade uppdrag, så deras kort namnges ur den, och uppdragsfilen ger den läsbara titeln
     (tillägg c). Granskningsvägen är planerad före start: kontorsuppdragens
     obligatoriska granskning i Runtime har en fast gräns på 180 sekunder, så kedjedrivarens separata slutgranskning och
-    skyddade publicering enligt AQUARIUM-V0-SLUTGRANSKNING-20260924 förbereds från början.
+    skyddade publicering enligt AQUARIUM-V0-SLUTGRANSKNING-20260924 förbereds från början. Genomfört 2026-09-25
+    (AQUARIUM-V0-SCEN-20260925): `office-aquarium-scene-2`:s första försök föll på ett enda befintligt prov som fortfarande
+    krävde schema 1, eftersom utföraren bara har filverktyg och inte kan köra proven; efterföljaren `office-aquarium-scene-3`,
+    med samma bas och samma frusna acceptans och en beskrivning som namnger de berörda proven, byggdes och prövades av
+    Runtime och klarade acceptansen. Runtimes egen granskning stannade vid 180 sekunder, och kedjedrivaren slutgranskade
+    separat och integrerade skyddat (PR 47, main `db2d0a29`). Båda uppdragen står parkerade och återupptas inte.
  3. Kedjedrivaren: den publicerade koden körs mot verkliga källor till en privat sida som prövas i Chrome och visas för
-    ägaren.
+    ägaren. Nästa steg efter denna post.
  4. Etapp 2: fönstret på 127.0.0.1 med jämförelsen (d); etapp 3: acceptans, mottagarprov, ägarprov och uthållighet.
 Prognos, som ersätter den i posten KORRIGERAD GESTALTNING nedan: första användbara integrerade vy uppskattas till omkring
 en och en halv arbetsdag efter beskedet, eftersom tilläggen a-c ändrar projektionen och inte bara utseendet; etapp 2 och
@@ -88,8 +93,9 @@ modellvalet är avslutade och återöppnas inte
 (historik nedan). Drift nu: aktiv konfiguration `e756fe5b` (runtime `c1cdaf5d`, kontoret `df5ed5dc`), AP-10:s schema
 bundet till den och opausat, nästa ordinarie körning 2026-09-25 07:00Z. I motorn väntar `office-aquarium-projection-1`,
 `-2` och `-3` i `waiting_diagnosis`, `-4` parkerat i `waiting_review` och `office-aquarium-scene-1` parkerat i
-`waiting_diagnosis`; inget av dem återupptas (se B, AQUARIUM-V0-PROJEKTION-20260924 och
-AQUARIUM-V0-GESTALTNING-20260924).
+`waiting_diagnosis`, `office-aquarium-scene-2` parkerat i `waiting_diagnosis` och `office-aquarium-scene-3` parkerat i
+`waiting_review`; inget av dem återupptas (se B, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924 och
+AQUARIUM-V0-SCEN-20260925).
 
 A. RIKTAD AP-10-RÄTTNING - levererad och aktiv. Det privata steget registrerar nu en
 avslutningssignal och avslutar anropet inom den befintliga stoppmodellen, i stället för att gå vidare till sin
@@ -182,10 +188,14 @@ den är också arkiverad som git bundle i `evidence/aquarium/local/etapp1/`. `of
 renderare för dioramat och datumregelns rättning) kördes på grenen aquarium/uppdrag-scen och står i `waiting_diagnosis`;
 det parkerades efter den korrigerade gestaltningen, återupptas inte och publiceras inte. Grenen står kvar lokalt med det
 skälet och är arkiverad som git bundle i `evidence/aquarium/local/etapp1/`. Varje senare uppdrag namnges här innan dess
-bas fryses, med granskningsvägen planerad före start enligt AQUARIUM-V0-SLUTGRANSKNING-20260924. Namngivet nästa:
-`office-aquarium-scene-2`, efterföljaren till `office-aquarium-scene-1` enligt AQUARIUM-V0-ARBETSVARLD-20260924, med
-egna indata på en egen uppdragsgren när scenmallen för arbetsvärlden är publicerad; det parkerade uppdraget och dess
-gren lämnas orörda.
+bas fryses, med granskningsvägen planerad före start enligt AQUARIUM-V0-SLUTGRANSKNING-20260924. Genomfört efter
+AQUARIUM-V0-ARBETSVARLD-20260924: `office-aquarium-scene-2` (första försöket; ett befintligt prov stod kvar på schema 1)
+och `office-aquarium-scene-3` (samma acceptans, preciserad beskrivning; byggt och prövat av Runtime, slutgranskat och
+integrerat av kedjedrivaren, PR 47), båda på grenen aquarium/uppdrag-scen-2. `-2` står i `waiting_diagnosis` och `-3`
+parkerat i `waiting_review`, och inget av dem återupptas för att publicera samma arbete igen. Grenen står kvar lokalt med
+namngivet skäl: dess commits är uppdragsindatas ursprungliga identiteter och övertagandets registrering, och den
+integreras inte (indata publicerades byte för byte med denna post); den är också arkiverad som git bundle i
+`evidence/aquarium/local/etapp1/`. Det parkerade `office-aquarium-scene-1` och dess gren är orörda.
 
 UNDERHÅLL (UNDERHALL-INGANGAR-20260924) - GENOMFÖRT 2026-09-24, efter det samlade beskedet och sedan övergång 15
 aktiverats och lästs tillbaka. Mätt läsande: kontorets ingång stod på main; 33 lokala grenar, varav 12 utan kopia på
@@ -217,7 +227,7 @@ bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd f�
 ÅTERUPPTAGNINGSPUNKT: denna post, AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924, AQUARIUM-V0-BEREDNING-20260924,
 UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924, AQUARIUM-V0-UPPDRAGSGREN-20260924,
 AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924,
-AQUARIUM-V0-ARBETSVARLD-20260924 och Runtime-planens ingång.
+AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925 och Runtime-planens ingång.
 
 ---
 
