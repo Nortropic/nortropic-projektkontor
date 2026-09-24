@@ -9,6 +9,15 @@ Läsordning: `docs/uppdrag.md` → `DEFINITION.md` → `docs/plan.md` → releva
 poster i `docs/decisions.md`. Planen ensam äger aktuellt steg, nästa handling och
 återupptagningspunkt. README är bara en pekare. `CLAUDE.md` importerar denna fil.
 
+Ingången följer main (UNDERHALL-INGANGAR-20260924). Primärutcheckningen står på `main`
+lika med `origin/main`, utan lokala commits; arbete sker i separata kloner eller
+worktrees. Vid sessionsstart körs `python3 -B tools/ingang.py` innan planen läses: den
+hämtar och jämför med `origin/main` och varnar, men ändrar inget. Avviker ingången läses
+planen från `origin/main` och avvikelsen rapporteras. Efter varje skyddad publicering
+snabbspolas ingången om den är ren, annars redovisas avvikelsen i leveransbeskedet.
+Ingen arbetsgren lever bara lokalt: den slutar publicerad, arkiverad eller kvar med
+namngivet skäl i planen. Regeln gäller ingången, inte kandidater i egna worktrees.
+
 En skrivande körning åt gången. Separat granskning före integration. Befintliga
 provprotokoll under `evidence/entry/` skrivs aldrig över; rättelser blir nya protokoll.
 Beslut raderas inte: en ersatt post märks SUPERSEDED med pekare till ersättaren.

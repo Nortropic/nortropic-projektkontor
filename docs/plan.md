@@ -1,4 +1,14 @@
-# Levande plan — A levererad och aktiv. B: Aquarium v0:s byggbeslut väntar på ägarens accept. Nästa: underhållsärendet
+# Rutin: ingången följer main
+
+Gäller varje session (UNDERHALL-INGANGAR-20260924). Börja med `python3 -B tools/ingang.py`: den hämtar och jämför
+ingången med `origin/main` och varnar, men ändrar inget. Avviker ingången läses planen från `origin/main`
+(`git show origin/main:docs/plan.md`) och avvikelsen rapporteras. Efter varje skyddad publicering snabbspolas ingången
+om den är ren, annars redovisas avvikelsen i leveransbeskedet. Ingen arbetsgren lever bara lokalt: den slutar
+publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står i den gällande posten nedan.
+
+---
+
+# Levande plan — A levererad och aktiv. B: Aquarium v0:s byggbeslut väntar på ägarens accept. Underhållet genomfört
 
 AKTUELLT 2026-09-24 13:40Z, efter ägarbeslutet AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924. AP-11 och modellvalet är
 avslutade och återöppnas inte (historik nedan). Drift nu: aktiv konfiguration `e756fe5b` (runtime `c1cdaf5d`, kontoret
@@ -25,10 +35,20 @@ B. AQUARIUM V0 - byggbeslutet är berett och väntar på ägarens accept:
 privat bilaga om dagens verkliga läge (`evidence/aquarium/local/`). Se AQUARIUM-V0-BEREDNING-20260924. Ingen
 implementation, installation, publicering av vyn eller nytt repo före accepten.
 
-UNDERHÅLL, namngivet ärende (UNDERHALL-INGANGAR-20260924) - NÄSTA: kontorets och Runtimes ingångar ska följa main, och
-inget arbete ska ligga bara lokalt. Det samlade beskedet om A och B är lämnat och övergång 15 är aktiverad och återläst,
-så ärendet börjar nu, utan konkurrerande skrivare: först läsande mätning, sedan avgränsad åtgärd, sedan protokoll i
-båda repos ingångar. Blockerar inte B.
+UNDERHÅLL (UNDERHALL-INGANGAR-20260924) - GENOMFÖRT 2026-09-24, efter det samlade beskedet och sedan övergång 15
+aktiverats och lästs tillbaka. Mätt läsande: kontorets ingång stod på main; 33 lokala grenar, varav 12 utan kopia på
+origin; ingen stash. Unikt innehåll mätt per fil och blob mot mains historik: beslutsunderlagen för AP07, AP08, AP09
+och AP11 och de accepterade uppdragsfilerna med frusen acceptans för AP07, AP10 och AP11 var värda att publicera och
+är publicerade byte för byte som de låg på grenarna (PR 38); allt annat ligger på main i annan form eller är ersatta planlägen utan
+publiceringsvärde. De tolv grenarna finns kvar och är arkiverade som git bundle i
+`evidence/entry/local/maintenance-20260924/branches-without-origin-copy-20260924.bundle` (SHA256
+`44f5d79bb368c905200841cae2068800b268d8f1c562d2ed3e5effbd71eb9cd9`): aquarium/byggbeslut, aquarium/byggbeslut-r1,
+prep/ap10-operativt-bevakningsansvar, work/ap06, work/ap07, work/ap07-preparation, work/ap08, work/ap08-preparation,
+work/ap09-preparation, work/ap10-execution, work/ap10-intake-task och work/map-presentation. Kvar med namngivet skäl:
+office/aterfunnet-underlag och office/aterfunnet-underlag-r1, den första granskningsrundans commit för det återfunna
+underlaget, med samma träd som det publicerade; bara meddelandet rättades. Runtimes del står i
+Runtime-planen (dess uppdrag publicerat som Runtime PR 60, dess ingång nu på main). Protokollet står i `AGENTS.md` och
+i rutinen överst i denna plan; startkontrollen är `tools/ingang.py`.
 
 VILANDE POSTER, inga åtgärder nu. `office-watch-policy-1` och `office-assignment-cli-1` (DevelopmentTask, vilande sedan
 2026-09-20/21) återupptas inte. Före en eventuell fortsättning ska prövas: verkligt behov i dag, gällande mandat,
@@ -37,7 +57,7 @@ från tidigare konfigurationer (25 vilande vid registreringen) är ett namngivet
 bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd föreslås. Ingetdera är förkrav för Aquarium.
 
 ÅTERUPPTAGNINGSPUNKT: denna post, AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924, AQUARIUM-V0-BEREDNING-20260924,
-UNDERHALL-INGANGAR-20260924 och Runtime-planens ingång.
+UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924 och Runtime-planens ingång.
 
 ---
 
