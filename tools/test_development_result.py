@@ -284,7 +284,7 @@ class ReconcileTestCase(unittest.TestCase):
             dict(task, sha256="a" * 63),
             dict(task, acceptance_sha256="zz" * 32),
             dict(task, merge_commit="a" * 64),
-            dict(task, merge_commit=MERGE.upper()),
+            dict(task, merge_commit="A" * 40),     # uppercase hex; MERGE is all digits, so MERGE.upper() was MERGE
             {k: v for k, v in task.items() if k != "merge_commit"},
         ]
         for bad in bad_tasks:
