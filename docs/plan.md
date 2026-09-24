@@ -36,8 +36,8 @@ B. AQUARIUM V0 - ACCEPTERAT 2026-09-24 (AQUARIUM-V0-ACCEPT-20260924); ETAPP 1 P�
 Byggväg, läst ur Runtimes faktiska kontorsprofil (`runtime/task.py` och runbookens AP04-avsnitt): ett kontorsuppdrag
 får skriva uttryckligt uppräknade filer under `tools/` (aldrig `tools/kontor.py`), varje anrop får 1-3600 modellsekunder,
 inga automatiska omtag, frusen acceptans som värden kör i sin sandlåda, utförare och granskare namngivna i uppdraget,
-och uppdragets indata måste ligga committade på den rena ingången innan `tools/kontor.py start`; enligt rutinen ovan
-står ingången på main, så indata publiceras först. Gränsen två filer och 480 sekunder gäller bara AP-11:s ändliga
+och uppdragets indata måste ligga committade på den rena ingången innan `tools/kontor.py start`; för v0 läggs de därför
+på en namngiven uppdragsgren enligt arbetsformen nedan (AQUARIUM-V0-UPPDRAGSGREN-20260924). Gränsen två filer och 480 sekunder gäller bara AP-11:s ändliga
 utvecklingsbindning och tillämpas inte här. Uppdragen namnger Claude (`claude-opus-5`) som utförare och granskare, som
 den aktiva konfigurationens utförarval redan gör för alla utvecklingsroller; inget modellval eller utförarval ändras.
 Med samma modellfamilj som författare och granskare är granskningen en separat läsning, inte en oberoende bedömning.
@@ -61,6 +61,25 @@ leveransbesked. Prognos: byggbeslutets planeringsvärden gäller tills vidare - 
 2½-3½ arbetsdagar och hela v0 efter omkring 4½-6½ - och uppdateras när de två Runtime-uppdragens verkliga tider är
 kända. Ägarens närvaro behövs för ägarprovet (cirka 15 minuter) och vid en eventuell formgivningsfråga.
 
+ARBETSFORM FÖR V0:S RUNTIME-UPPDRAG (AQUARIUM-V0-UPPDRAGSGREN-20260924), ett avgränsat undantag från rutinen ovan för
+v0:s koduppgifter genom Runtimes kontorsväg; det behöver inte frågas om på nytt för varje deluppgift. Runtimes kontorsväg
+kräver att uppdragets indata ligger committade på ingången medan kontorets main står kvar på uppdragets bas fram till
+publiceringen. Därför står ingången, bara medan ett accepterat Aquarium-uppdrag pågår, på en namngiven uppdragsgren med
+indata ovanpå main och en planpost som säger vilket uppdrag som pågår, varför grenen används och var
+återupptagningspunkten finns. Main är ingångens viloläge. När basen är fryst integreras inget annat till kontorets main
+- inte heller plan, dokument eller indata - förrän uppdragets publicering är hanterad; löpande läge bokförs genom
+befintlig återupptagningsväg (planposten på uppdragsgrenen och kontorets privata återupptagning) utan att den frysta
+fjärrbasen flyttas. En skrivare åt gången. Startkontrollens varning står kvar och förklaras av undantaget; den stängs
+aldrig av eller kringgås. Uppdragsgren, exakta indata och återupptagningsläge bevaras enligt befintlig bevarandeväg, så
+att arbetet kan tas över utan att ägaren minns grennamn eller återberättar uppdraget. Tiden, omkring 1-2 timmar per
+uppdrag, är en uppskattning och ingen återställningsgräns: vid avbrott eller kvotbrist bevaras samma arbete, och grenen
+byts inte, filer återställs inte och uppdraget startas inte om bara för att tiden gått. Efter verifierad skyddad
+integration hanteras publiceringen av uppdragsunderlaget enligt befintlig granskning och sekretessgräns; originalens
+identiteter bevaras och acceptansen skrivs aldrig om i efterhand. Därefter återförs ingången till ren main lika med
+origin/main utan att uppdragsgren eller bevis går förlorade, och nästa uppdrag utgår från det då aktuella läget.
+Uppdrag och grenar i v0: `office-aquarium-projection-1` (läsning och projektion) på grenen aquarium/uppdrag-projektion;
+varje senare uppdrag namnges här innan dess bas fryses.
+
 UNDERHÅLL (UNDERHALL-INGANGAR-20260924) - GENOMFÖRT 2026-09-24, efter det samlade beskedet och sedan övergång 15
 aktiverats och lästs tillbaka. Mätt läsande: kontorets ingång stod på main; 33 lokala grenar, varav 12 utan kopia på
 origin; ingen stash. Unikt innehåll mätt per fil och blob mot mains historik: beslutsunderlagen för AP07, AP08, AP09
@@ -72,7 +91,11 @@ publiceringsvärde. De tolv grenarna finns kvar och är arkiverade som git bundl
 prep/ap10-operativt-bevakningsansvar, work/ap06, work/ap07, work/ap07-preparation, work/ap08, work/ap08-preparation,
 work/ap09-preparation, work/ap10-execution, work/ap10-intake-task och work/map-presentation. Kvar med namngivet skäl:
 office/aterfunnet-underlag och office/aterfunnet-underlag-r1, den första granskningsrundans commit för det återfunna
-underlaget, med samma träd som det publicerade; bara meddelandet rättades. Runtimes del står i
+underlaget, med samma träd som det publicerade; bara meddelandet rättades. Kvar med namngivet skäl: aquarium/accept och
+aquarium/accept-r1, registreringens första granskningsrunda (underkänd för två utelämnade ägarinstruktioner), och
+aquarium/arbetsform och aquarium/arbetsform-r1, arbetsformens första granskningsrunda (underkänd för ett försvagat
+publiceringsvillkor och en kvarlämnad motsägelse), samt aquarium/arbetsform-r2, ett ogranskat mellanläg av samma rättelse,
+bevarade som historik. Runtimes del står i
 Runtime-planen (dess uppdrag publicerat som Runtime PR 60, dess ingång nu på main). Protokollet står i `AGENTS.md` och
 i rutinen överst i denna plan; startkontrollen är `tools/ingang.py`.
 
@@ -83,8 +106,8 @@ från tidigare konfigurationer (25 vilande vid registreringen) är ett namngivet
 bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd föreslås. Ingetdera är förkrav för Aquarium.
 
 ÅTERUPPTAGNINGSPUNKT: denna post, AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924, AQUARIUM-V0-BEREDNING-20260924,
-UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924 och Runtime-planens
-ingång.
+UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924, AQUARIUM-V0-UPPDRAGSGREN-20260924
+och Runtime-planens ingång.
 
 ---
 
