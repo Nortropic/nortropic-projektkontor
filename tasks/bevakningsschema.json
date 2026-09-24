@@ -1,0 +1,22 @@
+{
+  "id": "office-watch-schema-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "42ad990e128cba140c1b4b850f043582b0c32b30",
+  "runtime_revision": "a1c0eb2e33a243518247e8ad91d582ac711423a3",
+  "allowed_paths": [
+    "tools/bevakning.py",
+    "tools/test_bevakning.py",
+    "tools/BEVAKNING.md"
+  ],
+  "attempt_seconds": 900,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md. Repair only provider schema compatibility while preserving strict host validation and all prior policy tests. Use synthetic fixtures and .scratch. No actual network/private data, model calls, operations, activation or publication; host owns acceptance, independent review and protected integration."
+    }
+  ],
+  "brief": "tasks/bevakningsschema.md",
+  "acceptance": "acceptance/bevakningsschema.py",
+  "acceptance_sha256": "76a0fa694061be3e843ada843ad4b6a0de190559f5f83c523903d8d5054a8ac8"
+}

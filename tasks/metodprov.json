@@ -1,0 +1,20 @@
+{
+  "id": "office-method-trial-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "d79cfc049b4da8920e3c7458cdbee1e7236f0a21",
+  "runtime_revision": "2789ea0770e4234161e9bdb0378a6e3e7b8432d2",
+  "allowed_paths": [
+    "tools/METODPROV.md"
+  ],
+  "attempt_seconds": 1200,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md and deliver the one Swedish method document under its exact scope. Do not disclose historical case diagnoses or pretend the method is proven. Run its standalone synthetic example. Do not modify host acceptance, active tools or Runtime. Existing Runtime owns separate review and protected integration."
+    }
+  ],
+  "brief": "tasks/metodprov.md",
+  "acceptance": "acceptance/metodprov.py",
+  "acceptance_sha256": "dc564411119f82c331ddbee10eb753d16e525b2ceb76c8df3952870d5a611c4e"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "ap11-step-5",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "a743f14970c3ff11952bf41592f05b5a5c13f986",
+  "runtime_revision": "8cc5934726b71081dab57ce07e521af58d6425fa",
+  "allowed_paths": [
+    "tools/development_result.py",
+    "tools/test_development_result.py"
+  ],
+  "attempt_seconds": 480,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "claude",
+      "prompt": "Add tools/development_result.py to the Office repo (Nortropic/nortropic-projektkontor, base a743f14970c3ff11952bf41592f05b5a5c13f986) as the AP11 delivery reconciliation A. It is a pure, read-only data module with one public function reconcile(goal, reports) that relates the named requirements of the accepted goal to saved Runtime delivery observations and returns a JSON-safe dict for later handoff through the existing AP08 owner view. Reuse tools/kontor_result.py for every per-report interpretation by calling kontor_result.render through the module attribute at call time (import kontor_result as a top-level module; do not copy or reimplement its checks; do not from-import render). Do not modify kontor_result.py, agarbild.py or any existing file. Input goal: dict with id (must be exactly 'office-ap11'), requirements (non-empty list of dicts with unique non-empty string id, non-empty string text, and task that is either None or a dict with id (non-empty string), sha256 (64 lowercase hex), acceptance_sha256 (64 lowercase hex), merge_commit (40 lowercase hex)), and next_action (dict with non-empty string text and non-empty string authority). Any other goal shape raises ValueError. Input reports: a list of saved observations in the kontor_result shape plus task_sha256 (64 hex); a non-list raises ValueError; a malformed report item is not an error but can never support a requirement. Output dict keys: goal_id; live (always False); remote_current (always False); whole_goal_complete (always False); limitations (non-empty list of strings stating that this is a saved observation without live remote verification, that no completion or authority is inferred, and that the separate final review judges the whole goal); next_action (an equal copy of goal['next_action'], unchanged including authority); requirements (same order as the goal; each with id, text, task copy, status, result, problems); unmatched_reports (task_id or None for each report that matches no named requirement, in input order). Requirement status vocabulary, exactly: 'missing' (task is None, or no report has task_id equal to task.id); 'ambiguous' (two or more reports carry that task_id, even if byte-identical: never select the positive one); 'not_supported' (exactly one report matched but kontor_result.render(report)['status'] is not 'delivered', or report task_sha256 != task.sha256, or report acceptance_sha256 != task.acceptance_sha256, or report integration.merge_commit != task.merge_commit); 'delivery_supported' (exactly one report matched, rendered status 'delivered' and all three identities equal). result is exactly the unmodified dict returned by kontor_result.render for the single matched report, else None; problems is a list of short strings explaining any status other than delivery_supported. Whole-goal completion is never derived from requirement statuses, even when every requirement is delivery_supported. The function must not mutate goal or reports (build fresh structures; treat inputs as read-only), must return only JSON-serialisable data with finite numbers, and must use no I/O: no open, os.*, subprocess, socket, ctypes, network, clock, environment or logging; only stdlib helpers such as re, copy, math and json. No CLI, no main, no file reading and no writing, no import-time side effects beyond importing kontor_result and stdlib. Add a unittest module at exactly tools/test_development_result.py (in the tools directory next to the module, NOT under a tests/ directory; the task's allowed paths are only tools/development_result.py and tools/test_development_result.py) with synthetic fixtures covering the positive case, each identity mismatch, each missing report field, verified_delivery False, the empty report list, identical and differing duplicates, malformed and foreign goals, non-list reports, input non-mutation and reuse of kontor_result.render; these are candidate tests, not host acceptance. Host acceptance is the frozen recipe VERIFICATION_RECIPE.py (sha256 1ff7338eff202ff3d70a858ab42f9e4e313c35dce5b3dff4016bb823e10e1a96), unchanged. Write nothing outside the two allowed paths."
+    }
+  ],
+  "acceptance": "acceptance/ap11_reconciliation.py",
+  "acceptance_sha256": "1ff7338eff202ff3d70a858ab42f9e4e313c35dce5b3dff4016bb823e10e1a96",
+  "brief": "tasks/ap11-step-5.md",
+  "review_provider": "claude",
+  "development": {
+    "contract_sha256": "e70b7cf086038700f9c742e276e5ef9373fdd902e8298e9f78d52c26075060d8",
+    "work": "reconciliation"
+  }
+}
