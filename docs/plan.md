@@ -1,4 +1,4 @@
-# Levande plan — AP-11 AVSLUTAT. Nästa: det accepterade modellvalet för Claude Code och Codex (steg 3)
+# Levande plan — AP-11 AVSLUTAT. Modellvalet (steg 3): del 1-3 integrerade; nästa handling är ägarens aktivering
 
 AKTUELLT 2026-09-24. Det ändliga åtagandet AP-11 är **godkänt och avslutat**. `office-ap11-assessment-6`, dess enda
 räknade granskning (anrop 31, resultatets SHA256 `d63221afc0ab1c3008911b49e48af684d64ca6c636bf188d9f31e5eccc756a77`), godkände hela slutacceptansen G1-G10 utan
@@ -11,15 +11,30 @@ G6-demonstrationen bars av den femte och prövades av den sjätte; två fel i Ru
 D027). Hela beslutskedjan står i beslutsloggen under AP11-BEREDNING till AP11-AVSLUT-20260924; värdens eget
 stängningskvitto ligger i Runtime under `.runtime/ap11/claude-path/sixth-assessment-20260924/CLOSURE-READBACK.json`.
 
-NÄSTA: det accepterade återanvändbara modellvalet för Claude Code och Codex, planens steg 3 från 2026-09-22 (se
-MODELLVAL-FORTSÄTTNING-20260924). Tillgodoräknat och inte att börja om: modellvalet i den frysta releasekonfigurationen
-med vägran i stället för reserv (D022), identitetskontrollen mot valt modellnamn, kvalificeringen av `claude-opus-5`
-och Runtimes egen CLI-kopia (D023). Kvar, i denna ordning:
- 1. Codex-startkedjan kopplad till valet (`worker_command()` anger i dag `gpt-6-astra`/`high` själv).
- 2. En enkel befintlig ingång för modellbyte utan källkodsredigering (i dag en egen härledd releaseövergång).
- 3. En konkret modellvalsfråga till ägaren när vald modell saknar kapacitet - ingen automatisk växling.
-Varje del som Runtime-ändring med separat granskning och skyddad integration; varje driftbyte genom kontrollerad,
-granskad övergång. Redovisas skilt från AP-11. AP-11 återöppnas inte.
+MODELLVALET, steg 3 från 2026-09-22 (se MODELLVAL-FORTSÄTTNING-20260924), redovisat skilt från AP-11; AP-11
+återöppnas inte. Tillgodoräknat och inte ombyggt: modellvalet i den frysta releasekonfigurationen med vägran i stället
+för reserv (D022), identitetskontrollen mot valt modellnamn, kvalificeringen av `claude-opus-5` och Runtimes egen
+CLI-kopia (D023). Byggt och integrerat i Runtime 2026-09-24, varje del med separat granskning och skyddad integration:
+ 1. Codex-startkedjan kopplad till valet: D028, Runtime PR 52. Utan val är varje kommando byte för byte detsamma som
+    förut, uppmätt mot den aktiva releasens egen kod.
+ 2. En enkel befintlig ingång för modellbyte utan källkodsredigering: D029, Runtime PR 53. Verktyget
+    `scripts/model_choice.py` (stage, check, activate) körs som den aktiva releasens egen kopia och kan bara ändra
+    modellvalet; aktiveringen är ägarens, och den börjar inte utan en väg tillbaka.
+ 3. En konkret modellvalsfråga till ägaren när vald modell saknar kapacitet: D030, Runtime PR 54. Värden frågar -
+    vänta, eller byt modell med verktyget - och växlar aldrig själv; köp och uppgraderingar är aldrig ett val.
+
+NÄSTA HANDLING ÄR ÄGARENS: aktivera Runtime-releasen som bär del 1-3 (övergång 14). Den är stegad, kontrollerad mot
+den levande värden och separat granskad; den ändrar bara Runtime-koden, bär kontoret, modellvalet och AP-10:s kommando
+oförändrade och har en väg tillbaka. Kör först kontrollen, som inte ändrar något, sedan bytet, i en egen terminal:
+
+    LC_ALL=C "<runtime>/.runtime/temporal-venv/bin/python" -B "<runtime>/.runtime/modellval/transition-14/release-transition-14.py" check
+    LC_ALL=C "<runtime>/.runtime/temporal-venv/bin/python" -B "<runtime>/.runtime/modellval/transition-14/release-transition-14.py" activate
+
+Därefter görs modellbyten med verktyget (Runtime-runbooken, "Changing the model choice").
+
+Iakttagelse utanför steg 3, inte åtgärdad: AP-10:s privata steg sväljer en avslutningssignal på samma sätt som AP-11:s
+väktare gjorde före Runtime D026 (reproducerat 2026-09-24 med den aktiva releasens egen kod: anropet gick vidare till
+sin tidsgräns). Det hör till AP-10:s mandat och är ägarens att avgöra.
 
 Office-sviten är grön igen på main efter PR 30: ett fall i resultatavstämningens prov kunde aldrig falla som det var
 skrivet (versaler av en fixtur med bara siffror) och ersattes med ett verkligt versalvärde. Ingen kod under prov ändrades.
