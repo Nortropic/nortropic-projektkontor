@@ -22,11 +22,16 @@ dominerar scenen (maskinrummet och det frostade rummet tonas ned) och PROVDATA m
 varje plats. Byggvägen, med en skrivare åt gången:
  1. Scenmall (kedjedrivaren): `SCEN` i `tools/aquarium_vy.py` byts mot arbetsvärlden ur den godkända prototypen med
     finjusteringarna, som statisk mall med platshållare; `SKRIPT` står kvar byte för byte. Separat granskad och skyddat
-    publicerad.
+    publicerad. Genomfört 2026-09-24 med denna post: platser för 16 levererade volymer, 8 kort för uppdrag som inte
+    arbetar, 3 bänkar, granskningsbordet, utkiken, 4 brev på ägarens bord, ett nedtonat maskinrum och ett nedtonat
+    frostat rum; en figur ritas bara där renderaren markerar arbete som motorläsningen belägger, och en oläst källa
+    visas som dimma, inte som tomhet.
  2. Runtime-uppdrag `office-aquarium-scene-2`, efterföljaren till det parkerade `office-aquarium-scene-1`, som står kvar
     parkerat, inte återupptas och vars frysta uppgift inte skrivs om: tilläggen a-c och datumregelns rättning i
     `tools/aquarium.py` och renderaren för arbetsvärlden i `tools/aquarium_vy.py`, med prov och anvisning, frusen
-    acceptans och uppdragsgren enligt arbetsformen nedan. Granskningsvägen är planerad före start: kontorsuppdragens
+    acceptans och uppdragsgren enligt arbetsformen nedan. Rättelse av en tidigare redovisning: motorläsningen bär
+    uppdragets id även för parkerade uppdrag, så deras kort namnges ur den, och uppdragsfilen ger den läsbara titeln
+    (tillägg c). Granskningsvägen är planerad före start: kontorsuppdragens
     obligatoriska granskning i Runtime har en fast gräns på 180 sekunder, så kedjedrivarens separata slutgranskning och
     skyddade publicering enligt AQUARIUM-V0-SLUTGRANSKNING-20260924 förbereds från början.
  3. Kedjedrivaren: den publicerade koden körs mot verkliga källor till en privat sida som prövas i Chrome och visas för
