@@ -1372,3 +1372,40 @@ kedjedrivarens arbetsplats; full källtäckning påstås inte, och ingen ny full
 uppdateras med tilläggen och redovisas i nästa ordinarie lägesbesked.
 
 **Ersätter:** ingenting; följer efter AQUARIUM-V0-GESTALTNING-20260924 och besvarar ägarens ställningstagande i dess ägartur.
+
+## AQUARIUM-V0-SCEN-20260925 — arbetsvärldens renderare och schema 2 integrerade: byggt och prövat av Runtime, separat granskat och skyddat integrerat av kedjedrivaren
+
+**Status:** registrerat 2026-09-25 av kedjedrivaren (Claude Code).
+
+**Leveransen:** `tools/aquarium.py` i schema 2 (datumregelns rättning; utförare och steg bara ur motorläsningens
+aktivitetsnamn; uppdragsnamn ur motorläsningen; titlar för redan identifierade parkerade uppdrag ur deras namngivna
+uppdragsfiler genom en avgränsad läsare) och renderaren med kommandot i `tools/aquarium_vy.py` runt den publicerade mallen,
+med prov (kontorssviten har nu 344) och anvisning. Integrerad genom PR 47 (merge `db2d0a29`) på den frysta basen
+`556e1ab0`, med oförändrade tillåtna filer och acceptans.
+
+**Runtime byggde och prövade kandidaten:** `office-aquarium-scene-3` byggde kandidaten `fbdfd481`, som klarade den frysta
+acceptansen `acceptance/aquarium_scen_2.py` med alla 21 kontroller. Runtimes obligatoriska granskning stannade vid sin fasta
+gräns på 180 sekunder utan utlåtande och står ofullständig. **Separat granskad och skyddat integrerad av kedjedrivaren:**
+kedjedrivaren körde samma frysta acceptans mot exakt kandidatens filer genom den aktiva releasens sandlåda, med samma
+utfall; en färsk läsande granskare granskade hela uppgiften inom en ram på 45 minuter och godkände utan blockerande fynd;
+kandidaten publicerades genom den befintliga skyddade publiceraren med kandidatbundna test- och granskningsresultat, och PR,
+integrerad revision och filträd lästes tillbaka. Övertagandet registrerades på uppdragsgrenen före publiceringen.
+
+**Föregångaren:** `office-aquarium-scene-2`, med samma bas och acceptans, föll på ett enda befintligt prov som fortfarande
+krävde schema 1; utföraren har bara filverktyg och kan inte köra prov, och resten av kandidaten klarade acceptansen i
+kedjedrivarens diagnos. En fortsättning av ett kontorsuppdrag skickar samma instruktion blint, så efterföljaren fick en
+beskrivning som namnger de befintliga prov och hjälpfunktioner som schema 2 berör. Indata granskades separat i varje steg.
+
+**Körningarna:** `office-aquarium-scene-2` står i `waiting_diagnosis` och `office-aquarium-scene-3` i `waiting_review`.
+Kontorets verktyg har ingen stödd avbrytningsväg för ett kontorsuppdrag, så båda står uttryckligt parkerade med sina bevis
+och återupptas inte för att publicera samma arbete igen. `office-aquarium-scene-1` står orört parkerat.
+
+**Iakttagelse:** vid indatagranskningen framkom att ett verkligt körnings-id från bevakningen hade använts som testvärde i
+de redan publicerade `acceptance/aquarium.py` och `acceptance/aquarium_2.py` (PR 43). Id:t ensamt röjer inget innehåll. De
+frysta acceptansfilerna skrivs inte om i efterhand; den nya acceptansen använder ett uppenbart syntetiskt värde, som ett
+scenario prövar att visningsskyddet döljer.
+
+**Nästa:** den publicerade koden körs mot verkliga källor till en privat sida som prövas i Chrome och visas för ägaren;
+därefter etapp 2 (fönstret på 127.0.0.1 med jämförelsen d) och etapp 3.
+
+**Ersätter:** ingenting; följer efter AQUARIUM-V0-ARBETSVARLD-20260924.

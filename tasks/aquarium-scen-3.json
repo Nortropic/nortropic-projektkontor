@@ -1,0 +1,25 @@
+{
+  "id": "office-aquarium-scene-3",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "556e1ab07dcec74640d425252c9c369f84dfcc08",
+  "runtime_revision": "c1cdaf5de3d10cd31d4a7aa0ea58e4e8d6b08797",
+  "allowed_paths": [
+    "tools/aquarium.py",
+    "tools/test_aquarium.py",
+    "tools/aquarium_vy.py",
+    "tools/test_aquarium_vy.py",
+    "tools/AQUARIUM.md"
+  ],
+  "attempt_seconds": 3600,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "claude",
+      "prompt": "Read TASK.md and do exactly what it states: schema 2 of tools/aquarium.py with the corrected date rule, the observed work and task names and the bounded task-file titles; the pure renderer and the command in tools/aquarium_vy.py around its unchanged SCEN and SKRIPT constants; synthetic tests under .scratch only; and tools/AQUARIUM.md. No real sources, network, model calls, operational controls or publication. Runtime owns the frozen acceptance; review and integration follow the office's working form."
+    }
+  ],
+  "review_provider": "claude",
+  "brief": "tasks/aquarium-scen-3.md",
+  "acceptance": "acceptance/aquarium_scen_2.py",
+  "acceptance_sha256": "7b3d459a7c1ccb52def3ed92bad9bdc993780151928d44109ba9d1666b20c863"
+}
