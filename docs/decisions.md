@@ -982,3 +982,67 @@ eller städkampanj. Nästa samlade besked till ägaren ger läget för A och B:s
 operatörsåtgärder eller beslut som faktiskt behöver ägaren.
 
 **Ersätter:** ingenting raderas. Följer efter MODELLVAL-FORTSÄTTNING-20260924.
+
+## AQUARIUM-V0-BEREDNING-20260924 — byggbeslut för Aquarium v0, endast förslag
+
+**Status:** berett 2026-09-24 av kedjedrivaren (Claude Code) enligt AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 del B.
+**Förslag, inte accepterat.** Paketet är [evidence/aquarium/byggbeslut.md](../evidence/aquarium/byggbeslut.md) med tre
+kompositionsskisser med provdata; en privat bilaga i `evidence/aquarium/local/` redovisar dagens verkliga läge så som v0
+skulle visa det, med källa och tid för varje uppgift.
+
+**Förslaget i korthet:** en lugn, lokal helskärmsvy i kontorsrepot som läser kontorets och Runtimes befintliga
+läsvägar och visar fem fasta platser (levererat, arbete och granskning, stående åtaganden, ägarens bord, tekniskt stöd)
+med observationstid och källa. Vyn är läsande och felar stängt i tid: den ser levande ut bara när observationen är
+färsk. Fyra etapper, första användbara vy efter omkring 2½–3½ arbetsdagar från accept och hela v0 efter omkring
+4½–6½, med redovisade osäkerheter. Acceptansen prövar både sanningsenlig visning mot källorna och faktisk användbarhet
+(mottagarprov, ägarprov, åtta timmars uthållighet, tv-avstånd).
+
+**Befogenheter som en accept skulle ge:** bygga v0 i kontorsrepot inom de namngivna sökvägarna med separat granskning
+och skyddad publicering; lokal läsning utan skrivning av de uppräknade källorna, Runtime endast genom den aktiva
+releasens kod; en användarägd läsprocess som bara lyssnar på `127.0.0.1` medan vyn används; visuell kontroll och
+mottagarprov i ägarens webbläsare med befintlig modell och befintligt abonnemang; en kvart av ägarens tid. Inget nytt
+repo, ingen Runtime-ändring, inga nya modeller, konton, betalvägar eller behörigheter.
+
+**Ersätter:** ingenting. Idéunderlagets grind från Bootstrap/Kernel-tiden (`AQUARIUM_IMPLEMENTATION_READY` efter
+Organization OS och digital tvilling) är inte arbetsorder; principen att projektionen aldrig äger sanningen behålls.
+Väntar på ägarens accept, ändring eller avböjande.
+
+## UNDERHALL-INGANGAR-20260924 — ägarbeslut: ingångarna följer main, inget arbete ligger bara lokalt
+
+**Status:** registrerat 2026-09-24 av kedjedrivaren (Claude Code). Ägarens ord bevaras ordagrant privat i
+`evidence/entry/local/owner-words-maintenance-20260924.md` (SHA256
+`40793a1cc5be6e11c18c64174767e07b9d4fb1ab9b4d585ca527111d71dc1865`). Ingen exakt klocktid tillskrivs ägaren.
+
+**Ärendet:** ett namngivet underhållsärende i den befintliga planen, inte en städkampanj. Det blockerar varken
+AP-10-rättningen eller Aquarium v0.
+
+**Ordning:** görs efter nästa samlade besked om A och B, utan konkurrerande skrivare. Runtimes primärutcheckning rörs
+inte, och inget publiceras till Runtime-main, förrän övergång 15 är aktiverad och återläst.
+
+**Mät först, läsande:** för kontorets och Runtimes primärutcheckningar aktuell gren, lokala grenar, stash och
+registrerade worktrees. För varje gren utan verifierad kopia på origin: spets, gemensam bas med main och om den finns på
+GitHub; unikt innehåll mätt på fil- och blobnivå mot mains historik, inte antal commits; och en klassning av varje unik
+ändring som redan på main i annan form, värd att publicera, historik utan publiceringsvärde eller privat som aldrig får
+publiceras. För Runtime dessutom vad primärutcheckningens spårade filer läses av i drift (tjänst, publicerare,
+operatörsskript); ett grenbyte föreslås först när det är visat att inget levande beror på dem. Den ändrade
+`runtime/integration.py` och de ospårade `evidence/runs` bevaras.
+
+**Åtgärda avgränsat:** det som är värt att publicera går den skyddade vägen med separat granskning; resten arkiveras
+som git bundle i privat hemvist (`.runtime/` respektive `evidence/…/local/`) med SHA256 och en planpost om vad den bär,
+och grenarna finns kvar. Runtimes ingång flyttas till main efter övergång 15, om mätningen tillåter.
+
+**Protokoll i båda repos befintliga ingångar** (AGENTS.md och planens rutin), separat granskat och skyddat publicerat:
+primärutcheckningen står på main lika med origin/main utan lokala commits, och arbete sker i separata kloner eller
+worktrees; vid sessionsstart hämtas och jämförs ingången med origin/main innan planen läses, och avviker den läses
+planen från origin/main och avvikelsen rapporteras; efter varje skyddad publicering snabbspolas ingången om den är ren,
+annars redovisas avvikelsen i leveransbeskedet; ingen arbetsgren lever bara lokalt utan slutar publicerad, arkiverad
+eller kvar med namngivet skäl i planen. En liten startkontroll som bara varnar får ingå; den får inte ändra
+behörigheter eller globala inställningar.
+
+**Gränser:** ingen radering av grenar eller commits, ingen force-push, ingen omskrivning av historik, ingen
+återställning. Privat material (`evidence/**/local`, `.runtime`, råhistorik) pushas aldrig; bevis och kvitton skrivs
+aldrig över. Inget nytt repo och inga nya befogenheter. Beskedet blir kort: vad som låg lokalt, vad av det som var
+unikt, vad som publicerats respektive arkiverats och att protokollet är på plats; endast verkliga beslut, till exempel
+unikt innehåll där ägaren behöver avgöra publicering, tas till ägaren.
+
+**Ersätter:** ingenting raderas. Följer efter AQUARIUM-V0-BEREDNING-20260924.
