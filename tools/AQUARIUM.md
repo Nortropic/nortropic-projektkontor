@@ -3,8 +3,8 @@
 Aquarium är en lugn läsvy över vad kontoret har levererat, vad som faktiskt arbetar eller väntar och vad som behöver
 ägaren. `tools/aquarium.py` gör två saker: den läser (avgränsat och utan skrivning) och den projicerar läsningen till en
 visningssäker sammanfattning (kontraktets `schema` är 2). Den startar, godkänner, byter eller ändrar ingenting, och den
-renderar ingenting; `tools/aquarium_vy.py` renderar sidan ovanpå projektionen. Runtime och kontoret behåller sina egna
-sanningskällor.
+renderar ingenting; `tools/aquarium_vy.py` renderar sidan ovanpå projektionen och `tools/aquarium_fonster.py` håller
+sidan öppen som ett lokalt fönster. Runtime och kontoret behåller sina egna sanningskällor.
 
 ## Vad som läses
 
@@ -129,7 +129,8 @@ stället för att gissas, och den konfigurerade bemanningen visas bara som konfi
 en figur och aldrig observerat arbete. Interaktivt arbete, till exempel kedjedrivarens sessioner, observeras inte och
 visas därför inte, varken som arbete eller som frånvaro av arbete.
 
-Sidan är en ögonblicksbild, inte en live-vy. Den startar i det inaktuella läget och görs färsk bara av sin egen lilla
+Sidan är en ögonblicksbild, inte en live-vy; i fönstret laddas den om när det finns en ny läsning (se Fönstret). Den
+startar i det inaktuella läget och görs färsk bara av sin egen lilla
 skript-rad (fäst med sin SHA-256 i sidans Content-Security-Policy) så länge läsningen är yngre än den minsta
 `stale_after_seconds` bland de lästa källorna; varje källrad märks dessutom `inaktuell` för sig när just den källan hunnit
 bli gammal. En inaktuell sida visar `senast kända läge`: världen står still, figurerna blir konturer och en banderoll
@@ -137,7 +138,8 @@ säger att det inte betyder att arbete, tjänst eller ägarärenden har upphört
 dimma med texten att läget är okänt, inte tomt — aldrig som tomhet eller nollor. En sida vars projektion är `provdata`
 märks `PROVDATA` en gång för hela sidan: den är syntetisk och ingen observation av verksamheten.
 
-Sidan gör aldrig något annat: den läser ingen källa, anropar ingen modell, hämtar inget över nätet, har inget formulär och
+Sidan gör aldrig något annat: den läser ingen källa och anropar ingen modell, och den hämtar inget över nätet — utom att
+fönstrets sida frågar sitt eget fönster på 127.0.0.1 efter den senaste lästiden. Den har inget formulär och
 ingen knapp som startar, godkänner, pausar eller ändrar något, och den visar inga privata texter, sökvägar eller
 körningsidentifierare — bara det projektionen redan har gjort visningssäkert.
 
@@ -153,3 +155,70 @@ läser bara den angivna filen och samlar, serverar, startar eller ändrar ingent
 
 Proven i `tools/test_aquarium_vy.py` använder bara syntetiska projektioner och tillfälliga filer under repots befintliga
 `.scratch`; de läser aldrig verkliga källor och använder aldrig nätet.
+
+## Fönstret
+
+Vyn ovan är ett kommando som skriver en sida. Fönstret är samma sida, men öppen: en egen läsprocess som du startar och
+stoppar, och som läser om medan sidan är öppen.
+
+```
+python3 -B tools/aquarium_fonster.py [--port PORT]
+```
+
+Kommandot gör först en läsning — samma avgränsade läsning som `tools/aquarium.py` gör — och lyssnar sedan på
+`127.0.0.1`, på port `8741` eller den port du anger (fyra eller fem siffror, 1024–65535). Lyckas det skrivs raden
+`Aquarium-fönstret: http://127.0.0.1:8741/ · stoppa med Ctrl-C` på standard ut, och processen stannar där tills du
+avslutar den med Ctrl-C; då avslutas den tyst med 0. Går något fel — felaktiga argument, en första läsning som inte gick
+att göra eller en port som inte kunde öppnas — avslutas kommandot med 2 och enbart raden
+`Kunde inte starta Aquariums fönster.` på standardfel, utan något privat och utan att något skrivs på standard ut.
+Fönstret är en användarägd process: det startar inte vid inloggning, det är ingen bakgrundstjänst, det installerar
+ingenting och det exponerar ingenting utåt. Öppna adressen i Chrome, lägg fönstret i helskärm och spegla skärmen till
+tv:n om du vill ha bilden uppe i rummet.
+
+**Sidan laddar om sig själv.** Fönstrets sida bär, vid sidan av `SKRIPT`, ett andra litet skript, `FONSTERSKRIPT`, som
+är fäst med sin SHA-256 i sidans Content-Security-Policy precis som `SKRIPT`. Var 30:e sekund frågar det `/lasning.json`
+efter den senaste lästiden och laddar om sidan bara när tiden skiljer sig från den sida du ser. Det patchar ingenting
+och ritar ingenting själv: renderaren förblir det enda stället som gör en sida av en projektion. Har du en panel öppen
+och ingen ny läsning finns, ligger panelen kvar — sidan laddas inte om i onödan.
+
+**Läsningstakten.** En läsning görs bara när sidan frågar, och bara när det gått minst 120 sekunder sedan den förra
+läsningen *började*. Alltså läses källorna högst varannan minut, och bara medan en sida är öppen; står ingen sida öppen
+rörs källorna inte alls. En läsning i taget: frågar sidan medan en läsning pågår görs ingen ny. Misslyckas en läsning
+behålls den förra läsningen och dess sida oförändrade, men försöket räknas som påbörjat, så nästa försök sker tidigast
+120 sekunder senare.
+
+**Färskheten avgör sidan själv.** Fönstret gör ingenting åt hur färsk sidan ser ut. Det är sidans eget `SKRIPT` som var
+30:e sekund jämför läsningens tid med din klocka. Ett stoppat fönster, en sovande dator eller ett nät som ligger nere
+ger därför en sida som blir `inaktuell` när dess läsning är äldre än fem minuter — den ser aldrig färskare ut än den
+läsning den vilar på.
+
+**`nytt läge`.** Fönstret håller sina två senaste läsningar i minnet och jämför dem. Ett uppdrags observerade läge i en
+läsning är antingen *arbete* med motorns steg, tillstånd och utförare, eller *vilar* för ett uppdrag som inte arbetar;
+ett uppdrags-id som förekommer mer än en gång i samma läsning är tvetydigt och har inget läge. Skiljer sig läget mellan
+de två läsningarna märks uppdraget `nytt läge`: en märkning på den plats som visar uppdraget — en bänk, granskningsbordet
+eller ett kort på tavlan — och en rad i fördjupningen som säger vilken tid den förra läsningen har och vilket läge den
+visade. Raden säger bara att läget skiljer sig från förra läsningen. Den säger ingenting om när, hur, via vilken väg
+eller av vem det ändrades, och den beskriver ingen **överlämning** mellan två utförare: källorna belägger ingen sådan,
+och då påstår fönstret ingen. Den tid som står i raden är en lästid, inte en händelsetid.
+
+Finns ingen jämförelse säger fördjupningen vilken: `första läsningen sedan fönstret startade` vid den första läsningen
+och efter en omstart, och `underlaget räcker inte för en jämförelse` när underlaget inte räcker — när motorn inte gick
+att läsa i någon av läsningarna, när den ena är provdata och den andra inte, eller när tiden mellan läsningarna inte är
+mer än 0 och högst 300 sekunder. Då visas bara det aktuella läget, utan någon uppdiktad tidigare övergång. En märkning
+gäller bara läsningen efter ändringen: nästa läsning jämför på nytt, och märkningen är borta om läget inte ändrats igen.
+På en bänk och vid granskningsbordet anländer märkningen en gång i det färska läget; ett kort på tavlan är ett uppdrag
+som inte arbetar och flyttar sig aldrig.
+
+**Minne, inte historik.** Fönstret håller den senaste läsningen och dess sida i minnet och inget annat: ingen skriven
+fil, ingen händelsemotor, ingen databas och ingen historik. Stoppar du fönstret är det borta, och nästa start börjar om
+med en första läsning.
+
+**Vad fönstret svarar på.** Bara `GET` av `/` och `/lasning.json`, bara från `127.0.0.1` och bara när förfrågans
+värdnamn är exakt `127.0.0.1:PORT` — det hindrar andra sidor i webbläsaren från att läsa fönstret genom ett annat namn
+för 127.0.0.1. Allt annat får en fast rad: 405 för andra metoder, 403 för annan klient eller annat värdnamn och 404 för
+andra sökvägar. Innan den första läsningen finns svarar `/` med 503. Svaren cachas inte, sidan får inte bäddas in i en
+annan sida, och fönstret för ingen logg över vad som efterfrågats.
+
+Proven i `tools/test_aquarium_fonster.py` använder bara syntetiska projektioner, egna läsare och en egen klocka. De
+binder aldrig en socket: svaren efterfrågas direkt, hanteraren körs mot en koppling i minnet, och servern och läsningen
+byts ut när kommandot prövas. De läser aldrig verkliga källor, använder aldrig nätet och skriver ingen fil.
