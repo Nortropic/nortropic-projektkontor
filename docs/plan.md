@@ -44,16 +44,15 @@ RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
     arbetaren utan fel, och båda stoppen var rena.
  3. Aquariums leverans (spår A), där datumbristen i Arkivet står öppet redovisad. Genomfört 2026-09-25
     (AQUARIUM-V0-LEVERANS-20260925).
- 4. Nästa steg: användningsprovet `office-aquarium-arkivdatum-1` startas under den aktiva releasen (runtime `c1cdaf5d`), före
-    övergången. Från start till publicering integreras inget annat till kontorets main, enligt arbetsformen för
-    Runtime-uppdrag. Blir dess första granskning klar inom 180 sekunder får den bli klar och fördröjs eller upprepas
-    inte; revisionsfortsättningen är då prövad bara isolerat, och det redovisas så.
- 5. Övergång 16, som ägaren aktiverar med ett komplett kommando (`LC_ALL=C`, färsk kontroll, bindningar, driftpåverkan
-    och återhämtningsväg).
- 6. Stannade användningsprovets granskning vid 180 sekunder, fortsätter uppgiften under den nya releasen med
-    granskningstiden 720 sekunder. Det är kedjedrivarens val inom ramen, ungefär en och en halv gång den längsta
-    uppmätta fullständiga granskningen av samma slags kandidat (488 sekunder). Godkänt publiceras uppgiften av Runtimes
-    egen publicering.
+ 4. Användningsprovet `office-aquarium-arkivdatum-1` under den aktiva releasen (runtime `c1cdaf5d`), före övergången.
+    Genomfört 2026-09-25 (RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925): Runtimes egen granskning blev klar på 49,7
+    sekunder och godkände, och Runtime publicerade själv (PR 63). Revisionsfortsättningen är därför prövad bara
+    isolerat, och datumbristen i Arkivet är rättad.
+ 5. Nästa steg: övergång 16, som ägaren aktiverar med ett komplett kommando (`LC_ALL=C`, färsk kontroll, bindningar,
+    driftpåverkan och återhämtningsväg). Den står i ägarens tur nedan. Därefter uppdateras Runtimes plan och
+    beslutslogg.
+ 6. Behövdes inte: användningsprovets granskning stannade inte vid 180 sekunder, så ingen fortsättning med
+    granskningstid kördes.
 
 ETAPP 2 BYGGS: FÖNSTRET (inom AQUARIUM-V0-ACCEPT-20260924 och AQUARIUM-V0-ARBETSVARLD-20260924). Arbetsvärlden är
 visad med verkliga källor: steg 3 i posten nedan är genomfört med den publicerade koden, sidan prövades färsk och
@@ -259,10 +258,13 @@ till två arbetsdagar därefter, plus ägarprovet och åtta timmars uthållighet
 
 Ägarens tur: väntar ett beslut eller en operatörshandling på ägaren skrivs det i denna plan under en egen rad med
 blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD`
-eller `- [operatörshandling] text`; Aquarium läser blocket från main. Blocket finns inte nu:
-byggbeslutet för granskningens tidsbudget är accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i
-etapp 3 är godkänt (AQUARIUM-V0-AGARPROV-GODKANT-20260925). Övergång 16 skrivs in här som operatörshandling när den är
-förberedd. Förslaget till Digitala 1 syns för ägaren som beslutsloggens förslag, inte som ett block här.
+eller `- [operatörshandling] text`; Aquarium läser blocket från main. Byggbeslutet för granskningens tidsbudget är
+accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3 är godkänt
+(AQUARIUM-V0-AGARPROV-GODKANT-20260925). Förslaget till Digitala 1 syns för ägaren som beslutsloggens förslag, inte som
+ett block här. Övergång 16 är förberedd och står i blocket:
+
+ÄGARENS TUR
+- [operatörshandling] Aktivera övergång 16 med kedjedrivarens kommando: först check, sedan activate
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -270,7 +272,8 @@ andra); `digitala/beredning-r1-reviewed` och `digitala/beredning-r2-reviewed` (g
 DIGITALA-1-BEREDNING-20260925, den första underkänd och den andra ersatt av den publicerade tredje);
 `digitala/komplettering-r1` (ogranskat första utkast till DIGITALA-1-KOMPLETTERING-20260925, rättat före granskning);
 `aquarium/leverans-r1` (granskad första version av AQUARIUM-V0-LEVERANS-20260925, ersatt av den publicerade andra).
-Användningsprovets indatagren `aquarium/uppdrag-arkivdatum-r1` publiceras som uppdragsgren när uppdraget startas.
+Användningsprovets två grenar, `aquarium/uppdrag-arkivdatum-r1` och `aquarium/uppdrag-arkivdatum`, står i stycket om uppdrag och
+grenar i v0.
 
 
 ARBETSFORM FÖR V0:S RUNTIME-UPPDRAG (AQUARIUM-V0-UPPDRAGSGREN-20260924), ett avgränsat undantag från rutinen ovan för
@@ -316,7 +319,12 @@ Runtime, slutgranskat och integrerat av kedjedrivaren, PR 50), båda på grenen 
 `waiting_diagnosis` och `-2` parkerat i `waiting_review`, och inget av dem återupptas för att publicera samma arbete
 igen. Grenen står kvar lokalt med namngivet skäl: dess commits är uppdragsindatas ursprungliga identiteter, acceptansens
 omstrukturering och övertagandets registrering, och den integreras inte (indata publicerades byte för byte med denna
-post); den är också arkiverad som git bundle i `evidence/aquarium/local/etapp2/`.
+post); den är också arkiverad som git bundle i `evidence/aquarium/local/etapp2/`. Användningsprovet för Runtimes granskningstid, `office-aquarium-arkivdatum-1`
+(RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925), kördes på grenen aquarium/uppdrag-arkivdatum, vars indata är
+samma byte som de granskade på aquarium/uppdrag-arkivdatum-r1 ovanpå den tidigare basen. Uppdraget står avslutat och
+publicerat av Runtime (PR 63). Båda grenarna står kvar lokalt med namngivet skäl: deras commits är indatas
+ursprungliga identiteter, och de integreras inte (indata publicerades byte för byte med den posten). De är också
+arkiverade som git bundle i `evidence/granskningsbudget/local/anvandningsprov/`.
 
 UNDERHÅLL (UNDERHALL-INGANGAR-20260924) - GENOMFÖRT 2026-09-24, efter det samlade beskedet och sedan övergång 15
 aktiverats och lästs tillbaka. Mätt läsande: kontorets ingång stod på main; 33 lokala grenar, varav 12 utan kopia på
@@ -359,8 +367,8 @@ AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V
 AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925, AQUARIUM-V0-FONSTER-20260925, AQUARIUM-V0-AGARPROV-20260925,
 AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925,
 RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925,
-DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925 och Runtime-planens
-ingång.
+DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925,
+RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925 och Runtime-planens ingång.
 
 ---
 
