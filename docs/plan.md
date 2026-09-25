@@ -8,21 +8,51 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0 levererat, granskningstiden aktiv; Digitala 1 väntar på ägaren. AP-10-rättningen aktiv
+# Levande plan — Digitala 1: fiktiv kvalitetsdemo och avgränsad Runtime-diagnos. Aquarium v0 och granskningstiden klara
 
 TVÅ SPÅR (ARBETA-VIDARE-20260925). Spår A, Aquarium: levererat 2026-09-25 (AQUARIUM-V0-LEVERANS-20260925,
 `evidence/aquarium/leverans.md`). Uthållighetsprovet gick i åtta timmar till 17:05:59Z, med stoppkontroll, och
 primärutcheckningen följer main igen. Spår B, Runtime: förbättringen av granskningens tidsgräns är genomförd och aktiv
 enligt RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925; ägaren aktiverade övergång 16 2026-09-25 kl. 18:06Z (ordningen nedan).
-Båda spåren har nått sitt klart-när och står still. Nästa bygge behöver ett eget accepterat uppdrag; det som väntar är
-Digitala 1 nedan.
+Båda spåren har nått sitt klart-när och står still.
 
-NÄSTA UPPDRAG BEREDS (ägarens besked 2026-09-25, privat i `evidence/nasta-uppdrag/local/`). Beslutspaketet är
-DIGITALA-1-BEREDNING-20260925 med DIGITALA-1-KOMPLETTERING-20260925, som följer ägarens förtydligande samma dag. Det
-väntar på ägarens accept och två samlade svar. Det första gäller verksamheten, med behov, medgivande och underlag. Det
-andra gäller Vercel-kontot och dess upplägg för förhandsvisning och åtkomst. Hobby räcker inte, och ett Pro-team är
-rekommenderat som ägarens kostnadsbeslut. Inget byggs, installeras eller driftsätts före accepten. Aquariums avslut och
-Runtime-paketet, som gick före, är klara.
+DIGITALA 1 — FIKTIV KVALITETSDEMO OCH RUNTIME-DIAGNOS (DIGITALA-1-ACCEPT-20260925, ägarens besked privat i
+`evidence/digitala/local/`; gränserna står avsnitt för avsnitt i beslutsposten). Två spår, med en skrivare åt gången.
+Nästa besked till ägaren ger diagnosens läge och den första samlade briefen och designriktningen, med verifierat
+Vercel-team eller den enda konkreta åtkomstfråga som återstår.
+
+Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
+`evidence/digitala/local/norrglanta/`.
+ 1. Webbvägen som demon behöver (etapp 0, avgränsad till den vägen; en större återuppbyggnad kräver ett eget beslut).
+    Tre beroenden var klarlagda genom läsning i DIGITALA-1-KOMPLETTERING-20260925: webbgrundens skills, agenter och
+    arbetsflöden är inte installerade för Claude Code; kvalitetsgrindarnas verktygsrot `tools/web-quality/` behöver
+    `npm ci`; vakterna i efterarbetets rader 1-3 blockerar bara en rättelse i webbgrunden själv. Dessutom prövas
+    demoförfrågan utan leverans mot webbgrundens primärhandlingsgrind, med dess testklienthantering och utan att
+    regeln för riktiga kunder sänks. Mindre blockerande rättelser går genom webbgrundens egen granskning och publicering.
+ 2. Research och samlad brief ur scenariot, med webbgrundens planeringssteg och inspirationsarbete och en
+    rekommenderad visuell riktning tidigt. Ägaren bedömer målbild och designriktning vid briefstoppet.
+ 3. Vercel: verktyget 60.0.1 är installerat men inte inloggat. Teamet verifieras och bokförs efter inloggningen. Före
+    första uppladdningen: skydd för alla relevanta adresser, noindex, de uppladdade filerna och kostnadsinställningarna.
+ 4. Efter briefgodkännandet: repot `Nortropic/kund-demo-norrglanta`, bygget och webbgrundens granskning och
+    launchbedömning på den skyddade förhandsvisningen.
+ 5. Leverans: den skyddade webbplatsen, verkliga kontroller på mobil och större skärm, prövad navigation, länkar och
+    demoförfrågan, separat granskning mot briefen och gällande kvalitetskrav, uppmätt, bedömt och oprövat åtskilt, och en
+    kort överlämning med begränsningar. Den byggda sajten visas; poäng och gröna prov ersätter inte visuell bedömning.
+Prognos: brief och designriktning 2026-09-25. Efter briefgodkännandet omkring en till två arbetsdagar för bygge,
+granskning och leverans, beroende av vad etapp 0 visar. Uppskattningar, inga gränser.
+
+Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
+19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
+i en separat arbetsplats på samma kandidat `e68d3828` med publicerarens exakta anrop och miljö, och fyra genom
+publicerarens egen kod i provläge med svitens hela utdata fångad även vid vägran. Alla tolv var gröna. Utfallet är
+"inte reproducerat", inte åtgärdat; orsaken är okänd. Bättre fångst framåt: Runtimes publiceringsprov körs genom
+fångstomslaget, så att ett fallande prov, hela utdata, returkod och miljö bevaras. Bedömningen av påverkan: demon
+använder kontorets skyddade publicering och webbgrundens egen väg, inte Runtimes, så det olösta felet stoppar bara en
+framtida Runtime-publicering. Registret står privat i `evidence/granskningsbudget/local/svitdiagnos-20260925T192418Z/`.
+
+AP-10: nästa ordinarie körning enligt det levande schemat är 2026-09-26 07:00Z (läst 2026-09-25 18:07Z). Demon
+startar inga Runtime-implementationer och ändrar inte AP-10. Det är tillfällig arbetsplanering, inte ett påstående att
+samexistensen med AP-10 är löst.
 
 RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
  1. Genomfört 2026-09-25: Runtime-ändringen (Runtime D033) är byggd och prövad (550 prov, 25 bevarade historiker
@@ -263,8 +293,8 @@ till två arbetsdagar därefter, plus ägarprovet och åtta timmars uthållighet
 blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD`
 eller `- [operatörshandling] text`; Aquarium läser blocket från main. Byggbeslutet för granskningens tidsbudget är
 accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3 är godkänt
-(AQUARIUM-V0-AGARPROV-GODKANT-20260925). Förslaget till Digitala 1 syns för ägaren som beslutsloggens förslag, inte som
-ett block här. Ingen operatörshandling väntar på ägaren nu, så blocket finns inte: övergång 16 är aktiverad.
+(AQUARIUM-V0-AGARPROV-GODKANT-20260925). Digitala 1 är accepterat
+(DIGITALA-1-ACCEPT-20260925); ägarens bedömning av briefen skrivs in här som beslut när briefen är klar. Ingen operatörshandling väntar på ägaren nu, så blocket finns inte: övergång 16 är aktiverad.
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -372,7 +402,7 @@ AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925, AQUARIUM-V0-FONSTER
 AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925,
 RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925,
 DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925,
-RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925 och Runtime-planens ingång.
+RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925 och Runtime-planens ingång.
 
 ---
 
