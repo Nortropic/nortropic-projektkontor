@@ -1,0 +1,23 @@
+{
+  "id": "office-aquarium-arkivdatum-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "7fcbc77ea5c9ccc93b77396c1733bda467fe2f76",
+  "runtime_revision": "c1cdaf5de3d10cd31d4a7aa0ea58e4e8d6b08797",
+  "allowed_paths": [
+    "tools/aquarium.py",
+    "tools/test_aquarium.py",
+    "tools/AQUARIUM.md"
+  ],
+  "attempt_seconds": 1800,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "claude",
+      "prompt": "Read TASK.md and do exactly what it states: in tools/aquarium.py, an Arkivet item from the decision log without its own date takes the date of the delivery note of the same commitment and says so in its basis; add the two named tests to class Arkivet in tools/test_aquarium.py; add the one sentence to tools/AQUARIUM.md. No other file, real sources, network, model calls, operational controls or publication. Runtime owns the frozen acceptance; review and integration follow the office's working form."
+    }
+  ],
+  "review_provider": "claude",
+  "brief": "tasks/aquarium-arkivdatum-1.md",
+  "acceptance": "acceptance/aquarium_arkivdatum_1.py",
+  "acceptance_sha256": "0e59b88d47a9c56d0903633d226a5283d9fcee1ab5326b7e07a7884d9fe2ce53"
+}

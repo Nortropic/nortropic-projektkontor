@@ -1948,3 +1948,25 @@ prövad, och den mindre texten är liten på tv-avstånd. Det som byggbeslutet l
 bygge behöver ett eget accepterat uppdrag.
 
 **Ersätter:** ingenting.
+
+## RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925 — användningsprovet office-aquarium-arkivdatum-1 levererat
+
+**Status:** genomfört 2026-09-25 inom RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, steg 4 i planens RUNTIME-BYGGET I
+ORDNING. Uppdraget kördes genom Runtimes kontorsväg under den aktiva releasen (runtime `c1cdaf5d`), på den frysta basen
+main `7fcbc77e` från uppdragsgrenen aquarium/uppdrag-arkivdatum.
+
+**Utfallet:** Runtimes utförare (Claude, `claude-opus-5`) byggde kandidaten på 43 sekunder, och den frusna acceptansen
+godkände den. Runtimes egen granskning blev klar på 49,7 sekunder, inom den aktiva releasens gräns på 180 sekunder, och
+godkände utan blockerande fynd. Runtime publicerade själv (PR 63, main `3362b61b`). Arkivet tar nu datumet ur
+leveransbeskedet när en leveranspost saknar eget datum och säger det. På kontorets verkliga läge visas AP10 med
+2026-09-21 och grunden "beslutsloggen AP10-LEVERANS, datum ur leveransbesked AP10". Därmed är datumbristen som
+Aquariums leverans redovisade som öppen (AQUARIUM-V0-LEVERANS-20260925) rättad. Före start prövades den frusna
+acceptansen på den nya basen: basen föll, referenslösningen godkändes och sex felinjiceringar fälldes.
+
+**Vad provet inte visade:** eftersom granskningen blev klar inom 180 sekunder fick den bli klar, enligt accepten.
+Fortsättningen över revisionsbytet med en uttrycklig granskningstid är därför prövad bara isolerat, i helhetsprovet
+på isolerad motor, inte i drift.
+
+**Nästa:** övergång 16 väntar på ägaren som operatörshandling. Därefter uppdateras Runtimes plan och beslutslogg.
+
+**Ersätter:** ingenting.
