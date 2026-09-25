@@ -8,18 +8,31 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0 i slutprov, Runtime-förbättringen bereds parallellt. AP-10-rättningen levererad och aktiv
+# Levande plan — Aquarium v0 i slutprov, Runtime-förbättringen byggs parallellt. AP-10-rättningen levererad och aktiv
 
 TVÅ SPÅR (ARBETA-VIDARE-20260925). Spår A, Aquarium: uthållighetsprovet pågår och skyddas. Fönstret, mätningen och
 stoppkontrollen fortsätter utan ingrepp. Den prövade arbetskatalogen (primärutcheckningen) snabbspolas inte och byter
 inte gren förrän provet är slut; det är ett namngivet undantag från rutinen ovan. Ingen ny Runtime-release aktiveras,
 tjänsten startas inte om och AP-10 ändras inte. Annat arbete som påverkar tolkningen av lastmätningen redovisas i
 leveransbeskedet. Ägarprovet väntar på ägaren (ägarens tur nedan), och leveransredovisningen förbereds; leveransen sker
-mot den befintliga acceptansen. Spår B, Runtime: förbättringen av granskningens tidsgräns bereds i separat arbetsplats,
-med riktad läsning, lösningsberedning och små isolerade, i första hand modellfria förprov, utan anslutning till den
-levande motorn eller dess databas och utan implementation eller aktivering. Det korta, samlade byggbeslutet är framlagt
-som RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925 och väntar på ägarens accept; före accepten implementeras eller
-aktiveras inget. Redovisningen håller spåren isär.
+mot den befintliga acceptansen. Spår B, Runtime: förbättringen av granskningens tidsgräns byggs enligt
+RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, med implementation och lätta isolerade prov i en separat Runtime-arbetsplats,
+utan anslutning till den levande motorn eller dess databas. Redovisningen håller spåren isär.
+
+RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
+ 1. Nu: implementation, lätta isolerade prov, separat granskning och skyddad integration i Runtime.
+ 2. Efter uthållighetsprovets slut och stoppkontroll: helhetsprovet på isolerad motor, release och isolerad startövning.
+ 3. Aquariums leverans (spår A), där datumbristen i Arkivet står öppet redovisad.
+ 4. Användningsprovet `office-aquarium-arkivdatum-1` startas under den aktiva releasen (runtime `c1cdaf5d`), före
+    övergången. Från start till publicering integreras inget annat till kontorets main, enligt arbetsformen för
+    Runtime-uppdrag. Blir dess första granskning klar inom 180 sekunder får den bli klar och fördröjs eller upprepas
+    inte; revisionsfortsättningen är då prövad bara isolerat, och det redovisas så.
+ 5. Övergång 16, som ägaren aktiverar med ett komplett kommando (`LC_ALL=C`, färsk kontroll, bindningar, driftpåverkan
+    och återhämtningsväg).
+ 6. Stannade användningsprovets granskning vid 180 sekunder, fortsätter uppgiften under den nya releasen med
+    granskningstiden 720 sekunder. Det är kedjedrivarens val inom ramen, ungefär en och en halv gång den längsta
+    uppmätta fullständiga granskningen av samma slags kandidat (488 sekunder). Godkänt publiceras uppgiften av Runtimes
+    egen publicering.
 
 ETAPP 2 BYGGS: FÖNSTRET (inom AQUARIUM-V0-ACCEPT-20260924 och AQUARIUM-V0-ARBETSVARLD-20260924). Arbetsvärlden är
 visad med verkliga källor: steg 3 i posten nedan är genomfört med den publicerade koden, sidan prövades färsk och
@@ -226,10 +239,9 @@ till två arbetsdagar därefter, plus ägarprovet och åtta timmars uthållighet
 
 Ägarens tur: väntar ett beslut eller en operatörshandling på ägaren skrivs det i denna plan under en egen rad med
 blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD`
-eller `- [operatörshandling] text`; Aquarium läser blocket från main. Två beslut väntar på ägaren. Byggbeslutet för
-granskningens tidsbudget (RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925) visar Aquarium ur beslutsloggen, så det står
-inte i blocket. Ägarprovet i etapp 3 (byggbeslutets acceptans, punkt 9), där ägarens omdöme avgör och ett nej ger ett
-formgivningsvarv inom etappen, står i blocket:
+eller `- [operatörshandling] text`; Aquarium läser blocket från main. Byggbeslutet för granskningens tidsbudget är
+accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925). Ett beslut väntar på ägaren: ägarprovet i etapp 3
+(byggbeslutets acceptans, punkt 9), där ägarens omdöme avgör och ett nej ger ett formgivningsvarv inom etappen:
 
 ÄGARENS TUR
 - [beslut] Ägarprovet: öppna Aquarium-fönstret, svara på de fem frågorna och bedöm om vyn känns lugn och som ett akvarium och inte som en tabell — sedan 2026-09-25
@@ -303,7 +315,9 @@ historik och arkiverad som git bundle i `evidence/aquarium/local/etapp2/`. Kvar 
 etapp 3-planpostens första granskningsrunda (underkänd för ett felräknat intervall mellan två läsningar), bevarad som
 historik och arkiverad som git bundle i `evidence/aquarium/local/etapp3/`. Kvar med namngivet skäl: aquarium/agarprov-r1,
 ägarprovspostens första granskningsrunda (underkänd för en kvarlämnad mening om att punkterna 9 och 10 återstod), bevarad
-som historik och arkiverad som git bundle i `evidence/aquarium/local/etapp3/`. Runtimes del står i
+som historik och arkiverad som git bundle i `evidence/aquarium/local/etapp3/`. Kvar med namngivet skäl:
+aquarium/agarprov-rattelse-r1, rättelsens första granskningsrunda (underkänd för att beslutsposten tappade ägarens
+gränser), bevarad som historik och arkiverad som git bundle i `evidence/aquarium/local/etapp3/`. Runtimes del står i
 Runtime-planen (dess uppdrag publicerat som Runtime PR 60, dess ingång nu på main). Protokollet står i `AGENTS.md` och
 i rutinen överst i denna plan; startkontrollen är `tools/ingang.py`.
 
@@ -317,8 +331,8 @@ bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd f�
 UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924, AQUARIUM-V0-UPPDRAGSGREN-20260924,
 AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924,
 AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925, AQUARIUM-V0-FONSTER-20260925, AQUARIUM-V0-AGARPROV-20260925,
-AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925 och
-Runtime-planens ingång.
+AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925,
+RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925 och Runtime-planens ingång.
 
 ---
 

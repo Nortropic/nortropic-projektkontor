@@ -1646,3 +1646,62 @@ första granskning alls stannar.
 Inga andra ändringar eller befogenheter ingår.
 
 **Ersätter:** ingenting. Följer ARBETA-VIDARE-20260925.
+
+## RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925 — ägaren accepterar byggbeslutet för granskningens tidsbudget, med preciseringar
+
+**Status:** registrerat 2026-09-25 av kedjedrivaren (Claude Code). Ägarens ord bevaras ordagrant privat i
+`evidence/granskningsbudget/local/owner-words-accept-20260925.md` (SHA256
+`a323e9647e76efecc5f83168f59816bba631d3882c3e3299753dcba022d6e337`). Ingen exakt klocktid tillskrivs ägaren.
+
+**Accepten:** RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925 (kontorets PR 55) är genomförandemandat inom sin angivna
+omfattning, med preciseringarna nedan. Accepten gäller Runtime-bygget. Den ersätter inte ägarens ägarprov för Aquarium
+och godkänner inte ett ännu ofärdigt slutprov.
+
+**Provskyddet:** implementation och lätta isolerade prov får börja nu i den separata Runtime-arbetsplatsen. Aquariums
+uthållighetsprov och avslut fortsätter som planerat. Medan provet pågår ändras inte dess prövade kod, arbetskatalog,
+konfiguration, process eller underliggande drift, och provet startas inte om. Helhetsprovet på isolerad motor och
+driftaktiveringen väntar till efter uthållighetsprovets faktiska slut och stoppkontroll, enligt byggbeslutet. Påverkan på
+mätningarna redovisas ärligt, och ett påverkat intervall kallas inte ostört.
+
+**Paketet:** accepterat är
+- uttrycklig granskningstid på 180-900 sekunder enligt förslaget;
+- gemensam härledning av de berörda tidsramarna;
+- den befintliga stopp- och städningsmodellen, prövad med ändringen;
+- fortsatt `review_only` av samma frusna kandidat;
+- den avgränsade fortsättningen över Runtime-revision;
+- återanvändning av tillträdeskontrollen för de budgeterade granskningarna, utan ändring av AP-10:s uppdrag eller schema;
+- de angivna filändringarna, proven, den separata granskningen, den skyddade publiceringen, releasen och övergång 16;
+- det föreslagna användningsprovet.
+
+Kedjedrivaren väljer lämplig granskningstid inom den accepterade ramen och bokför valet; ägaren ska inte behöva välja
+sekunder för varje uppdrag. Inga automatiska förlängningar, blinda omtag eller modellbyten ingår.
+
+**Revisionsfortsättningen:** "senare revision på main" betyder inte valfri senare kod. Fortsättningen ska använda den
+avsedda, granskade och kontrollerat aktiverade releasen genom den prövade vägen. Originaluppdragets frysta indata,
+kandidat, acceptans, tidigare resultat och förbrukning bevaras. Den nya granskningsomgången binds till både den
+ursprungliga och den använda Runtime-revisionen och till den valda budgeten. `review_only` används inte för att ändra
+kandidat, bas eller sakuppdrag, och reparation och övriga omförsök behåller de avgränsningar som byggbeslutet anger.
+Återspelningsproven tillgodoräknas inom sin faktiska räckvidd; de ersätter inte det planerade provet av den nya
+fortsättningen.
+
+**Användningsprovet:** för att visa fortsatt granskning över revisionsbytet startas `office-aquarium-arkivdatum-1`
+efter Aquariums leverans men före aktiveringen av den nya Runtime-releasen. Ordningen samordnas i den befintliga planen,
+utan ny planeringsrunda eller rutinmässig ägarfråga. Hinner den första granskningen bli klar inom 180 sekunder får den
+bli klar; den fördröjs eller upprepas inte för att framkalla en tidsgräns, och då redovisas att just
+revisionsfortsättningen bara prövats isolerat. Aquariums äldre parkerade uppdrag lämnas orörda, och deras externa
+integrationer skrivs inte om till Runtime-avslut. Datumbristen som användningsprovet ska rätta redovisas öppet i
+Aquariums leverans och döljs inte som redan löst.
+
+**Omfattningen:** ingen generell kapacitetsplattform, andra arbetare, automatisk omplanering eller återöppning av AP-11
+ingår. Tillträde för vanliga implementationsaktiviteter ligger utanför paketet enligt förslaget; den kvarstående
+begränsningen redovisas, och samexistensen med AP-10 kallas inte löst i sin helhet. Tidigare giltiga prov och
+granskningar bevaras, och bara de ändrade kopplingarna och konkreta blockerande fynd kompletteras. Prognosen på omkring
+en och en halv arbetsdag är en uppskattning, inte ett godkännande att försvaga slutkraven.
+
+**Ägarens aktivering:** när ägarens aktivering behövs får ägaren ett komplett kommando med `LC_ALL=C`, färsk kontroll,
+exakta bindningar, faktisk driftpåverkan och tillämplig återhämtningsväg.
+
+**Samordningen:** kedjedrivaren bär uppdelning, granskarhantering och teknisk samordning inom detta samlade mandat,
+fortsätter utan nya rutinmässiga kör-besked och håller Aquarium-avslutet och Runtime-bygget åtskilda i redovisningen.
+
+**Ersätter:** ingenting. Följer RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925.
