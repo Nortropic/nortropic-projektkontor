@@ -19,6 +19,11 @@ förbereds; leveransen sker mot den befintliga acceptansen. Spår B, Runtime: f�
 byggs enligt RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, med implementation och lätta isolerade prov i en separat
 Runtime-arbetsplats, utan anslutning till den levande motorn eller dess databas. Redovisningen håller spåren isär.
 
+NÄSTA UPPDRAG BEREDS (ägarens besked 2026-09-25, privat i `evidence/nasta-uppdrag/local/`). Det rekommenderade nästa
+uppdraget är framlagt som DIGITALA-1-BEREDNING-20260925 och väntar på ägarens accept och två avgörande svar: vilken
+verklig verksamhet, och vilket Vercel-konto som får bära förhandsvisningen. Inget byggs före accepten, och Aquariums
+avslut och Runtime-paketet nedan går före.
+
 RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
  1. Genomfört 2026-09-25: Runtime-ändringen (Runtime D033) är byggd och prövad (550 prov, 25 bevarade historiker
     uppspelade utan avvikelse, 34 felinjiceringar som alla fälls), separat granskad i två varv och skyddat integrerad
@@ -333,7 +338,8 @@ UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-
 AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924,
 AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925, AQUARIUM-V0-FONSTER-20260925, AQUARIUM-V0-AGARPROV-20260925,
 AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925,
-RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925 och Runtime-planens ingång.
+RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925,
+DIGITALA-1-BEREDNING-20260925 och Runtime-planens ingång.
 
 ---
 

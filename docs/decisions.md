@@ -1722,3 +1722,98 @@ levande fönstret eller en bild av det.
 väntar på uthållighetsprovets slut och leveransbeskedet.
 
 **Ersätter:** ingenting. Fullföljer AQUARIUM-V0-AGARPROV-RATTELSE-20260925.
+
+## DIGITALA-1-BEREDNING-20260925 — byggbeslut för Digitalas första verkliga webbplats, endast förslag
+
+**Status:** förslag 2026-09-25 av kedjedrivaren (Claude Code) enligt ägarens besked samma dag, som står ordagrant privat i
+`evidence/nasta-uppdrag/local/owner-words-bered-nasta-20260925.md`. Inget är byggt, skapat eller ändrat; ägarens accept
+avgör. Aquariums avslut och Runtime-paketets prov, övergång och användning går före. Det lästa underlaget är förtecknat
+privat i `evidence/nasta-uppdrag/local/lasning-20260925.md`.
+
+**Underlaget:** definitionen och I-04 ger kontoret först och Digitala därefter. Enligt det lästa underlaget har ägaren
+ännu inte beslutat kund, pris eller affärsform för Digitala, och gränsen för autonomi mot en kund är inte ägarbeslutad.
+Digitalas webbgrund finns i `Nortropic/nortropic-webbforvaltning`, utbruten 2026-09-10: ett webbflöde i tolv steg med
+tre mänskliga stopp, sju agenter, granskningslinser och paketet `lokal-se` för svenska lokala tjänsteföretag. Paketet
+står som VALIDATING: flödet är byggt och kört men har ännu inte två raka riktiga kunder. Backtesternas fixturer
+kontrolleras, men deras beteendepåståenden har aldrig prövats mot ett byggt system. Efter utbrytningen pekar några av
+repots vakter på den gamla plattformen (efterarbetets rader 1-3).
+
+**Resultatet:** en färdig, granskad webbplats för en verklig lokal verksamhet som ägaren väljer, som förhandsvisning
+utan indexering att visa verksamheten, med granskningsrapport, launchbedömning och överlämning. Verksamheten får en
+användbar sajt och Digitala sin första verkliga leverans i dagens organisation. Det belagda behovet är att Digitala är
+nästa verksamhetsriktning efter kontoret (I-04) och att `lokal-se` bara kan nå PROVEN genom riktiga kunder. Webbgrunden
+kan också komma fram till att en ny sajt inte är vad verksamheten behöver: förbättra den befintliga, en åtgärd utan
+sajt eller avrådan. Då är det beskedet resultatet.
+
+**Omfattningen:** ingår gör en verksamhet i ring 1, research ur verksamhetens egna uppgifter, plan och brief, ett privat
+kundrepo, sajten byggd, fylld med innehåll, granskad och launchbedömd enligt webbgrundens egna grindar på en
+driftsatt förhandsvisning utan indexering på Vercel, och överlämningen till ägaren. Webbgrunden rättas bara där något
+blockerar just detta bygge. Utanför:
+- produktionsdriftsättning, DNS, Google-företagsprofil, Search Console och juridisk signering;
+- pris, avtal och kontakt med verksamheten, som är ägarens;
+- ring 2 och 3, nya paket, onboardingappen `verkstadsgolvet` och webbgrundens obemannade läge;
+- e-postnycklar, som markeras som väntande;
+- de vakter och den dokumentsynk ur efterarbetet som inte blockerar;
+- ett Runtime-mål för kundrepon, nya modeller, abonnemang och köp.
+
+**Genomförandet:** sajtkoden hamnar i ett nytt privat repo `kund-<slug>` i organisationen Nortropic, blockerande
+rättelser i `nortropic-webbforvaltning` och plan, beslut och privat underlag i kontoret. Återanvänds:
+- webbgrundens agenter, skills, arbetsflöden, paket och grindar för tillgänglighet, prestanda och bedömning;
+- kontorets plan, separata granskning och skyddade publicering för kontorets texter;
+- kedjedrivarens kontroll av förhandsvisningen i Chrome, som i Aquarium;
+- befintliga abonnemang och modellval.
+
+Kedjedrivaren kör webbflödets steg i sessioner i kundrepot, i webbgrundens bemannade läge (`Läge: bemannat` i
+researchfilen, eftersom obemannat är standard och hoppar över stoppet), med webbgrundens egna granskningar och ägarens
+godkännande vid briefstoppet. Runtime används inte för sajtkoden: dess kontorsprofil når bara kontorets och Runtimes
+repon, och ett mål för kundrepon vore ett nytt grundbygge. Allt kan göras utan den nya Runtime-releasen; etapp 0 och 1
+kan göras innan Vercel finns, medan etapp 2 kräver förhandsvisningen. De faktiska beroendena:
+1. en verksamhet som har sagt ja och ger sina uppgifter (ägaren);
+2. det privata kundrepot (accepten);
+3. Node och pnpm, som finns på datorn;
+4. att webbgrundens steg fungerar i dag, vilket är oprövat sedan utbrytningen och prövas i etapp 0;
+5. en driftsatt förhandsvisning på Vercel. Webbgrundens init-steg kör `vercel link` och ska redovisa länkens läge, och
+   grinden för prestanda mäter bara mot en driftsatt förhandsvisning över http(s). Vercel-verktyget och dess inloggning
+   saknas på datorn, så ägaren behöver logga in på ett Vercel-konto som får användas för en kunds förhandsvisning. Kräver
+   det kontot en betald plan är det ägarens beslut; kedjedrivaren köper ingenting.
+
+**Klart när:** sajten byggs utan fel och klarar webbgrundens granskning och launchbedömning på den driftsatta
+förhandsvisningen.
+Verksamhetens uppgifter står exakt, inga fakta är påhittade, och det som saknas står som blockerande frågor till
+verksamheten. En separat granskning har prövat sajten och kontorets redovisning, ägaren har godkänt briefen och sett
+förhandsvisningen, och överlämningen är levererad. Ägarens ingripanden bokförs löpande med tid och skäl och redovisas
+efteråt som iakttagelse, utan påstående i förväg om minskad börda.
+
+**Etapper och prognos:**
+0. Webbgrunden i dag: dess egna kontroller körs, och bara det som blockerar rättas, med separat granskning. Omkring en
+   halv dag.
+1. Research och plan till brief, med ägarens godkännande. Omkring en halv dag; ägaren 20-30 minuter, plus ägarens egen
+   tid att få verksamhetens uppgifter.
+2. Bygge, innehåll, granskning och launchbedömning på den driftsatta förhandsvisningen. 1-2 dagar; ägaren loggar in på
+   Vercel före etappen, några minuter.
+3. Överlämning. Omkring en timme; ägaren omkring 15 minuter.
+
+Första användbara resultat är briefen efter etapp 1. Totalt omkring 2-3 arbetsdagar, beroende av när uppgifterna kommer.
+Osäkerheter: webbgrundens skick efter utbrytningen, som kan kräva rättelser i etapp 0 och förlänga den, samt bilder och
+uppgifter från verksamheten.
+
+**Accepten behöver ge:**
+- målet "Digitala 1: en granskad förhandsvisad webbplats för" den verksamhet ägaren anger;
+- att skapa ett privat repo `kund-<slug>` i Nortropic;
+- att köra webbgrundens agenter och arbetsflöden, också dess flerdelade granskningar, inom befintliga abonnemang;
+- läsning av verksamhetens befintliga webbnärvaro och av 4-6 inspirationskandidater med högst sex skärmbilder, som
+  webbgrundens planeringssteg anger;
+- rättelser i `nortropic-webbforvaltning` som blockerar bygget, separat granskade och publicerade genom repots egen väg;
+- att installera Vercel-verktyget lokalt och driftsätta förhandsvisningar utan indexering till det Vercel-konto ägaren
+  loggar in på, samt lokala byggen på 127.0.0.1 för kontroll;
+- verksamhetens uppgifter privat i kontorets `evidence/digitala/local/`.
+
+Inga produktionsändringar, köp, nya abonnemang, kundkontakter från kedjedrivaren eller utvidgade behörigheter ingår.
+
+**Avgörande frågor till ägaren:**
+1. Vilken verklig lokal verksamhet ska få den första sajten, och har den sagt ja och kan ge sina uppgifter? Utan den
+   finns inget verkligt uppdrag att bygga, och ett syntetiskt mellanprojekt rekommenderas inte i stället.
+2. Vilket Vercel-konto får användas för en kunds förhandsvisning, och kan ägaren logga in på det före etapp 2?
+   Webbgrundens grindar kräver en driftsatt förhandsvisning.
+
+**Ersätter:** ingenting.
