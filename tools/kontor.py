@@ -42,10 +42,15 @@ def main(argv=None):
     reasons.add_argument('--reconcile')
     reasons.add_argument('--review-repair')
     reasons.add_argument('--review-retry')
+    # Uttrycklig granskningstid för en fortsatt granskning av samma kandidat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925).
+    # Runtime prövar gränserna 180-900 sekunder; här hör den bara till fortsatt med --review-retry.
+    parser.add_argument('--granskningstid', type=int)
     args = parser.parse_args(argv)
     signals = {k:getattr(args,k.replace('-','_')) for k in ('diagnosis','reconcile','review-repair','review-retry')}
     if any(signals.values()) and args.action != 'fortsatt':
         parser.error('Fortsättningsskäl får bara användas med fortsatt')
+    if args.granskningstid is not None and (args.action != 'fortsatt' or not args.review_retry):
+        parser.error('Granskningstid får bara anges med fortsatt --review-retry')
     try:
         path, task = selected_task(args.task)
         if args.action in ('status','resultat'):
@@ -63,6 +68,8 @@ def main(argv=None):
             argv.append('--resume')
             for key, value in signals.items():
                 if value: argv += ['--'+key, value]
+            if args.granskningstid is not None:
+                argv += ['--review-seconds', str(args.granskningstid)]
         return subprocess.run(argv, cwd=RUNTIME, check=False).returncode
     except (OSError, ValueError, KeyError) as error:
         print(json.dumps({'observation':'unavailable','error':str(error)},ensure_ascii=False))

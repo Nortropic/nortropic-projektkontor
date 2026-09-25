@@ -20,7 +20,11 @@ RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, med implementation och lätta isolera
 utan anslutning till den levande motorn eller dess databas. Redovisningen håller spåren isär.
 
 RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
- 1. Nu: implementation, lätta isolerade prov, separat granskning och skyddad integration i Runtime.
+ 1. Genomfört 2026-09-25: Runtime-ändringen (Runtime D033) är byggd och prövad (550 prov, 25 bevarade historiker
+    uppspelade utan avvikelse, 34 felinjiceringar som alla fälls), separat granskad i två varv och skyddat integrerad
+    (Runtime PR 62, main `a9a5eca1`). Kontorets flagga `--granskningstid` i `tools/kontor.py`, som bara hör till `fortsatt
+    --review-retry`, integreras med denna post och finns alltså på kontorets main före användningsprovet. Runtimes
+    primärutcheckning snabbspolas först efter uthållighetsprovet.
  2. Efter uthållighetsprovets slut och stoppkontroll: helhetsprovet på isolerad motor, release och isolerad startövning.
  3. Aquariums leverans (spår A), där datumbristen i Arkivet står öppet redovisad.
  4. Användningsprovet `office-aquarium-arkivdatum-1` startas under den aktiva releasen (runtime `c1cdaf5d`), före
