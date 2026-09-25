@@ -8,7 +8,7 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0: fönstret integrerat, prövning mot verkliga källor nästa. A levererad och aktiv
+# Levande plan — Aquarium v0: fönstret prövat mot verkliga källor, etapp 3 pågår, ägarprovet väntar på ägaren. A levererad och aktiv
 
 ETAPP 2 BYGGS: FÖNSTRET (inom AQUARIUM-V0-ACCEPT-20260924 och AQUARIUM-V0-ARBETSVARLD-20260924). Arbetsvärlden är
 visad med verkliga källor: steg 3 i posten nedan är genomfört med den publicerade koden, sidan prövades färsk och
@@ -44,12 +44,24 @@ historik: fönstret håller två läsningar i minnet och skriver inga filer. Vä
     180 sekunder, och kedjedrivaren slutgranskade separat och integrerade skyddat (PR 50, main `89da2f17`). Båda
     uppdragen står parkerade och återupptas inte.
  3. Kedjedrivaren: fönstret körs med den publicerade koden mot verkliga källor och prövas i Chrome, färskt, inaktuellt
-    efter stopp och i helskärm 1920×1080, och visas sedan för ägaren. Nästa steg efter denna post. Fönstret körs från
-    primärutcheckningen, eftersom läsningen hittar Runtime som systerkatalog till kontorsrepot.
-Därefter etapp 3: acceptansen i byggbeslutets avsnitt 7 med separat granskning av kod och verklig tillämpning,
-mottagarprov, ägarprov (omkring en kvart av ägarens tid), åtta timmars uthållighetsprov och leveransbesked. Prognos:
-steg 1 och 2 omkring en arbetsdag, steg 3 och etapp 3 därefter omkring en arbetsdag, plus ägarprovet och
-uthållighetsprovet. Uppskattningar, inga gränser.
+    efter stopp och i helskärm 1920×1080, och visas sedan för ägaren. Fönstret körs från primärutcheckningen, eftersom
+    läsningen hittar Runtime som systerkatalog till kontorsrepot. Genomfört 2026-09-25: den öppna sidan var färsk och
+    laddades om vid varje ny läsning, 121-132 sekunder isär; när fönstret stoppades blev den inaktuell av sig själv när
+    senaste läsningen passerat fem minuter (sett vid första kontrollen efteråt, 315 sekunder efter läsningen); allt utom
+    läsning från 127.0.0.1 vägrades (403, 405, 404); inga filer ändrades
+    utom motorns egen databas, som den körande motorn skriver ungefär varje minut även utan läsning; vid första
+    läsningen och vid nästa sade fördjupningen vad jämförelsen vilade på. Helskärmsbilden 1920×1080 visades för ägaren.
+Etapp 3 pågår sedan 2026-09-25: acceptansen i byggbeslutets avsnitt 7 med separat granskning av kod och verklig
+tillämpning, mottagarprov, ägarprov (omkring en kvart av ägarens tid), åtta timmars uthållighetsprov och
+leveransbesked. Mottagarprovet är klart: en färsk läsare i en separat session såg bara skärmbilder av den verkliga sidan
+och svarade utan hjälp rätt på alla fem frågorna, jämfört med källorna. Den separata granskningen av kod och verklig
+tillämpning godkände acceptansens punkter 1-8 och 11 utan blockerande fynd; punkterna 9 och 10 återstår.
+Uthållighetsprovet går i åtta timmar med grafikprocessorn tillåten, sedan ett första prov visat att Chromes last beror på
+den: med rörelse omkring 3,6 sekunder processortid per minut med grafikprocessorn mot 31,7 utan, och 0,9 med minskad
+rörelse; ett första prov med programvarurendering avbröts efter 78 minuter som inte representativt, och att sidan blir
+inaktuell när datorn sover är hittills visat bara som ett stoppat fönster. Ägarprovet väntar på ägaren (ägarens tur
+nedan), och tv-avståndet bedöms också där. Därefter leveransbesked och leveranspost. Prognos:
+leveransen samma dag som uthållighetsprovet är klart och ägarprovet gjort. Uppskattningar, inga gränser.
 
 ARBETSVÄRLDEN BYGGS (AQUARIUM-V0-ARBETSVARLD-20260924). Ägaren såg prototypen och godkände den sammanhängande rumsliga
 arbetsvärlden som gestaltningsriktning, med de fyra redovisade tilläggen och två finjusteringar; det är ett godkännande
@@ -202,8 +214,12 @@ till två arbetsdagar därefter, plus ägarprovet och åtta timmars uthållighet
 
 Ägarens tur: väntar ett beslut eller en operatörshandling på ägaren skrivs det i denna plan under en egen rad med
 blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD`
-eller `- [operatörshandling] text`; Aquarium läser blocket från main. Inget väntar på ägaren nu: ägarens
-ställningstagande till riktningen är besvarat (AQUARIUM-V0-ARBETSVARLD-20260924), så blocket finns inte.
+eller `- [operatörshandling] text`; Aquarium läser blocket från main. Ett beslut väntar på ägaren: ägarprovet i etapp 3
+(byggbeslutets acceptans, punkt 9), där ägarens omdöme avgör och ett nej ger ett formgivningsvarv inom etappen:
+
+ÄGARENS TUR
+- [beslut] Ägarprovet: öppna Aquarium-fönstret, svara på de fem frågorna och bedöm om vyn känns lugn och som ett akvarium och inte som en tabell — sedan 2026-09-25
+
 
 ARBETSFORM FÖR V0:S RUNTIME-UPPDRAG (AQUARIUM-V0-UPPDRAGSGREN-20260924), ett avgränsat undantag från rutinen ovan för
 v0:s koduppgifter genom Runtimes kontorsväg; det behöver inte frågas om på nytt för varje deluppgift. Runtimes kontorsväg
@@ -269,7 +285,9 @@ bevarade som historik. Kvar med namngivet skäl: aquarium/gestaltning-r1, gestal
 granskningsrunda (underkänd för en kvarlämnad nästa-steg-mening om det parkerade uppdraget och en ofullständig
 förteckning över motorns väntande uppdrag), bevarad som historik. Kvar med namngivet skäl: aquarium/scenmall-fonster-r1,
 fönstermallens första granskningsrunda (underkänd för en kvarlämnad mening om att mallen var oförändrad), bevarad som
-historik och arkiverad som git bundle i `evidence/aquarium/local/etapp2/`. Runtimes del står i
+historik och arkiverad som git bundle i `evidence/aquarium/local/etapp2/`. Kvar med namngivet skäl: aquarium/etapp3-plan-r1,
+etapp 3-planpostens första granskningsrunda (underkänd för ett felräknat intervall mellan två läsningar), bevarad som
+historik och arkiverad som git bundle i `evidence/aquarium/local/etapp3/`. Runtimes del står i
 Runtime-planen (dess uppdrag publicerat som Runtime PR 60, dess ingång nu på main). Protokollet står i `AGENTS.md` och
 i rutinen överst i denna plan; startkontrollen är `tools/ingang.py`.
 
@@ -282,7 +300,7 @@ bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd f�
 ÅTERUPPTAGNINGSPUNKT: denna post, AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924, AQUARIUM-V0-BEREDNING-20260924,
 UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924, AQUARIUM-V0-UPPDRAGSGREN-20260924,
 AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924,
-AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925 och Runtime-planens ingång.
+AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925, AQUARIUM-V0-FONSTER-20260925 och Runtime-planens ingång.
 
 ---
 
