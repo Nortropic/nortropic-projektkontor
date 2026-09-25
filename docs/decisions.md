@@ -1970,3 +1970,119 @@ på isolerad motor, inte i drift.
 **Nästa:** övergång 16 väntar på ägaren som operatörshandling. Därefter uppdateras Runtimes plan och beslutslogg.
 
 **Ersätter:** ingenting.
+
+## DIGITALA-1-ACCEPT-20260925 — ägaren accepterar en fiktiv kvalitetsdemo och beställer en avgränsad Runtime-diagnos
+
+**Status:** registrerat 2026-09-25 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/digitala/local/owner-words-demo-accept-20260925.md`. Ingen exakt klocktid tillskrivs ägaren. Posten följer
+beskedets avsnitt i ordning.
+
+**Riktningen:** ägaren ändrar inriktningen för Digitalas första uppdrag. Kvaliteten prövas först med fiktiva
+verksamheter, innan riktiga kunder tas in. Accepten gäller genomförandet av EN första kvalitetsdemo med webbgrundens
+befintliga brief- och granskningssteg; parallellt beställs en avgränsad diagnos av Runtimes två oförklarade
+provmisslyckanden. För just denna demo ersätts kravet i DIGITALA-1-BEREDNING-20260925 och DIGITALA-1-KOMPLETTERING-20260925
+på en verklig verksamhet, kundmedgivande och kundlämnat underlag. Tidigare beslut bevaras. Aquarium, AP-11 och det
+levererade Runtime-paketet förblir avslutade. Ingen ny masterplan och ingen generell audit ingår.
+
+**1. Verksamheten:** helt fiktiv: Norrglänta Utemiljö, ett mindre lokalt tjänsteföretag inom trädgårdsskötsel i Luleå
+och Boden. Målgrupperna är villaägare som vill ha hjälp med sin trädgård och mindre bostadsrättsföreningar som behöver
+återkommande skötsel. De tre tjänsteområdena är löpande trädgårdsskötsel (gräsklippning, ogräsrensning och skötsel av
+rabatter), häckklippning och enklare buskbeskärning, samt vår- och höststädning av trädgårdar och gemensamma
+utemiljöer. Avgränsningen: ingen trädfällning, avancerad markentreprenad, kemisk bekämpning eller annan tjänst som
+kräver att särskilda behörigheter eller certifieringar hittas på. Det fiktiva problemet är att företaget saknar
+webbplats och att förfrågningarna är ostrukturerade: kunden vet inte riktigt vad som erbjuds eller vilka uppgifter som
+behövs för ett relevant svar. Webbplatsens uppgift är att besökaren snabbt förstår tjänsterna och området, väljer
+relevant hjälp och kan genomföra en tydlig demoförfrågan. Positionering och ton: personligt, omsorgsfullt, tydligt och
+lokalt; välskötta utemiljöer utan krångel, med tydlig överenskommelse om vad som ska göras; inga obelagda superlativer
+eller påståenden som "bäst i Norrbotten". Kedjedrivaren får komplettera fallet med rimliga syntetiska uppgifter där en
+sammanhängande brief behöver dem, märkta som skapade testdata i researchunderlaget, utan att be ägaren agera fiktiv
+kund. Verkliga företags kontaktuppgifter, organisationsnummer, personal, recensioner, kundlogotyper eller utförda
+arbeten används aldrig som om de tillhörde Norrglänta. Behovsprövningen får kontrollera att lösningen är rimlig inom
+scenariot, men avsaknaden av ett verkligt företag är inte skäl att avråda från demon; webbgrundens interventionsbeslut
+styr alltså inte bort från denna uttryckligen beställda nya webbplats på den grunden.
+
+**2. Leveransen:** en riktig leverans med fiktivt innehåll: en fungerande webbplats, inte bara en bild, mall eller
+uppsättning fixturer. Utgångspunkten är startsida, tjänsteöversikt, en genomarbetad undersida för löpande
+trädgårdsskötsel, om företaget samt kontakt och demoförfrågan; briefen får justera sidindelningen inom samma lilla
+omfattning. Ingen blogg, e-handel, inloggning, databas, kalenderbokning eller generell webbplatsbyggare. Uttrycket ska
+kännas formgivet för just detta företag, med tydlig typografi, genomtänkt bildspråk, bra rytm och luft, läsbarhet och
+en sammanhängande mobilupplevelse, inte en generisk mall med utbytt logotyp och identiska kort. Webbgrundens befintliga
+inspirations- och kvalitetsarbete används; referenser stödjer konkreta designval och kopieras inte. En rekommenderad
+visuell riktning visas tidigt, så att grundkänslan kan bedömas innan hela sajten byggs. Bilder ska ha tillåten
+användning, och stockbilder eller genererade bilder beskrivs aldrig som verklig personal, riktiga kunder eller
+företagets faktiskt genomförda arbeten. Märkningen "Fiktivt företag · Digitala kvalitetsdemo" är tydlig men diskret och
+genomgående; sajten ska ändå kunna bedömas som en välgjord webbplats och inte vara full av upprepade varningstexter.
+Kontaktflödet fungerar som demonstration: validering, tydliga fel, tangentbordsanvändning och ett korrekt slutbesked.
+Inga mejl, SMS, bokningar eller riktiga leads skickas, och slutbeskedet säger att ingen förfrågan har skickats. Inga
+riktiga mottagare eller fungerande telefonlänkar till utomstående används, och inga verkliga personuppgifter samlas in
+för att testa formuläret.
+
+**3. Testklienten:** webbgrundens befintliga TESTKLIENT-mekanism används. Dess aktuella implementation läses, och
+gamla guideuppgifter följs inte blint där de skiljer sig från den verkliga körvägen. Testklientens syntetiska
+verksamhetsuppgifter är tillåtet underlag för bygget men inte verifierade externa fakta. Kvalitetskraven för kod,
+formgivning, innehåll, tillgänglighet, prestanda och fungerande användarflöden står kvar. Krav som behöver en verklig
+kund, verklig verksamhetsverifiering eller faktisk affärseffekt redovisas som ej prövade i demon, aldrig som PASS genom
+påhittade belägg. Kräver en grind exempelvis verifierad kontaktinformation används dess befintliga testklienthantering.
+Regeln för riktiga kunder sänks inte för att demofallet ska passera, och en konkret brist i testklientvägen redovisas
+separat. Demon räknas inte som en riktig kund, verklig försäljning, kundnöjdhet eller belägg för `lokal-se`:s
+kundbaserade PROVEN-status. Verkliga byggen, webbläsarprov och granskningar är däremot riktiga tekniska observationer,
+även när företaget är fiktivt.
+
+**4. Vercel:** ägaren har aktiverat Vercel Pro, och det redan aktiverade Pro-teamet används för den skyddade demon.
+Konto och team kontrolleras genom tillgänglig inloggning, utan att anta att teamet heter Nortropic. Är valet entydigt
+bokförs det och arbetet fortsätter; ägaren tillfrågas bara om flera möjliga team finns eller om en faktisk
+inloggnings- eller behörighetshandling behövs. Kedjedrivaren får installera Vercel-verktyget om det fortfarande
+saknas, länka just demoprojektet och driftsätta dess skyddade versioner genom den befintliga vägen. Före första
+uppladdningen verifieras rätt team och projekt, åtkomstskyddet konfigureras och prövas, det säkerställs att demon inte
+indexeras, det kontrolleras vilka filer som faktiskt laddas upp, och de befintliga kostnads- och
+förbrukningsinställningarna kontrolleras. Åtkomstskydd och noindex är olika saker. Alla relevanta
+driftsättningsadresser skyddas, även om plattformen ger den första driftsättningen en intern produktionsetikett. Ingen
+offentlig lansering, egen domän, DNS-ändring, Google-företagsprofil, Search Console eller annonsering ingår, och ingen
+delbar åtkomstlänk skickas till utomstående utan ägarens beslut. Ingen ny plan, betalplats, betalt tillägg eller annat
+köp ingår; den befintliga Pro-planen och dess inkluderade resurser används. Grundavgiften antas inte vara ett totalt
+kostnadstak, och behövs ett nytt kostnadsbeslut tas det före åtgärden. Credentials och skyddshemligheter hamnar aldrig
+i repot, webbläsarkoden eller rapporterna.
+
+**5. Runtime-diagnosen:** beställningen gäller de två misslyckandena bland de 16 svitkörningarna kring Runtime PR 62.
+Orsaken är okänd och beskrivs inte som ofarlig eller rättad. Diagnosen börjar i bevarade uppgifter om revision,
+kommando, arbetsplats och miljö och återskapar publicerarens testförutsättningar i en separat arbetsplats utan push,
+statusändringar, merge eller ingrepp i aktiv drift. Fullständig stdout, stderr och exitkod fångas även vid vägran,
+tillsammans med kodrevision, importväg och relevanta miljödata, med befintliga verktyg och utan en ny
+loggningsplattform. Passet är avgränsat med redovisad resursram. Återkommer felet identifieras det fallande provet och
+orsaken undersöks före fler körningar; det upprepas inte tills något blir grönt och kallas löst. Återkommer det inte
+är resultatet "inte reproducerat", med bättre fångst av nästa fel, inte "åtgärdat". Kedjedrivaren bedömer om fyndet
+påverkar den verifierings- eller publiceringsväg Digitala faktiskt ska använda. Ett relevant olöst fel stoppar just
+den beroende handlingen, inte automatiskt all research, formgivning och lokal utveckling. En kodrättning som diagnosen
+visar behov av avgränsas och bereds separat innan den genomförs. Mandatet är inte en allmän Runtime-härdning och ingen
+rätt att aktivera en ny release.
+
+**6. De andra Runtime-punkterna:** ingen extra skarp körning beställs för att tvinga fram revisionsfortsättningen med
+egen granskningsbudget; det isolerade helhetsprovet tillgodoräknas inom sin räckvidd, och nästa verkliga behov får ge
+ytterligare driftbevis. Ingen generell tillträdeskontroll för vanliga implementationer byggs före demon. Sådana
+Runtime-implementationer som kan hålla den delade arbetaren upptagen över AP-10:s aktuella körfönster startas inte, och
+det verkliga schemat kontrolleras i stället för en gammal rapporterad tid. Det är tillfällig arbetsplanering, inte ett
+påstående att hela samexistensen är tekniskt löst. AP-10 ändras eller pausas inte för att göra plats åt demon utan
+särskilt mandat.
+
+**7. Byggvägen och leveransen:** kedjedrivaren får skapa det privata repot `Nortropic/kund-demo-norrglanta`.
+Webbgrundens bemannade väg, befintliga agenter, granskningar och kontorets planering återanvänds; Runtime behöver inte
+utvidgas till kundrepon. Först kontrolleras den webbväg som demon faktiskt behöver. Mindre blockerande problem rättas
+genom befintlig granskning och publicering, och en större återuppbyggnad av webbgrunden kräver ett separat, konkret
+beslut. Research och en samlad brief tas fram ur det fiktiva scenariot. Briefgodkännandet behålls, men ägaren ombeds
+bedöma målbild och designriktning, inte fylla i varje syntetisk detalj; efter briefgodkännandet driver kedjedrivaren de
+tekniska delstegen. Den färdiga leveransen innehåller den fungerande skyddade webbplatsen på Vercel, verkliga
+kontroller på mobil och större skärm, prövad navigation, länkar och demoförfrågan, separat granskning mot briefen och
+gällande kvalitetskrav, en tydlig skillnad mellan uppmätt, bedömt och ännu oprövat, samt en kort överlämning med
+dokumenterade begränsningar. En hög poäng eller gröna tester ersätter inte faktisk visuell bedömning och användning i
+webbläsaren; den byggda sajten visas, inte bara en rapport om att den ska vara bra. Detta är en enda demo: inga fler
+företag väljs och ingen demofabrik startas innan den första leveransen har bedömts, och därefter avgör ägaren om ett
+nästa fiktivt fall behövs och vilken annan typ av kvalitet det ska pröva. Riktningsändringen och de två spåren
+registreras i den befintliga planen, och prognosen uppdateras utifrån den aktuella webbgrunden utan en ny omfattande
+förstudie.
+
+**Nästa besked:** ska ge den avgränsade Runtime-diagnosens läge och Digitalas första samlade brief och designriktning,
+med verifierat Vercel-team eller den enda konkreta åtkomstfråga som återstår. Ägaren ska inte längre behöva svara vilken
+riktig verksamhet som har sagt ja: första verksamheten är den beställda fiktiva Norrglänta Utemiljö.
+
+**Ersätter:** för denna demo kraven i DIGITALA-1-BEREDNING-20260925 och DIGITALA-1-KOMPLETTERING-20260925 på en verklig
+verksamhet, kundmedgivande och kundlämnat underlag; inget annat.
