@@ -1931,3 +1931,20 @@ andra konton eller betalningar ingår.
    är ett Pro-team med en driftsättande plats och upplägget ovan.
 
 **Ersätter:** ingen post. DIGITALA-1-BEREDNING-20260925 gäller i övrigt.
+
+## AQUARIUM-V0-LEVERANS-20260925 — Aquarium v0 levererat
+
+**Status:** levererat 2026-09-25 av kedjedrivaren (Claude Code) inom AQUARIUM-V0-ACCEPT-20260924, mot byggbeslutets
+befintliga acceptans. Leveransbeskedet är `evidence/aquarium/leverans.md`.
+
+**Utfallet:** acceptansens elva punkter är prövade mot den publicerade koden. Ägarprovet är godkänt
+(AQUARIUM-V0-AGARPROV-GODKANT-20260925). Uthållighetsprovet höll sidan öppen och färsk i åtta timmar, och efter stopp
+blev den inaktuell som avsett. Lasten redovisas med siffror, liksom kedjedrivarens samtidiga arbete under provet, och
+de intervallen kallas inte ostörda.
+
+**Öppet:** Arkivet visar AP10 som odaterad. Bristen är inte rättad i v0; den rättas i `office-aquarium-arkivdatum-1`,
+som också är användningsprovet för Runtimes granskningstid (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925). Sömn är inte
+prövad, och den mindre texten är liten på tv-avstånd. Det som byggbeslutet lämnar utanför v0 står kvar utanför. Ett nytt
+bygge behöver ett eget accepterat uppdrag.
+
+**Ersätter:** ingenting.

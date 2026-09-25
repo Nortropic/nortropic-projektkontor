@@ -8,16 +8,13 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0 i slutprov, Runtime-förbättringen byggs parallellt. AP-10-rättningen levererad och aktiv
+# Levande plan — Aquarium v0 levererat, Runtime-förbättringen i ordning. AP-10-rättningen levererad och aktiv
 
-TVÅ SPÅR (ARBETA-VIDARE-20260925). Spår A, Aquarium: uthållighetsprovet pågår och skyddas. Fönstret, mätningen och
-stoppkontrollen fortsätter utan ingrepp. Den prövade arbetskatalogen (primärutcheckningen) snabbspolas inte och byter
-inte gren förrän provet är slut; det är ett namngivet undantag från rutinen ovan. Ingen ny Runtime-release aktiveras,
-tjänsten startas inte om och AP-10 ändras inte. Annat arbete som påverkar tolkningen av lastmätningen redovisas i
-leveransbeskedet. Ägarprovet är godkänt (AQUARIUM-V0-AGARPROV-GODKANT-20260925), och leveransredovisningen
-förbereds; leveransen sker mot den befintliga acceptansen. Spår B, Runtime: förbättringen av granskningens tidsgräns
-byggs enligt RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, med implementation och lätta isolerade prov i en separat
-Runtime-arbetsplats, utan anslutning till den levande motorn eller dess databas. Redovisningen håller spåren isär.
+TVÅ SPÅR (ARBETA-VIDARE-20260925). Spår A, Aquarium: levererat 2026-09-25 (AQUARIUM-V0-LEVERANS-20260925,
+`evidence/aquarium/leverans.md`). Uthållighetsprovet gick i åtta timmar till 17:05:59Z, med stoppkontroll, och
+primärutcheckningen följer main igen. Spår B, Runtime: förbättringen av granskningens tidsgräns fortsätter i ordningen
+nedan enligt RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925. Ingen ny Runtime-release aktiveras förrän ägaren kör övergång
+16, tjänsten startas inte om och AP-10 ändras inte. Redovisningen håller spåren isär.
 
 NÄSTA UPPDRAG BEREDS (ägarens besked 2026-09-25, privat i `evidence/nasta-uppdrag/local/`). Beslutspaketet är
 DIGITALA-1-BEREDNING-20260925 med DIGITALA-1-KOMPLETTERING-20260925, som följer ägarens förtydligande samma dag. Det
@@ -31,9 +28,11 @@ RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
     uppspelade utan avvikelse, 34 felinjiceringar som alla fälls), separat granskad i två varv och skyddat integrerad
     (Runtime PR 62, main `a9a5eca1`). Kontorets flagga `--granskningstid` i `tools/kontor.py`, som bara hör till `fortsatt
     --review-retry`, integreras med denna post och finns alltså på kontorets main före användningsprovet. Runtimes
-    primärutcheckning snabbspolas först efter uthållighetsprovet.
+    primärutcheckning snabbspolades efter uthållighetsprovet.
  2. Efter uthållighetsprovets slut och stoppkontroll: helhetsprovet på isolerad motor, release och isolerad startövning.
- 3. Aquariums leverans (spår A), där datumbristen i Arkivet står öppet redovisad.
+    Påbörjat 2026-09-25 efter provets slut; utfallet skrivs in här innan användningsprovet startas.
+ 3. Aquariums leverans (spår A), där datumbristen i Arkivet står öppet redovisad. Genomfört 2026-09-25
+    (AQUARIUM-V0-LEVERANS-20260925).
  4. Användningsprovet `office-aquarium-arkivdatum-1` startas under den aktiva releasen (runtime `c1cdaf5d`), före
     övergången. Från start till publicering integreras inget annat till kontorets main, enligt arbetsformen för
     Runtime-uppdrag. Blir dess första granskning klar inom 180 sekunder får den bli klar och fördröjs eller upprepas
@@ -86,17 +85,17 @@ historik: fönstret håller två läsningar i minnet och skriver inga filer. Vä
     läsning från 127.0.0.1 vägrades (403, 405, 404); inga filer ändrades
     utom motorns egen databas, som den körande motorn skriver ungefär varje minut även utan läsning; vid första
     läsningen och vid nästa sade fördjupningen vad jämförelsen vilade på. Helskärmsbilden 1920×1080 visades för ägaren.
-Etapp 3 pågår sedan 2026-09-25: acceptansen i byggbeslutets avsnitt 7 med separat granskning av kod och verklig
-tillämpning, mottagarprov, ägarprov (omkring en kvart av ägarens tid), åtta timmars uthållighetsprov och
-leveransbesked. Mottagarprovet är klart: en färsk läsare i en separat session såg bara skärmbilder av den verkliga sidan
+Etapp 3 är genomförd 2026-09-25, och Aquarium v0 är levererat (AQUARIUM-V0-LEVERANS-20260925): acceptansen i
+byggbeslutets avsnitt 7 med separat granskning av kod och verklig tillämpning, mottagarprov, ägarprov, åtta timmars
+uthållighetsprov och leveransbesked. Mottagarprovet är klart: en färsk läsare i en separat session såg bara skärmbilder
+av den verkliga sidan
 och svarade utan hjälp rätt på alla fem frågorna, jämfört med källorna. Den separata granskningen av kod och verklig
 tillämpning godkände acceptansens punkter 1-8 och 11 utan blockerande fynd. Ägarprovet (punkt 9) är gjort: ägaren
-bedömde att vyn känns lugn och förklarade ägarprovet godkänt (AQUARIUM-V0-AGARPROV-GODKANT-20260925). Kvar är
-uthållighetsprovet (punkt 10) och leveransbeskedet. Uthållighetsprovet går i åtta timmar med grafikprocessorn tillåten, sedan ett första
-prov visat att Chromes last beror på den: med rörelse omkring 3,6 sekunder processortid per minut med grafikprocessorn
-mot 31,7 utan, och 0,9 med minskad rörelse; det första provet med programvarurendering avbröts efter 78 minuter som inte
-representativt, och att sidan blir inaktuell när datorn sover är hittills visat bara som ett stoppat fönster. Därefter
-leveransbesked och leveranspost. Prognos: leveransen när uthållighetsprovet är klart. Uppskattningar, inga gränser.
+bedömde att vyn känns lugn och förklarade ägarprovet godkänt (AQUARIUM-V0-AGARPROV-GODKANT-20260925).
+Uthållighetsprovet (punkt 10) höll sidan öppen och färsk i åtta timmar med grafikprocessorn, och den blev inaktuell
+210 sekunder efter att fönstret stoppats. Chrome använde i snitt 7,2 sekunder processortid per minut med rörelse, mot
+31,7 utan grafikprocessor och 0,9 med minskad rörelse. Det första provet med programvarurendering avbröts efter 78
+minuter som inte representativt. Att sidan blir inaktuell när datorn sover är visat bara som ett stoppat fönster.
 
 ARBETSVÄRLDEN BYGGS (AQUARIUM-V0-ARBETSVARLD-20260924). Ägaren såg prototypen och godkände den sammanhängande rumsliga
 arbetsvärlden som gestaltningsriktning, med de fyra redovisade tilläggen och två finjusteringar; det är ett godkännande
@@ -249,10 +248,17 @@ till två arbetsdagar därefter, plus ägarprovet och åtta timmars uthållighet
 
 Ägarens tur: väntar ett beslut eller en operatörshandling på ägaren skrivs det i denna plan under en egen rad med
 blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD`
-eller `- [operatörshandling] text`; Aquarium läser blocket från main. Inget väntar på ägaren nu, så blocket finns inte:
+eller `- [operatörshandling] text`; Aquarium läser blocket från main. Blocket finns inte nu:
 byggbeslutet för granskningens tidsbudget är accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i
 etapp 3 är godkänt (AQUARIUM-V0-AGARPROV-GODKANT-20260925). Övergång 16 skrivs in här som operatörshandling när den är
-förberedd.
+förberedd. Förslaget till Digitala 1 syns för ägaren som beslutsloggens förslag, inte som ett block här.
+
+LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
+`aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
+andra); `digitala/beredning-r1-reviewed` och `digitala/beredning-r2-reviewed` (granskade tidigare versioner av
+DIGITALA-1-BEREDNING-20260925, den första underkänd och den andra ersatt av den publicerade tredje);
+`digitala/komplettering-r1` (ogranskat första utkast till DIGITALA-1-KOMPLETTERING-20260925, rättat före granskning).
+Användningsprovets indatagren `aquarium/uppdrag-arkivdatum-r1` publiceras som uppdragsgren när uppdraget startas.
 
 
 ARBETSFORM FÖR V0:S RUNTIME-UPPDRAG (AQUARIUM-V0-UPPDRAGSGREN-20260924), ett avgränsat undantag från rutinen ovan för
@@ -341,7 +347,8 @@ AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V
 AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925, AQUARIUM-V0-FONSTER-20260925, AQUARIUM-V0-AGARPROV-20260925,
 AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925,
 RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925,
-DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925 och Runtime-planens ingång.
+DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925 och Runtime-planens
+ingång.
 
 ---
 
