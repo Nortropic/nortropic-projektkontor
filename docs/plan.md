@@ -17,8 +17,9 @@ tjänsten startas inte om och AP-10 ändras inte. Annat arbete som påverkar tol
 leveransbeskedet. Ägarprovet väntar på ägaren (ägarens tur nedan), och leveransredovisningen förbereds; leveransen sker
 mot den befintliga acceptansen. Spår B, Runtime: förbättringen av granskningens tidsgräns bereds i separat arbetsplats,
 med riktad läsning, lösningsberedning och små isolerade, i första hand modellfria förprov, utan anslutning till den
-levande motorn eller dess databas och utan implementation eller aktivering. Ett kort, samlat byggbeslut läggs fram för
-ägarens accept så snart det är berett. Redovisningen håller spåren isär.
+levande motorn eller dess databas och utan implementation eller aktivering. Det korta, samlade byggbeslutet är framlagt
+som RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925 och väntar på ägarens accept; före accepten implementeras eller
+aktiveras inget. Redovisningen håller spåren isär.
 
 ETAPP 2 BYGGS: FÖNSTRET (inom AQUARIUM-V0-ACCEPT-20260924 och AQUARIUM-V0-ARBETSVARLD-20260924). Arbetsvärlden är
 visad med verkliga källor: steg 3 i posten nedan är genomfört med den publicerade koden, sidan prövades färsk och
@@ -225,8 +226,10 @@ till två arbetsdagar därefter, plus ägarprovet och åtta timmars uthållighet
 
 Ägarens tur: väntar ett beslut eller en operatörshandling på ägaren skrivs det i denna plan under en egen rad med
 blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD`
-eller `- [operatörshandling] text`; Aquarium läser blocket från main. Ett beslut väntar på ägaren: ägarprovet i etapp 3
-(byggbeslutets acceptans, punkt 9), där ägarens omdöme avgör och ett nej ger ett formgivningsvarv inom etappen:
+eller `- [operatörshandling] text`; Aquarium läser blocket från main. Två beslut väntar på ägaren. Byggbeslutet för
+granskningens tidsbudget (RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925) visar Aquarium ur beslutsloggen, så det står
+inte i blocket. Ägarprovet i etapp 3 (byggbeslutets acceptans, punkt 9), där ägarens omdöme avgör och ett nej ger ett
+formgivningsvarv inom etappen, står i blocket:
 
 ÄGARENS TUR
 - [beslut] Ägarprovet: öppna Aquarium-fönstret, svara på de fem frågorna och bedöm om vyn känns lugn och som ett akvarium och inte som en tabell — sedan 2026-09-25
@@ -314,7 +317,8 @@ bevis, återgång och identitetskontroller kontrolleras innan någon åtgärd f�
 UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-ACCEPT-20260924, AQUARIUM-V0-UPPDRAGSGREN-20260924,
 AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924,
 AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925, AQUARIUM-V0-FONSTER-20260925, AQUARIUM-V0-AGARPROV-20260925,
-AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925 och Runtime-planens ingång.
+AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925 och
+Runtime-planens ingång.
 
 ---
 
