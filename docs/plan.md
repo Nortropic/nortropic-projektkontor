@@ -18,28 +18,37 @@ Båda spåren har nått sitt klart-när och står still.
 
 DIGITALA 1 — FIKTIV KVALITETSDEMO OCH RUNTIME-DIAGNOS (DIGITALA-1-ACCEPT-20260925, ägarens besked privat i
 `evidence/digitala/local/`; gränserna står avsnitt för avsnitt i beslutsposten). Två spår, med en skrivare åt gången.
-Nästa besked till ägaren ger diagnosens läge och den första samlade briefen och designriktningen, med verifierat
-Vercel-team eller den enda konkreta åtkomstfråga som återstår.
+Ägarens tillägg (DIGITALA-1-TILLAGG-20260925) och korrigering (DIGITALA-1-KORRIGERING-20260926) är registrerade: den gamla
+webbförvaltningen är inspiration till dagens flöde, inte Digitalas arbetskedja. Källgenomgången står privat i
+`evidence/digitala/local/ARBETSKEDJA-20260925.md`, som bara används som källmaterial. Bedömningen av idéerna står i
+`evidence/digitala/local/IDEBEDOMNING-20260926.md`. Nästa besked till ägaren ger avstämningen av dagens flöde och de idéer som
+bedömts vara bra. Ägarens bedömning av briefen väntar kvar i ägarens tur. Avstämningen och idéerna ändrar inte den riktning
+som ska bedömas.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`.
- 1. Webbvägen som demon behöver (etapp 0, avgränsad till den vägen; en större återuppbyggnad kräver ett eget beslut).
-    Tre beroenden var klarlagda genom läsning i DIGITALA-1-KOMPLETTERING-20260925: webbgrundens skills, agenter och
-    arbetsflöden är inte installerade för Claude Code; kvalitetsgrindarnas verktygsrot `tools/web-quality/` behöver
-    `npm ci`; vakterna i efterarbetets rader 1-3 blockerar bara en rättelse i webbgrunden själv. Dessutom prövas
-    demoförfrågan utan leverans mot webbgrundens primärhandlingsgrind, med dess testklienthantering och utan att
-    regeln för riktiga kunder sänks. Mindre blockerande rättelser går genom webbgrundens egen granskning och publicering.
- 2. Research och samlad brief ur scenariot, med webbgrundens planeringssteg och inspirationsarbete och en
-    rekommenderad visuell riktning tidigt. Ägaren bedömer målbild och designriktning vid briefstoppet.
+ 1. Dagens flöde för demon, inte den gamla webbgrundens körväg (DIGITALA-1-KORRIGERING-20260926). Kedjedrivaren bygger i
+    kundrepot med Claude Code, Vercel-verktyget och egna kontroller i webbläsaren. Valda idéer ur den gamla
+    webbförvaltningen och ur Improvements omsätts enligt bedömningen. Enligt den tidigare tolkningen kördes `npm ci` i
+    webbgrundens `tools/web-quality/`, vars git-ignorerade `node_modules/` står kvar orörd och oanvänd, och två korta
+    sessioner för sammanlagt cirka 0,35 USD enligt abonnemangets rapport: ett registreringsprov i en tillfällig katalog
+    och en isoleringskontroll i kontorets rot. Inget är installerat.
+ 2. Research och samlad brief ur scenariot, med en rekommenderad visuell riktning tidigt. Ägaren bedömer målbild och
+    designriktning vid briefstoppet. Briefen har en läsanvisning efter korrigeringen:
+    - Riktning, informationsarkitektur, innehåll och demoregler står fast.
+    - De gamla tekniska kopplingarna är referens, inte krav.
+    - Referenserna är märkta som sedda eller bara lästa.
+    - Budgetöverskridandet är redovisat: 21 laddningar mot högst 10.
  3. Vercel: verktyget 60.0.1 är installerat men inte inloggat. Teamet verifieras och bokförs efter inloggningen. Före
     första uppladdningen: skydd för alla relevanta adresser, noindex, de uppladdade filerna och kostnadsinställningarna.
- 4. Efter briefgodkännandet: repot `Nortropic/kund-demo-norrglanta`, bygget och webbgrundens granskning och
-    launchbedömning på den skyddade förhandsvisningen.
+ 4. Efter briefgodkännandet: repot `Nortropic/kund-demo-norrglanta`, bygget i dagens flöde och prövningen på den skyddade
+    förhandsvisningen, enligt DIGITALA-1-ACCEPT §7 och §3.
  5. Leverans: den skyddade webbplatsen, verkliga kontroller på mobil och större skärm, prövad navigation, länkar och
     demoförfrågan, separat granskning mot briefen och gällande kvalitetskrav, uppmätt, bedömt och oprövat åtskilt, och en
     kort överlämning med begränsningar. Den byggda sajten visas; poäng och gröna prov ersätter inte visuell bedömning.
-Prognos: brief och designriktning 2026-09-25. Efter briefgodkännandet omkring en till två arbetsdagar för bygge,
-granskning och leverans, beroende av vad etapp 0 visar. Uppskattningar, inga gränser.
+Prognos: brief och designriktning 2026-09-25, med läsanvisning 2026-09-26. Efter briefgodkännandet omkring en till två
+arbetsdagar för bygge, granskning och leverans i dagens flöde, beroende av bygget och förhandsvisningens kontroller.
+Uppskattningar, inga gränser.
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -47,8 +56,9 @@ i en separat arbetsplats på samma kandidat `e68d3828` med publicerarens exakta 
 publicerarens egen kod i provläge med svitens hela utdata fångad även vid vägran. Alla tolv var gröna. Utfallet är
 "inte reproducerat", inte åtgärdat; orsaken är okänd. Bättre fångst framåt: Runtimes publiceringsprov körs genom
 fångstomslaget, så att ett fallande prov, hela utdata, returkod och miljö bevaras. Bedömningen av påverkan: demon
-använder kontorets skyddade publicering och webbgrundens egen väg, inte Runtimes, så det olösta felet stoppar bara en
-framtida Runtime-publicering. Registret står privat i `evidence/granskningsbudget/local/svitdiagnos-20260925T192418Z/`.
+använder kontorets skyddade publicering för kontorsposterna och dagens flöde i kundrepot för bygget, inte Runtimes
+publicering, så det olösta felet stoppar bara en framtida Runtime-publicering. Registret står privat i
+`evidence/granskningsbudget/local/svitdiagnos-20260925T192418Z/`.
 
 AP-10: nästa ordinarie körning enligt det levande schemat är 2026-09-26 07:00Z (läst 2026-09-25 18:07Z). Demon
 startar inga Runtime-implementationer och ändrar inte AP-10. Det är tillfällig arbetsplanering, inte ett påstående att
@@ -294,13 +304,22 @@ blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rade
 eller `- [operatörshandling] text`; Aquarium läser blocket från main. Byggbeslutet för granskningens tidsbudget är
 accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3 är godkänt
 (AQUARIUM-V0-AGARPROV-GODKANT-20260925). Digitala 1 är accepterat
-(DIGITALA-1-ACCEPT-20260925); ägarens bedömning av briefen skrivs in här som beslut när briefen är klar. Ingen operatörshandling väntar på ägaren nu, så blocket finns inte: övergång 16 är aktiverad.
+(DIGITALA-1-ACCEPT-20260925) och briefen är klar för ägarens bedömning.
+
+ÄGARENS TUR
+- [beslut] Digitala 1: bedöm Norrgläntas målbild och designriktning och välj CTA-etikett och H1 — sedan 2026-09-25
+- [operatörshandling] Digitala 1: logga in Vercel-verktyget (kommandot vercel login i Terminal)
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
 andra); `digitala/beredning-r1-reviewed` och `digitala/beredning-r2-reviewed` (granskade tidigare versioner av
 DIGITALA-1-BEREDNING-20260925, den första underkänd och den andra ersatt av den publicerade tredje);
 `digitala/komplettering-r1` (ogranskat första utkast till DIGITALA-1-KOMPLETTERING-20260925, rättat före granskning);
+`digitala/accept-r1` och `digitala/accept-r2` (granskade tidigare versioner av DIGITALA-1-ACCEPT-20260925, den första
+underkänd för saknade ägargränser och den andra för en kvarlämnad mening, båda ersatta av den publicerade tredje);
+`digitala/korrigering-r1` och `digitala/korrigering-r2` (granskade tidigare versioner av DIGITALA-1-KORRIGERING-20260926,
+den första underkänd för en pekare som avgjorde klart-när och en prognos som byggde på etapp 0 och den andra för en
+kvarlämnad mening om webbgrundens väg, båda ersatta av den publicerade tredje);
 `aquarium/arkivdatum-underlag-r1` (första versionen av användningsprovets underlag, underkänd för en kvarlämnad mening och
 ersatt av den publicerade andra); `kontor/stang-granskningsbudget-r1` (första versionen av denna planpost, underkänd för en
 kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, ersatt före granskning av den publicerade
@@ -402,7 +421,8 @@ AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925, AQUARIUM-V0-FONSTER
 AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925,
 RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925,
 DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925,
-RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925 och Runtime-planens ingång.
+RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925, DIGITALA-1-TILLAGG-20260925,
+DIGITALA-1-KORRIGERING-20260926 och Runtime-planens ingång.
 
 ---
 
