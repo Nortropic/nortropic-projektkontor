@@ -14,10 +14,10 @@ TVÅ SPÅR (ARBETA-VIDARE-20260925). Spår A, Aquarium: uthållighetsprovet påg
 stoppkontrollen fortsätter utan ingrepp. Den prövade arbetskatalogen (primärutcheckningen) snabbspolas inte och byter
 inte gren förrän provet är slut; det är ett namngivet undantag från rutinen ovan. Ingen ny Runtime-release aktiveras,
 tjänsten startas inte om och AP-10 ändras inte. Annat arbete som påverkar tolkningen av lastmätningen redovisas i
-leveransbeskedet. Ägarprovet väntar på ägaren (ägarens tur nedan), och leveransredovisningen förbereds; leveransen sker
-mot den befintliga acceptansen. Spår B, Runtime: förbättringen av granskningens tidsgräns byggs enligt
-RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, med implementation och lätta isolerade prov i en separat Runtime-arbetsplats,
-utan anslutning till den levande motorn eller dess databas. Redovisningen håller spåren isär.
+leveransbeskedet. Ägarprovet är godkänt (AQUARIUM-V0-AGARPROV-GODKANT-20260925), och leveransredovisningen
+förbereds; leveransen sker mot den befintliga acceptansen. Spår B, Runtime: förbättringen av granskningens tidsgräns
+byggs enligt RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, med implementation och lätta isolerade prov i en separat
+Runtime-arbetsplats, utan anslutning till den levande motorn eller dess databas. Redovisningen håller spåren isär.
 
 RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
  1. Genomfört 2026-09-25: Runtime-ändringen (Runtime D033) är byggd och prövad (550 prov, 25 bevarade historiker
@@ -83,14 +83,13 @@ Etapp 3 pågår sedan 2026-09-25: acceptansen i byggbeslutets avsnitt 7 med sepa
 tillämpning, mottagarprov, ägarprov (omkring en kvart av ägarens tid), åtta timmars uthållighetsprov och
 leveransbesked. Mottagarprovet är klart: en färsk läsare i en separat session såg bara skärmbilder av den verkliga sidan
 och svarade utan hjälp rätt på alla fem frågorna, jämfört med källorna. Den separata granskningen av kod och verklig
-tillämpning godkände acceptansens punkter 1-8 och 11 utan blockerande fynd. Ägarprovet (punkt 9) står kvar och görs när
-ägaren är tillgänglig; mottagarprovet ersätter inte ägarens svar (AQUARIUM-V0-AGARPROV-RATTELSE-20260925). Kvar är
-ägarprovet, uthållighetsprovet (punkt 10) och leveransbeskedet. Uthållighetsprovet går i åtta timmar med grafikprocessorn tillåten, sedan ett första
+tillämpning godkände acceptansens punkter 1-8 och 11 utan blockerande fynd. Ägarprovet (punkt 9) är gjort: ägaren
+bedömde att vyn känns lugn och förklarade ägarprovet godkänt (AQUARIUM-V0-AGARPROV-GODKANT-20260925). Kvar är
+uthållighetsprovet (punkt 10) och leveransbeskedet. Uthållighetsprovet går i åtta timmar med grafikprocessorn tillåten, sedan ett första
 prov visat att Chromes last beror på den: med rörelse omkring 3,6 sekunder processortid per minut med grafikprocessorn
 mot 31,7 utan, och 0,9 med minskad rörelse; det första provet med programvarurendering avbröts efter 78 minuter som inte
 representativt, och att sidan blir inaktuell när datorn sover är hittills visat bara som ett stoppat fönster. Därefter
-leveransbesked och leveranspost. Prognos: leveransen när uthållighetsprovet är klart och ägarprovet gjort. Uppskattningar,
-inga gränser.
+leveransbesked och leveranspost. Prognos: leveransen när uthållighetsprovet är klart. Uppskattningar, inga gränser.
 
 ARBETSVÄRLDEN BYGGS (AQUARIUM-V0-ARBETSVARLD-20260924). Ägaren såg prototypen och godkände den sammanhängande rumsliga
 arbetsvärlden som gestaltningsriktning, med de fyra redovisade tilläggen och två finjusteringar; det är ett godkännande
@@ -243,12 +242,10 @@ till två arbetsdagar därefter, plus ägarprovet och åtta timmars uthållighet
 
 Ägarens tur: väntar ett beslut eller en operatörshandling på ägaren skrivs det i denna plan under en egen rad med
 blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rader `- [beslut] text — sedan ÅÅÅÅ-MM-DD`
-eller `- [operatörshandling] text`; Aquarium läser blocket från main. Byggbeslutet för granskningens tidsbudget är
-accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925). Ett beslut väntar på ägaren: ägarprovet i etapp 3
-(byggbeslutets acceptans, punkt 9), där ägarens omdöme avgör och ett nej ger ett formgivningsvarv inom etappen:
-
-ÄGARENS TUR
-- [beslut] Ägarprovet: öppna Aquarium-fönstret, svara på de fem frågorna och bedöm om vyn känns lugn och som ett akvarium och inte som en tabell — sedan 2026-09-25
+eller `- [operatörshandling] text`; Aquarium läser blocket från main. Inget väntar på ägaren nu, så blocket finns inte:
+byggbeslutet för granskningens tidsbudget är accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i
+etapp 3 är godkänt (AQUARIUM-V0-AGARPROV-GODKANT-20260925). Övergång 16 skrivs in här som operatörshandling när den är
+förberedd.
 
 
 ARBETSFORM FÖR V0:S RUNTIME-UPPDRAG (AQUARIUM-V0-UPPDRAGSGREN-20260924), ett avgränsat undantag från rutinen ovan för
@@ -336,7 +333,7 @@ UNDERHALL-INGANGAR-20260924, UNDERHALL-INGANGAR-GENOMFORT-20260924, AQUARIUM-V0-
 AQUARIUM-V0-SLUTGRANSKNING-20260924, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924,
 AQUARIUM-V0-ARBETSVARLD-20260924, AQUARIUM-V0-SCEN-20260925, AQUARIUM-V0-FONSTER-20260925, AQUARIUM-V0-AGARPROV-20260925,
 AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925,
-RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925 och Runtime-planens ingång.
+RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925 och Runtime-planens ingång.
 
 ---
 
