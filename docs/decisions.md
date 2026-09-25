@@ -1817,3 +1817,117 @@ Inga produktionsändringar, köp, nya abonnemang, kundkontakter från kedjedriva
    Webbgrundens grindar kräver en driftsatt förhandsvisning.
 
 **Ersätter:** ingenting.
+
+**Kompletteras av:** DIGITALA-1-KOMPLETTERING-20260925.
+
+## DIGITALA-1-KOMPLETTERING-20260925 — förtydligande av det beredda pilotuppdraget, endast förslag
+
+**Status:** förslag 2026-09-25 av kedjedrivaren (Claude Code) enligt ägarens besked samma dag, "DIGITALA 1 — FÖRTYDLIGA
+DET BEREDDA PILOTUPPDRAGET, INGEN BYGGSTART ÄNNU". Ordagranna utdrag står privat i
+`evidence/nasta-uppdrag/local/owner-words-digitala-fortydliga-20260925.md`. Beskedet är ingen accept. Posten kompletterar
+DIGITALA-1-BEREDNING-20260925, och de två är tillsammans beslutspaketet; där de skiljer sig gäller denna. Inget är
+installerat, inloggat, skapat, driftsatt, uppgraderat eller betalt, och ingen ny åtkomst har tagits. Vercels villkor är
+lästa 2026-09-25 i den officiella dokumentationen, vars sidor är uppdaterade mellan 2025-03-12 och 2026-09-18. Sidorna
+står privat i `evidence/nasta-uppdrag/local/vercel-docs-20260925/`.
+
+**Verksamheten och behovet:** kundrepot skapas och bygget börjar först när två saker är fastställda. Ägaren ska ha
+angett vilken verksamhet vi hjälper, vilket konkret problem eller mål den har, vad den har medgett och vilket underlag
+den kan lämna och vad som saknas; uppgifterna bokförs privat i `evidence/digitala/local/`. Vercel-upplägget nedan ska
+vara bekräftat. Ingen tidigare nämnd kontakt räknas som ett accepterat uppdrag. Kedjedrivaren hittar inte på behov,
+medgivanden, referenser, omdömen eller uppgifter om verksamheten. Webbgrundens interventionsbeslut prövar behovet före
+planen: NY SAJT, FÖRBÄTTRA BEFINTLIG, ICKE-SAJT-ÅTGÄRD eller AVRÅD. Vid allt annat än NY SAJT styr webbgrunden själv bort
+från bygget. Resultatet är då den granskade rekommendationen, och åtgärden den pekar på genomförs bara om den ryms i det
+accepterade mandatet. Väljer ägaren i stället ett eget verkligt webbehov gäller samma väg, om behovet ryms i webbgrundens
+ring 1. Det redovisas då som eget behov, inte som extern kund, och räknas inte som belägg för `lokal-se`.
+
+**Leveransens gräns:** leveransen är en granskad förhandsvisning bakom Vercels inloggningsskydd, med granskningsrapport,
+launchbedömning och överlämning, eller den granskade rekommendationen enligt ovan. Den är inte produktionsdrift, inte
+fortsatt förvaltning och inte en uppmätt effekt för verksamheten. Dessa ligger kvar utanför och hos ägaren: DNS,
+Google-företagsprofil, Search Console, pris, avtal, juridisk signering och kontakten med verksamheten. Kedjedrivaren tar
+inga kundkontakter.
+
+**Självständigheten:** detta är en bemannad verksamhetspilot genom webbgrundens befintliga arbetsflöde. Kedjedrivaren
+bär teknisk samordning, dokumentation, granskarhantering och relevanta omtag. Ägaren godkänner briefen och ser
+förhandsvisningen. Runtime bygger inte sajtkoden i kundrepot, och uppdraget bevisar inte i sig fortsatt självständig
+drivning efter kedjedrivarsessionens avslut. Ett Runtime-mål för kundrepon, webbgrundens obemannade läge och en generell
+integrationsplattform ingår inte. Ägarens faktiska insats och tekniska ingripanden bokförs löpande med tid och skäl.
+Minskad ägarbörda eller PROVEN för `lokal-se` påstås inte i förväg.
+
+**Vercel, kontrollerat mot dokumentationen:**
+- Hobby räcker inte. Planen får bara användas icke-kommersiellt och personligt. Vercel räknar en sajt som marknadsför en
+  verksamhets tjänster som kommersiell, liksom betalning för att skapa sajten, så detta gäller oavsett om Nortropic får
+  betalt. Hobby kan inte heller driftsätta från ett privat repo i en GitHub-organisation genom Git-kopplingen.
+- Pro räcker. Planen kostar 20 USD i månaden exklusive moms och ger en driftsättande plats och 20 USD användningskredit.
+  Användning utöver krediten debiteras löpande. Fler driftsättande platser kostar 20 USD styck i månaden, och
+  visningsplatser är gratis. Lösenordsskydd kostar 20 USD per projekt och månad och behövs inte. Pro-provet är gratis i
+  14 dagar, ett per användarkonto. Teamet återgår sedan till Hobby om inget betalmedel lagts in, så provet bär bara en
+  pilot som blir klar inom de dagarna.
+- Driftsättningen följer webbgrundens egen väg. Init kör `vercel link`. Launchsteget skapar förhandsvisningar med
+  `vercel deploy` och mäter mot deras unika driftsättningsadress. Grind 7 kräver att en naken adress svarar 401.
+  Webbgrundens stack beskriver också driftsättning från `main`, men launchsteget driftsätter själv med verktyget och
+  behöver ingen Git-koppling. Kedjedrivaren driftsätter därför med Vercel-verktyget från den lokala utcheckningen.
+  Vercels GitHub-app kopplas inte till organisationen Nortropic, så ingen ny åtkomst dit behövs. Någon annan
+  driftsättningsplattform föreslås inte.
+
+**Åtkomst, indexering och innehåll, var för sig:**
+- Åtkomst: ett nytt projekts första driftsättning blir alltid produktion, och Vercels standardskydd skyddar inte
+  produktionsadresser. Kundprojektet får därför skydd för alla driftsättningar med Vercel-inloggning innan den första
+  driftsättningen. Det ingår i alla planer. Ägaren öppnar förhandsvisningen som inloggad medlem i teamet. Verksamheten
+  får en delbar länk till en förhandsdriftsättning; den som har länken kommer in. Länken återkallas när piloten
+  avslutas. Vill verksamheten hellre ha personlig åtkomst kan den bjudas in, men måste då ha ett Vercel-konto.
+  Grindarna kommer in genom Vercels automatiseringsundantag. Dess hemlighet finns bara i miljön, vilket webbgrunden
+  redan kräver.
+- Indexering: Vercel sätter `X-Robots-Tag: noindex` på förhandsdriftsättningar och på passerade
+  produktionsdriftsättningar, men inte på den aktuella produktionen. Därför avser länken till verksamheten en
+  förhandsdriftsättning, och inloggningsskyddet hindrar sökrobotar från resten. Webbgrundens `testklient`-flagga gäller
+  påhittade verksamheter och används inte. Sajtens egna robotsinställningar hör till produktionen, som ligger utanför.
+- Innehåll: vid driftsättning med verktyget laddas allt i kundrepots katalog upp till Vercel, utom standardundantagen
+  och det som står i `.vercelignore`. Källa och byggloggar på `/_src` och `/_logs` visas bara för teamet så länge
+  källskyddet står kvar, och ingen driftsättning görs med `--public`. Kundrepot får därför bara innehåll som
+  verksamheten har godkänt för sin webbplats, plus webbgrundens tekniska filer. Råmaterial stannar i kontorets privata
+  `evidence/digitala/local/`: anteckningar, kontaktuppgifter utöver dem sajten visar, dokument och ej godkända bilder.
+  På förhandsvisningen kontrolleras tre saker: att webbgrundens interna kataloger `public/images/raw/`,
+  `public/images/ref/` och `design-referenser/` inte serveras, att `/_src` kräver inloggning och att noindex-huvudet
+  finns.
+
+**Kontrolleras när kontot är känt:** att teamet har Pro eller Enterprise; att ägaren är dess ägare och kan styra skydd,
+länkar och fakturering; att källskyddet står på; och att en utgiftsgräns är satt till det belopp ägaren väljer. Vercels
+utgiftsstyrning kan pausa teamets produktionsdriftsättningar vid det beloppet, med några minuters fördröjning. Inget av
+detta antas i förväg.
+
+**Etapp 0, avgränsad:** efter ett genomförandebeslut prövar etapp 0 bara den väg piloten behöver. Det gäller
+webbgrundens plan-, init-, innehålls-, gransknings- och launchsteg i bemannat läge och de kontroller de anropar.
+Läsningen har redan klarlagt tre beroenden:
+- Webbgrundens skills, agenter och arbetsflöden är inte installerade för Claude Code på datorn; av Nortropics egna
+  skills finns bara `nortropic-intake`. Launchsteget läser dessutom `~/.claude/skills/nortropic-eval/SKILL.md`.
+- Grindarna för prestanda och tillgänglighet körs bara ur den pinnade verktygsroten `tools/web-quality/`. En operatör
+  provisionerar den med `npm ci`.
+- Vakterna i efterarbetets rader 1-3 anropas inte av pilotens arbetsflöden och skills i kundrepot. De hör till
+  webbgrundens egen underhållsloop, som kräver att `kor-vakter.mjs` är grön före varje commit i webbgrunden. Måste
+  etapp 0 rätta något i webbgrunden blir de därför blockerande för den rättelsen och lagas först, på samma villkor.
+
+Rättelser görs bara där något blockerar piloten, i egna commits knutna till uppdraget och separat granskade. Kräver
+kontrollen en större ombyggnad redovisas det samlat för ägaren innan kundbygget dras in i den. Inga webbgrundsrättelser
+eller kundbyggen startas före accepten, och ingen ny plan, audit eller förstudie ingår.
+
+**Prognosen:** 2-3 arbetsdagar gäller om etapp 0 klarar sig med avgränsade rättelser, verksamhetens underlag finns och
+Vercel-teamet är klart. Den är inget leveranslöfte till verksamheten innan detta är känt.
+
+**Accepten behöver ge,** utöver DIGITALA-1-BEREDNING-20260925 och i stället för dess punkt om Vercel:
+- att installera webbgrundens skills, agenter och arbetsflöden från dess main för Claude Code på datorn och att
+  provisionera `tools/web-quality/` med `npm ci` enligt låsfilen. Etapp 0 kontrollerar att kontorets och Runtimes
+  sessioner inte påverkas.
+- att installera Vercel-verktyget lokalt och att göra följande i det Vercel-team ägaren anger och själv loggar in på:
+  skapa kundens projekt och sätta skyddet och källskyddet enligt ovan före första driftsättningen, skapa
+  automatiseringsundantaget och en delbar länk för verksamheten, driftsätta förhandsvisningar dit med verktyget och
+  återkalla länken vid överlämningen.
+
+Plan, kostnad och utgiftsgräns beslutar ägaren. Ingen produktionsdomän, ingen GitHub-app i organisationen och inga
+andra konton eller betalningar ingår.
+
+**Avgörande frågor till ägaren,** i stället för de två i DIGITALA-1-BEREDNING-20260925:
+1. Vilken verksamhet ska vi hjälpa, med vilket konkret behov, och har den medgett uppdraget och kan lämna underlag?
+2. Vilket Vercel-konto får användas, med vilket verifierat upplägg för kundförhandsvisning och åtkomst? Rekommendationen
+   är ett Pro-team med en driftsättande plats och upplägget ovan.
+
+**Ersätter:** ingen post. DIGITALA-1-BEREDNING-20260925 gäller i övrigt.
