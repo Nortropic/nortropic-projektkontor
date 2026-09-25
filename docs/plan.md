@@ -8,7 +8,40 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0: arbetsvärlden integrerad, verklig vy nästa (ägarens ja 2026-09-24). A levererad och aktiv
+# Levande plan — Aquarium v0: arbetsvärlden visad med verkliga källor, etapp 2 (fönstret) byggs. A levererad och aktiv
+
+ETAPP 2 BYGGS: FÖNSTRET (inom AQUARIUM-V0-ACCEPT-20260924 och AQUARIUM-V0-ARBETSVARLD-20260924). Arbetsvärlden är
+visad med verkliga källor: steg 3 i posten nedan är genomfört med den publicerade koden, sidan prövades färsk och
+inaktuell i Chrome och visades för ägaren. Etapp 2 gör vyn till ett fönster som kan stå öppet. En användarägd
+läsprocess lyssnar bara på 127.0.0.1 och läser om källorna högst varannan minut, och bara medan sidan är öppen och
+frågar efter senaste läsningen; sidan laddar om sig när en ny läsning finns. Aktualiteten felar stängt: sidan blir
+inaktuell av sin egen läsnings ålder, inte av att anslutningen bryts, så ett stoppat fönster blir inaktuellt när
+senaste läsningen är fem minuter gammal. Jämförelsen (d) görs bara mellan fönstrets två senaste läsningar i minnet:
+ett uppdrag som finns i båda med ett annat observerat läge märks "nytt läge", med förra läsningens tid och läge i
+fördjupningen. Märket påstår inte när, hur eller av vem läget ändrades och beskriver ingen överlämning; det gäller bara
+läsningen efter ändringen och spelas inte om. Vid första läsningen, efter omstart, när motorn inte kunde läsas i någon
+av läsningarna eller när de ligger mer än fem minuter isär visas bara aktuellt läge. Ingen händelsemotor, databas eller
+historik: fönstret håller två läsningar i minnet och skriver inga filer. Vägen, med en skrivare åt gången:
+ 1. Mallen (kedjedrivaren): `SCEN` får märket "nytt läge" på varje bänk, på granskningsbordet och på varje kort på
+    tavlan, och fönstrets fotrad; båda är dolda tills renderaren sätter deras klass, så ögonblicksbilden ser ut som
+    förut. På en bänk och vid granskningsbordet spelas märkets ankomst en gång i det färska läget, aldrig i det
+    inaktuella läget eller med minskad rörelse; ett kort på tavlan får märket utan rörelse, eftersom ett vilande
+    ärende aldrig animeras.
+    Publiceras med denna post efter separat granskning.
+ 2. Runtime-uppdrag `office-aquarium-window-1`: `tools/aquarium_fonster.py` (fönstret och jämförelsen), fönsterläget i
+    renderaren i `tools/aquarium_vy.py`, prov i `tools/test_aquarium_fonster.py` och avsnittet om fönstret i
+    `tools/AQUARIUM.md`, med frusen acceptans på uppdragsgrenen aquarium/uppdrag-fonster enligt arbetsformen nedan.
+    Utföraren har bara filverktyg och kan inte köra prov, så beskrivningen namnger de befintliga prov som berörs.
+    Runtimes sandlåda tillåter inga uttag, inte heller lokala, så proven driver fönstrets svar utan nätverk, och den
+    verkliga porten prövas i steg 3. Granskningsvägen är planerad före start: Runtimes obligatoriska granskning har en
+    fast gräns på 180 sekunder, så kedjedrivarens separata slutgranskning och skyddade publicering enligt
+    AQUARIUM-V0-SLUTGRANSKNING-20260924 förbereds från början.
+ 3. Kedjedrivaren: fönstret körs med den publicerade koden mot verkliga källor och prövas i Chrome, färskt, inaktuellt
+    efter stopp och i helskärm 1920×1080, och visas sedan för ägaren.
+Därefter etapp 3: acceptansen i byggbeslutets avsnitt 7 med separat granskning av kod och verklig tillämpning,
+mottagarprov, ägarprov (omkring en kvart av ägarens tid), åtta timmars uthållighetsprov och leveransbesked. Prognos:
+steg 1 och 2 omkring en arbetsdag, steg 3 och etapp 3 därefter omkring en arbetsdag, plus ägarprovet och
+uthållighetsprovet. Uppskattningar, inga gränser.
 
 ARBETSVÄRLDEN BYGGS (AQUARIUM-V0-ARBETSVARLD-20260924). Ägaren såg prototypen och godkände den sammanhängande rumsliga
 arbetsvärlden som gestaltningsriktning, med de fyra redovisade tilläggen och två finjusteringar; det är ett godkännande
@@ -40,8 +73,9 @@ varje plats. Byggvägen, med en skrivare åt gången:
     Runtime och klarade acceptansen. Runtimes egen granskning stannade vid 180 sekunder, och kedjedrivaren slutgranskade
     separat och integrerade skyddat (PR 47, main `db2d0a29`). Båda uppdragen står parkerade och återupptas inte.
  3. Kedjedrivaren: den publicerade koden körs mot verkliga källor till en privat sida som prövas i Chrome och visas för
-    ägaren. Nästa steg efter denna post.
+    ägaren. Genomfört 2026-09-25: sidan prövades färsk och inaktuell i Chrome och visades för ägaren.
  4. Etapp 2: fönstret på 127.0.0.1 med jämförelsen (d); etapp 3: acceptans, mottagarprov, ägarprov och uthållighet.
+    Pågår: posten ETAPP 2 BYGGS ovan.
 Prognos, som ersätter den i posten KORRIGERAD GESTALTNING nedan: första användbara integrerade vy uppskattas till omkring
 en och en halv arbetsdag efter beskedet, eftersom tilläggen a-c ändrar projektionen och inte bara utseendet; etapp 2 och
 3 omkring två arbetsdagar därefter med jämförelsen (d) inräknad, plus ägarprovet och åtta timmars uthållighetsprov. Det
@@ -195,7 +229,9 @@ integrerat av kedjedrivaren, PR 47), båda på grenen aquarium/uppdrag-scen-2. `
 parkerat i `waiting_review`, och inget av dem återupptas för att publicera samma arbete igen. Grenen står kvar lokalt med
 namngivet skäl: dess commits är uppdragsindatas ursprungliga identiteter och övertagandets registrering, och den
 integreras inte (indata publicerades byte för byte med denna post); den är också arkiverad som git bundle i
-`evidence/aquarium/local/etapp1/`. Det parkerade `office-aquarium-scene-1` och dess gren är orörda.
+`evidence/aquarium/local/etapp1/`. Det parkerade `office-aquarium-scene-1` och dess gren är orörda. Nästa uppdrag:
+`office-aquarium-window-1` (etapp 2, fönstret) på grenen aquarium/uppdrag-fonster, med granskningsvägen planerad före
+start (posten ETAPP 2 BYGGS överst).
 
 UNDERHÅLL (UNDERHALL-INGANGAR-20260924) - GENOMFÖRT 2026-09-24, efter det samlade beskedet och sedan övergång 15
 aktiverats och lästs tillbaka. Mätt läsande: kontorets ingång stod på main; 33 lokala grenar, varav 12 utan kopia på
