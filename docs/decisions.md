@@ -1820,6 +1820,8 @@ Inga produktionsändringar, köp, nya abonnemang, kundkontakter från kedjedriva
 
 **Kompletteras av:** DIGITALA-1-KOMPLETTERING-20260925.
 
+**Delvis ersatt av:** DIGITALA-1-KORRIGERING-20260926, i fråga om att webbgrundens agenter, skills, arbetsflöden, paket och grindar återanvänds och att kedjedrivaren kör webbflödets steg i webbgrundens bemannade läge. Vad det betyder för postens klart-när står i korrigeringsposten som kedjedrivarens läsning, som ägaren kan korrigera. Övrigt gäller.
+
 ## DIGITALA-1-KOMPLETTERING-20260925 — förtydligande av det beredda pilotuppdraget, endast förslag
 
 **Status:** förslag 2026-09-25 av kedjedrivaren (Claude Code) enligt ägarens besked samma dag, "DIGITALA 1 — FÖRTYDLIGA
@@ -1931,6 +1933,8 @@ andra konton eller betalningar ingår.
    är ett Pro-team med en driftsättande plats och upplägget ovan.
 
 **Ersätter:** ingen post. DIGITALA-1-BEREDNING-20260925 gäller i övrigt.
+
+**Delvis ersatt av:** DIGITALA-1-KORRIGERING-20260926, i fråga om etapp 0 som prövning av webbgrundens plan-, init-, innehålls-, gransknings- och launchsteg och punkten att installera webbgrundens skills, agenter och arbetsflöden för Claude Code och provisionera dess verktygsrot `tools/web-quality/` med `npm ci`. Övrigt gäller.
 
 ## AQUARIUM-V0-LEVERANS-20260925 — Aquarium v0 levererat
 
@@ -2086,3 +2090,221 @@ riktig verksamhet som har sagt ja: första verksamheten är den beställda fikti
 
 **Ersätter:** för denna demo kraven i DIGITALA-1-BEREDNING-20260925 och DIGITALA-1-KOMPLETTERING-20260925 på en verklig
 verksamhet, kundmedgivande och kundlämnat underlag; inget annat.
+
+**Delvis ersatt av:** DIGITALA-1-KORRIGERING-20260926, i fråga om att webbgrundens befintliga inspirations- och kvalitetsarbete (§2) och TESTKLIENT-mekanism (§3) används och att webbgrundens bemannade väg, befintliga agenter och granskningar återanvänds (§7). Enligt kedjedrivarens läsning, som ägaren kan korrigera, är den webbväg som enligt §7 kontrolleras först dagens flöde för demon. Principerna får tas in där bedömningen visar att de är bra. Övrigt gäller.
+
+## DIGITALA-1-TILLAGG-20260925 — ägarens tillägg: rekonstruera Digitalas arbetskedja och ta med Improvements
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/digitala/local/owner-words-arbetskedja-tillagg-20260925.md`, och ägarens två bifogade filer (beställningen som fil
+och ChatGPT:s källkarta) står bytekopierade med sha256 i `evidence/digitala/local/owner-files-arbetskedja-20260925/`. Ingen
+exakt klocktid tillskrivs ägaren. Tillägget hör till DIGITALA-1-ACCEPT-20260925 och samlar de tidigare allmänna
+instruktionerna om inspiration och återanvändning. Posten följer beskedets avsnitt i ordning.
+
+**Syftet:** en ordentlig, källförankrad bakgrundskontroll av hur Digitala och webbförvaltningen arbetat: research, skills,
+agenter, verktyg, överlämningar, byggande, granskning och lärande, med relevanta senare förbättringar och rättelser från
+Improvements. Resultatet ska vara en fungerande professionell arbetskedja för Norrglänta, inte bara en lista över
+installerbara skills eller ännu en allmän rapport.
+
+**1. Uppdraget står fast:** Norrglänta Utemiljö är det första fiktiva TESTKLIENT-fallet: trädgårdsskötsel i Luleå och Boden,
+en riktig kvalitetsdemo utan riktiga leads, kunder, kundomdömen eller kundeffekter. Fiktiva företag först är ägarens
+uttryckliga beslut, inte ett tillfälligt hinder i väntan på en riktig kund. Vercel Pro är aktiverat; exakt team, åtkomst och
+kostnadsinställningar kontrolleras genom befintligt mandat, och abonnemanget bevisar inte att allt är konfigurerat.
+Fungerande påbörjat arbete bevaras och aktuellt läge inventeras före varje ändring. Ingen omstart av Norrglänta, ingen ny
+masterplan och ingen återöppning av Aquarium eller AP-11. Runtime är dagens körmotor och Bootstrap- och Trust
+Kernel-antaganden återaktiveras inte; kontoret är Customer Zero och Digitala är den professionella webbverksamheten. Den
+avgränsade Runtime-diagnosen fortsätter separat och ersätter inte denna inventering. Kontrollen är heltäckande för Digitalas
+relevanta arbetskedja, inte en granskning av hela Nortropic eller varje rad i alla repon, och den ska ge bättre research,
+design och genomförande, inte främst fler administrativa grindar.
+
+**2. Källorna och vad som faktiskt lästs:** gällande ingång, plan och beslut i kontoret används. Källkartan läses som karta
+och härledda iakttagelser, inte som ersättning för original eller ny auktoritet. Huvudkällorna är webbgrunden (agents,
+skills, vendored-skills, workflows, relevanta docs, config, packs och anropade verktyg), Verkstadsgolvets research- och
+onboardingkedja (särskilt `lib/prompt-research.ts` med kontraktsläsare och anropare), webbmaterial i nortropic-system bara där
+SEPARATION-ORIGIN, beslut eller källkod leder dit, och befintlig Improvements-korpus, Intake-resultat, relevanta
+originalkonversationer, projektfiler och senare beslut. Webbträdets inventerade revision `e4c8c527` är en källidentitet, inte
+en order att återställa en senare version; relevanta förändringar kontrolleras. Redan lästa och korrekt bundna källor
+återanvänds; läst version och omfång anges, och fulltext, utdrag, sökträff och otillgänglig källa hålls isär. Claude Code har
+inte automatiskt tillgång till ChatGPT-projektet; material hittas genom den befintliga Intake- och korpusvägen. Saknas något
+lokalt anges exakt vilka källor som behövs i en samlad begäran. Improvements påstås inte genomgånget när bara repot lästs, och
+de delar som inte beror på luckorna fortsätter.
+
+**3. Kedjan från insamling till lärande:** research, behovs- och kapacitetsbedömning, brief och designresearch, kod,
+innehåll och bilder, granskning, rättning, verifierad förhandsvisning, överlämning och erfarenheter. För varje led: vem eller
+vad som driver det, indata och namngiven leverans, laddade skills och referenser och använda verktyg, verklig anropsplats,
+behörighet och resurser, vad som är dokumenterat, kopplat, lokalt tillgängligt och prövat, och om ledet återanvänds direkt,
+behöver anpassning, inte behövs för demon eller har en verklig blockerande lucka. Anropare och mottagare följs, inte
+README-tabeller. En funktion som skriver en prompt är inte en utförd researchkörning, ett workflow som nämner en skill bevisar
+inte att skillen laddats, och en generisk huvudsession ersätter inte utan redovisning de avsedda specialistrollerna.
+
+**4. Skills och agenter:** de sju namngivna rollerna och de generiska anropen i workflows inventeras; sju roller är inte en
+fullständig redovisning av alla modellprocesser eller deras kostnad. De tio egna skillsen och de nio vendorerade
+specialkompetenserna kontrolleras, med VENDORED.md och ursprungs- och integritetsbindningar. Impeccable är en dokumenterad
+lokal fork och taste har en historik med namnkonflikt; de byts inte mot senaste uppström eller ett paket med liknande namn.
+Skillnaden mellan generativt stöd för planner, byggare och innehåll och granskarens bedömningsstöd behålls, och relevant
+material laddas per roll och steg, inte alla böcker i varje anrop. För varje behövd komponent kontrolleras om den finns,
+vilken version som laddas, från vilken sökväg och av vilken roll. Dokumenterat modellval skiljs från faktiskt kvalificerad och
+åtkomlig modell, och gamla modellnamn eller effort-värden kopieras inte till dagens drift utan tillämpligt beslut.
+Inventeringen får läsa installations- och verktygsmetadata utan att röja hemligheter, men den ger inga nya
+installationstillstånd och ingen rätt till kostsamma prov för varje skill; giltiga bevis och ordinarie uppgiftskörning
+används där de räcker.
+
+**5. Research, metoden och inte bara källnamnen:** tre spår hålls åtskilda: verksamhetsunderlag (vad som är sant i det valda
+scenariot), design- och marknadsreferenser (hur relevanta sidor löser liknande uppgifter) och professionell kunskap
+(standarder, praxis, leverantörsdokumentation och erfarenheter). Research-kontraktet med 17 sektioner och kontrollrad och rätt
+paketmodul läses, och vägen från formulär, kanaler och komponerare till research.md och plannern följs; Verkstadsgolvets app,
+API-abonnemang och onboarding återaktiveras inte. För Norrglänta är identitet, tjänster och behov syntetiska scenarioindata,
+medan bransch- och designresearchen fortfarande ska vara källförankrad; påhittade företagsprofiler eller recensioner söks
+inte. Inspirationsprotokollets steg 5b–5f och inspirationskällorna tillämpas: bransch- och målgruppsuppslag före generisk
+stil, verkliga branschsajter via omdömes- och portfoliojakten, byråkredit i footer som möjlig väg men inget krav, SiteInspire,
+Land-book och relevanta bibliotek som komplement, koncept åtskilda från fungerande sajter, faktisk rendering och skärmbilder
+på desktop och mobil, samt referensöversättning, komposition och tvåpass-syntes i briefens §5. Den befintliga begränsade
+sökbudgeten följs och dess praktiska tillämpning förtydligas där källtexterna räknar olika; ingen obegränsad sökjakt. Ett högt
+betyg är en urvalsheuristik, inte bevis för att designen ger bra konvertering. Lokala alternativ skiljs från nationella
+designreferenser, och researchresultat får inte högre bevisstatus än källan stödjer. Oöppningsbara källor märks, layout eller
+rörelse som inte setts beskrivs inte, och inspirationssidor besöks läsande, utan formulär eller kontaktförfrågningar.
+
+**6. Överlämningen av kvalitet mellan roller:** kedjan research.md, briefens §5 och §7, referensbilder och
+`content/profile.ts`/`business.ts`, byggd sida och granskning följs särskilt. §5:s designavsikt och referensbilder ska nå både
+byggare och granskare, utan att anta att hela §5 finns i profile.ts, och filerna ska vara namngivna och åtkomliga med
+rollens faktiska verktyg; mottagaren gissar inga sökvägar. Bildkedjan (inventering och spårval, SLOTS.json, anskaffning,
+behandling, BILDRAPPORT och faktisk bildgranskning) och textkedjan (briefens ton och fakta, copy, content-humanizer,
+faktabevarande och fraskontroll) kontrolleras. Saknad FAL-, Trybloom- eller MCP-åtkomst eller annan betald bildväg är en
+konkret förutsättning, inte något som ordnas med nya köp i bakgrunden, och demomandatets bild- och rättighetsregler följs.
+Relevant kontext och verkligt nästa steg bevaras mellan sessioner genom befintliga planer och artefakter; ingen ny
+minnesplattform och ingen kopiering av privata kundminnen till globala instruktioner.
+
+**7. Förbättringar från Improvements:** tillgängligt källindex inventeras för relevanta områden, samband följs och inte bara
+träffar på ordet Digitala, och betydelsebärande original och bilagor läses där de finns. Temana: professionellt arbete från
+behov och discovery till förvaltning; användarens toppuppgifter och begriplighet; källors proveniens, aktualitet och
+frågeberoende auktoritet; referenser som påverkar bygget och jämförs med renderat resultat; specialkompetens och verktyg med
+tydlig konsument och nytta, inte flest agenter eller MCP:er; kontextkontinuitet, mottagaråtkomst och överlämning utan
+ägarens återberättande; skillnaden mellan maskinella prov, professionellt omdöme och observerade användar- och
+verksamhetsutfall; lärande från arbete utan självändrade kvalitetskrav; färre rutinmässiga ägarstopp med de verkliga risk-
+och behörighetsbesluten kvar. Källkartans namngivna källor är sökingångar, inte bevis för komplett källmängd eller automatisk
+adoption. Varje bärande sak klassas som uttryckligt ägarbeslut, accepterad specifikation, byggd mekanism, belagd körning,
+assistentförslag, extern metodreferens eller ersatt idé, och relevanta motsägelser och senare rättelser anges. Design Council
+och Double Diamond får bedömas som metodreferens där den passar, inte införas som ny allmän process eller kvalitetsstämpel.
+En äldre sammanställningsprompt är inte bevis för utförd sweep, och R39 är ett historiskt snitt; befintlig Intake och giltig
+infångning återanvänds och relevant saknat material kompletteras genom dess väg. Verktygsuppgradering, ny totalrecompile
+eller ny Kernel-fas görs inte till förkrav utan konkret nödvändighet och separat beslut.
+
+**8. Granska det som verkligen görs:** de sex workflowsen kartläggs, med vilka som gäller demon och vilka som bara beskriver
+historik eller senare produktion. Workflowvärden som tillhandahåller agent, pipeline, parallel och phase, verkliga argument
+och returformat och hur agent- och skillnamn löses identifieras; det antas inte att .js-filerna kan köras direkt eller att
+ett slashkommando finns för att det nämns. Full, diff och full, granskningslinser, skeptiker, faktatrohet, referenstrohet,
+färskhetskontroll och eval följs till sina faktiska konsumenter; ett poängtal eller PASS i text är inte automatiskt en
+verkställd publiceringsgrind. Ett tillbakavisat fynd skiljs från saknat bedömningsunderlag; en läsare som inte nått sidan
+eller filen har inte visat att den är felfri, och separata modellprocesser är inte garanterat oberoende omdömen.
+Demoförfrågan prövas enligt sitt demomål. Krav på verklig e-postleverans eller kundeffekt uppfylls inte genom påhitt eller
+oönskade utskick, och det som inte prövas redovisas utan att skydden för skarpa kunder sänks.
+
+**9. Leveransen och fortsättningen:** en sammanhållen not i befintlig dokumenthemvist med fyra delar: arbetskedjan och roll-,
+skill- och verktygsmatrisen; käll- och förbättringsmatrisen med källa och version, status, redan realiserat, betydelse för
+Norrglänta och disposition; faktisk körberedskap med vad som fungerar lokalt, vad som bara är dokumenterat och vilka precisa
+luckor som påverkar nästa steg; och konkreta konsekvenser för Norrgläntas research, brief, design, byggväg och acceptansprov.
+Ett viktigt kvalitetskrav ska gå att följa från ursprung till ansvarig roll, åtkomligt underlag, faktisk handling och
+prövning, för bärande samband och inte som en ny registrering av varje mening. Dispositionerna är återanvänd nu, anpassa inom
+mandat, senare förbättring, ej tillämpligt och källlucka, och varje gammal idé blir inte en ny uppgift. Bara redan tillåtna
+anpassningar genomförs; saknade rättigheter, ny kostnad, ändring av frusen acceptans eller större ombyggnad beskrivs konkret
+för beslut, och inga tysta ändringar görs av kvalitetsgrindar, modellval, policy eller aktiva releasefiler. När den relevanta
+bakgrunden och de bärande beroendena är avstämda fortsätter Norrglänta inom sitt gällande mandat och briefsteg, utan en ny
+rutinmässig fråga om att fortsätta. Nästa samlade besked visar vad som hittats och återanvänds, vad som annars hade tappats
+bort, vad som saknas och hur den första briefen och designriktningen blir bättre. Ägarens bedömning gäller upplevelse och
+viktiga beslut, inte att ägaren manuellt kopplar ihop skills och agenter. Slutresultatet är en riktigt bra Digitala-leverans
+med ett begripligt och återanvändbart arbetsflöde; mer dokumentation, fler skills och fler agentanrop är inte i sig
+resultatet.
+
+**Genomfört 2026-09-25/26:** källgenomgången gjordes med åtta avgränsade läsare, och noten står privat i
+`evidence/digitala/local/ARBETSKEDJA-20260925.md` med underlaget, eftersom den analyserar Improvements-korpusen och
+Norrgläntas referensmaterial. Den första versionen underkändes vid separat granskning och bevaras. Den andra underkändes på
+punkter i en byggväg som ägarens korrigering samma natt gjorde inaktuell. Noten används därefter bara som källgenomgång.
+
+**Korrigerat av:** DIGITALA-1-KORRIGERING-20260926. Den gamla webbförvaltningen är inspiration till dagens flöde, inte
+Digitalas arbetskedja. Tilläggets regler för källor, research, referenser, bilder, text, granskning och lärande gäller i
+övrigt.
+
+**Ersätter:** ingenting.
+
+## DIGITALA-1-KORRIGERING-20260926 — ägarens korrigering: den gamla webbförvaltningen är inspiration till dagens flöde, inte Digitalas arbetskedja
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/digitala/local/owner-words-korrigering-inspiration-20260926.md`. Ingen exakt klocktid tillskrivs ägaren. Posten
+korrigerar formuleringar i DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, DIGITALA-1-ACCEPT-20260925 och
+DIGITALA-1-TILLAGG-20260925. Den följer beskedets avsnitt i ordning.
+
+**Avsikten:** ägaren vill inte återanvända den gamla webbförvaltningen som Digitalas arbetskedja. Den och relevanta
+diskussioner i Improvements studeras för att hitta idéer som kan förbättra det nuvarande flödet, och en idé tas in bara om den
+efter bedömning är bra. Tidigare instruktioner om att gamla agenter, skills och workflows ska återanvändas som faktisk körväg
+ersätts av denna precisering.
+
+**1. Nuvarande Digitala är utgångspunkten:** dagens avsedda Digitala-arbete, kontorets aktuella arbetssätt och Norrgläntas
+accepterade kvalitetsmål. Den äldre webbgrunden är referensmaterial. Den är inte automatiskt dagens arbetskedja bara för att
+tidigare promptar har beskrivit den så. En kort avstämning skiljer mellan hur dagens flöde är avsett att fungera, vad som
+faktiskt används och vad som kopplats in från den gamla webbförvaltningen genom den tidigare feltolkningen. En önskad förmåga
+påstås inte finnas om den saknas, och en lucka fylls inte automatiskt med en gammal workflow.
+
+**2. Idéerna studeras, systemet importeras inte:** det som undersöks är hur vi tidigare samlade verksamhetsunderlag och hittade
+researchkällor, sökte, analyserade och valde designreferenser, fördelade arbete mellan specialister, gav olika roller relevant
+kunskap och verktyg, höll ihop brief, design, innehåll och implementation, och granskade verkligt resultat och lärde av
+brister. Relevanta diskussioner i Improvements läses också, inklusive senare rättelser och bortval. Gamla instruktioner läses
+som historiskt material, inte som aktiva kommandon. Inventeringen innebär inte att gamla skills, agenter, workflows,
+modellval, policyer eller installationspaket kopieras, installeras eller aktiveras. Version `e4c8c52` identifierar undersökt
+källmaterial. Den är inget beslut att låsa dagens Digitala till den versionen.
+
+**3. Varje idé bedöms mot dagens behov:** för en rekommenderad idé anges kort vilket konkret problem i dagens flöde den löser,
+hur vi löser det i dag, vad som talar för att idén blir bättre och inte bara annorlunda, vilken extra komplexitet, kostnad eller
+begränsning den ger, hur nyttan kan prövas proportionerligt och om principen ska tas in, prövas först eller avstås. Att något
+finns i ett gammalt repo, har många tester eller kallas en etablerad skill räcker inte som motivering. Även det som diskuteras i
+Improvements bedöms. Ett gammalt assistentförslag är inte ett ägarbeslut eller ett bevis.
+
+**4. Dagens flöde förbättras, inget parallellt byggs:** en bra princip får omsättas i en avgränsad förbättring av dagens flöde
+genom dess befintliga ändringsväg, med relevanta prov och granskning inom mandatet. Det är inget val mellan att använda det
+gamla systemet och att bygga en helt ny plattform från grunden. Arbetssättet utvecklas selektivt, och gamla tekniska lösningar
+följer inte automatiskt med idéerna. Kräver en förbättring ny kostnad, befogenhet eller ett större bygge, redovisas skillnaden
+före genomförandet. Inga nya godkännandepunkter skapas för vanliga tillåtna steg.
+
+**5. Det som redan hänt hanteras utan att arbete förstörs:** inga fler införanden görs enbart på grunden att den gamla
+webbförvaltningen måste återanvändas. Det som redan gjorts enligt den tolkningen redovisas med sin konkreta påverkan, och
+ingenting raderas, återställs eller avinstalleras blint. Fungerande sajtmaterial, underlag och bevis bevaras, och oberoende
+tillåtet arbete på Norrglänta fortsätter. Norrglänta förblir en fiktiv kvalitetsdemo. Vercel-, kostnads-, integritets- och
+granskningsgränserna består. Aquarium och AP-11 återöppnas inte, och Runtime-diagnosen hålls separat.
+
+**Nästa besked:** först en kort avstämning av dagens faktiska flöde och eventuella införanden från den gamla kedjan. Därefter
+de viktigaste inspirationsidéerna som bedöms vara bra för dagens Digitala: varför, och hur de kan förbättra Norrgläntas
+kvalitet. Ingen ny lång allmän inventeringsrapport behövs när källgenomgången redan är gjord; den används för bedömningen.
+Målet är det nuvarande Digitala förbättrat med väl valda idéer. Den gamla webbförvaltningen ska inte återinstalleras, döpas om
+eller omges av undantag.
+
+**Vad som ersätts:**
+- I DIGITALA-1-BEREDNING-20260925: att webbgrundens agenter, skills, arbetsflöden, paket och grindar återanvänds och att
+  kedjedrivaren kör webbflödets steg i webbgrundens bemannade läge.
+- I DIGITALA-1-KOMPLETTERING-20260925: etapp 0 som prövning av webbgrundens plan-, init-, innehålls-, gransknings- och
+  launchsteg, och punkten om att installera webbgrundens skills, agenter och arbetsflöden och provisionera dess verktygsrot
+  `tools/web-quality/` med `npm ci`.
+- I DIGITALA-1-ACCEPT-20260925: att webbgrundens befintliga inspirations- och kvalitetsarbete (§2) och TESTKLIENT-mekanism
+  (§3) används, och att webbgrundens bemannade väg, befintliga agenter och granskningar återanvänds (§7).
+- I DIGITALA-1-TILLAGG-20260925: att resultatet är den gamla arbetskedjan rekonstruerad som Digitalas körväg.
+
+Principerna i de gamla lösningarna får tas in där bedömningen visar att de är bra. Allt övrigt i posterna gäller.
+
+**Kedjedrivarens läsning av följden för klart-när:** BEREDNINGs krav att sajten klarar webbgrundens granskning och
+launchbedömning förutsatte de gamla arbetsflödena som körväg. Demons klart-när följer därför ACCEPT §7:s leverans och §3:s
+kvalitetskrav, konkretiserade i briefens kvalitetsbas. Ägaren kan korrigera läsningen.
+
+**Läget när korrigeringen kom:**
+- Briefen var framtagen med den gamla planneringsmetoden som mall, av en generell underagent som följde rollfilen, och
+  research.md följer det gamla research-kontraktet 3.1.0 med paketmodulen `lokal-se`.
+- `npm ci` var kört i webbgrundens `tools/web-quality/`. Paketen i dess `node_modules/` är lokala, git-ignorerade och
+  oanvända.
+- Ett registreringsprov var gjort i en tillfällig katalog med länkar till webbgrundens roller, skills och workflows. En
+  isoleringskontroll med en session i kontorets rot fann inga av webbgrundens roller bland sessionens agenter. De två korta
+  sessionerna kostade enligt abonnemangets rapport sammanlagt cirka 0,35 USD. Inget installerades i Claude Code eller i
+  något repo.
+- Det fanns utkast som skulle ha installerat och kört den gamla kedjan. De är inte genomförda.
+- Inget kundrepo, inget Vercel-projekt och inget bygge finns.
+
+Bedömningen av idéerna står privat i `evidence/digitala/local/IDEBEDOMNING-20260926.md`, och briefen har fått en läsanvisning
+efter korrigeringen.
+
+**Ersätter:** delar av de fyra posterna enligt ovan.
