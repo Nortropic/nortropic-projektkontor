@@ -421,9 +421,17 @@ def _arkivet(available, office):
         if key is None:
             continue
         delivered.add(key)
-        items.append({'key': key, 'title': entry['title'],
-                      'date': _first_date(entry['id'], entry['text']),
-                      'basis': 'beslutsloggen ' + entry['id']})
+        date = _first_date(entry['id'], entry['text'])
+        basis = 'beslutsloggen ' + entry['id']
+        if date is None:
+            # An undated delivery entry may take the date of the delivery note of the same
+            # commitment; nothing is invented, and the item says where the date came from.
+            note = next((item for item in office['notes'] if item['ap'] == key), None)
+            from_note = None if note is None else _first_date(note['ap'], note['text'])
+            if from_note is not None:
+                date = from_note
+                basis = basis + ', datum ur leveransbesked ' + key
+        items.append({'key': key, 'title': entry['title'], 'date': date, 'basis': basis})
     for note in office['notes']:
         if note['ap'] in delivered:
             continue
