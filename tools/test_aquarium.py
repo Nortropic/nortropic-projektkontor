@@ -264,6 +264,29 @@ class Arkivet(unittest.TestCase):
         self.assertIsNone(dates['AP20'])
         self.assertEqual(dates['AP21'], '2026-09-12')
 
+    def test_an_undated_delivery_takes_the_date_of_its_note(self):
+        office = {'main': '1a' * 20, 'main_date': READ_AT, 'plan_owner_turn': [],
+                  'notes': [{'ap': 'AP10', 'title': 'AP10 levererat', 'text': 'Klart 2026-09-15.'}],
+                  'entries': [entry('AP10-LEVERANS', 'AP10 levererad')]}
+        items = self.project(office)['items']
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]['key'], 'AP10')
+        self.assertEqual(items[0]['date'], '2026-09-15')
+        self.assertEqual(items[0]['basis'],
+                         'beslutsloggen AP10-LEVERANS, datum ur leveransbesked AP10')
+
+    def test_the_entry_date_wins_and_an_undated_note_invents_nothing(self):
+        office = {'main': '1a' * 20, 'main_date': READ_AT, 'plan_owner_turn': [],
+                  'notes': [{'ap': 'AP10', 'title': 'AP10 levererat', 'text': 'Klart 2026-09-15.'},
+                            {'ap': 'AP12', 'title': 'AP12 levererat', 'text': 'Utan datum.'}],
+                  'entries': [entry('AP10-LEVERANS-20260924', 'AP10 levererad'),
+                              entry('AP12-LEVERANS', 'AP12 levererad')]}
+        items = {item['key']: item for item in self.project(office)['items']}
+        self.assertEqual(items['AP10']['date'], '2026-09-24')
+        self.assertEqual(items['AP10']['basis'], 'beslutsloggen AP10-LEVERANS-20260924')
+        self.assertIsNone(items['AP12']['date'])
+        self.assertEqual(items['AP12']['basis'], 'beslutsloggen AP12-LEVERANS')
+
 
 class DateRule(unittest.TestCase):
     def test_written_dates_are_read(self):

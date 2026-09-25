@@ -104,6 +104,7 @@ intill eller som åtta siffror `YYYYMMDD` utan bokstav eller siffra intill. Där
 commit-hash, en digest eller ett annat tecken-id aldrig ett datum, och en kandidat som inte är ett riktigt datum hoppas
 över medan sökningen fortsätter. Första giltiga datumet i id:t används, annars det första i texten, annars inget
 (`null`). Samma regel gäller Arkivets `date` och en öppen berednings `since` vid Ägarens bord.
+Saknar en leveranspost i beslutsloggen datum används datumet i leveransbeskedet för samma åtagande, och posten säger det.
 
 ## Scenen
 
