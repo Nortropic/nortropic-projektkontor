@@ -30,10 +30,21 @@ RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
     --review-retry`, integreras med denna post och finns alltså på kontorets main före användningsprovet. Runtimes
     primärutcheckning snabbspolades efter uthållighetsprovet.
  2. Efter uthållighetsprovets slut och stoppkontroll: helhetsprovet på isolerad motor, release och isolerad startövning.
-    Påbörjat 2026-09-25 efter provets slut; utfallet skrivs in här innan användningsprovet startas.
+    Genomfört 2026-09-25. Helhetsprovet på isolerad motor, med en låtsasgranskare som behövde 200 sekunder, visade
+    alla fyra punkterna. Den första granskningen stannade vid 180 sekunder och uppgiften väntade på granskning.
+    Fortsättningen under en senare revision med 300 sekunders budget väntade först med motorns timers på bevakningens
+    tidsfönster och nådde sedan ett utlåtande med samma kandidat, utan ny implementation, med båda revisionerna,
+    releasen och budgeten bokförda. Ett avbrott under den budgeterade granskningen städade processgruppen och bokfördes
+    som avbrott. Båda historikerna spelades upp utan avvikelse. En första körning föll efter tre sekunder på ett fel i
+    provets egen fixtur, inte i Runtime, och kördes om efter rättelse. Releasen är stegad (konfiguration `e814c757`,
+    Runtime `a9a5eca1`, samma modellval och exakt de nio väntade filerna ändrade). De 11 öppna uppgiftshistorikerna i
+    den levande motorn spelades upp mot den nya koden utan avvikelse, och övergångens kontroll godkände alla
+    förutsättningar utan att välja eller stoppa något. Den isolerade startövningen på en port- och rotförskjuten kopia
+    startade den nya releasens daemon två gånger, omkring en sekund vardera. Alla elva uppgifter svarade genom den nya
+    arbetaren utan fel, och båda stoppen var rena.
  3. Aquariums leverans (spår A), där datumbristen i Arkivet står öppet redovisad. Genomfört 2026-09-25
     (AQUARIUM-V0-LEVERANS-20260925).
- 4. Användningsprovet `office-aquarium-arkivdatum-1` startas under den aktiva releasen (runtime `c1cdaf5d`), före
+ 4. Nästa steg: användningsprovet `office-aquarium-arkivdatum-1` startas under den aktiva releasen (runtime `c1cdaf5d`), före
     övergången. Från start till publicering integreras inget annat till kontorets main, enligt arbetsformen för
     Runtime-uppdrag. Blir dess första granskning klar inom 180 sekunder får den bli klar och fördröjs eller upprepas
     inte; revisionsfortsättningen är då prövad bara isolerat, och det redovisas så.
@@ -257,7 +268,8 @@ LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av gr
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
 andra); `digitala/beredning-r1-reviewed` och `digitala/beredning-r2-reviewed` (granskade tidigare versioner av
 DIGITALA-1-BEREDNING-20260925, den första underkänd och den andra ersatt av den publicerade tredje);
-`digitala/komplettering-r1` (ogranskat första utkast till DIGITALA-1-KOMPLETTERING-20260925, rättat före granskning).
+`digitala/komplettering-r1` (ogranskat första utkast till DIGITALA-1-KOMPLETTERING-20260925, rättat före granskning);
+`aquarium/leverans-r1` (granskad första version av AQUARIUM-V0-LEVERANS-20260925, ersatt av den publicerade andra).
 Användningsprovets indatagren `aquarium/uppdrag-arkivdatum-r1` publiceras som uppdragsgren när uppdraget startas.
 
 
