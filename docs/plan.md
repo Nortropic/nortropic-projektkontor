@@ -8,20 +8,21 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0 levererat, Runtime-förbättringen i ordning. AP-10-rättningen levererad och aktiv
+# Levande plan — Aquarium v0 levererat, granskningstiden aktiv; Digitala 1 väntar på ägaren. AP-10-rättningen aktiv
 
 TVÅ SPÅR (ARBETA-VIDARE-20260925). Spår A, Aquarium: levererat 2026-09-25 (AQUARIUM-V0-LEVERANS-20260925,
 `evidence/aquarium/leverans.md`). Uthållighetsprovet gick i åtta timmar till 17:05:59Z, med stoppkontroll, och
-primärutcheckningen följer main igen. Spår B, Runtime: förbättringen av granskningens tidsgräns fortsätter i ordningen
-nedan enligt RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925. Ingen ny Runtime-release aktiveras förrän ägaren kör övergång
-16, tjänsten startas inte om och AP-10 ändras inte. Redovisningen håller spåren isär.
+primärutcheckningen följer main igen. Spår B, Runtime: förbättringen av granskningens tidsgräns är genomförd och aktiv
+enligt RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925; ägaren aktiverade övergång 16 2026-09-25 kl. 18:06Z (ordningen nedan).
+Båda spåren har nått sitt klart-när och står still. Nästa bygge behöver ett eget accepterat uppdrag; det som väntar är
+Digitala 1 nedan.
 
 NÄSTA UPPDRAG BEREDS (ägarens besked 2026-09-25, privat i `evidence/nasta-uppdrag/local/`). Beslutspaketet är
 DIGITALA-1-BEREDNING-20260925 med DIGITALA-1-KOMPLETTERING-20260925, som följer ägarens förtydligande samma dag. Det
 väntar på ägarens accept och två samlade svar. Det första gäller verksamheten, med behov, medgivande och underlag. Det
 andra gäller Vercel-kontot och dess upplägg för förhandsvisning och åtkomst. Hobby räcker inte, och ett Pro-team är
-rekommenderat som ägarens kostnadsbeslut. Inget byggs, installeras eller driftsätts före accepten, och Aquariums avslut
-och Runtime-paketet nedan går före.
+rekommenderat som ägarens kostnadsbeslut. Inget byggs, installeras eller driftsätts före accepten. Aquariums avslut och
+Runtime-paketet, som gick före, är klara.
 
 RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
  1. Genomfört 2026-09-25: Runtime-ändringen (Runtime D033) är byggd och prövad (550 prov, 25 bevarade historiker
@@ -46,11 +47,13 @@ RUNTIME-BYGGET I ORDNING (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925):
     (AQUARIUM-V0-LEVERANS-20260925).
  4. Användningsprovet `office-aquarium-arkivdatum-1` under den aktiva releasen (runtime `c1cdaf5d`), före övergången.
     Genomfört 2026-09-25 (RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925): Runtimes egen granskning blev klar på 49,7
-    sekunder och godkände, och Runtime publicerade själv (PR 63). Revisionsfortsättningen är därför prövad bara
+    sekunder och godkände, och Runtime publicerade själv (kontorets PR 63). Revisionsfortsättningen är därför prövad bara
     isolerat, och datumbristen i Arkivet är rättad.
- 5. Nästa steg: övergång 16, som ägaren aktiverar med ett komplett kommando (`LC_ALL=C`, färsk kontroll, bindningar,
-    driftpåverkan och återhämtningsväg). Den står i ägarens tur nedan. Därefter uppdateras Runtimes plan och
-    beslutslogg.
+ 5. Övergång 16, som ägaren aktiverar med ett komplett kommando (`LC_ALL=C`, färsk kontroll, bindningar, driftpåverkan
+    och återhämtningsväg). Genomfört av ägaren 2026-09-25 kl. 18:06Z, efter en färsk kontroll. Efterkontrollen visade
+    att tjänsten kör konfigurationen `e814c757` (runtime `a9a5eca1`) ur den nya releasen, att AP-10:s schema är bundet
+    till den och opausat med nästa körning 2026-09-26 07:00Z, och att de elva vilande uppgifterna svarar genom den nya
+    arbetaren. Runtimes plan och beslutslogg är uppdaterade (Runtime D033, Runtimes PR 63, main `d5a44064`).
  6. Behövdes inte: användningsprovets granskning stannade inte vid 180 sekunder, så ingen fortsättning med
     granskningstid kördes.
 
@@ -188,9 +191,9 @@ i `evidence/aquarium/local/owner-words-aterkoppling-gestaltning-20260924.md`.
 AKTUELLT 2026-09-24, efter ägarbesluten AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-20260924 och AQUARIUM-V0-ACCEPT-20260924,
 ägarens återkoppling AQUARIUM-V0-GESTALTNING-20260924 och ägarens ja AQUARIUM-V0-ARBETSVARLD-20260924. AP-11 och
 modellvalet är avslutade och återöppnas inte
-(historik nedan). Drift nu: aktiv konfiguration `e756fe5b` (runtime `c1cdaf5d`, kontoret `df5ed5dc`), AP-10:s schema
-bundet till den och opausat; omgången 2026-09-25 07:00Z slutade otillräcklig (kapacitet), och nästa ordinarie körning
-är 2026-09-26 07:00Z. I motorn väntar `office-aquarium-projection-1`,
+(historik nedan). Driften fram till övergång 16 (2026-09-25 kl. 18:06Z): aktiv konfiguration `e756fe5b` (runtime
+`c1cdaf5d`, kontoret `df5ed5dc`), AP-10:s schema bundet till den och opausat; omgången 2026-09-25 07:00Z slutade
+otillräcklig (kapacitet). Driften nu står i steg 5 i posten RUNTIME-BYGGET I ORDNING överst. I motorn väntar `office-aquarium-projection-1`,
 `-2` och `-3` i `waiting_diagnosis`, `-4` parkerat i `waiting_review` och `office-aquarium-scene-1` parkerat i
 `waiting_diagnosis`, `office-aquarium-scene-2` parkerat i `waiting_diagnosis`, `office-aquarium-scene-3` parkerat i
 `waiting_review`, `office-aquarium-window-1` parkerat i `waiting_diagnosis` och `office-aquarium-window-2` parkerat i
@@ -261,16 +264,17 @@ blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rade
 eller `- [operatörshandling] text`; Aquarium läser blocket från main. Byggbeslutet för granskningens tidsbudget är
 accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3 är godkänt
 (AQUARIUM-V0-AGARPROV-GODKANT-20260925). Förslaget till Digitala 1 syns för ägaren som beslutsloggens förslag, inte som
-ett block här. Övergång 16 är förberedd och står i blocket:
-
-ÄGARENS TUR
-- [operatörshandling] Aktivera övergång 16 med kedjedrivarens kommando: först check, sedan activate
+ett block här. Ingen operatörshandling väntar på ägaren nu, så blocket finns inte: övergång 16 är aktiverad.
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
 andra); `digitala/beredning-r1-reviewed` och `digitala/beredning-r2-reviewed` (granskade tidigare versioner av
 DIGITALA-1-BEREDNING-20260925, den första underkänd och den andra ersatt av den publicerade tredje);
 `digitala/komplettering-r1` (ogranskat första utkast till DIGITALA-1-KOMPLETTERING-20260925, rättat före granskning);
+`aquarium/arkivdatum-underlag-r1` (första versionen av användningsprovets underlag, underkänd för en kvarlämnad mening och
+ersatt av den publicerade andra); `kontor/stang-granskningsbudget-r1` (första versionen av denna planpost, underkänd för en
+kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, ersatt före granskning av den publicerade
+tredje);
 `aquarium/leverans-r1` (granskad första version av AQUARIUM-V0-LEVERANS-20260925, ersatt av den publicerade andra).
 Användningsprovets två grenar, `aquarium/uppdrag-arkivdatum-r1` och `aquarium/uppdrag-arkivdatum`, står i stycket om uppdrag och
 grenar i v0.
@@ -322,7 +326,7 @@ omstrukturering och övertagandets registrering, och den integreras inte (indata
 post); den är också arkiverad som git bundle i `evidence/aquarium/local/etapp2/`. Användningsprovet för Runtimes granskningstid, `office-aquarium-arkivdatum-1`
 (RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925), kördes på grenen aquarium/uppdrag-arkivdatum, vars indata är
 samma byte som de granskade på aquarium/uppdrag-arkivdatum-r1 ovanpå den tidigare basen. Uppdraget står avslutat och
-publicerat av Runtime (PR 63). Båda grenarna står kvar lokalt med namngivet skäl: deras commits är indatas
+publicerat av Runtime (kontorets PR 63). Båda grenarna står kvar lokalt med namngivet skäl: deras commits är indatas
 ursprungliga identiteter, och de integreras inte (indata publicerades byte för byte med den posten). De är också
 arkiverade som git bundle i `evidence/granskningsbudget/local/anvandningsprov/`.
 
