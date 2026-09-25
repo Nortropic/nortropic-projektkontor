@@ -1453,6 +1453,8 @@ etapp 3.
 
 ## AQUARIUM-V0-AGARPROV-20260925 — ägarprovet för Aquarium v0 besvarat
 
+**SUPERSEDED → AQUARIUM-V0-AGARPROV-RATTELSE-20260925:** ägarprovet står kvar. Nedan bevaras postens dåtida innehåll.
+
 **Status:** registrerat 2026-09-25 av kedjedrivaren (Claude Code). Ägarens svar står ordagrant privat i
 `evidence/aquarium/local/owner-words-agarprov-20260925.md`.
 
@@ -1469,3 +1471,76 @@ begränsningarna. Leveransen av v0 väntar på uthållighetsprovet (punkt 10) oc
 när uthållighetsprovet är klart och visar det som krävs.
 
 **Ersätter:** ingenting; följer efter AQUARIUM-V0-FONSTER-20260925.
+
+## AQUARIUM-V0-AGARPROV-RATTELSE-20260925 — ägarprovet står kvar: ägarens tidigare svar var inte ägarprovet
+
+**Status:** registrerat 2026-09-25 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/aquarium/local/owner-words-arbeta-vidare-20260925.md`.
+
+**Rättelsen:** ägaren har klargjort att ägarprovet genomförs när ägaren är tillgänglig och att mottagarprovet inte
+ersätter ägarens svar. Kedjedrivaren läste ägarens tidigare svar som ägarprovets omdöme och bokförde punkt 9 som besvarad
+(AQUARIUM-V0-AGARPROV-20260925); den läsningen var fel. Det tidigare svaret bevaras som ett förhandsomdöme (kedjedrivarens
+benämning), inte som ägarprovet.
+
+**Följd:** punkt 9 i byggbeslutets acceptans står öppen tills ägaren har gjort ägarprovet: öppnat vyn, svarat på de fem
+frågorna och bedömt om den är lugn och känns som ett akvarium och inte som en tabell. Planens ägartur bär ägarprovet igen.
+Leveransen av v0 väntar på ägarprovet och på uthållighetsprovets slut.
+
+**Ersätter:** AQUARIUM-V0-AGARPROV-20260925, som märks SUPERSEDED och bevaras.
+
+## ARBETA-VIDARE-20260925 — ägarbeslut: två spår medan Aquariums uthållighetsprov pågår
+
+**Status:** registrerat 2026-09-25 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/aquarium/local/owner-words-arbeta-vidare-20260925.md`. Provets läge kontrollerades först: uthållighetsprovet,
+startat 09:05Z, pågick och hade inte avslutats, så det fanns ännu inget resultat att tillgodoräkna.
+
+**Beslutet:** att Aquarium går först betyder att dess leverans inte skjuts åt sidan, inte att annat arbete står stilla
+under det åtta timmar långa uthållighetsprovet. Provet och Aquariums återstående avslut fortsätter, och väntetiden används
+till att bereda den redan utpekade Runtime-förbättringen av granskningens tidsgräns. Två arbetsspår redovisas var för
+sig: A. Aquarium, med pågående slutprov, återstående acceptans och avslut; B. Runtime, med beredning och därefter
+eventuellt accepterat bygge. Kedjedrivaren bär den tekniska samordningen och fortsätter utan rutinmässiga kör-frågor
+inom beredningsmandatet.
+
+**Provskyddet:** hade provet redan avslutats skulle resultatet ha tillgodoräknats; provet startas inte om på grund av
+beslutet. Under provet behålls den Aquarium-kod, arbetskatalog och konfiguration som provet faktiskt använder; fönstret,
+mätningen och den planerade stoppkontrollen fortsätter utan ingrepp; ingen ny Runtime-release aktiveras och den delade
+tjänsten startas inte om; AP-10:s schema, modellval och befogenheter ändras inte. Arbete får bedrivas i en separat
+arbetsplats, och det säkerställs att arbetet inte ändrar filer eller beroenden som provet läser. Ingen automatisk
+snabbspolning eller branchväxling görs i den prövade arbetskatalogen under intervallet. En separat worktree är inte
+automatiskt isolerade processer, databaser eller datorresurser: prov för nästa ändring ansluter inte som konkurrerande
+arbetare till den levande motorn och använder inte dess databas. Tunga samtidiga belastningsprov undviks. Annat arbete
+som faktiskt påverkar tolkningen av lastmätningen redovisas, och ett påverkat intervall beskrivs inte som ostört; hela
+uthållighetsprovet börjas inte heller om utan konkret skäl. En skrivare åt gången gäller konkurrerande ändringar, inte
+ett förbud mot att arbeta medan läsprovet går.
+
+**Spår A, Aquarium:** leveransredovisningen förbereds med de redan giltiga granskningarna och mottagarprovet. Ägarprovet
+görs när ägaren är tillgänglig; mottagarprovet ersätter inte ägarens svar. Uthållighetsprovet redovisas som pågående fram
+till sitt faktiska slut; därefter fylls mätningarna och stoppkontrollen i, med eventuella avvikelser. Ingen ny
+formgivningsrunda, funktion eller allmän audit ingår; Aquarium avslutas mot sin befintliga acceptans.
+
+**Spår B, Runtime:** mandatet gäller riktad läsning, lösningsberedning och små isolerade, i första hand modellfria förprov,
+men ännu inte implementation eller driftaktivering av ett nytt Runtime-paket. Beredningen utgår från den befintliga koden
+och Aquariums bevarade körspår och bekräftar vad som faktiskt orsakade de ofullständiga granskningarna; filstorlek eller
+timeouttext ensamma ersätter inte diagnosen. Den bereder minsta sammanhängande ändring som ger en uttrycklig och
+begränsad granskningsbudget per uppdrag; överensstämmande tidsramar för modellprocess, värdhantering, Temporal-aktivitet
+och operatörens observation; bevarad avbrotts- och städningsförmåga; och kontrollerad fortsatt granskning av en redan
+byggd kandidat, utan ny implementation eller omskriven historik. Revisionsbindningen för frysta uppdrag ingår från
+början, eftersom en ny budgetfunktion inte är användbar om den väntande uppgiften sedan vägrar fortsätta under den nya
+körrevisionen. Den konkreta påverkan på AP-10:s tillgång till den delade arbetaren bedöms; ingen generell
+kapacitetsplattform byggs. Aquariums redan externt integrerade kandidater körs inte om och skrivs inte om till
+självständigt avslutade Runtime-leveranser; behöver de inte längre integration väljs ett relevant nästa uppdrag som
+användningsprov.
+
+**Byggbeslutet:** ett kort, samlat byggbeslut läggs fram så snart det är berett, utan att vänta på att uthållighetsprovet
+tar slut. Det återanvänder befintlig plan och beslutshemvist; ingen ny masterplan eller omfattande förstudie ingår.
+Beslutet anger det konkreta resultatet och den minsta föreslagna ändringen, vilka befintliga mekanismer som återanvänds,
+vad som lämnas utanför, hur den verkliga fortsättningsvägen ska prövas, resursram, få etapper och prognos, och exakt
+vilka ändringar och befogenheter ägarens accept omfattar. Efter ägarens accept får implementation och isolerade prov
+börja i den separata arbetsplatsen medan Aquarium-provet fortsätter; driftaktivering samordnas först efter provets avslut
+och ordinarie kontroller. Ägaren ska inte behöva acceptera varje teknisk deluppgift.
+
+**Gränser:** AP-11 förblir avslutat. Inga nya modeller, betalningsvägar, behörighetsutvidgningar eller generella
+säkerhetsändringar ingår genom beslutet.
+
+**Ersätter:** ingenting. Kompletterar AQUARIUM-V0-SLUTGRANSKNING-20260924, som beskrev granskningens fasta modellgräns
+på 180 sekunder och lämnade en högre gräns utanför som en Runtime-ändring.
