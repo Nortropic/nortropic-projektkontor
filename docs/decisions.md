@@ -1409,3 +1409,44 @@ scenario prövar att visningsskyddet döljer.
 därefter etapp 2 (fönstret på 127.0.0.1 med jämförelsen d) och etapp 3.
 
 **Ersätter:** ingenting; följer efter AQUARIUM-V0-ARBETSVARLD-20260924.
+
+## AQUARIUM-V0-FONSTER-20260925 — fönstret integrerat: byggt och prövat av Runtime, separat granskat och skyddat integrerat av kedjedrivaren
+
+**Status:** registrerat 2026-09-25 av kedjedrivaren (Claude Code).
+
+**Leveransen:** fönstret `tools/aquarium_fonster.py`, en användarägd läsprocess som bara svarar på 127.0.0.1, läser om
+källorna högst varannan minut och bara när en öppen sida frågar, och jämför sina två senaste läsningar så att ett uppdrag
+med ett nytt observerat läge märks utan att märket påstår när, hur eller av vem läget ändrades (ägarens tillägg d);
+fönsterläget i renderaren i `tools/aquarium_vy.py` runt den publicerade mallen, med ögonblicksbilden oförändrad; prov som
+inte binder något uttag (kontorssviten har nu 390) och avsnittet om fönstret i `tools/AQUARIUM.md`. Integrerad genom PR 50
+(merge `89da2f17`) på den frysta basen `72960eaa`, med oförändrade tillåtna filer och acceptans.
+
+**Runtime byggde och prövade kandidaten:** `office-aquarium-window-2` byggde kandidaten `9618616a`, som klarade den frysta
+acceptansen `acceptance/aquarium_fonster_1.py` med alla 13 kontrollgrupper. Runtimes obligatoriska granskning stannade vid
+sin fasta gräns på 180 sekunder utan utlåtande och står ofullständig. **Separat granskad och skyddat integrerad av
+kedjedrivaren:** kedjedrivaren körde samma frysta acceptans mot exakt kandidatens filer genom den aktiva releasens
+sandlåda, med samma utfall; en färsk läsande granskare granskade hela uppgiften inom en ram på 45 minuter och godkände utan
+blockerande fynd; kandidaten publicerades genom den befintliga skyddade publiceraren med kandidatbundna test- och
+granskningsresultat, och PR, integrerad revision och filträd lästes tillbaka. Övertagandet registrerades på uppdragsgrenen
+före publiceringen.
+
+**Föregångaren och starterna:** första starten av `office-aquarium-window-1` vägrades av Runtime innan något skapades,
+eftersom den frysta acceptansen var 306 882 byte och Runtime läser indatafiler på högst 262 144 byte; acceptansen
+omstrukturerades utan dubbletter i sina frysta data, med samma kontroller och samma provdata, och skillnaden granskades för
+sig. Andra starten byggde en kandidat vars produkt klarade varje fryst kontroll, men ett av utförarens egna prov föll på ett
+enda påstående om hur ett delat svarshuvud slutar; utföraren har bara filverktyg och kan inte köra prov, och med bara det
+påståendet ändrat klarade kandidaten hela acceptansen i kedjedrivarens diagnos. En fortsättning av ett kontorsuppdrag
+skickar samma instruktion blint, så efterföljaren fick samma bas och samma frusna acceptans och en beskrivning som namnger
+den fallgropen och andra av samma slag. Indata granskades separat i varje steg.
+
+**Körningarna:** `office-aquarium-window-1` står i `waiting_diagnosis` och `office-aquarium-window-2` i `waiting_review`.
+Kontorets verktyg har ingen stödd avbrytningsväg för ett kontorsuppdrag, så båda står uttryckligt parkerade med sina bevis
+och återupptas inte för att publicera samma arbete igen. De tidigare parkerade Aquarium-uppdragen står orörda.
+
+**Inte prövat här:** acceptansens sandlåda vägrar varje uttag, också lokala, så det verkliga fönstret på 127.0.0.1, sidans
+omladdning i webbläsaren, helskärm och spegling prövas separat av kedjedrivaren mot verkliga källor.
+
+**Nästa:** fönstret körs med den publicerade koden mot verkliga källor och prövas i Chrome och visas för ägaren; därefter
+etapp 3.
+
+**Ersätter:** ingenting; följer efter AQUARIUM-V0-SCEN-20260925.

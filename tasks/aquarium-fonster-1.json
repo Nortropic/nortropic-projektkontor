@@ -1,0 +1,24 @@
+{
+  "id": "office-aquarium-window-1",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "72960eaacd45ecf84518899b5744161731f067bf",
+  "runtime_revision": "c1cdaf5de3d10cd31d4a7aa0ea58e4e8d6b08797",
+  "allowed_paths": [
+    "tools/aquarium_fonster.py",
+    "tools/test_aquarium_fonster.py",
+    "tools/aquarium_vy.py",
+    "tools/AQUARIUM.md"
+  ],
+  "attempt_seconds": 3600,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "claude",
+      "prompt": "Read TASK.md and do exactly what it states: the window tools/aquarium_fonster.py with the comparison of two consecutive readings, the window's state, its answers, handler, server and command; the window mode of the renderer in tools/aquarium_vy.py around its unchanged SCEN and SKRIPT constants; synthetic tests that bind no socket, under .scratch only; and the window section of tools/AQUARIUM.md. No real sources, network, model calls, operational controls or publication. Runtime owns the frozen acceptance; review and integration follow the office's working form."
+    }
+  ],
+  "review_provider": "claude",
+  "brief": "tasks/aquarium-fonster-1.md",
+  "acceptance": "acceptance/aquarium_fonster_1.py",
+  "acceptance_sha256": "b2212104fd9c02e973c1a1d9427511609c5644b2c2b39b532a05eb0498d3c224"
+}
