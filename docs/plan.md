@@ -8,7 +8,7 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Levande plan — Aquarium v0: arbetsvärlden visad med verkliga källor, etapp 2 (fönstret) byggs. A levererad och aktiv
+# Levande plan — Aquarium v0: fönstret integrerat, prövning mot verkliga källor nästa. A levererad och aktiv
 
 ETAPP 2 BYGGS: FÖNSTRET (inom AQUARIUM-V0-ACCEPT-20260924 och AQUARIUM-V0-ARBETSVARLD-20260924). Arbetsvärlden är
 visad med verkliga källor: steg 3 i posten nedan är genomfört med den publicerade koden, sidan prövades färsk och
@@ -27,7 +27,9 @@ historik: fönstret håller två läsningar i minnet och skriver inga filer. Vä
     förut. På en bänk och vid granskningsbordet spelas märkets ankomst en gång i det färska läget, aldrig i det
     inaktuella läget eller med minskad rörelse; ett kort på tavlan får märket utan rörelse, eftersom ett vilande
     ärende aldrig animeras.
-    Publiceras med denna post efter separat granskning.
+    Publiceras med denna post efter separat granskning. Genomfört 2026-09-25: första granskningsrundan underkände en
+    kvarlämnad mening i modulens beskrivning om att mallen var oförändrad; den rättade mallen godkändes och publicerades
+    (PR 49, main `72960eaa`), och ögonblicksbilden är pixel för pixel densamma som förut.
  2. Runtime-uppdrag `office-aquarium-window-1`: `tools/aquarium_fonster.py` (fönstret och jämförelsen), fönsterläget i
     renderaren i `tools/aquarium_vy.py`, prov i `tools/test_aquarium_fonster.py` och avsnittet om fönstret i
     `tools/AQUARIUM.md`, med frusen acceptans på uppdragsgrenen aquarium/uppdrag-fonster enligt arbetsformen nedan.
@@ -35,9 +37,15 @@ historik: fönstret håller två läsningar i minnet och skriver inga filer. Vä
     Runtimes sandlåda tillåter inga uttag, inte heller lokala, så proven driver fönstrets svar utan nätverk, och den
     verkliga porten prövas i steg 3. Granskningsvägen är planerad före start: Runtimes obligatoriska granskning har en
     fast gräns på 180 sekunder, så kedjedrivarens separata slutgranskning och skyddade publicering enligt
-    AQUARIUM-V0-SLUTGRANSKNING-20260924 förbereds från början.
+    AQUARIUM-V0-SLUTGRANSKNING-20260924 förbereds från början. Genomfört 2026-09-25 (AQUARIUM-V0-FONSTER-20260925):
+    `office-aquarium-window-1`:s produkt klarade varje fryst kontroll, men ett av utförarens egna prov föll på ett enda
+    påstående; efterföljaren `office-aquarium-window-2`, med samma bas och samma frusna acceptans och en beskrivning som
+    namnger fallgroparna, byggdes och prövades av Runtime och klarade acceptansen. Runtimes egen granskning stannade vid
+    180 sekunder, och kedjedrivaren slutgranskade separat och integrerade skyddat (PR 50, main `89da2f17`). Båda
+    uppdragen står parkerade och återupptas inte.
  3. Kedjedrivaren: fönstret körs med den publicerade koden mot verkliga källor och prövas i Chrome, färskt, inaktuellt
-    efter stopp och i helskärm 1920×1080, och visas sedan för ägaren.
+    efter stopp och i helskärm 1920×1080, och visas sedan för ägaren. Nästa steg efter denna post. Fönstret körs från
+    primärutcheckningen, eftersom läsningen hittar Runtime som systerkatalog till kontorsrepot.
 Därefter etapp 3: acceptansen i byggbeslutets avsnitt 7 med separat granskning av kod och verklig tillämpning,
 mottagarprov, ägarprov (omkring en kvart av ägarens tid), åtta timmars uthållighetsprov och leveransbesked. Prognos:
 steg 1 och 2 omkring en arbetsdag, steg 3 och etapp 3 därefter omkring en arbetsdag, plus ägarprovet och
@@ -125,11 +133,13 @@ AKTUELLT 2026-09-24, efter ägarbesluten AP10-SIGNAL-OCH-AQUARIUM-BEREDNING-2026
 ägarens återkoppling AQUARIUM-V0-GESTALTNING-20260924 och ägarens ja AQUARIUM-V0-ARBETSVARLD-20260924. AP-11 och
 modellvalet är avslutade och återöppnas inte
 (historik nedan). Drift nu: aktiv konfiguration `e756fe5b` (runtime `c1cdaf5d`, kontoret `df5ed5dc`), AP-10:s schema
-bundet till den och opausat, nästa ordinarie körning 2026-09-25 07:00Z. I motorn väntar `office-aquarium-projection-1`,
+bundet till den och opausat; omgången 2026-09-25 07:00Z slutade otillräcklig (kapacitet), och nästa ordinarie körning
+är 2026-09-26 07:00Z. I motorn väntar `office-aquarium-projection-1`,
 `-2` och `-3` i `waiting_diagnosis`, `-4` parkerat i `waiting_review` och `office-aquarium-scene-1` parkerat i
-`waiting_diagnosis`, `office-aquarium-scene-2` parkerat i `waiting_diagnosis` och `office-aquarium-scene-3` parkerat i
-`waiting_review`; inget av dem återupptas (se B, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924 och
-AQUARIUM-V0-SCEN-20260925).
+`waiting_diagnosis`, `office-aquarium-scene-2` parkerat i `waiting_diagnosis`, `office-aquarium-scene-3` parkerat i
+`waiting_review`, `office-aquarium-window-1` parkerat i `waiting_diagnosis` och `office-aquarium-window-2` parkerat i
+`waiting_review`; inget av dem återupptas (se B, AQUARIUM-V0-PROJEKTION-20260924, AQUARIUM-V0-GESTALTNING-20260924,
+AQUARIUM-V0-SCEN-20260925 och AQUARIUM-V0-FONSTER-20260925).
 
 A. RIKTAD AP-10-RÄTTNING - levererad och aktiv. Det privata steget registrerar nu en
 avslutningssignal och avslutar anropet inom den befintliga stoppmodellen, i stället för att gå vidare till sin
@@ -229,9 +239,16 @@ integrerat av kedjedrivaren, PR 47), båda på grenen aquarium/uppdrag-scen-2. `
 parkerat i `waiting_review`, och inget av dem återupptas för att publicera samma arbete igen. Grenen står kvar lokalt med
 namngivet skäl: dess commits är uppdragsindatas ursprungliga identiteter och övertagandets registrering, och den
 integreras inte (indata publicerades byte för byte med denna post); den är också arkiverad som git bundle i
-`evidence/aquarium/local/etapp1/`. Det parkerade `office-aquarium-scene-1` och dess gren är orörda. Nästa uppdrag:
-`office-aquarium-window-1` (etapp 2, fönstret) på grenen aquarium/uppdrag-fonster, med granskningsvägen planerad före
-start (posten ETAPP 2 BYGGS överst).
+`evidence/aquarium/local/etapp1/`. Det parkerade `office-aquarium-scene-1` och dess gren är orörda. Genomfört i etapp 2
+(posten ETAPP 2 BYGGS överst): `office-aquarium-window-1` (första starten vägrades av Runtime innan något skapades,
+eftersom den frysta acceptansen översteg Runtimes gräns för indatafiler; efter omstruktureringen byggdes en kandidat vars
+produkt klarade varje fryst kontroll medan ett av utförarens egna prov föll på ett enda påstående) och
+`office-aquarium-window-2` (samma bas och frusna acceptans, en beskrivning som namnger fallgroparna; byggt och prövat av
+Runtime, slutgranskat och integrerat av kedjedrivaren, PR 50), båda på grenen aquarium/uppdrag-fonster. `-1` står i
+`waiting_diagnosis` och `-2` parkerat i `waiting_review`, och inget av dem återupptas för att publicera samma arbete
+igen. Grenen står kvar lokalt med namngivet skäl: dess commits är uppdragsindatas ursprungliga identiteter, acceptansens
+omstrukturering och övertagandets registrering, och den integreras inte (indata publicerades byte för byte med denna
+post); den är också arkiverad som git bundle i `evidence/aquarium/local/etapp2/`.
 
 UNDERHÅLL (UNDERHALL-INGANGAR-20260924) - GENOMFÖRT 2026-09-24, efter det samlade beskedet och sedan övergång 15
 aktiverats och lästs tillbaka. Mätt läsande: kontorets ingång stod på main; 33 lokala grenar, varav 12 utan kopia på
@@ -250,7 +267,9 @@ aquarium/arbetsform och aquarium/arbetsform-r1, arbetsformens första granskning
 publiceringsvillkor och en kvarlämnad motsägelse), samt aquarium/arbetsform-r2, ett ogranskat mellanläge av samma rättelse,
 bevarade som historik. Kvar med namngivet skäl: aquarium/gestaltning-r1, gestaltningsregistreringens första
 granskningsrunda (underkänd för en kvarlämnad nästa-steg-mening om det parkerade uppdraget och en ofullständig
-förteckning över motorns väntande uppdrag), bevarad som historik. Runtimes del står i
+förteckning över motorns väntande uppdrag), bevarad som historik. Kvar med namngivet skäl: aquarium/scenmall-fonster-r1,
+fönstermallens första granskningsrunda (underkänd för en kvarlämnad mening om att mallen var oförändrad), bevarad som
+historik och arkiverad som git bundle i `evidence/aquarium/local/etapp2/`. Runtimes del står i
 Runtime-planen (dess uppdrag publicerat som Runtime PR 60, dess ingång nu på main). Protokollet står i `AGENTS.md` och
 i rutinen överst i denna plan; startkontrollen är `tools/ingang.py`.
 
