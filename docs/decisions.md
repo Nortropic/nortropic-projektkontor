@@ -1544,3 +1544,105 @@ säkerhetsändringar ingår genom beslutet.
 
 **Ersätter:** ingenting. Kompletterar AQUARIUM-V0-SLUTGRANSKNING-20260924, som beskrev granskningens fasta modellgräns
 på 180 sekunder och lämnade en högre gräns utanför som en Runtime-ändring.
+
+## RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925 — byggbeslut för granskningens tidsbudget i Runtime, endast förslag
+
+**Status:** förslag 2026-09-25 av kedjedrivaren (Claude Code) enligt ARBETA-VIDARE-20260925, spår B. Inget är
+implementerat eller aktiverat; ägarens accept avgör. Underlaget ligger privat i `evidence/granskningsbudget/local/`.
+
+**Diagnos ur de bevarade körspåren.** Runtimes egna granskningar av `office-aquarium-projection-4`,
+`office-aquarium-scene-3` och `office-aquarium-window-2` arbetade när de stoppades. Granskaren läste ännu kandidatens
+filer (sista läsningen efter 102, 147 och 162 sekunder), och alla läsningar lyckades. Modellprocessens egen gräns avbröt
+den efter 180,8-180,9 sekunder (exit 124, processgruppen borttagen), innan något utlåtande fanns. Gränsen är fast för
+varje uppgift utan AP-11:s utvecklingsbindning: 180 sekunder för modellen, 195 för värdens väntan och 210 för
+Temporal-aktiviteten. Fullständiga separata granskningar av samma tre kandidater tog 391, 420 och 488 sekunder, med samma
+modell, ansträngning och läsprofil men kedjedrivarens större underlag. Dessutom binder `run.py` varje fortsättning av en
+kontorsuppgift till den Runtime-revision som uppgiften accepterades under. Den befintliga fortsättningen över en
+revisionsändring är inte tillåten för kontorsuppgifter, så en ny budget skulle inte nå en uppgift som redan väntar.
+
+**Resultatet och den minsta ändringen.**
+1. Budget: en kontorsuppgift kan ges en uttrycklig granskningstid på 180-900 sekunder. Den anges i det accepterade
+   uppdraget eller när en stannad granskning fortsätter (`kontor.py fortsatt --review-retry SKÄL --granskningstid N`).
+   Utan värde gäller 180 sekunder som i dag, och tidigare uppdrag behåller sammandrag och historik. 900 sekunder är
+   nästan dubbla den längsta uppmätta fullständiga granskningen.
+2. Tidsramarna kommer ur en enda härledning: modellprocessen får N, värdens väntan N+15 och Temporal-aktiviteten N+30
+   sekunder (i dag 180/195/210). Operatörens observation och dess yttre gräns räknas ur samma värden i stället för att
+   vara fasta.
+3. Avbrott och städning är de befintliga och prövas med den nya tiden: modellprocessens egen tidsgräns, signalvägen och
+   borttagningen av processgruppen. Ett avbrott bokförs som avbrott, aldrig som godkänt.
+4. Fortsatt granskning går den befintliga vägen `review_only`: samma frusna kandidat, nytt granskningsnummer och färsk
+   granskare. Tidigare granskningar bevaras, och ingen ny implementation görs.
+5. Revisionsbindning: en uppgift som väntar på ny granskning får fortsätta under en senare Runtime-revision på main. Det
+   prövas med samma slags härstamningskontroll som releasebyggaren redan gör, och båda revisionerna bokförs i
+   fortsättningen. Uppgiftens frysta indata ändras inte. Reparation och omförsök efter diagnos kräver fortfarande
+   oförändrad revision.
+6. AP-10: tjänsten har en enda aktivitetsplats. AP-10:s första steg har 105 sekunder från schemaläggning till färdigt.
+   En granskning som fortfarande håller platsen när den tiden gått av den dagliga omgången (09.00 svensk tid) gör därför
+   omgången otillräcklig. I dag gäller det en granskning som startar under de sista knappt två minuterna före omgången
+   och går till sin gräns; med 900 sekunder skulle det gälla knappt en kvart. Därför går en budgeterad granskning genom
+   AP-11:s befintliga tillträdeskontroll. Den startar inte om aktiviteten plus 60 sekunder inte ryms före nästa omgång,
+   och inte medan omgången pågår; då väntar den på en motortimer utan att hålla platsen. AP-10:s schema, kommando och
+   resurser ändras inte.
+
+**Återanvänds:** fortsättningen `review_only` med signalen `continue_after_review` och `kontor.py fortsatt
+--review-retry`, granskarprofilen, modellprocessens tidsgräns och städning, tillträdeskontrollen i `development_capacity`
+med sin motortimer, releasebyggarens härstamningskontroll, den skyddade publiceringen, arbetsformen för Runtime-uppdrag
+(AQUARIUM-V0-UPPDRAGSGREN-20260924) och den etablerade övergångsvägen med ombindning av konfigurationshashen.
+
+**Lämnas utanför:**
+- Implementationsaktiviteternas gränser och tillträde. En implementation i en vanlig kontorsuppgift kan fortfarande
+  hålla platsen över AP-10:s omgång. Det har inte hänt: `window-2`:s granskning slutade 06:55:46Z, fyra minuter före
+  omgången 2026-09-25. Risken namnges men rättas inte här.
+- En generell kapacitetsplattform, en andra arbetare och ändrad samtidighet.
+- Aquariums parkerade uppdrag, som varken fortsätts, körs om eller skrivs om.
+- Ändringar i AP-10 utöver ombindningen.
+- AP-11, som förblir avslutat.
+- Nya modeller, abonnemang, betalningsvägar, behörighetsutvidgningar och generella säkerhetsändringar.
+
+**Prövning av den verkliga fortsättningsvägen.**
+- Förprov nu, modellfritt och offline, utan den levande motorn: de 25 bevarade uppgiftshistorikerna i Runtime spelas
+  upp utan avvikelse, både med den aktiva koden och med en prototyp av arbetsflödesändringen. En avsiktligt felaktig
+  ändring (en extra timer före granskningen) fälls i de 15 historiker som nått granskning, och en ändrad aktivitetsgräns
+  ensam fäller ingen.
+- Före integration: enhetsprov för gränser, härledning, signal och revisionsregel, samt uppspelningen igen. Därtill
+  kommer ett modellfritt helhetsprov på en isolerad motor med egen port och databas, där en låtsasgranskare behöver mer
+  än 180 sekunder. Granskningen ska stanna vid 180 sekunder, uppgiften vänta, fortsätta med budget och nå ett utlåtande.
+  Ett avbrott under den budgeterade granskningen ska städa processgruppen och bokföras som avbrott.
+- I drift, som användningsprov, nästa relevanta uppdrag: `office-aquarium-arkivdatum-1`. Det rättar att Arkivet visar
+  AP10 som odaterad fast leveransbeskedet har ett datum, en känd brist från Aquariums acceptans. Uppdraget startas
+  efter Aquariums leverans, under den då aktiva revisionen. Stannar granskningen vid 180 sekunder fortsätter uppgiften
+  efter övergången med `--granskningstid 720` under den nya revisionen. Den ska då nå ett utlåtande inom budgeten med
+  samma kandidat och med den första granskningen bevarad. Godkänt publiceras det av Runtimes egen publicering, inte av
+  kedjedrivaren. Blir granskningen klar inom 180 sekunder prövar provet bara den oförändrade vägen, och fortsättningen
+  är då prövad bara isolerat; det redovisas så.
+
+**Resursram, etapper och prognos.**
+1. Implementation och isolerade prov i en separat Runtime-arbetsplats, omkring en halv arbetsdag. Det får börja efter
+   accepten medan uthållighetsprovet pågår; helhetsprovet på isolerad motor körs först efter provets slut.
+2. Separat granskning och skyddad integration, 1-2 timmar.
+3. Efter uthållighetsprovet och de ordinarie kontrollerna: release, isolerad startövning, övergång 16 och efterkontroll,
+   1-2 timmar.
+4. Användningsprovet efter Aquariums leverans: indata med frusen acceptans och separat granskning, körning och
+   fortsättning, 2-3 timmar.
+
+Totalt omkring en och en halv arbetsdag; det är uppskattningar, inga gränser. Modellanvändningen ryms i befintligt
+abonnemang: kedjedrivarens arbete, 4-6 separata läsande granskningar, och i användningsprovet en implementation och en
+eller två granskningar i Runtime. Osäkerheter: antalet granskningsvarv, fynd i startövningen och om användningsprovets
+första granskning alls stannar.
+
+**Accepten omfattar exakt:**
+- Ändringarna ovan i Runtime: `runtime/task.py`, `runtime/development_binding.py`, `runtime/attempt.py`,
+  `runtime/activities.py`, `runtime/workflow.py` och `runtime/run.py`, med prov under `scripts/` samt Runtimes plan och
+  beslutslogg.
+- Ändringarna i kontoret: flaggan `--granskningstid` i `tools/kontor.py`, bara tillsammans med `fortsatt
+  --review-retry`, med prov samt kontorets plan och beslutslogg.
+- Separat granskning och skyddad integration av exakt detta.
+- En ny release, en isolerad startövning och övergång 16 genom den etablerade vägen, efter uthållighetsprovets slut och
+  de ordinarie kontrollerna. AP-10:s schema binds om till den nya konfigurationshashen och är i övrigt oförändrat, och
+  ägaren kör aktiveringskommandot som vid övergång 15.
+- Användningsprovets uppdrag med frusen acceptans enligt arbetsformen för Runtime-uppdrag: dess körning, en fortsatt
+  granskning på högst 900 sekunder och publicering genom Runtimes egen skyddade väg.
+
+Inga andra ändringar eller befogenheter ingår.
+
+**Ersätter:** ingenting. Följer ARBETA-VIDARE-20260925.
