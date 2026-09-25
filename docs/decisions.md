@@ -1705,3 +1705,20 @@ exakta bindningar, faktisk driftpåverkan och tillämplig återhämtningsväg.
 fortsätter utan nya rutinmässiga kör-besked och håller Aquarium-avslutet och Runtime-bygget åtskilda i redovisningen.
 
 **Ersätter:** ingenting. Följer RUNTIME-GRANSKNINGSBUDGET-BEREDNING-20260925.
+
+## AQUARIUM-V0-AGARPROV-GODKANT-20260925 — ägaren godkänner ägarprovet för Aquarium v0
+
+**Status:** registrerat 2026-09-25 av kedjedrivaren (Claude Code). Ägarens svar bevaras ordagrant privat i
+`evidence/aquarium/local/owner-words-agarprov-godkant-20260925.md` (SHA256
+`ab6f38c1f7e7c0b6740bc1356208a42cf483b56133dfcf80304c9146e0c44f05`). Ingen exakt klocktid tillskrivs ägaren; svaret kom
+efter kedjedrivarens besked med de fem frågorna och fönstrets adress.
+
+**Svaret:** ägaren bedömde att vyn känns lugn och att den verkar bra, och förklarade ägarprovet godkänt. Enligt
+byggbeslutets acceptans, punkt 9, avgör ägarens omdöme. De fem frågorna besvarade ägaren inte var för sig, om vyn känns
+som ett akvarium och inte som en tabell uttalade sig ägaren inte särskilt om, och svaret säger inte om ägaren såg det
+levande fönstret eller en bild av det.
+
+**Följd:** punkt 9 är uppfylld. Planens ägartur tas bort, eftersom inget annat väntar på ägaren nu. Leveransen av v0
+väntar på uthållighetsprovets slut och leveransbeskedet.
+
+**Ersätter:** ingenting. Fullföljer AQUARIUM-V0-AGARPROV-RATTELSE-20260925.
