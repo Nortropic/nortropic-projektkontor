@@ -13,7 +13,7 @@ A place carries aq-otillganglig when its source could not be read, and its fog s
 SCEN also holds the window's two marks, both hidden until their class is set: a `nytt läge` tag on each bench, on the
 review desk and on each board card, shown with the class aq-nytt-lage (on a bench and the review desk the tag, card and
 sign arrive once in the fresh look; a board card is a task that does not work and never moves), and the window's footer
-line, shown with the body class aq-fonsterlage; `render` sets neither.
+line, shown with the body class aq-fonsterlage; `render` sets both only in the window mode.
 PROVDATA is marked once for the whole page (body class aq-provdata). The page starts in the stale look (class
 aq-inaktuell: the world stands still and fades, figures become outlines marked as last known, a banner says that this does
 not mean work has ended); only SKRIPT, placed once at <!--AQ:SKRIPT--> and pinned by its SHA-256 in the page's
@@ -21,10 +21,17 @@ Content-Security-Policy, compares the reading's time with the viewer's clock and
 reading is younger than the smallest source limit. Decorative motion (daylight, plants) runs only in the fresh look and
 never with reduced motion. Each place links to a panel (:target) with its rows and its source line.
 
-`render` only fills SCEN and never changes it, and SKRIPT is unchanged, byte for byte. `render(projection)` is pure: no
-file, clock, process or network, the input is never mutated and the same input gives the same page; the modules it uses
-and ZONE are created at import. The command reads one projection file and writes one new page, and it collects, serves,
-starts and changes nothing.
+`render(projection, jamforelse)` with a comparison of the window's two latest readings (tools/aquarium_fonster.py)
+renders the same scene as the window's page instead: FONSTERSKRIPT beside SKRIPT, both pinned by fonster_csp(), the body
+class aq-fonsterlage, the mark aq-nytt-lage on every shown place whose task the comparison names, one added row per such
+task and one last row in the Verkstaden panel that says what the comparison rests on. A mark says only that the observed
+state differs from the previous reading; it never says when, how, by which route or by whom it changed, and it never
+describes a handover. Called with one argument, or with None as the second, `render` returns exactly the snapshot.
+
+`render` only fills SCEN and never changes it, and SCEN, SKRIPT and FONSTERSKRIPT are unchanged, byte for byte.
+`render` is pure: no file, clock, process or network, the inputs are never mutated and the same inputs give the same
+page; the modules it uses, ZONE and the pinned digests are created at import. The command reads one projection file and
+writes one new page, and it collects, serves, starts and changes nothing.
 """
 import base64
 from datetime import datetime
@@ -345,6 +352,19 @@ SKRIPT = '''(function () {
   setInterval(tick, 30000);
 })();'''
 
+FONSTERSKRIPT = '''(function () {
+  var read = document.body.getAttribute('data-read-at');
+  function poll() {
+    fetch('/lasning.json', {cache: 'no-store'}).then(function (answer) {
+      return answer.ok ? answer.json() : null;
+    }).then(function (latest) {
+      if (latest && typeof latest.read_at === 'string' && latest.read_at !== read) location.reload();
+    }).catch(function () {});
+  }
+  poll();
+  setInterval(poll, 30000);
+})();'''
+
 # --- constants and formats --------------------------------------------------------
 
 SCHEMA = 2
@@ -366,6 +386,16 @@ UNREADABLE_ENGINE = 'Motorn kunde inte läsas; inget visas som noll'
 UNREADABLE_WATCH = 'bevakningen kunde inte läsas'
 NOT_MODEL_CHOICE = ' · följer inte modellvalet'
 
+# The window mode: the comparison of the window's two latest readings, and nothing else.
+JAMFOR_KEYS = ('grund', 'forra_read_at', 'uppdrag')
+LAGE_KEYS = ('plats', 'step', 'state', 'executor')
+GRUNDER = ('första', 'otillräcklig', 'jämförd')
+FIRST_READING = 'första läsningen sedan fönstret startade; bilden visar bara aktuellt läge'
+NO_BASIS = 'underlaget räcker inte för en jämförelse; bilden visar bara aktuellt läge'
+NOT_WHEN_OR_HOW = '; nytt läge visar det uppdaterade läget, inte när eller hur det ändrades'
+FÖRRA_STEG = {'granskning': 'granskning', 'integration': 'integration', 'steg': 'steg pågår'}
+MARK = ' aq-nytt-lage'
+
 # The renderer touches no file: the zone and the pinned script digest are made at import, and the
 # zone is asked for both a winter and a summer offset here so that no lookup is left to `render`.
 ZONE = ZoneInfo('Europe/Stockholm')
@@ -381,6 +411,17 @@ _CSP = ("default-src 'none'; style-src 'unsafe-inline'; script-src 'sha256-"
         + "'; base-uri 'none'; form-action 'none'")
 
 
+def _pinned(script):
+    """The base64 of one script's SHA-256, as a Content-Security-Policy pins it."""
+    return base64.b64encode(hashlib.sha256(script.encode('utf-8')).digest()).decode('ascii')
+
+
+# The window page pins both scripts and may ask its own window, and nothing else, over the network.
+_FONSTER_CSP = ("default-src 'none'; style-src 'unsafe-inline'; script-src 'sha256-"
+                + _pinned(SKRIPT) + "' 'sha256-" + _pinned(FONSTERSKRIPT)
+                + "'; connect-src 'self'; base-uri 'none'; form-action 'none'")
+
+
 def _refuse():
     raise ValueError(ERROR)
 
@@ -388,6 +429,11 @@ def _refuse():
 def csp():
     """The page's Content-Security-Policy, pinning SKRIPT by its SHA-256."""
     return _CSP
+
+
+def fonster_csp():
+    """The window page's policy, pinning SKRIPT and FONSTERSKRIPT by their SHA-256."""
+    return _FONSTER_CSP
 
 
 def _moment(value):
@@ -502,6 +548,47 @@ def TITEL(item):
     return MISSING_TITLE.get(item['title_status'], 'titeln kunde inte läsas')
 
 
+def FÖRRA(lage):
+    """What the previous reading showed for this task; a reading's state, never an event."""
+    if lage['plats'] == 'vilar':
+        return 'arbetade inte'
+    if lage['step'] == 'utförande':
+        return 'utförande · ' + ('utförare ej belagd' if lage['executor'] is None
+                                else EXEC(lage['executor']))
+    return FÖRRA_STEG.get(lage['step'], 'arbetsflödessteg')
+
+
+def JÄMFÖRELSE(jamforelse):
+    """The window's comparison line: what differs from the previous reading, not when or how."""
+    if jamforelse['grund'] == 'första':
+        return FIRST_READING
+    if jamforelse['grund'] == 'otillräcklig':
+        return NO_BASIS
+    count = len(jamforelse['uppdrag'])
+    changed = ('inget uppdrag i nytt läge' if not count
+               else ANTAL(count, '1 uppdrag i nytt läge', '%d uppdrag i nytt läge'))
+    return ('jämfört med läsningen ' + TID(jamforelse['forra_read_at']) + ': ' + changed
+            + NOT_WHEN_OR_HOW)
+
+
+def _nytt(jamforelse, task):
+    """Whether this reading shows a new observed state for this task, compared with the previous."""
+    return jamforelse is not None and task in jamforelse['uppdrag']
+
+
+def _MARKT(klass, jamforelse, task):
+    """The mark on a place that shows a task in a new observed state."""
+    return klass + MARK if _nytt(jamforelse, task) else klass
+
+
+def _TILLAGG(jamforelse, task):
+    """A row's addition: the previous reading's time and the state it showed."""
+    if not _nytt(jamforelse, task):
+        return ''
+    return (' · nytt läge; förra läsningen ' + TID(jamforelse['forra_read_at']) + ': '
+            + FÖRRA(jamforelse['uppdrag'][task]))
+
+
 # --- the page ---------------------------------------------------------------------
 
 
@@ -544,8 +631,35 @@ def _validate(projection):
             _refuse()
 
 
-def _fill(values, rows):
-    """Three passes over SCEN: escaped placeholders, then list rows, then the pinned script."""
+def _validate_jamforelse(jamforelse):
+    """Refuse anything that is not one comparison of two readings, as `jamfor` returns it."""
+    if type(jamforelse) is not dict or set(jamforelse) != set(JAMFOR_KEYS):
+        _refuse()
+    uppdrag = jamforelse['uppdrag']
+    if jamforelse['grund'] not in GRUNDER or type(uppdrag) is not dict:
+        _refuse()
+    if jamforelse['grund'] == 'jämförd':
+        if _moment(jamforelse['forra_read_at']) is None:
+            _refuse()
+    elif jamforelse['forra_read_at'] is not None or uppdrag:
+        _refuse()
+    for task, lage in uppdrag.items():
+        if type(task) is not str or type(lage) is not dict or set(lage) != set(LAGE_KEYS):
+            _refuse()
+        if lage['plats'] == 'vilar':
+            if any(lage[key] is not None for key in ('step', 'state', 'executor')):
+                _refuse()
+        elif lage['plats'] == 'arbete':
+            if type(lage['step']) is not str or type(lage['state']) is not str:
+                _refuse()
+            if lage['executor'] is not None and type(lage['executor']) is not str:
+                _refuse()
+        else:
+            _refuse()
+
+
+def _fill(values, rows, jamforelse):
+    """Three passes over SCEN: escaped placeholders, then list rows, then the pinned scripts."""
     if set(values) != _NAMES or set(rows) != _SLOTS:
         _refuse()
 
@@ -557,7 +671,10 @@ def _fill(values, rows):
 
     page = _PLACEHOLDER.sub(one, SCEN)
     page = _SLOT.sub(slot, page)
-    return page.replace('<!--AQ:SKRIPT-->', '<script>' + SKRIPT + '</script>')
+    script = '<script>' + SKRIPT + '</script>'
+    if jamforelse is not None:
+        script += '<script>' + FONSTERSKRIPT + '</script>'
+    return page.replace('<!--AQ:SKRIPT-->', script)
 
 
 def _rubrik(projection, waiting):
@@ -639,7 +756,7 @@ def _arkivet(A, R, sources, local_date, values, rows):
                                      else ' · main ' + R['office_main']))
 
 
-def _verkstaden(V, sources, values, rows):
+def _verkstaden(V, sources, values, rows, jamforelse):
     """The benches take the work in progress; the board takes the tasks that do not work."""
     bench = [item for item in V['items'] if item['state'] == 'pågår']
     desk = [item for item in V['items'] if item['state'] in ('granskas', 'integreras')]
@@ -661,7 +778,7 @@ def _verkstaden(V, sources, values, rows):
             klass += (' aq-figur aq-claude' if item['executor'] == 'claude' else
                       ' aq-figur aq-codex' if item['executor'] == 'codex' else
                       ' aq-figur aq-okand')
-        values['AQ_BANK_%d_CLASS' % number] = klass
+        values['AQ_BANK_%d_CLASS' % number] = _MARKT(klass, jamforelse, item['task'])
         values['AQ_BANK_%d_NAMN' % number] = NAMN(item['short'])
         values['AQ_BANK_%d_VEM' % number] = VEM(item)
         values['AQ_BANK_%d_VAD' % number] = SEDAN(item)
@@ -674,8 +791,9 @@ def _verkstaden(V, sources, values, rows):
             values['AQ_PARK_%d_NAMN' % number] = ''
             values['AQ_PARK_%d_TITEL' % number] = ''
             continue
-        values['AQ_PARK_%d_CLASS' % number] = ('aq-pa' if item['title_status'] == 'läst'
-                                               else 'aq-pa aq-titel-saknas')
+        values['AQ_PARK_%d_CLASS' % number] = _MARKT(
+            'aq-pa' if item['title_status'] == 'läst' else 'aq-pa aq-titel-saknas',
+            jamforelse, item['task'])
         values['AQ_PARK_%d_NAMN' % number] = NAMN(item['short'])
         values['AQ_PARK_%d_TITEL' % number] = (TITEL(item) + ' · ' + item['task'] + ' · '
                                                + SEDAN(item))
@@ -693,18 +811,23 @@ def _verkstaden(V, sources, values, rows):
              else ANTAL(len(bench), '1 i arbete', '%d i arbete'))
             + ' · ' + ANTAL(len(parked), '1 uppdrag arbetar inte', '%d uppdrag arbetar inte'))
         listed = [_rad('Pågår', item['task'] + ' · ' + VEM(item) + ' · ' + SEDAN(item)
-                       + ' · steg ' + STEG(item)) for item in bench]
+                       + ' · steg ' + STEG(item) + _TILLAGG(jamforelse, item['task']))
+                  for item in bench]
         if not listed:
             listed = [_rad('Läge', 'Inget arbete pågår i motorn')]
         if parked:
             listed += [_rad('Arbetar inte', item['task'] + ' · ' + TITEL(item) + ' · '
-                            + SEDAN(item)) for item in parked]
+                            + SEDAN(item) + _TILLAGG(jamforelse, item['task']))
+                       for item in parked]
         else:
             listed.append(_rad('Arbetar inte', 'inga uppdrag'))
         if V['titles'] != 'ok':
             listed.append(_rad('Uppdragsfiler',
                                'kunde inte läsas; titlarna är okända men uppdragen visas'))
         rows['verkstaden'] = listed
+    if jamforelse is not None:
+        # The window always says what the comparison rests on, also when the engine was unreadable.
+        rows['verkstaden'].append(_rad('Jämförelse', JÄMFÖRELSE(jamforelse)))
     values['AQ_KALLA_VERKSTADEN'] = KÄLLA(sources, ('engine', 'tasks'))
 
     first = desk[0] if desk else None
@@ -715,8 +838,9 @@ def _verkstaden(V, sources, values, rows):
         values['AQ_GRANSK_VAD'] = ''
         values['AQ_GRANSK_TITEL'] = 'ingen granskning'
     else:
-        values['AQ_GRANSK_CLASS'] = ('aq-granskas aq-figur aq-okand'
-                                     if first['state'] == 'granskas' else 'aq-integreras')
+        values['AQ_GRANSK_CLASS'] = _MARKT('aq-granskas aq-figur aq-okand'
+                                           if first['state'] == 'granskas' else 'aq-integreras',
+                                           jamforelse, first['task'])
         values['AQ_GRANSK_NAMN'] = NAMN(first['short'])
         values['AQ_GRANSK_VEM'] = VEM(first)
         values['AQ_GRANSK_VAD'] = SEDAN(first)
@@ -737,7 +861,8 @@ def _verkstaden(V, sources, values, rows):
         values['AQ_GRANSK_UNDER'] = ' · '.join(parts)
         rows['granskningen'] = [
             _rad('Granskas' if item['state'] == 'granskas' else 'Integreras',
-                 item['task'] + ' · ' + VEM(item) + ' · ' + SEDAN(item) + ' · steg ' + STEG(item))
+                 item['task'] + ' · ' + VEM(item) + ' · ' + SEDAN(item) + ' · steg ' + STEG(item)
+                 + _TILLAGG(jamforelse, item['task']))
             for item in desk]
     values['AQ_KALLA_GRANSKNINGEN'] = KÄLLA(sources, ('engine',))
 
@@ -917,16 +1042,26 @@ def _kallor(sources, R, rows):
     rows['kallor'] = listed
 
 
-def render(projection):
-    """Fill SCEN from one projection. Pure: no file, clock, process or network, nothing mutated."""
+def render(projection, jamforelse=None):
+    """Fill SCEN from one projection. Pure: no file, clock, process or network, nothing mutated.
+
+    With a comparison of two readings the page is the window's: both scripts, the window's policy and
+    footer line, and a mark and a row on each task whose observed state differs from the previous
+    reading. Without one, and with `None`, it is exactly the snapshot.
+    """
     _validate(projection)
+    if jamforelse is not None:
+        _validate_jamforelse(jamforelse)
     sources, R = projection['sources'], projection['revisions']
     read_at = projection['read_at']
     limits = [sources[name]['stale_after_seconds'] for name in SOURCES
               if sources[name]['status'] == 'ok']
     waiting = _agare(projection['agarens_bord'])
-    values = {'AQ_CSP': csp(),
-              'AQ_BODY_CLASS': 'aq-provdata' if projection['provdata'] else '',
+    body = 'aq-provdata' if projection['provdata'] else ''
+    if jamforelse is not None:
+        body = (body + ' aq-fonsterlage').strip()
+    values = {'AQ_CSP': csp() if jamforelse is None else fonster_csp(),
+              'AQ_BODY_CLASS': body,
               'AQ_READ_AT': read_at,
               'AQ_STALE_AFTER': str(min(limits)) if limits else '0',
               'AQ_OBSERVERAT': TID(read_at), 'AQ_SENAST': TID(read_at),
@@ -936,12 +1071,12 @@ def render(projection):
                          + values['AQ_RUBRIK'] + ', läst ' + TID(read_at))
     rows = {}
     _arkivet(projection['arkivet'], R, sources, _LOKALT(read_at), values, rows)
-    _verkstaden(projection['verkstaden'], sources, values, rows)
+    _verkstaden(projection['verkstaden'], sources, values, rows, jamforelse)
     _utkiken(projection['utkiken'], sources, values, rows)
     _bordet(projection['agarens_bord'], sources, waiting, values, rows)
     _maskinrummet(projection['sockeln'], R, sources, values, rows)
     _kallor(sources, R, rows)
-    return _fill(values, rows)
+    return _fill(values, rows, jamforelse)
 
 
 # --- command ----------------------------------------------------------------------
