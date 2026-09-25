@@ -1450,3 +1450,22 @@ omladdning i webbläsaren, helskärm och spegling prövas separat av kedjedrivar
 etapp 3.
 
 **Ersätter:** ingenting; följer efter AQUARIUM-V0-SCEN-20260925.
+
+## AQUARIUM-V0-AGARPROV-20260925 — ägarprovet för Aquarium v0 besvarat
+
+**Status:** registrerat 2026-09-25 av kedjedrivaren (Claude Code). Ägarens svar står ordagrant privat i
+`evidence/aquarium/local/owner-words-agarprov-20260925.md`.
+
+**Svaret:** ägaren fick fönstret visat med verkliga källor (helskärm 1920×1080, färskt, och samma öppna sida inaktuell
+efter stopp) och ombads om ägarprovet i byggbeslutets acceptans, punkt 9. Ägaren bedömde att vyn ser bra ut, med
+förbehållet att kedjedrivaren är nöjd med resten av acceptansen. Ägaren besvarade inte de fem frågorna om vad som är
+levererat, vad som arbetar, vad som väntar och på vad, vad som behöver ägaren och hur gammal bilden är; det de prövar har
+mottagarprovet (punkt 8) prövat, där en färsk läsare svarade rätt på alla fem jämfört med källorna. Det framgår inte om
+ägaren öppnade fönstret själv eller bedömde de skickade bilderna, och tv-avståndet (punkt 11) bedömde ägaren inte
+särskilt.
+
+**Följd:** planens ägartur för ägarprovet tas bort. Punkt 9 räknas som besvarad genom ägarens omdöme, med de noterade
+begränsningarna. Leveransen av v0 väntar på uthållighetsprovet (punkt 10) och leveransbeskedet; kedjedrivaren levererar
+när uthållighetsprovet är klart och visar det som krävs.
+
+**Ersätter:** ingenting; följer efter AQUARIUM-V0-FONSTER-20260925.
