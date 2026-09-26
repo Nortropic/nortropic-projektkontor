@@ -3965,3 +3965,103 @@ resultatposten; inga modellsessioner i övrigt. Planens steg 14 öppnas; steg 12
 **Kvar för ägaren:** inget nytt beslut begärs för inventeringen; den riktade kontrollens tre förslag står kvar.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-INVENTERING-TILLAGG-20260926 — ägaren utökar inventeringen med fem delar: omvärldsbevakning som rutin, referensläsning av Claude Design och tre sajter, metodlitteraturen, lanseringskedjan för ett skarpt kundfall och Vercel Pro; bedömning, inget införande
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens två besked, lämnade i sessionen som en
+inklistrad text under etapp 2, är sparade ordagrant i `evidence/digitala/local/owner-words-inventering-tillagg-20260926.md`.
+Rubrikerna lyder "DIGITALA — TILLÄGG TILL INVENTERINGEN: OMVÄRLDSBEVAKNING, REFERENSSAJTER OCH METODLITTERATUR" och
+"DIGITALA — TILLÄGG TILL INVENTERINGEN, DEL 4 OCH 5: LANSERINGSKEDJAN FÖR RIKTIGA KUNDER OCH VERCEL PRO". Båda utökar
+planens steg 14 (DIGITALA-1-INVENTERING-20260926); ägaren skriver att de inte ändrar etapp 2 eller 3 och inte rör
+Norrgläntas sajt, skydd eller drift, och att etapp 2 fortsätter parallellt och inte väntar. Nedan registreras varje del
+med sina gränser; ordalydelsen är ägarens där den står inom citattecken.
+
+**Syftet (del 1–3).** "Ge Digitalas flöde för webbplatser en grund i det som är belagt och det som eliten faktiskt
+gör, och göra den grunden till en återkommande vana, inte en engångsläsning. Resultatet ska vara justeringar av dagens
+flöde som går att pröva, med källa och revision för varje påstående."
+
+**Del 1, omvärldsbevakning som rutin.** Beskriv en återkommande bevakning: vad som läses, var, hur ofta, hur läsbevis
+sparas och när en läsning ska leda till ett prov; samma metod som inventeringen (original via GitHubs läs-API eller
+sparade sidor, dokumenterade sökningar, bedömning per resurs mot flödets steg); föreslå ett tak per omgång i tid och
+antal resurser, "så att bevakning inte blir läsning utan slut".
+
+**Del 2, Claude Design och tre sajter som lästa referenser.** Claude Designs publika dokumentation och exempel läses som
+metodbeskrivning (konceptsteget, riktningar, bild, typografi, kritik); "Använd inte produkten och skapa inget konto";
+behövs produkten för att lära mer redovisas det som förslag för ägarens beslut. openai.com, anthropic.com och claude.com
+läses som jakt-1 och jakt-5: skärmbilder i 390 och 1440 med datum, första vy och två sektioner; hantverket noteras
+(typskala, rytm, återhållsamhet, bildbruk, rörelse), inte mönstren; per sajt vad som är överförbart till en lokal
+tjänstesajt och vad som inte är det; sett och läst hålls isär; "högst tio nya sidladdningar, alla läsande".
+
+**Del 3, metodlitteraturen för webbplatser.** En läslista över det som faktiskt är belagt: Nielsen Norman Groups
+heuristiker och användbarhetsforskning, Krug, Bringhursts typografi, Frosts atomic design, Gothelfs Lean UX, GV:s
+design sprint, Baymards forskning om formulär och konvertering, WCAG 2.2 och web.dev för teknisk kvalitet, samt det
+kedjedrivaren bedömer hör dit; varje källa pinnad med upplaga eller revision och läsdatum; per källa vilket steg i
+flödet den påverkar (research, brief, koncept, bygge, redaktionellt pass, kritik, prov, publicering), vilka delar som
+läses och formen i registret (läsunderlag, kontrollista eller kritikfråga); forskning och etablerade läroböcker skiljs
+från blogginlägg och README-filer, och åsikt märks.
+
+**Krav på del 1–3.** Läs i original, modellfritt där det går; ingenting installeras, ansluts eller köps; nya verktyg
+eller konton är förslag för ägarens beslut. Stäm av mot RIKTNING §4, kunskapsregistret, inventeringen och dess
+rekommendationer; bedöm inte om det som redan är bedömt. "Varje justering av flödet är ett namngivet förslag med
+belägg, kostnad, ett billigt prov i nästa fall och vad det ersätter." Håll isär läst, sett och bedömt; skriv "okänt" när
+något inte går att avgöra. Privat material stannar privat; kontorsposten bär inga adresser, användarnamn eller
+hemligheter. Dokumentet granskas separat innan det registreras. Etapp 2 fortsätter parallellt, "men det som hinner bli
+klart får användas i komparnas Design Read". Nästa besked ska bära: rutinen med tak och läsbevis; referensläsningen
+(sett, läst, överförbart); läslistan med källa, revision, steg och form; de tre till fem viktigaste justeringarna av
+flödet ordnade efter nytta mot kostnad; det som är okänt och de beslut som behövs från ägaren.
+
+**Del 4, lanseringskedjan bedömd för ett skarpt kundfall.** Den gamla webbförvaltningens automatisering av lansering
+vägs in i dagens flöde som förberedelse för en riktig kund: "Bedömning nu, införande bara genom eget beslut i det
+skarpa fallet." Kedjan gås igenom del för del — domänköp, DNS, Vercel-domänkoppling och certifikat, Search
+Console-verifiering och sitemap-inskick, Google-företagsprofil, analys, uppföljning efter lansering och det som hittas
+därutöver — "Läs bara; kör och installera inget." Per del: vad den gjorde, vilka konton och rättigheter den
+förutsatte, vad som var automatiserat och vad som krävde en människa, var i ett skarpt kundflöde den hör hemma; en
+status mot dagens flöde (infört som idé, delvis, medvetet utanför demon, aldrig bedömt); vad som kan automatiseras utan
+risk och vad som ska vara ett manuellt steg med kundens medgivande ("allt som rör kundens domän, konton,
+personuppgifter och pengar"); en checklista för ett skarpt fall med ägare per steg, kontroller före och efter och vad
+som loggas, med Vercel skilt från Google och registrarer; samt vad ett skarpt fall kräver som ingen demo kan visa
+(avtal, kundens texter och bilder, riktig mottagning av förfrågningar, personuppgiftshantering, förvaltning) —
+"vad ett skarpt fall kräver som ingen fiktiv demo kan visa". Inget
+körs mot Norrglänta eller något fiktivt fall; demoreglerna står fast: ingen domän, DNS, Search Console,
+företagsprofil eller annonsering för de fiktiva företagen.
+
+**Del 5, Vercel Pro.** "Syfte: vi betalar för Vercel Pro. Ta reda på vad planen ger som vi inte använder, vad som
+skulle ge nytta i flödet och vad som skulle kosta extra." Vercels aktuella dokumentation och prislista läses och det som ingår
+skrivs ned (förhandsvisningar, skydd, kommentarer på förhandsvisningar, analys och Speed Insights, loggar och
+observability, cron, edge-konfiguration, bildoptimering, domäner och certifikat, teamfunktioner, användningskredit och
+vad som debiteras utöver), pinnat med läsdatum; jämförs med vad Norrglänta-projektet använder i dag (driftsättningar,
+skydd, undantaget för prov, noindex, ingen analys) — "Läs bara projektets inställningar; ändra ingenting"; per funktion
+bedöms nytta för flödet (bygge, prov, granskning, lansering, förvaltning), kostnad inom krediten eller utöver, risk
+(tredjepartsskript, personuppgifter, spårning) och om den passar en fiktiv demo, ett skarpt fall eller båda; särskild
+tydlighet om det som kostar pengar eller lägger till skript på kundens sajt; "Inget aktiveras. Allt som skulle kosta
+eller ändra skyddet är förslag för mitt beslut"; även det som är outnyttjat men inte behövs redovisas.
+
+**Gemensamma krav på del 4–5.** Läs i original, modellfritt där det går; inget köps, aktiveras, ansluts eller
+installeras; ingen ändring av Norrgläntas projekt, skydd eller drift. Stäm av mot ACCEPT:s demoregler, RIKTNING §4,
+registret och den pågående inventeringen; bedöm inte om det som redan är bedömt. Håll isär läst, sett och bedömt;
+skriv "okänt" där det inte går att avgöra. Privat material stannar privat: inga adresser, projekt-id, team-id,
+kostnadsdetaljer per konto eller hemligheter i kontorsposten. Dokumentet granskas separat innan det registreras; etapp
+2 fortsätter parallellt. Nästa besked ska bära: lanseringskedjan del för del med status, krav och automatiserbarhet
+och checklistan för ett skarpt fall; Vercel Pro (ingår, används, föreslås tas i bruk, kostar extra, lämnas medvetet);
+de tre till fem viktigaste justeringarna ordnade efter nytta mot kostnad; det som är okänt och de beslut som behövs.
+
+**Kedjedrivarens tolkning och plan.** Steg 14 delas i sex delar: a) de 32 namnen och de trendande reponen (dokumentet i
+andra granskningsrunda när detta skrivs; egen resultatpost), b) bevakningsrutinen, c) referensläsningen, d)
+metodlitteraturen, e) lanseringskedjan, f) Vercel Pro. Del b–d redovisas i ett privat dokument och del e–f i ett
+annat, vart och ett granskat separat av Runtimes läsare före sin resultatpost, eftersom ägaren gav dem som två besked
+med var sitt "nästa besked". Ordningen är c (referensläsningen, som kan nå komparnas kritik), d, b, e, f; etapp 2
+(steg 12) fortsätter parallellt och väntar inte, enligt ägarens ord. Sidladdningarna i del 2 görs med den befintliga
+skärmbildsverktygslådan (puppeteer-core och lokal Chrome) mot de tre publika sajterna och Claude Designs publika
+dokumentation, räknade och loggade mot taket tio; ingen produkt används, inget konto skapas. Del 4 läser den gamla
+webbförvaltningens filer som källmaterial (DIGITALA-1-KORRIGERING-20260926: inspiration, inte körväg). Del 5 läser
+Vercels dokumentation och projektets inställningar genom den befintliga inloggningens läsvägar; inget ändras och inga
+identifierare förs till kontoret. Resursram: kedjedrivarens läsning och modellfria hämtningar; granskningar av två
+dokument och två resultatposter; inga modellsessioner i övrigt. Allt som föreslås tas in bara genom nytt beslut.
+
+**Vad som ersätts.** Meningen i DIGITALA-1-INVENTERING-20260926 om att steg 12 börjar efter steg 14 ersätts av
+ägarens nya ord: etapp 2 fortsätter parallellt. Del 5:s läsning av Vercels dokumentation loggas men räknas inte mot
+del 2:s tak på tio sidladdningar, som ägaren satte för referenssajterna (kedjedrivarens tolkning).
+
+**Kvar för ägaren:** inget nytt beslut begärs för registreringen; besluten kommer med resultatposterna.
+
+**Ersätter:** ingen post; ersätter ordningsmeningen om steg 12 i DIGITALA-1-INVENTERING-20260926.
