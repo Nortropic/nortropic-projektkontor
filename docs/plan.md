@@ -24,7 +24,8 @@ webbförvaltningen är inspiration till dagens flöde, inte Digitalas arbetskedj
 `evidence/digitala/local/IDEBEDOMNING-20260926.md`. Avstämningen och idéerna gavs ägaren 2026-09-26. Ägaren har därefter
 godkänt briefen (DIGITALA-1-BRIEF-GODKAND-20260926): CTA-etiketten "Skicka förfrågan", H1-kandidat 1 och målbilden och
 designriktningen. Demon är levererad 2026-09-26 bakom inloggning (DIGITALA-1-LEVERANS-20260926), och ägarens bedömning
-väntar i ägarens tur.
+väntar i ägarens tur. Ägaren har därefter beställt en riktad kontroll och förbättring av fem områden efter en extern
+kodgranskning (DIGITALA-1-RIKTAD-KONTROLL-20260926). Den pågår i steg 6.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`.
@@ -57,6 +58,16 @@ Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med resear
     `evidence/digitala/local/norrglanta/OVERLAMNING-20260926.md`. Nästa steg är ägarens
     bedömning av den byggda sajten och ägarens beslut om ett nästa fiktivt fall. Inget nytt företag väljs före det
     (DIGITALA-1-ACCEPT §7).
+ 6. PÅGÅR från 2026-09-26: den riktade kontrollen (DIGITALA-1-RIKTAD-KONTROLL-20260926). Den gäller:
+    - rabattskötseln genom hela kedjan;
+    - tidsfällans två klockor;
+    - vad kontaktfältet validerar;
+    - Säsongsplanens inramning som önskemål;
+    - ett avgränsat redaktionellt pass.
+
+    Huvudrubriken ändras inte; alternativet visas som förslag. Rättningarna görs i kundrepot och prövas på en ny skyddad
+    förhandsvisning, med separat granskning innan den befordras. Nästa besked redovisar varje område och levererar
+    skärmbilder bundna till den bedömda versionen.
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -432,8 +443,8 @@ AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNI
 RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925,
 DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925,
 RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925, DIGITALA-1-TILLAGG-20260925,
-DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-LEVERANS-20260926 och Runtime-planens
-ingång.
+DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-LEVERANS-20260926,
+DIGITALA-1-RIKTAD-KONTROLL-20260926 och Runtime-planens ingång.
 
 ---
 

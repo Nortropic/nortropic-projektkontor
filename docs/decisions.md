@@ -2416,3 +2416,117 @@ Proven hittade verkliga fel, och alla rättades:
 fall behövs (DIGITALA-1-ACCEPT-20260925 §7). Spår 1 står still tills dess.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-RIKTAD-KONTROLL-20260926 — ägaren beställer en riktad kontroll och förbättring av Norrglänta efter en extern kodgranskning
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/digitala/local/owner-words-riktad-kontroll-20260926.md`. Ingen exakt klocktid tillskrivs ägaren. Posten hör till
+DIGITALA-1-LEVERANS-20260926 och följer beskedets avsnitt i ordning.
+
+**Uppdraget:** fynden kontrolleras mot den aktuella demon, den godkända briefen och dagens implementation.
+- Verifierade avvikelser rättas inom befintlig acceptans.
+- Förslag som ändrar godkänt innehåll eller beteende hålls åtskilda från felrättningar.
+- Ingen ny grundläggande omdesign beställs.
+
+**Underlagets räckvidd:** den externa granskningen (ChatGPT) byggde på:
+- kundrepots version `2a84fd3`;
+- sidornas innehåll, komponenter, formulärlogik och provkod;
+- kontorets briefgodkännande och leveranspost.
+
+Den kunde inte öppna den skyddade sidan och hade inte de slutliga skärmbilderna. Den har alltså inte gjort någon visuell
+slutgranskning och inte själv klickat igenom sidan.
+- Fynden behandlas som underbyggda granskningsfrågor, inte som ett facit.
+- Varje fynd bekräftas, preciseras eller avvisas med relevant underlag.
+- Arbetet börjar i aktuellt läge. Revisionen är en jämförelsepunkt, inte en order att återställa något.
+- Redan genomförda rättningar tillgodoräknas.
+
+**1. Rabattskötsel, ingår eller tillval:** berörda källor är tjänstebeskrivningen, FAQ, Säsongsplanen och sidan om löpande
+skötsel. Det som ska göras:
+- Kontrollera hur erbjudandet definieras i den godkända briefen och hur det presenteras på sidan.
+- Motsäger beskrivningarna varandra rättas de till samma avsedda innebörd genom hela kedjan: tjänstebeskrivning, FAQ,
+  Säsongsplan, förfrågan och slutbesked.
+- Erbjudandet ändras inte godtyckligt för att göra koden enklare.
+- Är briefen själv motsägelsefull redovisas det, och en konkret lösning rekommenderas i stället för att ett val tillskrivs
+  ägaren.
+- Både valt och bortvalt tillval prövas. Ett korrekt överfört fältvärde räcker inte om texten beskriver ett annat
+  erbjudande.
+
+**2. Tidsfällan och de två klockorna:** den lästa implementationen jämför webbläsarens starttid med serverns klocka. En
+klientklocka som går före kan då ge ett mänskligt ifyllande en negativ varaktighet och det tysta robotsvaret. Det som ska
+göras:
+- Felet reproduceras först isolerat, utan att datorns systemklocka ändras och utan verkliga utskick.
+- Bekräftas det görs minsta lämpliga rättning, så att intervallet inte bygger på två osynkroniserade klockor. Lösningen
+  väljs efter demons behov och den befintliga koden, och ingen ny generell antibotplattform byggs.
+- Normal ifyllning, snabb ifyllning och relevant klockskillnad prövas, liksom att den tidigare rättade fokushanteringen
+  fortfarande fungerar.
+- Tidsfällans verkliga begränsning beskrivs: den är inte ensam ett bevis för att en besökare är en robot.
+
+**3. Kontaktfältet:** fältet heter "Telefonnummer eller e-post", men valideringen kräver bara minst fem tecken, och proven
+belägger längdregeln, inte ett rimligt kontaktformat. Det som ska göras:
+- Fastställ vad den godkända demon ska demonstrera.
+- Ingår ett rimligt telefon- eller e-postformat rättas valideringen och proven proportionerligt. Säkra fiktiva exempel
+  används, och både godtagna format och uppenbart ogiltig text prövas. Ingen leveransbarhetskontroll görs och ingen
+  mottagare kontaktas.
+- Är längdregeln ett uttryckligt accepterat demobeslut redovisas den som en avsiktlig begränsning, och proven beskrivs inte
+  som mer heltäckande än de är.
+- En ändring av den avsikten ska vara ett namngivet förslag. En rekommendation får inte bli en efterhandsändring av
+  acceptansen.
+
+**4. Säsongsplanen, önskemål och överenskommelse:** sidan säger att planen skriver ihop "vad vi kommer överens om", men
+besökaren har bara valt ett önskat upplägg. Det som ska göras:
+- Formuleringen bedöms i den verkliga användarresan och mot briefens löfte att omfattningen bestäms innan arbetet börjar.
+- Den rekommenderade inramningen är "Ditt önskade säsongsupplägg", med en kort förklaring att valen följer med i
+  förfrågan och att omfattning och tid bestäms senare.
+- Funktionen och förifyllningen behålls.
+- Rekommendationen skiljs från ett redan fattat ägarbeslut. Den genomförs inom briefen om den är en entydig precisering,
+  annars redovisas den konkreta ändringen för beslut.
+- Demobeskedet att inget skickas ska fortsatt vara tydligt.
+
+**5. Redaktionellt och visuellt:** löftet om en tydlig överenskommelse återkommer i huvudrubriken, flera sektioner och
+nästan likadana citat på Om-sidan. Det som ska göras:
+- Sidorna läses som en besökare, och det bedöms om varje avsnitt tillför ny information.
+- Ett avgränsat redaktionellt pass görs inom godkänd ton och faktabas. Löftet bevaras, men avsnitten får fylla olika syften.
+- Meriter, personalhistorier eller kundresultat hittas inte på för att fylla ut Om-sidan.
+- FAQ-formuleringen "är en av våra två målgrupper" kontrolleras särskilt, eftersom den är internt plannerspråk.
+
+**Huvudrubriken:** ägaren har godkänt H1-kandidat 1, och den ändras inte automatiskt.
+- Alternativet bedöms: H1 "Trädgårdsskötsel i Luleå och Boden" och den separata stödtexten "Med en tydlig överenskommelse
+  innan vi börjar."
+- Det jämförs med den godkända versionen på mobil och desktop och visas som förslag innan ett eventuellt byte.
+- Antalet rader avgör inte ensamt vilken version som fungerar bäst.
+
+**Bilderna:** deras geografiska ursprung är redan redovisat. Att de inte är från Norrbotten är inte automatiskt ett fel
+eller en beställning på nya bilder. Deras visuella och innehållsliga lämplighet bedöms utan att lokal proveniens
+tillskrivs dem.
+
+**Genomförande och gränser:**
+- Dagens Digitala-flöde behålls. Den gamla webbförvaltningens agenter, skills, kontrakt eller workflows återinförs inte.
+- Sajtens fungerande grund och Säsongsplanen behålls, liksom demogränserna:
+  - fiktivt företag;
+  - inga mejl, SMS, bokningar eller riktiga leads;
+  - inga riktiga mottagare eller telefonlänkar;
+  - skyddad Vercel-driftsättning och noindex;
+  - inga nya kostnader, tjänster eller behörigheter.
+- Fungerande arbete och tidigare bevis behålls. Accepterade krav ändras inte för att en ny kandidat ska bli grön.
+- Relevanta regressionsprov körs för ändringarna, och ordinarie granskning och publicering görs enligt dagens väg.
+- Ingen ny generell audit, ingen ny åttatimmarsprovning och inget omtag av hela bygget görs utan konkret skäl.
+- Aktuella prov ska avse den kandidat och den skyddade version som faktiskt bedöms, och äldre resultat återges inte som
+  nya.
+- Bara redan tillåten provåtkomst används. Inga lösenord, cookies eller automatiseringshemligheter röjs i skärmbilder,
+  rapporter eller länkar.
+
+**Nästa besked:** för vart och ett av de fem områdena redovisas kort:
+- om det är ett bekräftat fynd, ett avvisat fynd eller ett förbättringsförslag;
+- vilket underlag som avgjorde;
+- eventuell rättning och vad som faktiskt prövats;
+- vad som fortfarande är okänt eller behöver ägarens beslut.
+
+Beskedet ska dessutom:
+- leverera aktuella skärmbilder av hela startsidan, Säsongsplanen och Om-sidan på mobil och desktop, bundna till den
+  bedömda versionen, så att även den externa granskaren kan göra en visuell bedömning;
+- hålla maskinella mätningar, redaktionellt och designmässigt omdöme och verkligt användarprov åtskilda.
+
+Ingen ny fiktiv verksamhet startas i passet. Målet är att göra demons erbjudande, språk och funktion sammanhängande, inte
+att samla fler gröna prov eller börja om med en ny teknisk grund.
+
+**Ersätter:** ingen post.
