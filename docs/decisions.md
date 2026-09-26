@@ -3869,3 +3869,99 @@ denna posts ordinarie kontorsgranskning.
 
 **Ersätter:** ingen post. Skrivrätten gällde bara de beskrivna antecknings- och länkändringarna; valvet är i övrigt
 skyddat som förut (AGENTS.md).
+
+## DIGITALA-1-ETAPP1-RESULTAT-20260926 — etapp 1 klar: kunnandet installerat och registrerat på användarnivå och i kundrepot, kontrollerat med en byggsession och en modellfri detektorkörning; en väg avvek, allt pinnat
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Planens steg 11 (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926,
+etapp 1). Norrgläntas sajt, innehåll, skydd och drift är oförändrade; ingen driftsättning. Utfallet står privat i
+`evidence/digitala/local/genomforande-20260926/etapp1/UTFALL-ETAPP1.md` med råmaterial i samma mapp; registret i
+`evidence/digitala/local/kunskap/REGISTER.md` har en ny del F.
+
+**Gjort, mot klart-när.** Pluginen frontend-design installerad på kedjedrivarens användarnivå från
+`claude-plugins-official` vid exakt den pinnade revisionen (marknadsplatsens commit `fa59bc90…`; skillfilen
+byte-identisk med registrets kopia). Emils emil-design-eng och mobile-native registrerade som skills på användarnivå
+ur de pinnade kopiorna (revision `d16ebe60…`, MIT), med licens och källnot. Impeccable pilotinstallerad i kundrepot
+utan hook och utan underagenter: npm-paketets (4.1.0) installerare gav HTTP 404 på skillpaketet, eftersom
+release-tillgången för skill 4.4.0 aldrig publicerades (senaste paketrelease 4.3.1); skillen kopierades därför ur
+källrepot vid den pinnade revisionen `9d715cc4…`, som också är GitHubs HEAD (noll commits sedan 2026-09-25), enligt
+originalets egen reservväg — skill 4.4.0, motor 0.1.6, 54 filer, kundrepo-commit `a963c73`; README:s ignoreblock
+tillagt; hookmanifestet ur källan läst och sparat (SessionStart, PostToolUse på Edit och Write samt Stop kör
+launcherns `hook`), och hooken är av; motorn hämtad en gång av launchern till hemkatalogen. `/impeccable init` körd
+som egen session med briefens svar i prompten: `PRODUCT.md` skriven på svenska i kundrepot (commit `02c844d`), inga
+andra ändringar, live-läge och byggväg inte konfigurerade, tre punkter uttryckligen öppna (pris, mottagande i skarpt
+läge, fler orter eller tjänster). Taste (§0–§1 och §4) infört som läsunderlag i registret med git-blob kontrollerad mot
+källan. Registret uppdaterat: nya rader i A, B och D, laddning per steg, del F med form, revision, plats, licens och
+kontroll per resurs, kontrollsummor för fjorton filer, lärdomarna L14 och L15 och mottagarprovets etapp 1-avsnitt.
+
+**Kontrollerna.** En färsk byggsession (Read, Write, Skill; användarnivåns skills och plugins; tom arbetsyta) fick en
+mobil-först-uppgift utan att någon skill nämndes: den anropade frontend-design av sig själv som första handling och
+skrev sidan; Emils två skills var listade som tillgängliga men anropades inte. Villkoret är därmed **delvis** uppfyllt,
+och lärdomen L14 säger att en registrerad skill är tillgänglig, inte garanterat laddad — kopplingstabellen anropar
+Emils skills uttryckligen när steget kräver det. Impeccables detektor kördes modellfritt på Norrgläntas byggda HTML
+vid `ada775e`, på en spegel med stilmallarna: tolv varningar — tio vänsterställda accentlinjer i kort och noter, en
+trång FAQ-inramning och en platt rubrikskala på tjänsteöversikten — är golvet som etapp 2 mäts mot; utan spegel gav
+verktyget sju falska rubrikfynd, vilket registret nu anger.
+
+**Resurser.** Två modellsessioner (mottagarprovet och init), inom ramen 1–2; inga kontorsgranskningar i etappen utöver
+denna post. Nätverkshämtningar och skrivningar höll sig inom mandatets befogenhetsrad (marknadsplats, npm-cache,
+sparse-klon av källrepot, motorbinär i hemkatalogen, kundrepots `.claude/`, `.gitignore` och `PRODUCT.md`).
+
+**Ägarens ord under etappen.** Efter beskedet om installerarens 404 skrev ägaren, ordagrant: "Allt finns väl på github
+så du kan hitta den senaste versionen" (sparat i `evidence/digitala/local/owner-words-github-senaste-version-20260926.md`).
+Kontroll: den senaste versionen på GitHub är den pinnade revisionen; kopian ur repot är alltså den senaste.
+
+**Iakttagelser som förs vidare.** Init-sessionen körde i acceptEdits med Bash tillåtet bara för launchern, men
+Claude Codes läskommandon (`ls`, `cat`, `head`, `git status`) passerade utan nekande — provarprofilen med vakt är
+strängare, och skillnaden tas med till etapp 3. Detektorn behöver spegeln med `_next/static`. Två av mandatets
+pinningar var paketnummer; den stabila källan var git-revisionen (L15). Från registreringens granskning: etapp 3 är
+oberoende och får gå parallellt (rubrikens "i ordning" gäller etapp 1 före 2); inga MCP-anslutningar ingår i etapp 1;
+riktning B i kvalitetsprovet utgår om inga fria foton klarar demoreglerna.
+
+**Kvar utanför etappen, oförändrat.** Hooken av; underagenterna inte installerade; `DESIGN.md` inte skriven; inga
+versionsbyten; hemvistfrågan öppen (skills på användarnivå, Impeccable i kundrepot).
+
+**Granskning:** en runda genom Runtimes skrivskyddade läsare tillsammans med registreringen nedan; utfallet i
+granskningskvittot.
+
+**Kvar för ägaren:** inget nytt; den riktade kontrollens tre förslag står kvar.
+
+**Ersätter:** ingen post.
+
+## DIGITALA-1-INVENTERING-20260926 — ägaren beställer en inventering av 32 namngivna repon och fler trendande GitHub-repon, som bedömning för flödet som skapar kvalitativa digitala upplevelser
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens ord, lämnade i sessionen under etapp 1
+tillsammans med en skärmbild, ordagrant: "Ta dig tiden och inventera dessa också utöver de redan nämna och fler
+githubs som trendar för flödet vi arbetar med att skapa kvalitativa digitala upplevelser". Orden och kedjedrivarens
+avskrift av skärmbildens lista är sparade privat i `evidence/digitala/local/owner-words-inventera-repos-20260926.md`
+(bilden bredvid). Skärmbilden visar ett inlägg med rubriken "32 Claude repos worth every penny" och listan:
+superpowers, anthropic-skills, karpathy-skills, everything-claude-code, gstack, ponytail, caveman, graphify,
+claude-mem, planning-with-files, taste-skill, ui-ux-pro-max, mattpocock skills, wshobson agents, awesome-claude-skills,
+awesome-claude-code, claude-plugins, repomix, context7, serena, firecrawl, beads, vibe-kanban, github-mcp,
+playwright-mcp, awesome-mcp-servers, claude-code-router, cc-switch, claude-hud, rtk, headroom, system-prompts.
+
+**Kedjedrivarens tolkning av uppdraget.** En inventering är en bedömning, inte en installation: varje repo läses i
+original (modellfritt via GitHubs läs-API: beskrivning, licens, aktivitet, aktuell revision, README) och bedöms med
+samma form som RIKTNING-DIGITALA-20260926 §4 — vad det är, vilket steg i flödet det skulle träffa (research, brief,
+koncept, bygge, kritik, prov, publicering, eller kedjedrivarens eget arbetssätt), överlapp med det som redan finns eller
+är bedömt, kostnad, beroenden och yta, och en rekommendation: ta in, pröva, avstå eller redan bedömd. "Utöver de redan
+nämnda" betyder att resurserna i §4 inte bedöms om; "fler githubs som trendar" görs som dokumenterade sökningar på
+GitHub (frågor, datum, sortering) efter repon för formgivning, gränssnitt, kritik och prov, där listans namn är
+utgångspunkt. "Ta dig tiden" läses som att grundligheten går före snabbheten; inventeringen går därför före etapp 2,
+eftersom den kan påverka hur komparna görs. Ingenting installeras, registreras eller ansluts på inventeringens grund:
+det som rekommenderas tas in bara genom ett nytt beslut (korrigeringens §8, registrets regel 4 och 7), och det som
+ligger utanför Digitalas flöde (kedjedrivarens verktyg för minne, kontext, kostnad, växling) redovisas som utanför.
+
+**Leverans och klart-när.** Ett privat inventeringsdokument
+(`evidence/digitala/local/genomforande-20260926/inventering/INVENTERING-REPOS-20260926.md`) med en rad per repo,
+sökningarna sparade med resultat, en samlad rekommendation grupperad per steg i flödet och en lista över det som
+ligger utanför; dokumentet granskas separat av Runtimes läsare före resultatposten. Klart när alla 32 är bedömda i
+original, sökningarna dokumenterade, rekommendationerna motiverade och granskningen gjord; resultatpost därefter.
+Resursram: kedjedrivarens egen läsning och modellfria hämtningar; en granskningsrunda för dokumentet och en för
+resultatposten; inga modellsessioner i övrigt. Planens steg 14 öppnas; steg 12 (etapp 2) börjar efter steg 14, steg 13
+(etapp 3) är oberoende.
+
+**Granskning:** en runda genom Runtimes skrivskyddade läsare tillsammans med etapp 1-posten ovan.
+
+**Kvar för ägaren:** inget nytt beslut begärs för inventeringen; den riktade kontrollens tre förslag står kvar.
+
+**Ersätter:** ingen post.
