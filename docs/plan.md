@@ -16,6 +16,13 @@ primärutcheckningen följer main igen. Spår B, Runtime: förbättringen av gra
 enligt RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925; ägaren aktiverade övergång 16 2026-09-25 kl. 18:06Z (ordningen nedan).
 Båda spåren har nått sitt klart-när och står still.
 
+OBSIDIAN-ÖVERBLICKEN (OVERBLICK-OBSIDIAN-20260926), klar 2026-09-26: ett avgränsat dokumentationsuppdrag parallellt med
+Digitala, utfört av en separat session. Ägarens befintliga Obsidian-valv har fått en daterad överblick i mappen
+`overblick/` (ingång `overblick/00-OVERBLICK.md`, nådd från valvets `LAGER-LAS-FORST.md`): mål och krav, design och
+kvalitet, arkitektur och faktisk arbetskedja, agenter, skills och verktyg, metoder och nästa steg, och det som inte är
+gjort ännu. Den är en läsning med lästid och källor, ingen uppgiftskö; denna plan äger fortsatt nästa handling, och en
+uppdatering är en ny beställning. Underlaget står privat i `evidence/map-delivery/local/overblick-20260926/` (`LAGE.md`).
+
 DIGITALA 1 — FIKTIV KVALITETSDEMO OCH RUNTIME-DIAGNOS (DIGITALA-1-ACCEPT-20260925, ägarens besked privat i
 `evidence/digitala/local/`; gränserna står avsnitt för avsnitt i beslutsposten). Två spår, med en skrivare åt gången.
 Ägarens tillägg (DIGITALA-1-TILLAGG-20260925) och korrigering (DIGITALA-1-KORRIGERING-20260926) är registrerade: den gamla
@@ -539,8 +546,8 @@ DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-L
 DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926, DIGITALA-1-JAMFORELSE-20260926,
 DIGITALA-1-JAMFORELSE-RESULTAT-20260926, DIGITALA-1-PRECISERING-20260926, DIGITALA-1-PRECISERING-RESULTAT-20260926,
 DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926, DIGITALA-1-GENOMFORANDE-RESULTAT-20260926,
-DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926, DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926 och
-Runtime-planens ingång.
+DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926, DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926,
+OVERBLICK-OBSIDIAN-20260926 och Runtime-planens ingång.
 
 ---
 

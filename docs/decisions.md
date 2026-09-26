@@ -3798,3 +3798,74 @@ granskningskvittot.
 **Kvar för ägaren:** den riktade kontrollens tre förslag (oberoende). Inget nytt beslut begärs.
 
 **Ersätter:** ingen post.
+
+## OVERBLICK-OBSIDIAN-20260926 — ägaren beställer en avgränsad komplettering av Obsidian-kartan parallellt med Digitala; överblicken är införd i det befintliga valvet
+
+**Status:** registrerat 2026-09-26 av den session som fick beställningen (Claude Code), skild från Digitala-sessionen.
+Ägarens beställning och ett tillägg samma dag står ordagrant privat i
+`evidence/digitala/local/owner-words-obsidian-overblick-20260926.md` och
+`evidence/digitala/local/owner-words-obsidian-ej-gjort-20260926.md`. Beställning och genomförande registreras i samma
+post, eftersom kontorets skrivplats under arbetet hölls av Digitala-sessionens publiceringar (PR 81 och 82); Digitala-
+sessionen fick en samordningsnotis före denna publicering. Underlaget står privat i
+`evidence/map-delivery/local/overblick-20260926/` med `LAGE.md` som ingång.
+
+**§1 Det pågående arbetet bevaras:** plan, mandat och privat återupptagningspunkt kontrollerades först (`tools/ingang.py`
+varnade för Digitala-sessionens då opublicerade gren). Digitala-sessionen var aktiv och skrev när beställningen kom;
+dokumentationssessionen tog därför inte över Digitala-skrivandet (AGENTS.md: skrivansvar tas inte över förrän
+föregående skrivare slutat), återstartade inget prov, återställde inget äldre läge och ändrade varken Norrgläntas sajt,
+Runtime, AP-10, verktygsval, öppna genomförandebeslut eller Digitalas filer. Digitala-sessionen fortsatte det redan
+tillåtna arbetet och publicerade under tiden PR 81 och, efter ägarens beslut kl. 16:21Z, PR 82. Ingen session fick
+uppdraget att fortsätta hela Nortropic: två avgränsade uppgifter, inte två huvudansvariga.
+
+**§2 En andra session beredde innehållet:** en separat läsarsession genom kontorets befintliga läsarväg (Runtimes
+skrivskyddade Claude-profil med pinnad CLI 2.1.257 och `claude-opus-5` på samma abonnemang; ingen ny betalväg, modell
+eller underagent), med stabila kopior av källorna och skrivrätt bara på nio svarsfiler i sin egen privata arbetsyta.
+Den lämnade färdiga anteckningstexter, källhänvisningar (57 bärande påståenden spårade till fil och rad) och ett konkret
+ändringsförslag, inte en plan, och ändrade inga källrepon, planen, valvet, konfiguration, prov eller drift. Ingen
+manuell session och ingen underagent startades för samma arbete.
+
+**§3 Befintlig karta och gällande källor:** valvet är ägarens befintliga lokala Obsidian-valv, där kartans aktuella lager
+infördes genom den avslutade kartleveransen 2026-09-20; visningskopian är inte valvet, och inget valvval återstod.
+Inget nytt valv, ingen databas och ingen konkurrerande dokumentationsstruktur skapades. Källorna gavs med revision eller
+lästid: kontoret `4fde387` med deltan till `8e73ea2` och `c050a51`, kundrepot `ada775e`, Runtime `d5a4406`, den gamla
+webbförvaltningen `e4c8c52` som källmaterial, privata filer med lästid. Befintliga genomgångar återanvändes
+(riktningsbeskedets karta över arbetskedjan, kunskapsregistret, jämförelsen version 4, idébedömningen); ingen ny sweep.
+Inga hemligheter kopierades.
+
+**§4 Fem frågor och det som inte är gjort ännu:** en ny mapp `overblick/` med sju anteckningar, nådd genom ett tillägg
+överst i valvets befintliga "läs först"-anteckning: ingången (vad vi bygger, hur arbetet fungerar, vad som gäller, vad
+som händer nu, statusord), A mål och krav (avdelningens mål skilda från Norrgläntas brief), B design och kvalitet
+(Digitalas principer ur kunskapsregistret; inget gemensamt designsystem finns; Norrgläntas designriktning och
+komponenter länkade separat, inte som kundmall), C arkitektur och faktisk arbetskedja (den befintliga kartan
+återanvänd; automatiserat, kedjedrivarstyrt, mänskligt och föreslaget åtskilt), D agenter, skills och verktyg (fil på
+disk, registrerad resurs, faktiskt anrop och belagd funktion åtskilda; länkar till instruktionerna i repona, inga egna
+körinstruktioner, AGENTS.md och CLAUDE.md orörda), E metoder och nästa steg (kedjan behov → lärande med metoder, källor
+och var resultaten används; länk till denna plan som ensam äger nästa handling) och F det som inte är gjort ännu
+(ägarens tillägg: en enkel överblick, ingen uppgiftskö). Varje anteckning bär lästid och källor; GÄLLANDE, FAKTISKT
+PRÖVAT, PÅGÅENDE, FÖRSLAG och HISTORISKT skiljs där det spelar roll; saknat står som saknat; den gamla
+webbförvaltningen visas som källmaterial, inte som dagens kedja; kunskapslagrets områden länkas som idéunderlag, inte
+som belägg.
+
+**§5 Integrationen:** valvets 1 199 filer bands vid lästiden; deltan efter lästiden fördes in, daterade (PR 81, ägarens
+beslut 16:21Z, PR 82 och etapp 1:s början). Den konkreta ändringsmängden granskades separat i tre rundor: den första
+godkände, den andra underkände en rad som lämnade ett redan beslutat mandat hos ägaren, den tredje godkände den rättade
+versionen, som skrevs in oförändrad. Före skrivningen togs en privat bevarandekopia av hela valvet och lästes om;
+skrivningen skapade sju nya filer utan överskrivning och gjorde en ren infogning i en befintlig anteckning, med journal
+per fil, och efterkontrollen visade att inget annat ändrats. Ägarens egna ändringar, fungerande länkar och historiken
+bevarades; valvet ersattes inte med någon kopia. `.obsidian`-inställningar, plugins, kunskapslagret, det historiska
+lagret, researchoriginal och frusna provunderlag är orörda; Obsidian uppdaterade själv sin lista över senaste filer.
+Inget öppet val beskrivs som beslutat: den riktade kontrollens tre förslag, valet av webbläsarväg efter steg 13 och
+hemvisten för Digitalas gemensamma verktyg står som öppna med pekare till beslutsfrågan.
+
+**§6 Klart-när och besked:** ingången finns i den befintliga kartan. Länkarna är mekaniskt kontrollerade i valvet (47
+wikilänkar, 12 lokala och 19 GitHub-länkar, inga fel) och de bärande påståendena kontrollerade mot källorna av värden
+och granskarna. Ingen visuell kontroll i Obsidian är gjord eller påstådd. Dokumentation är inte förmåga: anteckningarna
+beskriver förmågor, de skapar dem inte. Överblicken är en daterad läsning; den hålls inte levande av sig själv, och en
+uppdatering är en ny avgränsad beställning.
+
+**Resursåtgång, separat från Digitala:** fyra modellsessioner på abonnemanget för själva dokumentationen (beredningen och
+tre granskningsrundor, sammanlagt cirka 12,6 USD enligt strömmarnas rapport; den egna ramen var högst fyra), plus
+denna posts ordinarie kontorsgranskning.
+
+**Ersätter:** ingen post. Skrivrätten gällde bara de beskrivna antecknings- och länkändringarna; valvet är i övrigt
+skyddat som förut (AGENTS.md).
