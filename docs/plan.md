@@ -45,8 +45,9 @@ upplevelsen; leveransen och dess bevis är historik, inte ett nöjt omdöme), de
 längre som argument, den egna webbläsarvägen är fryst tills valet av väg är avstämt mot standardlösningar, och ett
 samlat besked med riktning, tilläggsmandat och nästa synliga kvalitetsprov är lämnat (DIGITALA-1-RIKTNING-BESKED-20260926).
 Ägaren har därefter valt hela tilläggsmandatet (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926): etapp 1, kunnande i
-byggsessionen, pågår i steg 11; etapp 2, kvalitetsprovet, följer i steg 12; etapp 3, webbläsarvägen till avgörande, i
-steg 13; etapp 4 ingår inte.
+byggsessionen, är klar (DIGITALA-1-ETAPP1-RESULTAT-20260926, steg 11); ägaren har därefter beställt en inventering av 32
+namngivna repon och fler trendande GitHub-repon (DIGITALA-1-INVENTERING-20260926, steg 14), som går före etapp 2,
+kvalitetsprovet (steg 12); etapp 3, webbläsarvägen till avgörande (steg 13), är oberoende; etapp 4 ingår inte.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`. Kunskapsstödet för dagens flöde står i `evidence/digitala/local/kunskap/REGISTER.md`
@@ -120,19 +121,15 @@ inte krav.
     `evidence/digitala/local/genomforande-20260926/riktning/RIKTNING-DIGITALA-20260926.md`. Den egna webbläsarvägen
     förblir fryst tills etapp 3 (steg 13) avgör valet. Ägaren valde hela mandatet 2026-09-26
     (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926); fortsättningen står i steg 11–13.
-11. PÅGÅR 2026-09-26: etapp 1, kunnande i byggsessionen (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926). Installera
-    pluginen frontend-design från `claude-plugins-official` på kedjedrivarens användarnivå och anteckna installerad
-    revision mot den pinnade läsningen; registrera emil-design-eng och mobile-native som skills på användarnivå ur de
-    pinnade kopiorna i `evidence/digitala/local/kunskap/externa/` (MIT); pilotinstallera Impeccable i kundrepot med
-    `npx impeccable install --providers=claude --no-hooks`, versioner pinnade (paket 4.1.0, skill 4.4.0, motor
-    engine-v0.1.6), läs det installerade hookmanifestet innan någon hook aktiveras och kör `/impeccable init` som eget
-    steg; för in Taste §0–§1 och §4 som läsunderlag i registret. Kontroll: en färsk byggsession anropar frontend-design
-    och Emils skills av sig själv på en gränssnittsuppgift; `npx impeccable detect` körs modellfritt på Norrgläntas
-    byggda HTML som första golv. Norrgläntas sajt, innehåll, skydd och drift ändras inte. Klart när installerat,
-    versionerat, kontrollerat och `kunskap/REGISTER.md` uppdaterat, med resultatpost efter separat granskning. Ram: 1–2
-    modellsessioner. Nästa handling: pluginen. Återupptagningspunkt:
-    `evidence/digitala/local/genomforande-20260926/LAGE.md` (avsnittet etapp 1).
-12. VÄNTAR (börjar efter steg 11): etapp 2, kvalitetsprovet — tre statiska komps ("Ljuset", "Arbetet", "Planen") för
+11. KLART 2026-09-26: etapp 1, kunnande i byggsessionen (DIGITALA-1-ETAPP1-RESULTAT-20260926). frontend-design
+    installerad som plugin på användarnivå vid den pinnade revisionen; emil-design-eng och mobile-native registrerade
+    som skills ur de pinnade kopiorna; Impeccable (skill 4.4.0, motor 0.1.6, källrevision `9d715cc4` = GitHub HEAD)
+    kopierad ur källrepot till kundrepot utan hook efter att paketinstalleraren gav 404, hookmanifestet läst, hooken
+    av, `/impeccable init` körd och `PRODUCT.md` skriven; Taste §0–§1 och §4 i registret; kontrollerna: byggsessionen
+    anropade frontend-design själv men inte Emils skills (delvis; L14), detektorn gav tolv varningar som golv.
+    Två modellsessioner. Utfall privat i `evidence/digitala/local/genomforande-20260926/etapp1/UTFALL-ETAPP1.md`;
+    registret del F.
+12. VÄNTAR (börjar efter steg 14): etapp 2, kvalitetsprovet — tre statiska komps ("Ljuset", "Arbetet", "Planen") för
     Norrgläntas första vy och Säsongsplan i en privat katalog med riktigt innehåll, visade 390 och 1440 bredvid dagens
     första vy och närmaste referens; en designkritik per komp av en separat läsarsession och en samlad; Impeccables
     detektorer modellfritt på komps och dagens HTML som golv; ägarens omdöme på en sida. Ingen sajtändring, ingen
@@ -147,6 +144,15 @@ inte krav.
     Frysningen av den egna vägen hävs bara för dessa steg. Klart när körningarna är redovisade som lyckade,
     misslyckade eller ej bedömbara och valet motiverat, med resultatpost efter separat granskning. Ram: 3–5
     modellsessioner.
+14. PÅGÅR 2026-09-26: inventeringen (DIGITALA-1-INVENTERING-20260926). De 32 namngivna reponen och fler trendande
+    GitHub-repon läses i original (modellfritt via GitHubs läs-API) och bedöms med §4-formen: steg i flödet, överlapp,
+    kostnad och yta, rekommendation (ta in, pröva, avstå, redan bedömd); sökningarna dokumenteras med fråga, datum och
+    resultat. Ingenting installeras eller ansluts på inventeringens grund; det som rekommenderas tas in bara genom
+    nytt beslut. Klart när alla 32 är bedömda, sökningarna dokumenterade, rekommendationerna motiverade och dokumentet
+    granskat av Runtimes läsare, med resultatpost efter separat granskning. Ram: kedjedrivarens läsning, två
+    granskningsrundor, inga modellsessioner i övrigt. Nästa handling: läsningen av de 32 (metadata och README sparade i
+    `evidence/digitala/local/genomforande-20260926/inventering/`). Återupptagningspunkt:
+    `evidence/digitala/local/genomforande-20260926/LAGE.md` (avsnittet inventering).
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -547,7 +553,8 @@ DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926, DIGITA
 DIGITALA-1-JAMFORELSE-RESULTAT-20260926, DIGITALA-1-PRECISERING-20260926, DIGITALA-1-PRECISERING-RESULTAT-20260926,
 DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926, DIGITALA-1-GENOMFORANDE-RESULTAT-20260926,
 DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926, DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926,
-OVERBLICK-OBSIDIAN-20260926 och Runtime-planens ingång.
+OVERBLICK-OBSIDIAN-20260926, DIGITALA-1-ETAPP1-RESULTAT-20260926, DIGITALA-1-INVENTERING-20260926 och Runtime-planens
+ingång.
 
 ---
 
