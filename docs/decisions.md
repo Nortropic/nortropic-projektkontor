@@ -3638,3 +3638,113 @@ prov startas för avstämningen. Avstämningens modellanrop redovisas separat fr
 lämnat med registrerad riktning, granskat tilläggsmandat och ett konkret nästa steg.
 
 **Ersätter:** ingen post; ersätter tolkningar enligt ovan.
+
+## DIGITALA-1-RIKTNING-BESKED-20260926 — det samlade beskedet är lämnat: faktisk arbetskedja, orsakerna bakom den otillräckliga upplevelsen, rekommenderad förbättring med konkreta resurser, ett tilläggsmandat i tre etapper och ett synligt kvalitetsprov; ett beslut kvar
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Posten sammanfattar det besked som
+DIGITALA-1-RIKTNING-20260926 §8 beställde. Beskedet står privat i
+`evidence/digitala/local/genomforande-20260926/riktning/RIKTNING-DIGITALA-20260926.md` med läsningarna av aktuella
+original i `riktning/lasning/`. Ingenting är installerat, anslutet, ändrat på sajten eller beslutat. Avstämningens
+modellanrop redovisas separat nedan.
+
+**1. Pågående arbete.** Paketets del 1 tillgodoräknad; del 2 (installation) aldrig utförd och ersatt av tilläggsmandatet; seedfallet och den blinda granskningen färdiga;
+bildbedömningen ej gjord och tas in i kvalitetsprovet; den egna webbläsarvägen fryst vid säker delgräns (granskad,
+inte körd med provare i version 2; tre opushade provkodscommits); resultatposten publicerad som historik;
+korrigeringen registrerad. Inga prov startades för avstämningen. Nästa handling är ägarens beslut om tilläggsmandatet.
+
+**2. Faktisk arbetskedja.** Kartan i beskedet visar per huvudsteg vem eller vad som driver, var det ligger, vad som är
+automatiserat och vad som kräver ägaren. Automatiserat i dag: kontorets ingångskontroll, granskningens och
+publiceringens grindar, de deterministiska proven och byggkontrollerna, driftsättningens skydd. Operatörssteg: nästan
+allt skapande (research, brief, formgivning, bygge, bildval, copy), varje granskningsarbetsyta, varje driftsättning,
+lärandet, och fortsättningen efter sessionsbyte (planen och det privata läget; ingen automatisk återupptagning).
+Ägaren behövs vid mandat, briefstopp, leverans och Vercel-inloggning. Förmågor som finns och är anropbara:
+registrering, granskning och publicering; prov och mätningar; skyddad driftsättning; ett kunskapsregister som en
+färsk session hittar; isolerade läsarsessioner; en webbläsarhållare med proxygräns (byggd, prövad mot lokala fällor).
+Bara beskrivna eller föreslagna: variantsteg före bygget, redaktionellt pass som rutinsteg, designkritik med
+referenser, art direction för bilder, deterministiska designdetektorer, automatisk laddning av rätt underlag per
+steg, AI-scenarioprovare i drift. Ingen separat "Digitala-avdelning" finns; P1–P5 är ett avgränsat bidrag; den gamla webbförvaltningen är
+källmaterial.
+Namngiven, olöst fråga: var Digitalas gemensamma verktyg och skills ska bo (kontoret, ett eget repo eller
+operatörens användarnivå); i dag delat mellan kontorets privata evidensmapp och kundrepots provkatalog.
+
+**3. Rekommenderad förbättring.** Kedjedrivarens läsning av Norrgläntas skärmbilder mot två referenser och briefens
+avsikt: sajten är korrekt men generisk. Observerade orsaker i kedjan: en tom bildinventering och licensdrivet
+bildval (bilderna ligger under en mörk overlay och bildposterna säger själva att de inte visar företagets arbete);
+inget konceptsteg (en skiss, sedan bygge, och formgivning i samma pass som implementation); två belagda avsteg från briefens egen komposition (H1 på fem rader mot högst tre på
+390 px; det föreskrivna överlappet hero/ledger saknas); en prövning som mäter korrekthet och briefföljsamhet men
+aldrig om upplevelsen är bra. Kedjedrivarens egna bedömningar, märkta så i dokumentet: en typografi utan egen röst, en
+kompositionsmall som är densamma i varje sektion trots varierande innehåll, ett signaturelement som är formulär
+snarare än upplevelse, en mörk första vy. Hypoteser som kvalitetsprovet prövar: att
+bilden är den största orsaken; att tre visade riktningar hade gett ett annat val; att rörelse gör Säsongsplanen
+minnesvärd. De få förändringarna: ett konceptsteg med två–tre riktningar på namngivna axlar före bygget; en
+bildstrategi som antingen bär identiteten grafiskt eller använder dokumentära bilder inom demoreglerna; kunnande i
+byggsessionen som anropbara skills i stället för läslistor (frontend-design som plugin, Emils emil-design-eng och
+mobile-native som registrerade skills, prototype som metod av nyttoskäl, Taste som läsunderlag för konceptet); en
+designkritik som eget steg med skärmbilder och referenser bredvid, och Impeccables kritik och deterministiska
+detektorer som pilot; lärdomsposter om upplevelsen, inte bara om process och kod. Det som inte ändras: demoreglerna,
+tillgängligheten, skyddet, det redaktionella passet, kedjeproven och den separata granskningen.
+
+**Webbläsarvägen mot standardlösningar (korrigeringens §6; dokumentets §4.3):** Playwright MCP (v0.0.82, Apache-2.0) ger ett rikt agentgränssnitt med
+isolering, hemlighetsfil och spår, men säger själv att dess origin-listor och servern inte är en säkerhetsgräns och
+bär kärnverktyg för godtycklig kod (evaluate, run_code) som bara kan nekas per verktyg på klientsidan, och kallar
+sin hemlighetsfil en bekvämlighet snarare än en säkerhetsfunktion;
+agent-browser har opt-in-funktioner för domänlista, sessioner och åtgärdspolicy som är relevanta men oprövade av oss,
+med en stor yta och egen installation. Det säkerhetskritiska i den egna vägen (proxygräns, vakt,
+tom arbetsyta, hemlighetens väg) levereras inte av Playwright MCP och av agent-browser bara som deklarerade,
+oprövade funktioner. Rekommendation: behåll den egna gränsen som isoleringslager, kör de två återstående stegen med
+den egna vägen, pröva sedan agent-browser mot samma spärrprovsfällor, och avgör med båda utfallen vilket
+handlingsgränssnitt provaren ska ha; ett byte kräver inte att den egna vägen först misslyckas och är inte automatiskt
+bättre.
+
+**4. Tilläggsmandat (förslag för ett enda beslut).** Etapp 1: kunnande i byggsessionen — installera pluginen
+frontend-design från Anthropics officiella marknadsplats i kedjedrivarens Claude Code med installerad version
+antecknad mot den pinnade läsningen; registrera emil-design-eng och mobile-native som skills ur de pinnade kopiorna;
+pilotinstallera Impeccable i kundrepot utan hook tills dess manifest är läst (skillen kör en pinnad motorbinär som
+hämtas en gång till hemkatalogen; `/impeccable init` som eget steg), versioner pinnade; Taste §0–§1 och §4 som
+läsunderlag; kontroll genom att en färsk byggsession anropar skillsen själv och genom en modellfri
+detektorkörning på Norrgläntas byggda HTML; hemvistfrågan namngiven; klart när installerat, versionerat, kontrollerat och registret uppdaterat; 2–3 timmar,
+1–2 modellsessioner. Etapp 2:
+kvalitetsprovet (punkt 5); en arbetsdag, 3–4 sessioner; klart när tre komps med kritik och en rekommenderad riktning
+ligger framför ägaren och en lärdomspost om vad som skilde är skriven. Etapp 3: webbläsarvägen till avgörande — omprov av
+verktygsgränsen med version 2 och den första skyddade scenariokörningen mot den bevarade leveransen med kontroll av
+driftsättningen (2 sessioner, en tredje bara vid verktygsfel), provkoden pushad utan driftsättning, samma spärrprov
+mot agent-browser med domänlista, session, avstängd WebMCP och åtgärdspolicy (1–2 sessioner), därefter det namngivna
+valet mellan egen väg, agent-browser och Playwright MCP bakom vår gräns; klart när körningarna är redovisade med
+lyckat, misslyckat eller ej bedömbart och valet motiverat. Etapp 4 (ingår inte): om ägaren väljer en riktning, ett avgränsat
+förbättringsuppdrag för Norrglänta eller nästa fiktiva fall, som eget beslut. Ram: 7–11 modellsessioner totalt
+redovisade separat, inga kostnader eller konton; befogenheter per etapp namngivna (nätverkshämtning av plugin och
+motorbinär, skrivning i användarkatalog och kundrepo, push utan driftsättning, åtkomst till den skyddade demon med det
+befintliga undantaget, installation av agent-browser för jämförelsen); ingen ändring av Runtime, AP-10, modellval, driftsättning eller skydd; allt levererat bevaras; det som ersätts är den generella
+installationsgränsen, "ingen installation begärs" i jämförelsedokumentets §7 och beslutspunkten om fem sessioner, som
+kedjedrivaren drog tillbaka i planens steg 9 och som mandatet ersätter om ägaren godtar det (kedjedrivarens tolkning
+av korrigeringens §2 och §7).
+
+**5. Nästa synliga kvalitetsprov.** Tre statiska komps för Norrgläntas första vy och Säsongsplan på namngivna axlar —
+"Ljuset" (typografisk och illustrerad identitet utan fotohero), "Arbetet" (dokumentära fria bilder med människor och
+arbete, om sådana finns inom demoreglerna), "Planen" (Säsongsplanen som hero) — visade 390 och 1440 bredvid dagens
+första vy och närmaste referens, med en designkritik per komp av en separat läsarsession och Impeccables detektorer
+som golv, och ägarens omdöme på en sida. Modellbedömning plus ägarens bedömning, inte ett mänskligt användarprov;
+ingen sajtändring; ett produktändrande steg är ett förslag tills det omfattas av ett beslut.
+
+**Granskning:** två rundor genom Runtimes skrivskyddade läsare (samma modellfamilj som kedjedrivaren), med ägarens ordagranna
+korrigering, skärmbilderna av sajten och referenserna och de sparade originalen i arbetsytan. Första rundan underkände
+med fyra blockerande fynd — typografiomdömet motsades av briefen och bilderna, ett Playwright-verktyg var fel
+beskrivet, Impeccables installationsform stämde inte med originalet, och agent-browser hade valts bort på uppgifter
+originalet inte bär — och elva anmärkningar (numrerade I1–I10 och I12); alla rättades i en andra version med nya läsningar sparade. Andra rundan
+godkände utan blockerande fynd, med tio precisionsanmärkningar (bland annat att H1-regeln gäller 390 px, ett saknat
+föreskrivet överlapp, agent-browsers installationsavtryck och att WebMCP är påslaget som standard, resursramens nedre
+gräns); de är införda i den levererade tredje versionen utan ny omläsning; version ett och två är bevarade som
+`RIKTNING-DIGITALA-20260926-r1.md` och `-r2.md` i samma katalog.
+
+**Avstämningens resursåtgång, separat från P1–P5:** inga provsessioner; kontorsgranskningar: registreringen i två
+rundor, beskedet i två rundor, denna post i tre rundor (den första underkände fyra redovisningsfel i posten själv:
+del 2 kallad tillgodoräknad, fel antal anmärkningar, egna bedömningar under observerade orsaker och en
+granskningsrunda för lite i resursraden; den andra godkände utan blockerande fynd en version som ännu saknade planraden
+om den bevarade första grenen och lämnade åtta restrisker, införda här; den tredje granskade den fullständiga
+versionen); modellfria hämtningar av originalen, sparade i `riktning/lasning/`; kedjedrivarens egen läsning av de
+sparade skärmbilderna av Norrglänta och de två referenserna.
+
+**Kvar för ägaren:** ett beslut om tilläggsmandatet, helt, delvis eller inte alls; den riktade kontrollens tre förslag
+står kvar oberoende.
+
+**Ersätter:** ingen post.
