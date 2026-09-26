@@ -4672,3 +4672,63 @@ paket hämtat pinnat till en privat katalog, inget installerat globalt.
 post; inget i denna post föregriper dem. Etapp 4 ingår inte i mandatet.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-AGARBESLUT-20260926 — ägarens beslut om Digitalas fyra ägarrader: riktningen "Ljuset med Planen" byggs in i Norrglänta nu (etapp 4 beställd), rekommendationerna följs, ägaren deltar inte i prov, den inkluderade Pro-krediten får bära driften men inget därutöver, alla fyra prov godtagna
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens ord lämnades under kvällen i kontorets genomgång av
+Digitala-raderna (förd av en annan session efter FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926) och vidarebefordrades
+ordagrant; de står privat i `evidence/digitala/local/owner-words-digitala-rader-20260926.md`,
+`owner-words-a2-c2-c3-20260926.md`, `owner-words-etapp4-krediter-d-20260926.md` och `owner-words-krediter-val-20260926.md`, tillsammans med genomgången de
+besvarade och kedjedrivarens tolkning rad för rad (`AGARBESLUT-TOLKNING-20260926.md`). Genomgången numrerade punkterna
+A1–A3 (den riktade kontrollen), B1–B4 (etapp 2), C1–C10 (inventeringens tio beslut) och P-A–P-D (de fyra proven).
+
+**Ägarens ord, i sak.** "kör enligt rekommendationer, jag har ska inte vara inblandad i några testar, min mänskliga
+kommer när allt är klart enligt AI" · "har satt vercel budget på 20 men vi ska inte använda krediter, vi kör på pro" ·
+"ja, stockholm självklart. ja checklista, inget som kostar krediter ska ingå" · "D låter bra" · "hallmark låter bra" ·
+"antrhopic metoden låter bra" · "pb låter bra"; på följdfrågorna: A2 "Felmeddelande", C2 "Lämna okända", C3 "Fria källor
+tills vidare", etapp 4 "Bygg in den nu", avsnitt D "Ja, alla fyra", om krediter först: "Jag menar att inget på vercel som
+kostar faktiskta krediter ska användas, vi har pro av en anledning", och på den följande faktafrågan valet "Krediten i Pro
+får användas", vars alternativtext löd: "Krediten som ingår i Pro får användas, men inga betalda tillägg och inget utöver
+krediten. Etapp 4 byggs som i dag (serverfunktion för formuläret, bildoptimering), utan analys, fältmått eller
+hastighetsbegränsning."
+
+**Besluten, punkt för punkt.**
+- A1 och B4: den kortare huvudrubriken med separat stödtext (rekommendationen), prövad före leverans. A2: regeln minst
+  fem tecken står kvar och ett tydligt felmeddelande förklarar den. A3: ja till rättelseanteckningen i briefen.
+- B1–B3: riktningen är kombinationen "Ljuset med Planen" — fotofri, ljus första vy som ram och Säsongsplanen som det
+  bärande objektet, sida vid sida på dator och rubrik följd av plan på mobil. Ägaren lämnar inget eget omdöme nu: hans
+  mänskliga bedömning görs på den färdiga sajten.
+- C1: fem läsande sidladdningar av Claude Designs dokumentation utan konto (ägarens egen prövning utesluts av att han
+  inte deltar i prov). C2: mobilvyerna lämnas okända. C3: fria källor tills vidare, inget köps. C4: nej — ägaren deltar
+  inte i något prov. C5: bevakningsrutinen går från oktober (Digitalas del av månadsomgången). C6: se krediter nedan.
+  C7: ja, funktionsregion Stockholm. C8: ja, checklistan för skarpa fall blir mall i registret, utan punkter som kostar
+  krediter. C9: rotation av åtkomstskyddets automationsnyckel och en nyckel per verktyg — ingår i "kör enligt
+  rekommendationer" (den var rekommenderad och märkt mest angelägen); genomförs som hygienåtgärd i etapp 4:s
+  driftsättning. C10: nej — det bärs av ägarens ord att inget som kostar krediter ska ingå (analys och fältmätning
+  debiteras per enhet) och av kreditvalet, som utesluter dem för etapp 4.
+- P-A, P-B, P-C, P-D: ja, alla fyra.
+- **Etapp 4 är beställd**: "Bygg in den nu" — Digitala bygger riktningen i Norrglänta med sina ordinarie prov och
+  granskning och driftsätter den skyddade demon; ägaren bedömer den färdiga sajten när allt är klart. Ägarens
+  mänskliga bedömning är därmed etapp 4:s slutpunkt, inte dess start.
+
+**Krediter (C6, C10 och ramen för allt vidare).** Ägaren har själv satt Vercels utgiftsbudget till 20 USD (C6; rekommendationens aviseringsnivåer 50, 75 och 100 procent följer teamets budgetinställning, som ägaren gjort själv och kedjedrivaren inte rör). På faktafrågan om krediterna (formulärets serverfunktion och bildoptimeringen debiteras på Pro från första enheten mot den inkluderade månadskrediten; ören per månad för demon; ingen faktura under krediten) valde ägaren "Krediten i Pro får användas" (`owner-words-krediter-val-20260926.md`): den inkluderade krediten får bära dagens drift (serverfunktion, bildoptimering), men inga betalda tillägg, ingen analys eller fältmätning (C10 nej) och inget som debiteras utöver krediten. Ramen gäller etapp 4 och allt vidare.
+
+**Vad som därmed öppnas (planens steg 15–18).** Steg 15, etapp 4: bygget av "Ljuset med Planen" i Norrglänta enligt
+etapp 2:s rekommendation, med DESIGN.md för riktningen (P-A, verktyget hämtas pinnat), Hallmark som extra kritikröst i
+granskningen (P-C), canvas-design bara om egen grafik behövs (P-D), den kortare rubriken med stödtext prövad före
+leverans (A1/B4), kontaktfältets felmeddelande (A2), rättelseanteckningen i briefen (A3), scenariernas produktfynd
+sorterade i fel som rättas och observationer som noteras, funktionsregion Stockholm satt före driftsättningen (C7),
+kreditregeln, rotation av automationsnyckeln vid driftsättningen (C9), de ordinarie proven (acceptans, tillgänglighet,
+prestanda, tre renderingsläsningar, detektorn, skyddade scenarier med den valda webbläsarvägen) och separat granskning;
+driftsättning bakom åtkomstskyddet; ägarens bedömning på den färdiga sajten. Ram, satt av kedjedrivaren (ägaren angav
+ingen): 6–10 modellsessioner; inga kostnader utöver planen, den inkluderade krediten får bäras; demoreglerna står fast. Klart-när innefattar också lärdomsposten, användningsnoterna för kopplade underlag och för
+planens förslag, och förslagsraden för nästa fall (rytmerna). Steg 16: checklistan som mall i registret utan
+kreditförbrukande punkter (C8). Steg 17: fem sidladdningar av Claude Designs dokumentation (C1) och P-B:s mätning av
+referenssajterna med den valda webbläsarvägen. Steg 18: bevakningsrutinen från oktober (C5), enligt rytmen per månad.
+
+**Gränser som står kvar.** Demoreglerna (DIGITALA-1-ACCEPT-20260925); ingen lansering, domän eller annonsering; inga
+riktiga mottagare; ägaren deltar inte i prov; ingenting som kostar pengar eller krediter utöver det beslutade; den gamla
+webbgrunden är inspiration, inte körväg; Runtime och AP-10 orörda; varje etapp avslutas med resultatpost efter separat
+granskning.
+
+**Ersätter:** ingen post; de fyra Digitala-raderna i ägarens tur är besvarade och tas bort ur planen.
