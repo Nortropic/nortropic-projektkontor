@@ -4199,3 +4199,169 @@ prov och den riktade kontrollens tre förslag står kvar oberoende. Om P-A, P-C 
 omgång komps, inte i denna.
 
 **Ersätter:** ingen post.
+
+## FORVALTNINGAR-LOPANDE-UTVECKLING-20260926 — ägaren beställer en återkommande utvecklingsrytm för förvaltningarna; förslaget med tre rytmer, Runtimes minsta form och effekt uppmätt skilt från bedömt är lämnat för tre beslut; inget är infört
+
+**Status:** registrerat 2026-09-26 av den session som fick beställningen (Claude Code), skild från Digitala-sessionen.
+Ägarens besked står ordagrant privat i `evidence/forvaltningsutveckling/local/lopande-20260926/owner-words-lopande-utveckling-20260926.md`;
+ingen exakt klocktid tillskrivs ägaren. Beställning och förslag registreras i samma post. Förslaget är ett privat
+dokument, `evidence/forvaltningsutveckling/local/lopande-20260926/FORVALTNINGSRYTM-20260926.md`, granskat separat av Runtimes
+läsare före registreringen (version 1, godkänd; version 2 för in fem precisionsrättningar, se Granskning). Ingenting är infört, startat eller ändrat utöver denna post och planraden.
+Digitala-sessionen fick samordningsnotiser före och under arbetet. Den publicerade en post under tiden (PR 87) och lät
+denna publicering gå före sin nästa; kandidaten är byggd på den main som då gällde.
+
+**Beställningen, avsnitt för avsnitt.**
+- *Uppdraget:* ett eget uppdrag för kontoret om hur det ska arbeta utvecklande med förvaltningarna över tid, inte om något
+  enskilt fall. En annan session driver samtidigt Digitala (steg 12–14), och ingenting där rörs: inte kundrepot, inte
+  `evidence/digitala`, inte planens Digitala-steg och inte pågående poster. Varje publicering samordnas med den sessionen
+  genom kontorets vanliga väg (skrivplatsen, PROFILES-raden sist, ff-only), och kandidaten byggs på aktuell main. Båda
+  sessionerna kan inte publicera samtidigt; den som kommer tvåa bygger om sin kandidat på den nya main, och meddelandet
+  mellan sessionerna sköter de själva.
+- *Syftet:* kontoret registrerar i dag beslut och äger planen, men utvecklingen av förvaltningarna sker bara när ägaren
+  beställer den, en förvaltning i taget. Ägaren vill ha en återkommande rytm där lärdomar samlas, förslag prövas i nästa
+  fall och effekt mäts, med ägarbeslut på få punkter. Inga nya workflows, roller eller automatiska loopar; planen,
+  kontorsposterna och den separata granskningen bär det.
+- *Gör så här 1–2:* läs läget först (uppdraget, definitionen, planen och posterna om kontorets arbetsform, Digitalas
+  kunskapsstöd och lärdomar — registret, LARDOMAR-formen och mottagarproven — och Runtimes drift), med `tools/ingang.py` som
+  vanligt. Beskriv nuläget ärligt: vilka förvaltningar som finns, vilken utvecklingsrytm var och en har, var lärdomar
+  hamnar och vad som inte fångas, med "okänt" där det inte går att avgöra.
+- *Gör så här 3:* föreslå tre stående rytmer med form, ägare, klart-när och tak. Per fall: lärdomspost, användningsnoter
+  per underlag, en rad i planen med det förslag som ska prövas i nästa fall, och att detta står i varje uppdrags klart-när.
+  Per månad: en bevakningsomgång per förvaltning med tak i tid och antal resurser, sparade läsbevis och ett tydligt villkor
+  för när en läsning får bli ett prov; för Digitala finns ett förslag i inventeringens del 1, som byggs vidare på och inte
+  görs om. Per kvartal: en förvaltningsgenomgång som kontorspost per förvaltning med fyra frågor — vad lärdes, vad mättes,
+  vad prövades, vad föreslås — och högst tre beslutspunkter för ägaren.
+- *Gör så här 4:* ange vad varje rytm kräver och inte kräver av ägaren, och vad som händer när en punkt inte får beslut, så
+  att ägarens tur inte växer utan slut.
+- *Gör så här 5:* ta ställning till Runtime särskilt: den står i drift med frysta regler och saknar lärdomsfil och
+  förslagsrad. Föreslå den minsta form som ger den en utvecklingsrytm utan att röra aktiv drift, redovisad som ett eget
+  beslut.
+- *Gör så här 6:* föreslå hur effekt mäts per förvaltning, med det som går att mäta i dag (prov, granskningsutfall,
+  sessioner, tid) och det som kräver ett skarpt fall (kunder, användare, konvertering); bedömt blandas inte ihop med
+  uppmätt.
+- *Gränser:* ingenting införs av sig självt, och rytmerna är förslag för ägarens beslut. Inga nya verktyg, konton,
+  kostnader eller behörigheter. Inga ändringar i Runtime, AP-10, modellvalet eller något kundrepo. Privat material stannar
+  privat, och kontorsposten bär inga adresser, användarnamn eller hemligheter. Förslaget skrivs som ett privat dokument,
+  granskas separat av Runtimes läsare och registreras därefter som en post med planrad. Fråga bara vid verkligt vägval,
+  kostnad eller rättighet.
+- *Nästa besked:* nuläget per förvaltning; de tre rytmerna med form, ägare, tak och klart-när; Runtimes minsta form som
+  eget beslut; hur effekt mäts, uppmätt skilt från bedömt; det som är okänt och de beslut som behövs, högst tre.
+
+**Nuläget.** Beslutsloggen kallar bara Digitala en förvaltning: kontoret är den första funktionen och Digitala första
+yrkesförvaltning (I-04). Runtime är motorn i eget repo och står i drift. Förslaget räknar tre förvaltningar: Digitala, Runtime och kontoret (med
+AP-10-åtagandet och Aquarium); om ägaren räknar kontoret som en förvaltning är okänt. Utveckling sker i dag bara genom
+ägarens besked.
+- *Digitala* har den mest utvecklade formen: en lärdomsfil i P4-formen med 16 poster, ett register som kräver en
+  användningsnot per underlag och fall, ett godkänt mottagarprov och ett förslag till månatlig bevakning (inventeringens
+  del b, beslut D5). Men inga användningsnoter är skrivna ännu (enligt en sökning i det privata underlaget), avstämningen har aldrig körts (den kräver två relevanta
+  tillämpningar), och planen säger inte vilket förslag nästa fall ska pröva.
+- *Runtime* ändras bara genom accepterade uppdrag och övergångar (senast D033 och övergång 16). Lärdomar hamnar i
+  beslutsloggens mätningar och gränser, i planernas iakttagelser, i privata diagnosnoter och i kedjedrivarens
+  användarminne, som bedömt bara Claude Code läser. Sju öppna poster är namngivna men inte rangordnade, bland dem ett odiagnostiserat
+  prov som föll i 2 av 16 publiceringskörningar och samexistensen med AP-10. AP-10:s schemalagda omgångar 2026-09-22–26
+  slutade alla otillräckliga; senast granskade besked är från 2026-09-21. Planen bokför det som iakttagelse, inte som
+  förslag eller fråga.
+- *Kontoret* utvecklas per beställning; AP07-METOD införde ingen ny rutin, och I-07b låter självförbättring vänta tills
+  ägaren avgör att tillräckligt arbete finns. Ingen av de lästa filerna lägger samman granskningsutfallen. Uppmätt ur
+  planens förteckning över bevarade granskningsgrenar: 20 underkända rundor för kontors- och planposter 2026-09-24–26;
+  av de 19 med angivet skäl gällde, i kedjedrivarens klassning, 10 text som stod kvar från ett tidigare läge, 4
+  utelämnade eller försvagade ägargränser, 5 felaktiga tal eller obelagda påståenden och 1 en felaktig pekare; en runda
+  har två skäl och räknas i två kategorier. Talen är ett golv. Planens beskrivning av ägarens tur har ingen regel för
+  när en obeslutad punkt lämnar turen.
+
+**Förslaget, tre rytmer** (inget införs utan beslut). Gemensamt: planen, kontorsposterna och den separata granskningen bär
+rytmerna; ingen ny workflow, roll, schemaläggning, automatisk loop eller körning genom Runtimes schema. En omgång blir av
+när en session läser planen och ser att den passerat sitt datum; startas ingen session blir den inte av och noteras som
+utebliven. Ett förslag prövas bara inom ett redan accepterat uppdrags mandat; allt som kräver ny kostnad, behörighet,
+installation eller driftändring blir en kandidat till beslutspunkt. Digitalas P4-form och registrets fyra utfall för
+användningsnoten är formen i alla tre förvaltningarna.
+- *Per fall:* varje uppdrag med eget resultat lämnar en lärdomspost i förvaltningens lärdomsfil, användningsnoter för de
+  kopplade underlagen och för planens förslag, och en rad "FÖRSLAG ATT PRÖVA I NÄSTA FALL" per förvaltning (ett
+  namngivet förslag med belägg, billigt prov och vad det ersätter, eller "inget förslag"). Kedjedrivaren skriver en fast
+  mening om detta i varje nytt uppdrags klart-när, och resultatpostens ordinarie granskning prövar att det finns. Ägare:
+  kedjedrivaren. Tak per fall: högst tre nya lärdomsposter, en förslagsrad per berörd förvaltning, uppskattningsvis
+  högst 30 minuter och inga extra modellsessioner. Kräver inget av ägaren.
+- *Per månad:* en bevakningsomgång per förvaltning, byggd på inventeringens del b, utan modellsessioner utöver del b:s
+  eventuella granskning av Digitalas bevakningsnot. Digitala följer del b oförändrad och avgörs av D5, som inte frågas
+  två gånger. Runtime läser AP-10:s omgångar genom den befintliga bevakningsbilden, utgåvenoter för de verktyg Runtime
+  kör och som AP-10 inte täcker, och Runtimes öppna lista; tak en timme och sex resurser. Kontoret läser bara sina egna
+  register (ägarens tur, granskningsutfall, nya lärdomar i användarminnet, som förs över i utförarneutral form till en
+  privat lärdomsfil, och resursåtgång); tak 45 minuter. Läsbevis sparas i en katalog per månad med en bevakningsnot. En
+  läsning blir ett prov bara när del b:s tre villkor gäller samtidigt: den träffar ett namngivet glapp eller en
+  observerad brist i en lärdomspost, den kan prövas avgränsat i nästa fall utan att ändra aktiv drift, sajt, skydd,
+  modellval eller behörighet, och kostnaden är noll eller står som beslut. En säkerhets- eller driftrisk i något som
+  redan är aktivt tas upp i nästa besked (ett tillägg, inte en ändring av del b). Ägare: kedjedrivaren. Första omgången
+  oktober 2026. Kräver inget av ägaren varje månad utöver det del b redan säger om Digitalas sajtlista och beslutet D5;
+  inget månadsbesked.
+- *Per kvartal:* en genomgångspost per förvaltning med de fyra frågorna, bara uppmätta tal under "vad mättes", och högst
+  tre beslutspunkter per post, var och en med vad som gäller utan beslut. Kontorets genomgång redovisar också hur rytmerna
+  själva gick. Ägare: kedjedrivaren skriver, Runtimes läsare granskar separat, ägaren beslutar. Första genomgången januari
+  2027. Tak: tre beslutspunkter och uppskattningsvis två timmar per post, en granskningssession (högst en till vid
+  underkännande), inga nya prov för genomgångens skull. Kräver av ägaren att läsa högst tre korta poster per kvartal och ta
+  ställning till högst tre punkter i var och en; inte att läsa underlaget eller formulera förslag.
+
+**När en punkt inte får beslut.** Utan beslut införs inget. Varje punkt bär sin förfallstid i radens text, i det format
+Aquarium läser. Vid nästa genomgång för samma förvaltning stängs en obeslutad punkt som "obeslutad, avstådd tills vidare"
+och lämnar ägarens tur; den får komma tillbaka bara med nytt belägg. Högst tre öppna rytmpunkter per förvaltning samtidigt.
+Operatörshandlingar och säkerhetspunkter förfaller inte. Rytmerna kan alltså ge som mest nio punkter per kvartal, och
+varje punkt lämnar turen senast vid nästa genomgång, förutsatt att den blir av.
+
+**Runtime, eget beslut.** Den aktiva releasen binder `AGENTS.md`; en ändring där stoppar varje nytt modellanrop, AP-10
+inräknat, tills en ny release är aktiv (D032). Rekommendation A: rytmen bor i kontoret — en privat lärdomsfil för Runtime i
+kontoret, första gången fylld ur befintliga källor och omskriven utförarneutralt; en förslagsrad för Runtime i kontorets
+plan, att pröva vid nästa accepterade Runtime-ändring; månadsomgången och kvartalsgenomgången. Ingen commit i Runtime,
+ingen release, ingen övergång, ingen ändring i AP-10, modellvalet eller Runtimes `AGENTS.md`. Alternativ B är samma form i
+Runtimes eget repo (inte i `AGENTS.md`), en Runtime-publicering utanför detta uppdrags gränser; C, genom `AGENTS.md`,
+avstås; D är dagens läge utan rytm.
+
+**Effekt.** Enligt I-03 inget mätsystem och inget procentkrav: effekten följs med det som redan registreras, redovisat som
+antal med källa, aldrig som mål. Uppmätt i dag: för Digitala prov per version, skärmbildsskriptets och detektorns
+mätningar, granskningsrundor, modellsessioner mot ram, tider och användningsnoternas utfall (i dag inga); för Runtime
+provsvitens utfall, publiceringskörningar, granskningstid mot budget, övergångar, AP-10:s dygnsutfall och modellanrop mot
+tak; för kontoret underkända rundor med skäl, ägarens tur (rader och ålder), sessioner och tider. Kräver ett skarpt fall
+eller längre drift: besökares beteende och konvertering, fältdata, kundens omdöme, flera veckors drift och verklig samtidig
+last; minskad ägarbörda beskrivs enligt I-03 som vad ägaren inte längre behövde göra. Bedömt, och märkt så: upplevelsens
+kvalitet, om en lärdom hjälpte, robusthet utöver prövade fall och om ett förslag var bra.
+
+**Okänt.** Om ägaren räknar kontoret som en förvaltning; om sessioner startas varje månad (rytmerna har ingen automatik);
+om och hur D5 beslutas; när nästa Digitala-fall och nästa Runtime-ändring kommer; orsakerna till AP-10:s otillräckliga
+omgångar och till provet som föll 2 av 16; hur lång tid rytmerna faktiskt tar; hur fullständigt användarminnet är.
+
+**Förhållande till gällande beslut.** Ett ja till rytmerna vore det avgörande som I-07b lämnar till ägaren. Rytmerna ger
+ingen befogenhet åt sig själva (I-08), och samma modellfamilj granskar, vilket är en separat läsning och inte ett oberoende
+omdöme. Ett införande skulle skriva att AP07-METOD:s "ingen ny rutin" ersätts för just dessa tre rytmer; AP07:s recept
+förblir frivilligt, och `AGENTS.md` behöver inte ändras. AP-10 och Digitalas filer rörs inte.
+
+**Beslut för ägaren.**
+1. De tre rytmerna: helt (första månadsomgången oktober 2026, första genomgången januari 2027), delvis eller inte. Utan
+   beslut införs inget.
+2. Runtimes minsta form: A (rekommenderas), B eller D. Utan beslut: D.
+3. Förfallsregeln även för rader i ägarens tur som inte kommer från rytmerna (äldre än ett kvartal; operatörshandlingar och
+   säkerhetspunkter undantagna): ja eller nej. Utan beslut gäller regeln bara rytmernas egna punkter.
+
+**Granskning.** Dokumentet granskades separat av Runtimes skrivskyddade läsare (samma modellfamilj som författaren: en
+separat läsning, inte ett oberoende omdöme), med ägarens ordagranna besked, kopior av källorna vid de lästa revisionerna
+och värdens räkningar i arbetsytan. Läsningen godkände version 1 utan blockerande fynd och prövade de bärande
+uppgifterna mot källorna: sökningen efter ordet förvaltning, de 23 Digitala-posterna, lärdomsfilens 16 poster och deras
+lägen, att inga användningsnoter finns, minnesräkningen, de 20 underkända rundorna och deras kategorier, AP-10:s
+omgångar, Runtimes sju öppna poster, bindningen av `AGENTS.md` och varje tal i effekttabellen. Av åtta restrisker är fem
+införda som precisionsrättningar i version 2 utan ny omläsning: bara Digitala kallas förvaltning i I-04; kategorierna
+för de underkända rundorna är kedjedrivarens klassning, inte en mätning; sökningen citeras där frånvaron av
+användningsnoter påstås; Digitalas månadsomgång behåller del b:s regel om uppstart efter mer än sex veckor, och
+undantaget för säkerhets- och driftrisk är ett tillägg, inte en ändring av del b; förfallet förutsätter att genomgången
+blir av. Kvar som redovisade restrisker: vissa bedömningar vilar på privat material utanför arbetsytan, rytmerna kan ge
+upp till nio beslutspunkter per kvartal (läsningen per post är flaggad), och ordval. Svaret var inte giltig JSON
+(citattecken i fritext); domen är utläst ur början av det bevarade råsvaret. Version 1 och ändringen till version 2 är
+bevarade i samma katalog. Postens första version granskades separat och godkändes utan blockerande fynd; fem av dess
+anmärkningar är införda här (att en runda räknas i två kategorier, att Digitalas månadsomgång kan ha en granskning av
+noten, ägarens del i den omgången, att taket för lärdomsposter gäller per fall och att de tre besluten står på en rad i
+ägarens tur). Den här versionens granskning redovisas i publiceringens kvitto.
+
+**Resurser.** Tre modellsessioner på abonnemanget, inom den egna ramen på högst fyra: dokumentets granskning i en runda
+och denna posts granskning i två rundor. Inga andra modellsessioner och ingen underagent; inga nya verktyg, konton,
+kostnader eller behörigheter.
+
+**Plan:** en paragraf om förslaget överst i planen, en rad i ägarens tur med de tre besluten, postens namn i
+återupptagningspunkten och den första kandidatens gren i förteckningen över lokala grenar med namngivet skäl.
+
+**Ersätter:** ingen post. Ingenting ersätts förrän ägaren beslutar.
