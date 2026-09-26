@@ -36,8 +36,10 @@ P1–P5-paketet enligt dokumentets version 4 (DIGITALA-1-GENOMFORANDE-20260926).
 uppdragets tolkning (DIGITALA-1-RIKTNING-20260926): kvalitetsåterkopplingen om Norrglänta är lämnad (inte nöjd med
 upplevelsen; leveransen och dess bevis är historik, inte ett nöjt omdöme), den gamla installationsgränsen gäller inte
 längre som argument, den egna webbläsarvägen är fryst tills valet av väg är avstämt mot standardlösningar, och ett
-samlat besked med riktning, tilläggsmandat och nästa synliga kvalitetsprov är lämnat (DIGITALA-1-RIKTNING-BESKED-20260926);
-tilläggsmandatet väntar på ett enda ägarbeslut i ägarens tur.
+samlat besked med riktning, tilläggsmandat och nästa synliga kvalitetsprov är lämnat (DIGITALA-1-RIKTNING-BESKED-20260926).
+Ägaren har därefter valt hela tilläggsmandatet (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926): etapp 1, kunnande i
+byggsessionen, pågår i steg 11; etapp 2, kvalitetsprovet, följer i steg 12; etapp 3, webbläsarvägen till avgörande, i
+steg 13; etapp 4 ingår inte.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`. Kunskapsstödet för dagens flöde står i `evidence/digitala/local/kunskap/REGISTER.md`
@@ -72,7 +74,9 @@ inte krav.
     Den byggda sajten visas för ägaren; poäng och gröna prov ersätter inte visuell bedömning. Överlämningen står privat i
     `evidence/digitala/local/norrglanta/OVERLAMNING-20260926.md`. Ägarens bedömning av den byggda
     sajten är lämnad 2026-09-26 (inte nöjd med upplevelsen; DIGITALA-1-RIKTNING-20260926). Frågan om ett nästa fiktivt
-    fall eller ett avgränsat förbättringsuppdrag bereds i steg 10; inget nytt företag väljs före det (DIGITALA-1-ACCEPT §7).
+    fall eller ett avgränsat förbättringsuppdrag är besvarad: det är tilläggsmandatets etapp 4, som inte ingår i
+    mandatet och är ett eget beslut efter kvalitetsprovet i steg 12 (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926); inget
+    nytt företag väljs före det (DIGITALA-1-ACCEPT §7).
  6. KLART 2026-09-26: den riktade kontrollen (DIGITALA-1-RIKTAD-KONTROLL-20260926, resultat i
     DIGITALA-1-RIKTAD-RESULTAT-20260926). Kundrepots `main` bär den granskade och befordrade versionen.
     - Rabattskötseln ingår genom hela kedjan.
@@ -99,15 +103,43 @@ inte krav.
     försök bevarade), seedfallet och den blinda granskningen gjorda med
     riktiga fynd, bildbedömningen ej gjord, inga skyddade scenarier körda eftersom taket på åtta modellsessioner
     nåddes. Norrgläntas sajt, skydd och drift orörda; ingen driftsättning. Efter DIGITALA-1-RIKTNING-20260926 är den
-    egna webbläsarvägen fryst vid säker delgräns (koden bevarad, kundrepots tre provkodscommits opushade) tills valet
-    av väg är avstämt i steg 10; beslutspunkten om fler sessioner är tillbakadragen. Återupptagningspunkt: posten och
+    egna webbläsarvägen fryst vid säker delgräns (koden bevarad, kundrepots tre provkodscommits opushade) tills etapp 3
+    (steg 13) avgör valet av väg; beslutspunkten om fler sessioner är tillbakadragen och ersatt av tilläggsmandatets
+    resursram (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926). Återupptagningspunkt: posten och
     `evidence/digitala/local/genomforande-20260926/LAGE.md`.
 10. KLART 2026-09-26: riktningsavstämningen (DIGITALA-1-RIKTNING-20260926, besked i DIGITALA-1-RIKTNING-BESKED-20260926).
     Kartan över den faktiska kedjan, orsakerna bakom den otillräckliga upplevelsen (observerat skilt från hypotes),
     rekommenderad förbättring, tilläggsmandat i tre etapper och kvalitetsprovet står privat i
     `evidence/digitala/local/genomforande-20260926/riktning/RIKTNING-DIGITALA-20260926.md`. Den egna webbläsarvägen
-    förblir fryst tills tilläggsmandatets etapp 3 är beslutad; inget är installerat eller ändrat. Nästa steg är
-    ägarens beslut i ägarens tur.
+    förblir fryst tills etapp 3 (steg 13) avgör valet. Ägaren valde hela mandatet 2026-09-26
+    (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926); fortsättningen står i steg 11–13.
+11. PÅGÅR 2026-09-26: etapp 1, kunnande i byggsessionen (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926). Installera
+    pluginen frontend-design från `claude-plugins-official` på kedjedrivarens användarnivå och anteckna installerad
+    revision mot den pinnade läsningen; registrera emil-design-eng och mobile-native som skills på användarnivå ur de
+    pinnade kopiorna i `evidence/digitala/local/kunskap/externa/` (MIT); pilotinstallera Impeccable i kundrepot med
+    `npx impeccable install --providers=claude --no-hooks`, versioner pinnade (paket 4.1.0, skill 4.4.0, motor
+    engine-v0.1.6), läs det installerade hookmanifestet innan någon hook aktiveras och kör `/impeccable init` som eget
+    steg; för in Taste §0–§1 och §4 som läsunderlag i registret. Kontroll: en färsk byggsession anropar frontend-design
+    och Emils skills av sig själv på en gränssnittsuppgift; `npx impeccable detect` körs modellfritt på Norrgläntas
+    byggda HTML som första golv. Norrgläntas sajt, innehåll, skydd och drift ändras inte. Klart när installerat,
+    versionerat, kontrollerat och `kunskap/REGISTER.md` uppdaterat, med resultatpost efter separat granskning. Ram: 1–2
+    modellsessioner. Nästa handling: pluginen. Återupptagningspunkt:
+    `evidence/digitala/local/genomforande-20260926/LAGE.md` (avsnittet etapp 1).
+12. VÄNTAR (börjar efter steg 11): etapp 2, kvalitetsprovet — tre statiska komps ("Ljuset", "Arbetet", "Planen") för
+    Norrgläntas första vy och Säsongsplan i en privat katalog med riktigt innehåll, visade 390 och 1440 bredvid dagens
+    första vy och närmaste referens; en designkritik per komp av en separat läsarsession och en samlad; Impeccables
+    detektorer modellfritt på komps och dagens HTML som golv; ägarens omdöme på en sida. Ingen sajtändring, ingen
+    driftsättning. Klart när tre komps med kritik och en rekommenderad riktning ligger framför ägaren och en
+    LARDOMAR-post om vad som skilde är skriven, med resultatpost efter separat granskning. Ram: 3–4 modellsessioner.
+13. VÄNTAR (oberoende av 11–12, får gå parallellt): etapp 3, webbläsarvägen till avgörande — omprov B med version 2 av
+    provaren; den första skyddade scenariokörningen mot den bevarade leveransen med `--verify-deployment` (2 sessioner,
+    en tredje bara vid verktygsfel; den verkliga provhemligheten först när omprov B visat gränsen); kundrepots provkod
+    pushad utan driftsättning; samma spärrprov A/B mot agent-browser med `--allowed-domains`, `--session`,
+    `--no-webmcp` och åtgärdspolicy (installation pinnad, 1–2 sessioner); därefter ett namngivet val mellan egen väg,
+    agent-browser bakom vår gräns och Playwright MCP bakom vår gräns (Playwright MCP installeras inte före valet).
+    Frysningen av den egna vägen hävs bara för dessa steg. Klart när körningarna är redovisade som lyckade,
+    misslyckade eller ej bedömbara och valet motiverat, med resultatpost efter separat granskning. Ram: 3–5
+    modellsessioner.
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -368,7 +400,6 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 
 ÄGARENS TUR
 - [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
-- [beslut] Digitala 1: ta ställning till tilläggsmandatet i tre etapper (kunnande i byggsessionen med namngivna installationer; kvalitetsprovet med tre riktningar för Norrgläntas första vy; webbläsarvägen till avgörande) — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -508,7 +539,8 @@ DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-L
 DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926, DIGITALA-1-JAMFORELSE-20260926,
 DIGITALA-1-JAMFORELSE-RESULTAT-20260926, DIGITALA-1-PRECISERING-20260926, DIGITALA-1-PRECISERING-RESULTAT-20260926,
 DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926, DIGITALA-1-GENOMFORANDE-RESULTAT-20260926,
-DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926 och Runtime-planens ingång.
+DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926, DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926 och
+Runtime-planens ingång.
 
 ---
 
