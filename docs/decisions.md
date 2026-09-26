@@ -4561,3 +4561,45 @@ förteckningen över lokala grenar med namngivet skäl.
 
 **Ersätter:** AP07-METOD:s "ingen ny rutin" för just dessa tre rytmer (pekare i den posten); planens förslagsparagraf och
 ägarens rad från FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, vars post står kvar som historik.
+
+## FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926 — ägaren säger ja till beslut 3: förfallsregeln gäller också rader i ägarens tur utanför rytmerna; AP-10 väntar på kvoten
+
+**Status:** registrerat 2026-09-26 av den session som lämnade förslaget (Claude Code). På ägarens begäran gick
+kedjedrivaren igenom vad ägaren behövde ta ställning till, i tre avsnitt: 1 beslut 3, 2 AP-10 (inget beslut behövs),
+3 Digitala-raderna i ägarens tur, med frågan om en lika noggrann genomgång av dem. Ägarens svar, ordagrant: "1: ja",
+"2: vi väntar", "3: ja". Det är sparat privat i
+`evidence/forvaltningsutveckling/local/lopande-20260926/owner-words-beslut3-ja-20260926.md`; ingen exakt klocktid
+tillskrivs ägaren.
+
+**Beslutet (1: ja).** Beslut 3 i FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926 är avgjort: förfallsregeln gäller också
+rader i ägarens tur som inte kommer från rytmerna.
+- En rad i ägarens tur som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i genomgångsposten för sitt område:
+  Digitala, Runtime eller kontoret, och kontoret för en rad utan tydligt område. Posten lyfter den antingen som en av sina
+  högst tre beslutspunkter, med vad som gäller utan beslut, eller bokför den som "obeslutad, vilande", och då lämnar raden
+  ägarens tur. Förslaget bakom raden står kvar i sin post och kan tas upp igen med nytt belägg.
+- En obesvarad rad är aldrig ett ja, och ingenting införs av att den blir vilande.
+- Operatörshandlingar och säkerhetspunkter förfaller inte; de står kvar tills de är hanterade.
+- Första gången regeln kan verka är genomgången första veckan i januari 2027. Digitalas rader hanteras i Digitalas
+  genomgångspost, som skrivs av den som driver Digitala; ingen Digitala-rad ändras nu.
+
+**AP-10 (2: vi väntar).** Ägaren väljer att vänta tills Codex-kvoten kommer tillbaka. Ingenting ändras i AP-10,
+modellvalet eller Runtime. Enligt kontrollen i FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926, läst i datorns tidszon,
+blir omgången 2026-09-27 sannolikt otillräcklig och 2026-09-28 07:00Z den första som kan få kvot; månadsomgången för
+Runtime läser utfallet.
+
+**Genomgången av Digitala-raderna (3: ja).** Kedjedrivarens tolkning: svaret gäller frågan om en lika noggrann genomgång,
+inte Digitala-besluten själva. Genomgången är en förklaring ur Digitalas poster och dokument; beslut som ägaren tar om
+Digitala-raderna förs över ordagrant till Digitala-spåret och registreras där.
+
+**Verkställt med denna post:** ägarens rad om beslut 3 tas bort ur ägarens tur; stycket om ägarens tur i planen och
+RYTMER-blocket får var sin mening om förfallsregeln; arbetssättet (`evidence/forvaltningsutveckling/local/RYTMER.md`) har
+samma lydelse; postens namn förs in i återupptagningspunkten. Detta är en ren registrering av ett ägarbeslut utan eget
+resultat, så ingen lärdomspost behövs; kontorets förslagsrad (K1) prövades ändå före granskningen, och sökningen efter
+det ersatta lägets formuleringar gav inga kvarlämnade träffar.
+
+**Granskning.** En separat läsning genom Runtimes skrivskyddade läsare (samma modellfamilj som författaren: en separat
+läsning, inte ett oberoende omdöme); utfallet står i publiceringens kvitto.
+
+**Resurser.** En modellsession på abonnemanget, för granskningen. Inga andra.
+
+**Ersätter:** förslagets standardläge för beslut 3 ("regeln gäller bara rytmernas egna punkter") och ägarens rad om beslut 3.

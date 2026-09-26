@@ -36,6 +36,8 @@ RYTMER
 - Nästa månadsomgång: 2026-10-01 eller första session därefter. Runtime och kontoret enligt arbetssättet; Digitala enligt
   inventeringens del b när beslutet D5 är taget.
 - Nästa genomgång: första veckan i januari 2027, en kontorspost per förvaltning med högst tre beslutspunkter.
+- Förfallsregeln gäller rytmernas egna punkter och alla andra rader i ägarens tur som är äldre än ett kvartal
+  (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926); operatörshandlingar och säkerhetspunkter förfaller inte.
 
 FÖRSLAG ATT PRÖVA I NÄSTA FALL
 - Digitala: inget satt vid införandet; sätts av den som driver nästa Digitala-fall.
@@ -448,14 +450,16 @@ eller `- [operatörshandling] text`; Aquarium läser blocket från main. Byggbes
 accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3 är godkänt
 (AQUARIUM-V0-AGARPROV-GODKANT-20260925). Digitala 1 är accepterat
 (DIGITALA-1-ACCEPT-20260925), briefen godkänd (DIGITALA-1-BRIEF-GODKAND-20260926) och demon levererad
-(DIGITALA-1-LEVERANS-20260926).
+(DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
+genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
+obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926).
 
 ÄGARENS TUR
 - [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
 - [beslut] Digitala 1: lämna omdömet om etapp 2:s tre riktningar på sidan för ägaren (riktning, skäl, vad som förs vidare) och ta ställning till de tre punkterna där (foto eller inte i första vyn; handling först eller löfte först; rubrikens delning) — sedan 2026-09-26
 - [beslut] Digitala 1: ta ställning till inventeringens tio beslut ur del b–f (D1–D5: Claude Designs dokumentation, två mobilvyer, böcker, mänskligt prov, bevakningsrutin; D-F1–D-F5: utgiftsavisering, funktionsregion, checklista som mall, hygienåtgärd i åtkomstskyddets automationsväg, analys i första skarpa fallet) — DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926, sedan 2026-09-26
 - [beslut] Digitala 1: ta ställning till inventeringens fyra avgränsade prov (P-A DESIGN.md per riktning med modellfri lint, P-C Hallmarks audit som kritikröst och P-D canvas-design om Ljuset behöver grafik i etapp 2; P-B designlang-mätning av referenserna i etapp 3) — sedan 2026-09-26
-- [beslut] Förvaltningarna: förfallsregeln även för punkter i ägarens tur utanför rytmerna, ja eller nej (kedjedrivaren rekommenderar ja; utan beslut gäller regeln bara rytmernas punkter; förfaller vid kontorets genomgång 2027Q1) — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -611,7 +615,8 @@ DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926, DIGITALA-1-TI
 OVERBLICK-OBSIDIAN-20260926, DIGITALA-1-ETAPP1-RESULTAT-20260926, DIGITALA-1-INVENTERING-20260926,
 DIGITALA-1-INVENTERING-TILLAGG-20260926, DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-ETAPP2-RESULTAT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926,
-FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926 och Runtime-planens ingång.
+FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
+FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926 och Runtime-planens ingång.
 
 ---
 
