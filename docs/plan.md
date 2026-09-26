@@ -59,8 +59,8 @@ samlat besked med riktning, tilläggsmandat och nästa synliga kvalitetsprov är
 Ägaren har därefter valt hela tilläggsmandatet (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926): etapp 1, kunnande i
 byggsessionen, är klar (DIGITALA-1-ETAPP1-RESULTAT-20260926, steg 11); ägaren har därefter beställt en inventering av 32
 namngivna repon och fler trendande GitHub-repon (DIGITALA-1-INVENTERING-20260926, steg 14), utökad med fem delar
-(DIGITALA-1-INVENTERING-TILLAGG-20260926: bevakningsrutin, referensläsning, metodlitteratur, lanseringskedjan för ett
-skarpt fall, Vercel Pro); etapp 2, kvalitetsprovet (steg 12), är levererad och väntar på ägarens omdöme
+(DIGITALA-1-INVENTERING-TILLAGG-20260926); inventeringen är klar i alla fem delar och väntar på ägarens beslut
+(DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926); etapp 2, kvalitetsprovet (steg 12), är levererad och väntar på ägarens omdöme
 (DIGITALA-1-ETAPP2-RESULTAT-20260926); etapp 3,
 webbläsarvägen till avgörande (steg 13), är oberoende; etapp 4 ingår inte.
 
@@ -161,34 +161,27 @@ inte krav.
     Frysningen av den egna vägen hävs bara för dessa steg. Klart när körningarna är redovisade som lyckade,
     misslyckade eller ej bedömbara och valet motiverat, med resultatpost efter separat granskning. Ram: 3–5
     modellsessioner.
-14. PÅGÅR 2026-09-26: inventeringen (DIGITALA-1-INVENTERING-20260926), utökad med fem delar
-    (DIGITALA-1-INVENTERING-TILLAGG-20260926). Ingenting installeras, ansluts, köps eller aktiveras på inventeringens
-    grund; allt som föreslås tas in bara genom nytt beslut. Delar och klart-när:
+14. KLART 2026-09-26: inventeringen (DIGITALA-1-INVENTERING-20260926), utökad med fem delar
+    (DIGITALA-1-INVENTERING-TILLAGG-20260926). Ingenting installerades, anslöts, köptes eller aktiverades; allt som
+    föreslås tas in bara genom nytt beslut. Delar:
     a) KLART 2026-09-26 (DIGITALA-1-INVENTERING-RESULTAT-20260926): de 32 namngivna och 28 trendande repon lästa i
        original och bedömda; dokumentet godkänt i andra rundan (version tre med precisionsnoterna); fyra avgränsade
        prov (P-A DESIGN.md per riktning, P-C Hallmark som kritikröst, P-D canvas-design vid behov i etapp 2; P-B
        designlang-mätning i etapp 3) i ägarens tur; ingenting installerat.
-    b) omvärldsbevakning som rutin: vad, var, hur ofta, läsbevis, när en läsning leder till prov, tak per omgång i tid
-       och antal resurser; samma metod som inventeringen; klart när rutinen står med tak och läsbevis i dokumentet.
-    c) referensläsning: Claude Designs publika dokumentation läst som metodbeskrivning (ingen produkt, inget konto);
-       openai.com, anthropic.com och claude.com i 390 och 1440 med datum, första vy och två sektioner, hantverket
-       noterat, överförbart och inte överförbart per sajt, sett skilt från läst; högst tio sidladdningar, alla läsande;
-       klart när skärmbilderna är sparade med datum och laddningarna redovisade mot taket.
-    d) metodlitteraturen: läslista med upplaga eller revision och läsdatum, steg i flödet, lästa delar och form i
-       registret; forskning och läroböcker skilda från blogginlägg och README, åsikt märkt; klart när varje källa
-       bär upplaga eller revision, läsdatum, steg och form.
-    e) lanseringskedjan för ett skarpt kundfall: den gamla webbförvaltningens launchkedja läst del för del (inget körs),
-       status mot dagens flöde, automatiserbart mot manuellt med kundens medgivande, checklista med ägare per steg,
-       Vercel skilt från Google och registrarer, vad ingen fiktiv demo kan visa; demoreglerna står fast; klart när varje
-       del har status, krav och automatiserbarhet och checklistan är skriven.
-    f) Vercel Pro: dokumentation och prislista lästa med datum, jämfört med vad Norrglänta använder (bara läsning av
-       inställningarna), nytta, kostnad och risk per funktion, vad som kostar eller lägger till skript, vad som är
-       outnyttjat men inte behövs; inget aktiveras; klart när varje funktion har nytta, kostnad, risk och passform.
-       Läsningen av Vercels dokumentation loggas men räknas inte mot del c:s tak, som gäller referenssajterna.
-    Del b–d redovisas i ett privat dokument, del e–f i ett annat; vart och ett granskas separat före sin resultatpost,
-    som bär tre till fem justeringar av flödet ordnade efter nytta mot kostnad, det okända och ägarens beslut. Ordning:
-    c, d, b, e, f. Ram: kedjedrivarens läsning och modellfria hämtningar, granskningar av dokument och poster, inga
-    modellsessioner i övrigt. Nästa handling: del c:s skärmbilder. Återupptagningspunkt:
+    b–d) KLART 2026-09-26 (DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926): bevakningsrutin med fyra spår, tak och
+       läsbevis; Claude Designs produktsida läst som metodbeskrivning (metoden okänd ur det lästa; ingen produkt, inget
+       konto); tre sajter i 1440 och delvis 390 med datum, tio av tio sidladdningar redovisade (sex förbrukade av ett
+       skalfel, redovisat); tjugofyra källor pinnade med typ, upplaga eller revision, läsdatum, steg och form; dokumentet
+       godkänt i första rundan.
+    e–f) KLART 2026-09-26 (samma post): den gamla lanseringskedjan läst del för del med status, konton,
+       automatiserbarhet och plats; checklista för ett skarpt fall med ägare per steg, Vercel skilt från Google och
+       registrar; vad ingen fiktiv demo kan visa; Vercel Pro läst ur trettiosju sidor med datum mot Norrgläntas bruk,
+       nytta, kostnad, risk och passform per funktion; inget aktiverat; dokumentet godkänt i femte rundan (fyra rundor
+       underkände uppgifter om planen, rättade mot de lästa sidorna efter en parallell förkontroll; versionerna bevarade). En hygienåtgärd i skyddet föreslås som beslut; skälet står
+       privat.
+    Tio justeringar som förslag (J1–J5, F1–F5) och tio beslut (D1–D5, D-F1–D-F5) står i posten; ägarens tur. Ram
+    hållen: kedjedrivarens läsning, modellfria hämtningar, dokument- och postgranskningar, inga modellsessioner i
+    övrigt. Nästa handling: ingen inom steg 14; fortsättningen bestäms av ägarens beslut. Återupptagningspunkt:
     `evidence/digitala/local/genomforande-20260926/LAGE.md` (avsnittet inventering).
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
@@ -451,6 +444,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 ÄGARENS TUR
 - [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
 - [beslut] Digitala 1: lämna omdömet om etapp 2:s tre riktningar på sidan för ägaren (riktning, skäl, vad som förs vidare) och ta ställning till de tre punkterna där (foto eller inte i första vyn; handling först eller löfte först; rubrikens delning) — sedan 2026-09-26
+- [beslut] Digitala 1: ta ställning till inventeringens tio beslut ur del b–f (D1–D5: Claude Designs dokumentation, två mobilvyer, böcker, mänskligt prov, bevakningsrutin; D-F1–D-F5: utgiftsavisering, funktionsregion, checklista som mall, hygienåtgärd i åtkomstskyddets automationsväg, analys i första skarpa fallet) — DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926, sedan 2026-09-26
 - [beslut] Digitala 1: ta ställning till inventeringens fyra avgränsade prov (P-A DESIGN.md per riktning med modellfri lint, P-C Hallmarks audit som kritikröst och P-D canvas-design om Ljuset behöver grafik i etapp 2; P-B designlang-mätning av referenserna i etapp 3) — sedan 2026-09-26
 - [beslut] Förvaltningarna: ta ställning till förslaget om löpande utveckling (de tre rytmerna; Runtimes minsta form, där A rekommenderas; förfallsregeln även för punkter utanför rytmerna) — sedan 2026-09-26
 
@@ -491,6 +485,9 @@ ett gjort-påstående i steg 12:s nästa handling utan spår i det privata läge
 `kontor/forvaltningar-lopande-r1` (granskad första version av FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, godkänd men
 ersatt före publiceringen av den publicerade andra med preciserade formuleringar om kategoriernas dubbelräkning,
 månadsomgångens modellsessioner, ägarens del i Digitalas omgång, takets räckvidd och de tre besluten på en rad);
+`digitala/inventering-tillagg-resultat-r0` (ogranskad första kandidat av DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926,
+återkallad efter en minut för att posten namngav åtkomstskyddets nyckel, som e–f-dokumentets granskare bett hålla utanför den
+publika posten, ersatt av den granskade andra);
 `aquarium/arkivdatum-underlag-r1` (första versionen av användningsprovets underlag, underkänd för en kvarlämnad mening och
 ersatt av den publicerade andra); `kontor/stang-granskningsbudget-r1` (första versionen av denna planpost, underkänd för en
 kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, ersatt före granskning av den publicerade
@@ -600,7 +597,7 @@ DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926, DIGITALA-1-G
 DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926, DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926,
 OVERBLICK-OBSIDIAN-20260926, DIGITALA-1-ETAPP1-RESULTAT-20260926, DIGITALA-1-INVENTERING-20260926,
 DIGITALA-1-INVENTERING-TILLAGG-20260926, DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-ETAPP2-RESULTAT-20260926,
-FORVALTNINGAR-LOPANDE-UTVECKLING-20260926 och Runtime-planens ingång.
+FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926 och Runtime-planens ingång.
 
 ---
 

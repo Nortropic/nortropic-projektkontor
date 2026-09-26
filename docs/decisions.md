@@ -4365,3 +4365,109 @@ kostnader eller behörigheter.
 återupptagningspunkten och den första kandidatens gren i förteckningen över lokala grenar med namngivet skäl.
 
 **Ersätter:** ingen post. Ingenting ersätts förrän ägaren beslutar.
+
+## DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926 — inventeringens del b–f är lästa och bedömda i två granskade dokument: bevakningsrutin med tak, Claude Design och tre sajter som lästa referenser, metodlitteraturen pinnad, lanseringskedjan bedömd för ett skarpt kundfall och Vercel Pro läst mot Norrgläntas bruk; tio justeringar som förslag, ingenting infört
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Planens steg 14 b–f (DIGITALA-1-INVENTERING-TILLAGG-20260926).
+Två privata dokument under `evidence/digitala/local/genomforande-20260926/inventering/`: `INVENTERING-TILLAGG-BCD-20260926.md`
+(del b–d, godkänt i första granskningsrundan utan blockerande fynd) och `INVENTERING-TILLAGG-EF-20260926.md` (del e–f,
+godkänt i femte rundan; fyra rundor underkände uppgifter om planen — två tilläggspriser, att prissidans fria kvoter
+för användningsbaserade resurser gäller Hobby-planen medan Pro debiteras från första enheten mot krediten, en för
+absolut formulering om vad som ingår, och en aviseringskanal — alla rättade mot de lästa sidorna, och mellan tredje
+och fjärde rundan gick dokumentet genom en parallell förkontroll mot källsidorna som gav 27 rättelser till;
+versionerna ett till fyra är bevarade). Ingenting installerades, anslöts, köptes eller aktiverades;
+inget konto skapades; Norrgläntas sajt, skydd och drift är oförändrade. Läst, sett och bedömt hålls isär i dokumenten;
+"okänt" står där källorna inte bär uppgiften.
+
+**Del b, omvärldsbevakning som rutin.** Fyra spår med var sin källa och sitt läsbevis: verktyg och skills via GitHubs
+läs-API mot en pinnad lista och två sökningar med de dokumenterade frågorna; kunskap och forskning via sparade sidor med
+datum; plattformen via ändringsloggar; elitens hantverk som två sajter per omgång ur en lista som ägaren och
+kedjedrivaren bygger tillsammans, aldrig ur trendlistor. En omgång i månaden eller vid nytt fall efter mer än sex
+veckor. Tak per omgång: två timmar, högst tolv resurser lästa närmare, högst två sajter med skärmbilder, högst tio
+sidladdningar, inga modellsessioner utom en eventuell granskning av bevakningsnoten. Läsbevis i samma form som
+inventeringen. En läsning leder till ett prov bara när tre villkor gäller samtidigt: ett namngivet glapp eller en
+observerad brist, avgränsat prövbart i nästa fall utan att ändra sajt, skydd eller modellval, och noll kostnad eller
+kostnad som beslut. Förslaget går alltid till kontoret som förslag.
+
+**Del c, referensläsning.** Claude Designs produktsida lästes som metodbeskrivning: den beskriver vad (en första
+version ur en beskrivning, på varumärket, förfining, delning, överlämning) men inte hur; metoden i konceptsteget är
+okänd ur det lästa. Produkten användes inte och inget konto skapades. De tre sajterna lästes i 1440 med första vy och
+två sektioner, och i 390 där det gick: två mobilvyer blev inte läsbara eftersom sajterna själva navigerade vidare vid
+vyportbytet, och står som okända. Sidladdningarna blev tio av tio, varav sex förbrukades av ett skalfel som gav
+felsidor; felet är redovisat med bevis. Samlat om hantverket: det som skiljer de tre från Norrglänta i dag är skala
+(rubrik på två till tre rader med stor luft, brödtext 17–20 px), ett tydligt kontrastpar i typografin och att första
+vyn visar sajtens sak utan foto under overlay; inte överförbart är beställd konst, produktheron, prisplaner och den
+globala publiken. En lärdom för rutinen: helsidesbilder av sajter med rullningsanimerat innehåll är blanka; använd
+sektionsbilder.
+
+**Del d, metodlitteraturen.** Tjugofyra källor i en tabell med typ (forskning, lärobok, standard, vägledning, praktik),
+upplaga eller revision med läsdatum, steg i flödet, lästa delar och form i registret. Forskning och standarder bär krav
+och kontrollistor, läroböcker bär metod och vokabulär, praktik märks som åsikt; README-filer och blogginlägg ingår
+inte. Fyra källors upplagor kunde inte pinnas mot förlagssidorna (blockerade eller utan svar) och står markerade ur
+eget minne. Böckerna finns inte som fria texter; inget köps utan beslut.
+
+**Del e, lanseringskedjan för ett skarpt kundfall.** Den gamla webbförvaltningens kedja lästes del för del, inget
+kördes: förlanseringsgrind med åtta linser och begränsad fixslinga, primärhandlingsgrind, juridikgrind, säkerhetsgrind,
+domänköp, DNS, domänkoppling med certifikat och kanonisk variant, noindex bort, Search Console, Bing, uppetid,
+företagsprofil, kataloger, analys, uppföljning och överlämning. Varje del bär vad den gjorde, vilka konton den
+förutsatte, automatiserat mot människa, plats i flödet och status mot dagens flöde (delvis infört, infört som idé,
+medvetet utanför demon, aldrig byggt eller aldrig bedömt). Fyra av de sexton delarna var aldrig byggda i den gamla
+kedjan heller. Automatiserbart utan risk är det som läser eller prövar utan att ändra hos kunden; allt som rör
+kundens domän, konton, personuppgifter eller pengar är manuellt med kundens medgivande; juridiskt sign-off,
+lanseringsbeslutet och irreversibla skrivningar i Google-tjänster automatiseras aldrig. Checklistan för ett skarpt fall
+har ägare per steg, kontroll före och efter och loggplats, med Vercel skilt från Google och registrar. Det ingen fiktiv
+demo kan visa: avtal och personuppgiftsbiträdesavtal, kundens egna bilder med rättigheter, riktig mottagning av
+förfrågningar, en integritetspolicy som stämmer med det som faktiskt görs, förvaltning, ägarskap hos kunden,
+fakturering och support.
+
+**Del f, Vercel Pro.** Trettiosju dokumentationssidor hämtade modellfritt med sidornas egna datum; Norrgläntas projekt-
+och teaminställningar lästa genom befintlig inloggning, inget ändrat. Planen ger en månatlig
+användningskredit som täcker fakturerbar användning från första enheten (prissidans fria kvoter gäller Hobby, inte
+Pro), en fri lägsta CDN-nivå, förhandsvisningar med åtkomstskydd och automationsväg, kommentarer utan kostnad
+(delbara länkars villkor inte lästa), fältmått med fri nivå, körloggar en dag, cron, domäner med certifikat (obegränsat
+antal med en mjuk gräns), brandvägg med egna regler, utgiftsstyrning och säkra släpp; analys, bildoptimering, funktioner och hastighetsbegränsning
+debiteras per enhet mot krediten. Norrglänta använder
+åtkomstskydd på alla driftsättningar med den automationsväg proven behöver, bildoptimering och versionsskydd; analys-
+och fältmåttsposter finns i projektet men sajten bär inga skript och ingen data samlas; funktionsregionen är USA:s
+östkust, inte Stockholm; ingen Git-koppling, inga egna domäner. Per funktion står nytta, kostnad, risk och passform;
+allt som kostar, lägger till skript eller ändrar skyddet är beslut för ägaren. Outnyttjat men inte behövligt är listat
+och är ingen önskelista. En hygienåtgärd i skyddet föreslås som beslut efter läsningen; skälet står i det privata
+dokumentet och i beskedet till ägaren, inte här.
+
+**Justeringar av flödet, som förslag ordnade efter nytta mot kostnad**, alla med belägg, kostnad, billigt prov och vad
+de ersätter i dokumenten:
+- Del b–d: J1 konceptsteg med Design Read, dial-värden och tre riktningar med kritik före valet som ordinarie steg
+  (3–4 modellsessioner per fall); J2 typografisk kontrollista i registret med mätning ur skärmbildsskriptet (0 kr);
+  J3 formulärkontrollista ur forskningen in i byggsidans formulärfil (0 kr); J4 ett litet mänskligt prov med tre
+  personer efter komparna och före bygget (tid, inga personuppgifter sparas); J5 bevakningsrutinen med tak (två timmar
+  i månaden).
+- Del e–f: F1 utgiftsavisering och budget på teamet (0 kr, ändrar teaminställning); F2 funktionsregion Stockholm
+  (0 kr, ändrar projektinställning); F3 vid första skarpa fallet hastighetsbegränsning och bot-regel på
+  förfrågningsvägen samt kommentarer för kundens granskning (hastighetsbegränsning per enhet mot krediten, kommentarer
+  0, delbara länkars villkor inte lästa); F4 hygien i
+  åtkomstskyddets automationsväg: rotation som rutin och en nyckel per verktyg (0 kr, ändrar skyddet, kräver ny
+  driftsättning); F5 checklistan för ett skarpt fall som mall i registret (0 kr).
+
+**Okänt:** Claude Designs metod bortom produktsidan; mobilvyerna av två sajter; fyra bokupplagor; betald forskning;
+om heuristikpoäng och Impeccables bedömning dubblerar varandra; vad en projektpost utan påslag betyder; brandväggens
+nuvarande regler; om cron är påslaget som funktion; om ett regelpakets enhetspriser gäller något Pro-erbjudande; om
+bot-tjänstens grundkontroller ingår på Pro; delbara länkars villkor; om certifikaten utfärdas automatiskt;
+funktionspriserna i Stockholm; teamets nuvarande utgiftsinställning; bildtransformationernas antal och belopp;
+kreditutnyttjandet per månad (läses vid behov, stannar utanför kontoret).
+
+**Beslut för ägaren** (i dokumenten D1–D5 och D-F1–D-F5): D1 fem sidladdningar för Claude Designs dokumentation utan
+konto, eller ägarens egen prövning i eget konto på ett fall som inte är en riktig kund; D2 två sidladdningar för
+mobilvyerna, eller okända; D3 böcker som ägda exemplar (rekommendation: Krug och Bringhurst; Lean UX kan vänta) eller
+de fria källorna tills vidare; D4 om ägaren vill vara en av tre i det mänskliga provet; D5 bevakningsrutinen från
+oktober 2026; D-F1 utgiftsavisering och budget; D-F2 funktionsregion Stockholm; D-F3 checklistan som mall och F3 vid
+första skarpa fallet; D-F4 hygienåtgärden i åtkomstskyddets automationsväg; D-F5 om analys eller fältmått ska ingå i
+första skarpa fallet (aldrig i demon).
+
+**Resurser.** Kedjedrivarens läsning och modellfria hämtningar; dokumentgranskningar (en runda för del b–d, fem för
+del e–f) samt en parallell förkontroll av del e–f (56 läsande agentanrop) och denna posts granskning; inga modellsessioner i övrigt; 0 kr.
+
+**Kvar för ägaren:** besluten ovan; inventeringens fyra prov (DIGITALA-1-INVENTERING-RESULTAT-20260926), etapp 2:s
+omdöme (DIGITALA-1-ETAPP2-RESULTAT-20260926) och den riktade kontrollens tre förslag står kvar oberoende. Steg 14 är
+därmed klart; ingen justering införs utan nytt beslut.
+
+**Ersätter:** ingen post.
