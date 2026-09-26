@@ -53,7 +53,8 @@ Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med resear
     - uppmätt, bedömt och oprövat åtskilt;
     - en kort överlämning med begränsningar.
 
-    Överlämningen står privat i `evidence/digitala/local/norrglanta/OVERLAMNING-20260926.md`. Nästa steg är ägarens
+    Den byggda sajten visas för ägaren; poäng och gröna prov ersätter inte visuell bedömning. Överlämningen står privat i
+    `evidence/digitala/local/norrglanta/OVERLAMNING-20260926.md`. Nästa steg är ägarens
     bedömning av den byggda sajten och ägarens beslut om ett nästa fiktivt fall. Inget nytt företag väljs före det
     (DIGITALA-1-ACCEPT §7).
 
@@ -327,6 +328,8 @@ underkänd för saknade ägargränser och den andra för en kvarlämnad mening, 
 `digitala/korrigering-r1` och `digitala/korrigering-r2` (granskade tidigare versioner av DIGITALA-1-KORRIGERING-20260926,
 den första underkänd för en pekare som avgjorde klart-när och en prognos som byggde på etapp 0 och den andra för en
 kvarlämnad mening om webbgrundens väg, båda ersatta av den publicerade tredje);
+`digitala/leverans-r1` (granskad första version av DIGITALA-1-LEVERANS-20260926, godkänd men ersatt före publiceringen
+av den publicerade andra med rättade formuleringar om bildernas ursprung, bedömarnas förhandsvisning och befordran);
 `aquarium/arkivdatum-underlag-r1` (första versionen av användningsprovets underlag, underkänd för en kvarlämnad mening och
 ersatt av den publicerade andra); `kontor/stang-granskningsbudget-r1` (första versionen av denna planpost, underkänd för en
 kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, ersatt före granskning av den publicerade
