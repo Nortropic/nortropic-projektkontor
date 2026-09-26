@@ -154,9 +154,10 @@ inte krav.
 14. PÅGÅR 2026-09-26: inventeringen (DIGITALA-1-INVENTERING-20260926), utökad med fem delar
     (DIGITALA-1-INVENTERING-TILLAGG-20260926). Ingenting installeras, ansluts, köps eller aktiveras på inventeringens
     grund; allt som föreslås tas in bara genom nytt beslut. Delar och klart-när:
-    a) de 32 namngivna och fler trendande GitHub-repon, lästa i original och bedömda med §4-formen; dokumentet
-       godkänt i andra granskningsrundan (version tre med precisionsnoterna införda); klart när resultatposten är
-       publicerad.
+    a) KLART 2026-09-26 (DIGITALA-1-INVENTERING-RESULTAT-20260926): de 32 namngivna och 28 trendande repon lästa i
+       original och bedömda; dokumentet godkänt i andra rundan (version tre med precisionsnoterna); fyra avgränsade
+       prov (P-A DESIGN.md per riktning, P-C Hallmark som kritikröst, P-D canvas-design vid behov i etapp 2; P-B
+       designlang-mätning i etapp 3) i ägarens tur; ingenting installerat.
     b) omvärldsbevakning som rutin: vad, var, hur ofta, läsbevis, när en läsning leder till prov, tak per omgång i tid
        och antal resurser; samma metod som inventeringen; klart när rutinen står med tak och läsbevis i dokumentet.
     c) referensläsning: Claude Designs publika dokumentation läst som metodbeskrivning (ingen produkt, inget konto);
@@ -439,6 +440,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 
 ÄGARENS TUR
 - [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
+- [beslut] Digitala 1: ta ställning till inventeringens fyra avgränsade prov (P-A DESIGN.md per riktning med modellfri lint, P-C Hallmarks audit som kritikröst och P-D canvas-design om Ljuset behöver grafik i etapp 2; P-B designlang-mätning av referenserna i etapp 3) — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -582,7 +584,7 @@ DIGITALA-1-JAMFORELSE-RESULTAT-20260926, DIGITALA-1-PRECISERING-20260926, DIGITA
 DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926, DIGITALA-1-GENOMFORANDE-RESULTAT-20260926,
 DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926, DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926,
 OVERBLICK-OBSIDIAN-20260926, DIGITALA-1-ETAPP1-RESULTAT-20260926, DIGITALA-1-INVENTERING-20260926,
-DIGITALA-1-INVENTERING-TILLAGG-20260926 och Runtime-planens ingång.
+DIGITALA-1-INVENTERING-TILLAGG-20260926, DIGITALA-1-INVENTERING-RESULTAT-20260926 och Runtime-planens ingång.
 
 ---
 
