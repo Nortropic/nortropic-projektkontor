@@ -2873,3 +2873,72 @@ webbförvaltningen blir det nya systemet.
   kontorspost med resultatet. Ramen är slut när ägaren fått beskedet.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-JAMFORELSE-RESULTAT-20260926 — jämförelsen av dagens Digitala med den gamla webbförvaltningen, Improvements och aktuella original är levererad: fem justeringar föreslås, inget är infört
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Posten redovisar det analys- och förslagsuppdrag som
+DIGITALA-1-JAMFORELSE-20260926 beställde. Ingenting är installerat, ändrat eller infört. Underlaget står privat:
+- jämförelsen med de fem leveranserna i `evidence/digitala/local/JAMFORELSE-DIGITALA-20260926.md`;
+- läsningarna av originalkällorna i `evidence/digitala/local/jamforelse-underlag/`;
+- de separata granskningarna i `evidence/digitala/local/review-digitala-jamforelse-dokument-r1/` och `-r2/`.
+
+**Källor och ram:** den gamla webbförvaltningen vid version `e4c8c52` genom läsarrapporterna A–H och originalet där
+slutsatser krävde det; den lokala Improvements-korpusen genom riktade sökningar och utdrag; Norrgläntas research, brief,
+prov, granskningar, överlämning och den riktade kontrollens utfall; tio originalrepon och åtta gallerier lästa
+2026-09-26 genom GitHubs läs-API och offentliga sidor, utan kloner, installation eller körning. Korpusens slutpunkt och
+luckor är redovisade; ingen lucka är fylld med antaganden.
+
+**Vad som faktiskt togs in (leverans 1):** alla nio idéer i IDEBEDOMNING-20260926 är belagda i Norrglänta med konkreta
+artefakter, från referensöversättningen och listan över AI-generiska mönster till acceptansproven, bildposterna,
+faktakontrollen, granskningen mot renderad sida, lanseringschecklistan, pinnade verktyg och källtabellen med läsdatum.
+Ingen är prövad över flera fall. Idébedömningen var kedjedrivarens rekommendation inom ägarens korrigering, inte nio
+ägarbeslut. Det som avvisades var maskineri; ett tjugotal kompetensinnehåll och metoder i de gamla rollerna, skillsen och
+Improvements-turerna hade ingen eller bara en indirekt bedömning och är nu bedömda, till exempel copy-blocklistens
+strukturregler, LEARNING-RECORD:s lagar och Verkstadsgolvets fältgrupper.
+
+**Hur kvalitet skapas:** dagens flöde skiljer verksamhetsunderlag, referenser och fackkunskap, spårar fynd till
+lösningsval och märker sett mot läst. Luckorna är att designidéer inte prövas som varianter före bygget, att inget
+redaktionellt pass skiljer sig från faktakontrollen, att inget pinnat kunskapsunderlag når något steg, att lärdomar inte
+har en form för andra fallet, och att granskningen läst rendering men inte kod. Den externa läsningens fynd på
+Norrglänta kom från kodläsning; dagens prov fann fel som kodläsning inte kan se. Observationssättet avgjorde, inte
+regellistan.
+
+**Resurskartan (leverans 2):** av de namngivna resurserna rekommenderas sju textfiler från fyra källor som pinnade
+läsunderlag per steg (Anthropics frontend-design, Vercels Web Interface Guidelines-regelfil vid den redan pinnade
+versionen, två av Addy Osmanis web-quality-skills, och Emil Kowalskis skills för rörelse, mobil och varianter), varav
+en som fristående skill på uttrycklig anrop (Emils prototype), och gallerierna som en referenslista med
+användningsvillkor. Impeccable, Taste,
+soft-skill, UI UX Pro Max och content-humanizer avstås eller sparas, med skäl. Vercels next-skills är flyttade och
+ersatta av Next.js egna dokument, som kundrepot redan har. Ingen MCP-anslutning och inget betalt innehåll ingår.
+
+**Det prioriterade paketet (leverans 3), fem justeringar, var och en med prövning:**
+1. designhypoteser prövas som varianter före bygget, med fasta mål skilda från prövbara detaljer;
+2. ett redaktionellt pass som eget steg, med ett svenskt underlag och kedjeprovet;
+3. ett litet, pinnat kunskapsstöd per steg med en "använd"-anteckning per fall;
+4. erfarenhetsåterföring i minsta form, en post per fall med status vid andra fallet;
+5. granskning med olika observationssätt: rendering, kodläsning, innehållsjämförelse och mänskligt användarprov, och
+   ett Codex-experiment bara inom kvot.
+
+**Bevara och avstå (leverans 4):** dagens flöde behåller det som gör det starkare än den gamla kedjan, bland annat
+uppmätt, bedömt och ej prövat isär, separat granskning med komplett fillista, acceptansprov före bygget, pinnade
+verktyg och privat skilt från publikt. Rollerna, workflowsen, den åtta skills stora kanonen, skeptikermekaniken,
+eval-poängen och de av copy-blocklistans universella krav som inte passar en fiktiv demo (org.nr, F-skatt, upprepad
+ort) följer inte med. Innehåll som strukturregler för copy och lärandets lagar
+följer med som text.
+
+**Okänt och beslut (leverans 5):** Library-filerna är fortfarande otillgängliga och betyder lite för paketet;
+ChatGPT-projektets innehåll efter korpusens slutpunkt är inte tillgängligt och dess betydelse är okänd, eftersom det
+kan innehålla senare bedömningar av samma resurser; mänskliga användarprov saknas helt och betyder mycket för frågan om
+lösningen är bra nog.
+Ett samlat införandemandat för nästa fiktiva fall är formulerat som förslag. Det är inte accepterat och inte påbörjat.
+
+**Granskning:** två separata läsningar av de bärande slutsatserna genom Runtimes skrivskyddade profil, med de åtta
+felslag beställningen namngav som en av granskningsfrågorna. Den första underkände utkastet på två punkter, båda rättade: den gamla
+säkerhetschecklistan nämnde tidsfällans klockregel uttryckligen, vilket kalibreringen hade missat, och en pinne för en
+resurs var inte den lästa. Den andra godkände den rättade versionen med åtta precisionsförslag om belägg och
+formuleringar, som är införda med kompletterande läsbevis sparade; ingen tredje runda är gjord. De lästa texterna och de
+citerade korpusutdragen är sparade som läsbevis.
+
+**Kvar för ägaren:** ta ställning till det rekommenderade införandemandatet, helt, delvis eller inte alls.
+
+**Ersätter:** ingen post.

@@ -28,7 +28,8 @@ väntar i ägarens tur. Ägaren har därefter beställt en riktad kontroll och f
 kodgranskning (DIGITALA-1-RIKTAD-KONTROLL-20260926). Den är genomförd (DIGITALA-1-RIKTAD-RESULTAT-20260926), och tre
 förslag väntar på ägaren. Ägaren har därefter beställt en samlad jämförelse av dagens Digitala-flöde med den gamla
 webbförvaltningens kunnande, Improvements och aktuella originalkällor, som ett analys- och förslagsuppdrag
-(DIGITALA-1-JAMFORELSE-20260926). Den pågår i steg 7.
+(DIGITALA-1-JAMFORELSE-20260926). Den är levererad (DIGITALA-1-JAMFORELSE-RESULTAT-20260926), och ett
+rekommenderat införandemandat väntar på ägaren.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`.
@@ -71,11 +72,10 @@ Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med resear
 
     Huvudrubriken är orörd. Alternativet, två förslag om kontaktfältets validering och en rättelseanteckning i briefen
     väntar som förslag i ägarens tur.
- 7. PÅGÅR från 2026-09-26: jämförelsen och resursförslaget (DIGITALA-1-JAMFORELSE-20260926). Ett analys- och
-    förslagsuppdrag inom kedjedrivarens deklarerade arbetsram: ingen installation, flödesändring eller produktändring.
-    Leveransen är fem delar i ett privat dokument (jämförelsetabell, resurskarta, prioriterat förbättringspaket, bevara
-    och avstå, okänt och beslut), granskade av en separat läsare före registreringen, och ett samlat rekommenderat
-    införandemandat för ägarens beslut. Norrgläntas leverans och drift rörs inte.
+ 7. KLART 2026-09-26: jämförelsen och resursförslaget (DIGITALA-1-JAMFORELSE-20260926, resultat i
+    DIGITALA-1-JAMFORELSE-RESULTAT-20260926). Fem leveranser i ett privat dokument, granskade av en separat läsare.
+    Inget är infört. Fem justeringar och ett samlat införandemandat väntar på ägarens beslut i ägarens tur.
+    Norrgläntas leverans och drift är orörda.
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -337,6 +337,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 ÄGARENS TUR
 - [beslut] Digitala 1: bedöm den levererade Norrglänta-demon och avgör om ett nästa fiktivt fall behövs — sedan 2026-09-26
 - [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
+- [beslut] Digitala 1: ta ställning till det rekommenderade införandemandatet för dagens flöde (fem justeringar och sju pinnade textfiler från fyra källor inför nästa fiktiva fall) — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -352,6 +353,8 @@ kvarlämnad mening om webbgrundens väg, båda ersatta av den publicerade tredje
 av den publicerade andra med rättade formuleringar om bildernas ursprung, bedömarnas förhandsvisning och befordran);
 `digitala/riktad-resultat-r1` (granskad första version av DIGITALA-1-RIKTAD-RESULTAT-20260926, godkänd men ersatt före
 publiceringen av den publicerade andra med preciserade formuleringar och båda förslagen om kontaktfältet);
+`digitala/jamforelse-resultat-r1` (granskad första version av DIGITALA-1-JAMFORELSE-RESULTAT-20260926, underkänd för två
+sammanslagna respektive föråldrade formuleringar och ersatt av den publicerade andra);
 `aquarium/arkivdatum-underlag-r1` (första versionen av användningsprovets underlag, underkänd för en kvarlämnad mening och
 ersatt av den publicerade andra); `kontor/stang-granskningsbudget-r1` (första versionen av denna planpost, underkänd för en
 kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, ersatt före granskning av den publicerade
@@ -455,8 +458,8 @@ RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925
 DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925,
 RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925, DIGITALA-1-TILLAGG-20260925,
 DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-LEVERANS-20260926,
-DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926, DIGITALA-1-JAMFORELSE-20260926 och
-Runtime-planens ingång.
+DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926, DIGITALA-1-JAMFORELSE-20260926,
+DIGITALA-1-JAMFORELSE-RESULTAT-20260926 och Runtime-planens ingång.
 
 ---
 
