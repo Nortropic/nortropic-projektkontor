@@ -23,17 +23,26 @@ kvalitet, arkitektur och faktisk arbetskedja, agenter, skills och verktyg, metod
 gjort ännu. Den är en läsning med lästid och källor, ingen uppgiftskö; denna plan äger fortsatt nästa handling, och en
 uppdatering är en ny beställning. Underlaget står privat i `evidence/map-delivery/local/overblick-20260926/` (`LAGE.md`).
 
-LÖPANDE UTVECKLING AV FÖRVALTNINGARNA (FORVALTNINGAR-LOPANDE-UTVECKLING-20260926), förslag 2026-09-26, inget infört: ett
-eget kontorsuppdrag parallellt med Digitala, utfört av en separat session. Förslaget ger Digitala, Runtime och kontoret
-tre stående rytmer som planen, kontorsposterna och den separata granskningen bär, utan ny workflow, roll eller
-automatisk loop: per fall en lärdomspost, användningsnoter och en förslagsrad för nästa fall, skrivna in i varje
-uppdrags klart-när; per månad en bevakningsomgång per förvaltning med tak och utan modellsessioner utöver del b:s
-granskning av Digitalas bevakningsnot, för Digitala inventeringens del b (beslut D5); per kvartal en genomgångspost per
-förvaltning med fyra frågor och högst tre beslutspunkter. En obeslutad punkt förfaller vid nästa genomgång, och utan
-beslut införs inget. Runtimes rytm föreslås bo helt i kontoret, utan ändring i Runtime, AP-10 eller modellvalet.
-Dokumentet och läget står privat i `evidence/forvaltningsutveckling/local/lopande-20260926/`
-(`FORVALTNINGSRYTM-20260926.md`, `LAGE.md`). Tre beslut står samlade på en rad i ägarens tur; tills ägaren beslutar
-gäller dagens arbetssätt.
+LÖPANDE UTVECKLING AV FÖRVALTNINGARNA, INFÖRD 2026-09-26 (FORVALTNINGAR-LOPANDE-UTVECKLING-20260926 och
+FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926): ägaren valde förslagets rekommendationer. De tre rytmerna gäller helt
+för Digitala, Runtime och kontoret, och Runtimes rytm bor i kontoret utan ändring i Runtime, AP-10 eller modellvalet.
+Planen, kontorsposterna och den separata granskningen bär rytmerna; en omgång blir av när en session läser planen och ser
+att datumet passerat, annars noteras den som utebliven. Arbetssättet står privat i
+`evidence/forvaltningsutveckling/local/RYTMER.md` och lärdomsfilerna i `evidence/forvaltningsutveckling/local/runtime/LARDOMAR.md`
+och `evidence/forvaltningsutveckling/local/kontoret/LARDOMAR.md`; Digitalas lärdomsfil står i dess kunskapsmapp. Varje nytt
+uppdrag får i sitt klart-när en lärdomspost, användningsnoter och förslagsraden för nästa fall.
+
+RYTMER
+- Nästa månadsomgång: 2026-10-01 eller första session därefter. Runtime och kontoret enligt arbetssättet; Digitala enligt
+  inventeringens del b när beslutet D5 är taget.
+- Nästa genomgång: första veckan i januari 2027, en kontorspost per förvaltning med högst tre beslutspunkter.
+
+FÖRSLAG ATT PRÖVA I NÄSTA FALL
+- Digitala: inget satt vid införandet; sätts av den som driver nästa Digitala-fall.
+- Runtime: vid nästa Runtime-publicering körs publicerarens prov genom fångstomslaget, så att ett nytt fall av provet som
+  föll i 2 av 16 körningar bevaras med utdata, returkod och miljö (lärdom R4; ryms i ett vanligt mandat).
+- Kontoret: före varje granskning av en kontorspost söks modellfritt efter det ersatta lägets formuleringar i posten och i
+  hela planen, och varje träff läses (lärdom K1; ryms i ett vanligt mandat).
 
 DIGITALA 1 — FIKTIV KVALITETSDEMO OCH RUNTIME-DIAGNOS (DIGITALA-1-ACCEPT-20260925, ägarens besked privat i
 `evidence/digitala/local/`; gränserna står avsnitt för avsnitt i beslutsposten). Två spår, med en skrivare åt gången.
@@ -446,7 +455,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 - [beslut] Digitala 1: lämna omdömet om etapp 2:s tre riktningar på sidan för ägaren (riktning, skäl, vad som förs vidare) och ta ställning till de tre punkterna där (foto eller inte i första vyn; handling först eller löfte först; rubrikens delning) — sedan 2026-09-26
 - [beslut] Digitala 1: ta ställning till inventeringens tio beslut ur del b–f (D1–D5: Claude Designs dokumentation, två mobilvyer, böcker, mänskligt prov, bevakningsrutin; D-F1–D-F5: utgiftsavisering, funktionsregion, checklista som mall, hygienåtgärd i åtkomstskyddets automationsväg, analys i första skarpa fallet) — DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926, sedan 2026-09-26
 - [beslut] Digitala 1: ta ställning till inventeringens fyra avgränsade prov (P-A DESIGN.md per riktning med modellfri lint, P-C Hallmarks audit som kritikröst och P-D canvas-design om Ljuset behöver grafik i etapp 2; P-B designlang-mätning av referenserna i etapp 3) — sedan 2026-09-26
-- [beslut] Förvaltningarna: ta ställning till förslaget om löpande utveckling (de tre rytmerna; Runtimes minsta form, där A rekommenderas; förfallsregeln även för punkter utanför rytmerna) — sedan 2026-09-26
+- [beslut] Förvaltningarna: förfallsregeln även för punkter i ägarens tur utanför rytmerna, ja eller nej (kedjedrivaren rekommenderar ja; utan beslut gäller regeln bara rytmernas punkter; förfaller vid kontorets genomgång 2027Q1) — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -488,6 +497,10 @@ månadsomgångens modellsessioner, ägarens del i Digitalas omgång, takets räc
 `digitala/inventering-tillagg-resultat-r0` (ogranskad första kandidat av DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926,
 återkallad efter en minut för att posten namngav åtkomstskyddets nyckel, som e–f-dokumentets granskare bett hålla utanför den
 publika posten, ersatt av den granskade andra);
+`kontor/forvaltningar-beslut-r1` (granskad första version av FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926, underkänd
+för ett absolut påstående om tidszonen i leverantörens besked om AP-10:s kvot, ersatt av den publicerade tredje);
+`kontor/forvaltningar-beslut-r2` (granskad andra version av samma post, underkänd för att sammanfattningen av det första
+fyndet knöt UTC−12 till fel påstående, ersatt av den publicerade tredje);
 `aquarium/arkivdatum-underlag-r1` (första versionen av användningsprovets underlag, underkänd för en kvarlämnad mening och
 ersatt av den publicerade andra); `kontor/stang-granskningsbudget-r1` (första versionen av denna planpost, underkänd för en
 kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, ersatt före granskning av den publicerade
@@ -597,7 +610,8 @@ DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926, DIGITALA-1-G
 DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926, DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926,
 OVERBLICK-OBSIDIAN-20260926, DIGITALA-1-ETAPP1-RESULTAT-20260926, DIGITALA-1-INVENTERING-20260926,
 DIGITALA-1-INVENTERING-TILLAGG-20260926, DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-ETAPP2-RESULTAT-20260926,
-FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926 och Runtime-planens ingång.
+FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926,
+FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926 och Runtime-planens ingång.
 
 ---
 
