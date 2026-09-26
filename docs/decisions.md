@@ -2343,3 +2343,76 @@ ny kostnad eller befogenhet redovisas före åtgärden.
 - Uppgifterna står privat i `evidence/digitala/local/vercel/`.
 
 **Ersätter:** ingen post. Planens ägartur töms, eftersom beslutet är fattat och operatörshandlingen utförd.
+
+## DIGITALA-1-LEVERANS-20260926 — Norrgläntademon levererad bakom inloggning; ägarens bedömning återstår
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Posten gäller leveransen enligt DIGITALA-1-ACCEPT-20260925
+§7, gjord i dagens flöde (DIGITALA-1-KORRIGERING-20260926) efter briefgodkännandet (DIGITALA-1-BRIEF-GODKAND-20260926).
+Underlaget står privat:
+- överlämningen i `evidence/digitala/local/norrglanta/OVERLAMNING-20260926.md`;
+- provresultaten i `evidence/digitala/local/norrglanta/ACCEPTANSPROV-RESULTAT-20260926.md`;
+- mätningarna och granskningarna bredvid dem.
+
+**Vad som är levererat:**
+- Den fiktiva sajten har sex sidor, en 404-sida och en felsida.
+- Den är byggd i det privata kundrepot `Nortropic/kund-demo-norrglanta` med Next.js 16.3.6.
+- Den är driftsatt med Vercel-verktyget i teamet Nortropic.
+- Alla adresser kräver Vercel-inloggning, med skyddet "All Deployments".
+- Den granskade versionen är befordrad till projektets produktionsadress, också den bakom inloggning. Befordran byggde
+  om samma källkod, och kärnproven kördes om på produktionsadressen.
+- Ingen förfrågan har skickats. Formuläret kontrolleras av sajtens server och kastas, och sajten har inga telefon- eller
+  mejllänkar.
+
+**Uppmätt, bedömt och ej prövat:**
+- **Uppmätt** på den skyddade förhandsvisningen:
+  - demoförfrågans prov a–h, 8 av 8;
+  - Lighthouse 97–100 för prestanda på mobil och 100 på desktop, och 100 för tillgänglighet och bästa praxis;
+  - axe 0 överträdelser i 19 lägen;
+  - målytor minst 24 × 24 px;
+  - kontrast för text över bild;
+  - noindex på varje svar;
+  - åtkomstskyddet på alla adresser;
+  - exakt de 40 tillåtna filerna uppladdade;
+  - inga anrop utanför sajten;
+  - reducerad rörelse;
+  - Schema Markup Validator utan fel;
+  - en faktakontroll av den byggda texten utan fynd.
+- **Bedömt:**
+  - ett femsekunderstest med tre isolerade bedömare, som alla svarade rätt;
+  - toppuppgift 1 och 2 med isolerade bedömare på mobil och desktop, gjort på en tidigare förhandsvisning med samma
+    första vy;
+  - en separat slutgranskning i tre rundor, alla godkända utan blockerande fynd.
+- **Ej prövat:**
+  - leverans av förfrågan, klick-till-samtal, verkliga leads och konvertering, eftersom företaget är fiktivt;
+  - toppuppgift 3 med en isolerad bedömare, och tidtagning av toppuppgifterna med en människa som inte känner sajten;
+  - Lighthouse på 404-sidan;
+  - SEO-poängen på en noindex-demo.
+
+**Idéerna i bygget** (`evidence/digitala/local/IDEBEDOMNING-20260926.md`):
+- Acceptansproven skrevs före bygget och prövades. Femsekunderstestet behålls som ett billigt prov, inte som krav.
+- Referensöversättningen, listan över AI-generiska mönster, en post per bild, faktakontrollen och granskningen mot den
+  renderade sidan är tagna i bruk.
+- Lanseringschecklistan, de låsta mätverktygen och källorna per fråga med läsdatum är också i bruk.
+
+Proven hittade verkliga fel, och alla rättades:
+- fokus hoppade till felsammanfattningen när ett fält rättades;
+- en tidsfälla löste aldrig ut;
+- ett CTA-band saknades;
+- Vercels verktygsfält laddade ett skript från tredje part på varje sida, och verktygsfältet är nu avstängt i projektet;
+- en kantlinje uppstod av en krock mellan klassnamn.
+
+**Avvikelser från briefen** står med skäl i överlämningen. Bland dem:
+- sajten har ingen analystjänst;
+- H1 bryts i fem rader på mobil med den valda kandidaten;
+- bilderna är miljöbilder med fastställd fri licens, men ingen av dem är tagen i Norrbotten.
+
+**Kostnad och åtkomst:**
+- Sex driftsättningar är gjorda.
+- Förbrukningen utöver den inkluderade krediten var 0 USD, och teamets utgiftsbudget är orörd.
+- Ett automatiseringsundantag för proven finns. Hemligheten finns bara lokalt och bör återkallas när demon avslutas.
+- Ingen delbar länk, domän, DNS eller offentlig lansering ingår.
+
+**Kvar för ägaren:** att bedöma den byggda sajten, enligt demons eget mått i briefen, och att avgöra om ett nästa fiktivt
+fall behövs (DIGITALA-1-ACCEPT-20260925 §7). Spår 1 står still tills dess.
+
+**Ersätter:** ingen post.

@@ -23,7 +23,8 @@ webbförvaltningen är inspiration till dagens flöde, inte Digitalas arbetskedj
 `evidence/digitala/local/ARBETSKEDJA-20260925.md`, som bara används som källmaterial. Bedömningen av idéerna står i
 `evidence/digitala/local/IDEBEDOMNING-20260926.md`. Avstämningen och idéerna gavs ägaren 2026-09-26. Ägaren har därefter
 godkänt briefen (DIGITALA-1-BRIEF-GODKAND-20260926): CTA-etiketten "Skicka förfrågan", H1-kandidat 1 och målbilden och
-designriktningen.
+designriktningen. Demon är levererad 2026-09-26 bakom inloggning (DIGITALA-1-LEVERANS-20260926), och ägarens bedömning
+väntar i ägarens tur.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`.
@@ -42,13 +43,19 @@ Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med resear
  3. Vercel: ägaren har loggat in verktyget. Teamet Nortropic (Pro, med ägaren som ägare) och de befintliga
     kostnadsinställningarna är kontrollerade och bokförda i DIGITALA-1-BRIEF-GODKAND-20260926. Före första uppladdningen:
     projektet, skydd för alla driftsättningar med Vercel-inloggning, noindex och de uppladdade filerna.
- 4. PÅGÅR från 2026-09-26: repot `Nortropic/kund-demo-norrglanta`, bygget i dagens flöde och prövningen på den skyddade
-    förhandsvisningen, enligt DIGITALA-1-ACCEPT §7 och §3. Bygget återupptas från kundrepots senaste commit.
- 5. Leverans: den skyddade webbplatsen, verkliga kontroller på mobil och större skärm, prövad navigation, länkar och
-    demoförfrågan, separat granskning mot briefen och gällande kvalitetskrav, uppmätt, bedömt och oprövat åtskilt, och en
-    kort överlämning med begränsningar. Den byggda sajten visas; poäng och gröna prov ersätter inte visuell bedömning.
-Prognos: briefen godkänd 2026-09-26. Därefter omkring en till två arbetsdagar för bygge, granskning och leverans i
-dagens flöde, beroende av bygget och förhandsvisningens kontroller. Uppskattningar, inga gränser.
+ 4. KLART 2026-09-26: repot `Nortropic/kund-demo-norrglanta`, bygget i dagens flöde och prövningen på den skyddade
+    förhandsvisningen, enligt DIGITALA-1-ACCEPT §7 och §3. Kundrepots `main` bär den levererade versionen.
+ 5. LEVERERAT 2026-09-26 (DIGITALA-1-LEVERANS-20260926). Leveransen omfattar:
+    - den skyddade webbplatsen;
+    - verkliga kontroller på mobil och större skärm;
+    - prövad navigation, länkar och demoförfrågan;
+    - en separat granskning mot briefen och gällande kvalitetskrav;
+    - uppmätt, bedömt och oprövat åtskilt;
+    - en kort överlämning med begränsningar.
+
+    Överlämningen står privat i `evidence/digitala/local/norrglanta/OVERLAMNING-20260926.md`. Nästa steg är ägarens
+    bedömning av den byggda sajten och ägarens beslut om ett nästa fiktivt fall. Inget nytt företag väljs före det
+    (DIGITALA-1-ACCEPT §7).
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -304,8 +311,11 @@ blockets rubrik (orden ägarens och tur i versaler, ensamma på raden), som rade
 eller `- [operatörshandling] text`; Aquarium läser blocket från main. Byggbeslutet för granskningens tidsbudget är
 accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3 är godkänt
 (AQUARIUM-V0-AGARPROV-GODKANT-20260925). Digitala 1 är accepterat
-(DIGITALA-1-ACCEPT-20260925) och briefen godkänd (DIGITALA-1-BRIEF-GODKAND-20260926). Inget beslut och ingen
-operatörshandling väntar på ägaren nu, så blocket finns inte.
+(DIGITALA-1-ACCEPT-20260925), briefen godkänd (DIGITALA-1-BRIEF-GODKAND-20260926) och demon levererad
+(DIGITALA-1-LEVERANS-20260926).
+
+ÄGARENS TUR
+- [beslut] Digitala 1: bedöm den levererade Norrglänta-demon och avgör om ett nästa fiktivt fall behövs — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -419,7 +429,8 @@ AQUARIUM-V0-AGARPROV-RATTELSE-20260925, ARBETA-VIDARE-20260925, RUNTIME-GRANSKNI
 RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925,
 DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925,
 RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925, DIGITALA-1-TILLAGG-20260925,
-DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926 och Runtime-planens ingång.
+DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-LEVERANS-20260926 och Runtime-planens
+ingång.
 
 ---
 
