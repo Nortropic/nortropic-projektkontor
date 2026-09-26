@@ -2308,3 +2308,38 @@ Bedömningen av idéerna står privat i `evidence/digitala/local/IDEBEDOMNING-20
 efter korrigeringen.
 
 **Ersätter:** delar av de fyra posterna enligt ovan.
+
+## DIGITALA-1-BRIEF-GODKAND-20260926 — ägaren godkänner Norrgläntas brief; Vercel-kontot och teamet är kontrollerade
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens två besked står ordagrant privat i
+`evidence/digitala/local/owner-words-cta-h1-20260926.md` och `evidence/digitala/local/owner-words-briefgodkannande-20260926.md`,
+det andra med kedjedrivarens fråga före svaret. Ingen exakt klocktid tillskrivs ägaren. Posten hör till
+DIGITALA-1-ACCEPT-20260925 §4 och §7.
+
+**Besluten:**
+- Primär-CTA-etiketten är "Skicka förfrågan". Kedjedrivarens besked efter korrigeringen gav "Skicka förfrågan" och "Be om
+  ett förslag" som alternativ och tre H1-kandidater, och ägaren svarade "Skicka förfrågan och H1 alternativ 1".
+- H1 på startsidan är kandidat 1: "Trädgårdsskötsel i Luleå och Boden – med en tydlig överenskommelse innan vi börjar."
+- Målbilden och designriktningen är godkända. Kedjedrivaren frågade om ägaren godkänner målbilden och designriktningen i
+  riktningsskissen, med ett "ja" som tillräckligt svar, och ägaren svarade "Ja".
+
+**Följden:** briefen är godkänd enligt DIGITALA-1-ACCEPT-20260925 §7, och kedjedrivaren driver de tekniska delstegen i
+dagens flöde (DIGITALA-1-KORRIGERING-20260926): kundrepot `Nortropic/kund-demo-norrglanta`, bygget och prövningen på den
+skyddade förhandsvisningen. Idéerna i den privata bedömningen omsätts utan nya godkännandepunkter. Det som skulle kräva
+ny kostnad eller befogenhet redovisas före åtgärden.
+
+**Vercel, kontrollerat 2026-09-26 genom ägarens inloggning, bara läsande:**
+- Ägaren loggade själv in Vercel-verktyget. Kontot har exakt ett team, Nortropic, på Pro-planen med status aktiv, och
+  ägaren är teamets ägare. Valet är entydigt enligt ACCEPT §4 och bokförs här.
+- Teamet har fem befintliga projekt för andra uppdrag. De rörs inte. Något projekt för Norrglänta fanns inte.
+- De befintliga kostnadsinställningarna: teamet har en utgiftsbudget på 20 USD för förbrukning utöver den inkluderade
+  krediten. Den är aktiv, pausar inget vid 100 procent och har ingen webhook. Förbrukningen i den löpande perioden var
+  0 USD. Budgeten fanns redan; vem som satte den framgår inte av läsningen.
+- Kedjedrivaren ändrar inte budgeten: plan, kostnad och utgiftsgräns beslutar ägaren (DIGITALA-1-KOMPLETTERING-20260925).
+  En liten statisk demo väntas rymmas i den inkluderade krediten, men grundavgiften antas inte vara ett kostnadstak
+  (ACCEPT §4).
+- Före första uppladdningen återstår enligt ACCEPT §4: projektet skapas och verifieras, Vercel-inloggning sätts som skydd
+  för alla driftsättningar och prövas, noindex säkerställs och de filer som faktiskt laddas upp kontrolleras.
+- Uppgifterna står privat i `evidence/digitala/local/vercel/`.
+
+**Ersätter:** ingen post. Planens ägartur töms, eftersom beslutet är fattat och operatörshandlingen utförd.
