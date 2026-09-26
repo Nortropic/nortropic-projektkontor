@@ -48,7 +48,8 @@ samlat besked med riktning, tilläggsmandat och nästa synliga kvalitetsprov är
 byggsessionen, är klar (DIGITALA-1-ETAPP1-RESULTAT-20260926, steg 11); ägaren har därefter beställt en inventering av 32
 namngivna repon och fler trendande GitHub-repon (DIGITALA-1-INVENTERING-20260926, steg 14), utökad med fem delar
 (DIGITALA-1-INVENTERING-TILLAGG-20260926: bevakningsrutin, referensläsning, metodlitteratur, lanseringskedjan för ett
-skarpt fall, Vercel Pro); etapp 2, kvalitetsprovet (steg 12), pågår parallellt enligt ägarens ord; etapp 3,
+skarpt fall, Vercel Pro); etapp 2, kvalitetsprovet (steg 12), är levererad och väntar på ägarens omdöme
+(DIGITALA-1-ETAPP2-RESULTAT-20260926); etapp 3,
 webbläsarvägen till avgörande (steg 13), är oberoende; etapp 4 ingår inte.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
@@ -131,17 +132,14 @@ inte krav.
     anropade frontend-design själv men inte Emils skills (delvis; L14), detektorn gav tolv varningar som golv.
     Två modellsessioner. Utfall privat i `evidence/digitala/local/genomforande-20260926/etapp1/UTFALL-ETAPP1.md`;
     registret del F.
-12. PÅGÅR 2026-09-26 (parallellt med steg 14, enligt DIGITALA-1-INVENTERING-TILLAGG-20260926): etapp 2, kvalitetsprovet — tre statiska komps ("Ljuset", "Arbetet", "Planen") för
-    Norrgläntas första vy och Säsongsplan i en privat katalog med riktigt innehåll, visade 390 och 1440 bredvid dagens
-    första vy och närmaste referens; en designkritik per komp av en separat läsarsession och en samlad; Impeccables
-    detektorer modellfritt på komps och dagens HTML som golv; ägarens omdöme på en sida. Ingen sajtändring, ingen
-    driftsättning. Klart när tre komps med kritik och en rekommenderad riktning ligger framför ägaren och en
-    LARDOMAR-post om vad som skilde är skriven, med resultatpost efter separat granskning. Ram: 3–4 modellsessioner.
-    Görs med etapp 1:s kunnande; det som hinner bli klart i steg 14 b–d får användas i komparnas Design Read. Läge
-    enligt det privata läget (avsnittet etapp 2): konceptsteget skrivet och tre komps byggda som första versioner —
-    A "Ljuset", B′ "Arbetet" (B i sin definierade form utgick: inga fria arbetsfoton med människor som klarar
-    demoreglerna hittades) och C "Planen". Nästa handling: jämförelsesidor, detektorkörning och kritiksessionerna.
-    Återupptagningspunkt: `evidence/digitala/local/genomforande-20260926/LAGE.md` (avsnittet etapp 2).
+12. KLART 2026-09-26, väntar på ägarens omdöme: etapp 2, kvalitetsprovet (DIGITALA-1-ETAPP2-RESULTAT-20260926).
+    Konceptsteg med Design Read och tvåpass-kontroll; tre komps — A "Ljuset", C "Planen" och B′ "Arbetet" (B i sin
+    definierade form utgick: inga fria arbetsfoton med människor klarar demoreglerna) — i 390 och 1440 bredvid dagens
+    första vy och närmaste referens; tre kritiksessioner och en samlad; detektorn tio varningar mot dagens tolv;
+    rekommendationen är kombinationen "Ljuset med Planen"; sidan för ägaren skriven; lärdomspost L16. Fyra
+    modellsessioner. Ingen sajtändring. Allt privat under `evidence/digitala/local/genomforande-20260926/etapp2/`.
+    Nästa handling ligger hos ägaren (omdömet); en andra omgång komps görs bara om ägaren ber om det eller godtar
+    inventeringens prov P-A, P-C eller P-D.
 13. VÄNTAR (oberoende av 11–12, får gå parallellt): etapp 3, webbläsarvägen till avgörande — omprov B med version 2 av
     provaren; den första skyddade scenariokörningen mot den bevarade leveransen med `--verify-deployment` (2 sessioner,
     en tredje bara vid verktygsfel; den verkliga provhemligheten först när omprov B visat gränsen); kundrepots provkod
@@ -440,6 +438,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 
 ÄGARENS TUR
 - [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
+- [beslut] Digitala 1: lämna omdömet om etapp 2:s tre riktningar på sidan för ägaren (riktning, skäl, vad som förs vidare) och ta ställning till de tre punkterna där (foto eller inte i första vyn; handling först eller löfte först; rubrikens delning) — sedan 2026-09-26
 - [beslut] Digitala 1: ta ställning till inventeringens fyra avgränsade prov (P-A DESIGN.md per riktning med modellfri lint, P-C Hallmarks audit som kritikröst och P-D canvas-design om Ljuset behöver grafik i etapp 2; P-B designlang-mätning av referenserna i etapp 3) — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
@@ -584,7 +583,7 @@ DIGITALA-1-JAMFORELSE-RESULTAT-20260926, DIGITALA-1-PRECISERING-20260926, DIGITA
 DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926, DIGITALA-1-GENOMFORANDE-RESULTAT-20260926,
 DIGITALA-1-RIKTNING-20260926, DIGITALA-1-RIKTNING-BESKED-20260926, DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926,
 OVERBLICK-OBSIDIAN-20260926, DIGITALA-1-ETAPP1-RESULTAT-20260926, DIGITALA-1-INVENTERING-20260926,
-DIGITALA-1-INVENTERING-TILLAGG-20260926, DIGITALA-1-INVENTERING-RESULTAT-20260926 och Runtime-planens ingång.
+DIGITALA-1-INVENTERING-TILLAGG-20260926, DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-ETAPP2-RESULTAT-20260926 och Runtime-planens ingång.
 
 ---
 

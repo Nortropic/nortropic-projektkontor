@@ -4140,3 +4140,62 @@ npm-registrets metadata; kontorsgranskningar: dokumentet i två rundor, denna po
 kvar oberoende.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-ETAPP2-RESULTAT-20260926 — kvalitetsprovet är levererat: tre riktningar som statiska komps, fyra kritiksessioner, jämförelsesidor och en sida för ägarens omdöme; rekommendationen är kombinationen "Ljuset med Planen"; ingen sajtändring
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Planens steg 12 (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926,
+etapp 2). Allt står privat under `evidence/digitala/local/genomforande-20260926/etapp2/`: konceptsteget
+(`KOMPS-PLAN.md`), komparna, skärmbilderna, jämförelsesidorna, kritiksessionerna, utfallet (`UTFALL-ETAPP2.md`) och
+sidan för ägaren (`SIDA-FOR-AGAREN.md`). Norrgläntas sajt, skydd och drift är oförändrade; ingen driftsättning. Det
+här är modellbedömning plus ägarens bedömning, inte ett mänskligt användarprov.
+
+**Konceptsteget.** Före bygget skrevs en Design Read och tre dial-värden ur briefen (Taste §0–§1), riktningarnas
+axlar, det som hålls konstant (innehåll, palett, typsnitt, demoregler, tillgänglighetsgolv) och en tvåpass-kontroll
+enligt frontend-design som ändrade fyra saker innan något byggdes (en eyebrow ströks, B blev delad vy i stället för
+text över foto, en trust-rad utan täckning ströks, sektionsföljden fick skilja sig mellan riktningarna).
+
+**Komparna.** A "Ljuset": ljus första vy utan foto, typografin och säsongslinjalen som bild, björkstreck som
+gläntmotiv. C "Planen": Säsongsplanen som hero med förvalt tillstånd, mening i klartext och "Ta med i förfrågan" i
+första vyn på båda bredderna. B "Arbetet" i sin definierade form — fria dokumentära foton med människor och arbete i
+nordiskt ljus — utgick enligt planens eget villkor: två sökomgångar i Wikimedia Commons gav inga bilder som klarar
+demoreglerna; i stället byggdes B′, en delad vy med sajtens befintliga fria bild utan overlay och med synlig bildtext,
+som prövar kompositionshalvan och redovisas som ett svagare prov. Skärmbilderna togs i 390 och 1440 med
+skärmbildsskriptet, som också mäter rubrikens radantal och om handlingen syns i första vyn; det fångade fel i tre
+versioner av C som ögat missade.
+
+**Kritiken.** Tre separata läsarsessioner (en per komp) med kompens skärmbilder och HTML, dagens första vy och
+Säsongsplan, de två närmaste referenserna, briefens designriktning, frontend-designs kalibreringslista, Impeccables
+bedömningsgrunder och detektorns fynd; därefter en samlad session över alla tre. Utfall: A "specifik för Norrglänta",
+men vinsten sitter i säsongslinjalen direkt under första vyn och i den ljusa ytan, inte i björkstrecken, som läses som
+bandning; B′ "annorlunda men utbytbar" — kompositionen kan flyttas till vilket företag som helst och bilden visar inget
+arbete, medan det som bär är ingen overlay, ingen text över foto och bildtexten; C "specifik för Norrglänta" — det enda
+elementet i hela materialet som inte kan flyttas till en annan bransch, men underdimensionerat (sidans minsta rubrik,
+låga tappytor, förklaringsraden dold på mobil). Alla tre kritiker fann att komparna försämrat den Säsongsplan som
+redan ligger i produktion, och att sektionsstapeln nedanför vikningen överlevde alla tre axlarna. Detektorn gav
+komparna tio varningar sammanlagt mot dagens tolv; den samlade sessionen varnar för att läsa talen som rangordning.
+
+**Hypoteserna.** Identiteten bär utan foton — ja, men bäraren är säsongsobjektet och den ljusa ytan, inte ett
+illustrerat motiv. Bilden var inte huvudorsaken utan dess behandling (overlay, text över foto); den positiva halvan,
+dokumentärt arbete, kan bara prövas med egna bilder. Signaturelementet bär första vyn men inte sidan.
+
+**Rekommendation.** Kombinationen "Ljuset med Planen": A:s ljusa, foto-fria rubrikvy som ram och C:s Säsongsplan
+som sidans bärande objekt, i eller direkt under första vyn; björkmotivet och parkbilden stryks; tillbaka in från
+dagens sajt: märkta valgrupper med riktiga kontroller, namngivna rader, månader som rader på mobil, knappen i
+headern. Det ingen riktning löste och som återstår oavsett val: stapeln nedanför vikningen och det föreskrivna
+överlappet hero/ledger. Ett produktändrande steg är etapp 4 och ett eget beslut.
+
+**Sidan för ägaren.** Tre rader (vad riktningen prövar, vad kritiken såg, rekommendation), hypotesernas svar, det
+okända (rörelse, verklig läsbarhet utomhus, interaktionstillstånd, ägarens smak) och tre punkter bara ägaren kan
+avgöra: foto eller inte i första vyn; handling först eller löfte först; om den godkända rubrikens delning i rubrik plus
+underrad godkänns som permanent form eller om rubriken ska skrivas om kortare.
+
+**Resurser.** Fyra modellsessioner (tre kritiker och en samlad), inom ramen 3–4; kedjedrivarens eget arbete; inga nya
+befogenheter, inga installationer; Commons-sökningarna var läsande API-anrop. Lärdomspost L16 skriven (konstanterna
+måste omfatta det som redan fungerar; en axel för rytm nedanför vikningen saknades; modellfri mätning fångar det ögat
+missar; detektorns tal är ingen rangordning; fotohypoteser kräver egna bilder).
+
+**Kvar för ägaren:** omdömet på sidan (riktning, skäl, vad som förs vidare) och de tre punkterna; inventeringens fyra
+prov och den riktade kontrollens tre förslag står kvar oberoende. Om P-A, P-C och P-D godtas tas de in i en andra
+omgång komps, inte i denna.
+
+**Ersätter:** ingen post.
