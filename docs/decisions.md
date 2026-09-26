@@ -3366,3 +3366,119 @@ det första försöket föll på ett verktygsfel i provskriptet och är bevarat.
 **Plan:** Digitala-planen får raden om kunskapsstödet; steg 9 uppdateras med del 1 på plats och mottagarprovet kvar.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-GENOMFORANDE-RESULTAT-20260926 — införanderesultatet: kunskapsstödet tillgängligt och kopplat, metodproven gjorda, AI-provvägens gränser visade men inget skyddat scenario kört inom sessionstaket; ett beslut kvar
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Posten är det samlade besked som
+DIGITALA-1-GENOMFORANDE-20260926 §7 begär: införanderesultatet med mottagarprovet, åtkomstkontrollerna och metodprovens
+utfall, och ett konkret hinder som kräver ett verkligt beslut. Underlaget står privat i
+`evidence/digitala/local/genomforande-20260926/` (läge, driftsättningsbindning, provvägen, alla spärrprovsförsök,
+metodproven, granskningen) och `evidence/digitala/local/kunskap/`. Norrgläntas sajt, skydd och drift är orörda; ingen
+driftsättning har gjorts; inget är installerat eller anslutet.
+
+**Del 1 — tillgängligt och kopplat: KLART.** Kunskapsmappen med de tolv kontrollerade kopiorna, registret, de tre
+härledda underlagen och lärdomsfilen (nu tretton poster) står på plats (DIGITALA-1-KUNSKAPSSTOD-20260926). Mottagarprovet
+är godkänt: en färsk läsarsession i kontorets rot, utan filnamn i frågan, följde ingången uppdrag → definition → plan →
+register och svarade rätt på tre frågor om vilket underlag som läses var, med vilka delar och vilken konfliktregel; fyra
+läsningar, 28 sekunder (`kunskap/MOTTAGARPROV.md`). Det visar åtkomst och koppling, inte förbättrad kvalitet.
+
+**Del 2 — installation: ingen gjord.** Prototype är metod (alternativ A). Playwright, nya webbläsare och
+MCP-anslutningar har inte tillkommit.
+
+**Del 3 — provvägen, gränserna och metodproven: DELVIS.**
+- *Byggt.* Provskriptet och webbläsarhållaren i kundrepots `scripts/prov/` (befintlig Chrome och puppeteer-core), en
+  privat startare och en privat vakt för verktygsanropen. Hållaren håller gränsen i tre lager för hela webbläsaren
+  under hela sessionen: en lokal proxy som all trafik måste passera och som bara släpper vitlistans värd, värdregler i
+  Chrome, och ett förfrågningsfilter; popupfönster och nya flikar stängs. Skyddsundantaget sätts en gång som cookie av
+  hållaren, ur en miljövariabel som bara den ser; provaren, uppgiftstexten, konfigurationen och spåren får det aldrig.
+  Kundrepots provkod utlöser ingen driftsättning (ingen git-koppling; deployeringslistan utesluter `scripts/`).
+- *Webbläsargränsen och hemligheterna (§4 A och C), modellfritt mot lokala provmål med falsk hemlighet:* försök 1 föll
+  på ett verktygsfel i provskriptet, försök 2 visade en verklig lucka (nya flikar och popup hann skicka fyra anrop
+  till det främmande målet innan de stängdes) som proxylagret stängde; försök 3 godkänt: noll anrop nådde det
+  främmande målet via länk, ny flik, popup, omdirigering, annat värdnamn, bild, fetch eller formulär; demoresan
+  genomfördes; den falska hemligheten fanns bara i grundsättningens två anrop mot det tillåtna målet, aldrig i
+  konfiguration, spår, bilder eller hos det främmande målet; undantagscookien följde med till det tillåtna
+  formuläret och aldrig till det främmande; den tillfälliga profilen raderades. Alla försök är bevarade.
+- *Verktygs- och datagränsen (§4 B), en modellsession per försök:* försök 1–4 nekade även det tillåtna kommandot.
+  Orsaken hittades i verktygets egna texter: läsväggsinställningen granskar också sökvägar som ett Bash-kommando
+  namnger, och provskriptet ligger utanför arbetsytan, så varje anrop blev en fråga som frågelöst läge nekade; varken
+  regler eller vaktens tillåtelse når förbi. Försök 5 godkänt utan den inställningen och utan det begränsade läget:
+  det tillåtna kommandot fungerade (öppna, titta, läsa skärmbilden i arbetsytan, läsa sidtext, avsluta); kedjade
+  kommandon, andra skalkommandon, läsning utanför arbetsytan, skrivning av fil och adress utanför vitlistan nekades av
+  vakten och skriptet; ingen fråga nådde behörighetslagret; inget nådde det främmande målet; ingen hemlighet i spår.
+  Det är en avvikelse från v4:s skiss, där de två inställningarna ingick; de kompenseras av vakten (ett slutet
+  regelverk som avgör varje anrop och loggar beslutet), reglerna, frågelöst läge, tom MCP-lista och en tom arbetsyta.
+- *Separat granskning av startaren, gränssnittet och spärrprovens resultat före första skyddade körning:* två rundor genom Runtimes skrivskyddade läsare (samma modellfamilj som kedjedrivaren: separata läsningar, inte
+  oberoende omdömen). Den första underkände med ett blockerande fynd — skalets jokertecken, klammer och tilde
+  passerade vaktens argumentregel och expanderades innan skriptet såg dem, så lokala sökvägar kunde hamna i spår,
+  slutrapport och formulärfält som provaren kunde läsa — och tolv förbättringar, bland annat att bindningen inte
+  kontrollerades, att arbetsytan låg i kontorsrepot, att spårfiler var läsbara för provaren och att stegtaket
+  förbrukades av vägrade anrop. Allt rättades i en andra version: sluten argumentgrammatik per handling i både vakt och
+  skript, avslut utan argument, öppning bara till HTML-sidor inom vitlistan, spår och vaktlogg utanför arbetsytan,
+  arbetsyta i en tillfällig katalog utanför repona, bara den egna inställningsfilen som källa så att användarens
+  tillåtelseregler inte följer med, vakten för alla verktyg, tvingande bindning och en kontrollmall per körning.
+  Webbläsarprovet kördes om modellfritt med version två och höll (försök 4). Den andra rundan godkände utan
+  blockerande fynd, med elva anmärkningar (två kvarstående från första rundan: läsregelns form och att kontrollen mot
+  driftsättningen inte var körd) och tre villkor: omprovet av verktygsgränsen med version två måste visa en namngiven
+  lista, den första skyddade körningen får därefter starta utan ny granskningsrunda mot en kontrollista, och
+  läsregelns form ska visas hålla. Efter den
+  andra rundan rättades anmärkningarna i koden — Bash saknar nu tillåtelseregel, så att frågelöst läge nekar om vakten
+  inte svarar; vakten speglar skriptets sidregel för öppning; inga citattecken i fritext; samma miljöfilter — och
+  startarens kontroll mot driftsättningen kördes modellfritt mot den bundna driftsättningen och sparades som bevis
+  (rätt id, adress och commit godtas; det rörliga aliaset och fel commit avvisas). Dessa rättningar är inte omlästa,
+  och startaren i version två har inte körts i någon modellsession. Det tredje villkoret från andra rundan, läsregelns
+  form, kvarstår som anmärkning: regeln skrivs nu i båda stavningarna av den tillfälliga arbetsytan men är inte prövad
+  utan vakten.
+- *Skyddade scenarier mot den bevarade leveransen: INTE körda.* Del 3:s tak på åtta modellsessioner nåddes innan
+  åtkomstkontrollerna var godkända: fem sessioner gick åt till verktygsgränsens försök, en till den blinda
+  granskningen, en till seedfallet och en till en bildbedömning som föll på ett fel i kedjedrivarens egen prompt.
+  Efter den separata granskningens rättningar är verktygsgränsen dessutom bara visad modellfritt (vaktens regelverk
+  och webbläsarprovet), inte i en ny modellsession. Provvägen är därför **visad mot lokala provmål, inte prövad mot
+  demon**; det som återstår att visa där står i granskningens lista (bland annat att undantagscookien är värdbunden
+  på riktigt, att https-vägen genom proxyn håller och att sajtens egna anrop ryms i vitlistan). Provvägen bedöms som
+  "fungerar delvis": användbar inom de prövade gränserna, inte redo för nästa fall förrän verktygsgränsen är omprövad
+  i en session och ett skyddat scenario har körts och kontrollerats.
+- *Seedfallet (P2), blint på en arbetskopia av den levererade textens sidor med två planterade avvikelser:* båda
+  hittades med högsta vikt (FAQ:s "ingår alltid" mot tillvalet; intern planeringsprosa på Om oss), inget av de
+  tidigare rättade ställena togs upp igen, och läsaren lämnade sjutton ytterligare fynd på den levererade texten som
+  står som observationer och förslag. Ett av dem är troligen ett falskt positivt ur textutdraget (dekorativ bild med
+  tom alternativtext) och prövas mot sidans kod innan det räknas. Kalibrering, inte bevis på generalisering.
+- *Blind kod- och innehållsgranskning (D) av det bevarade paketet före rättningarna, utan kända fynd i prompten:* alla
+  fem kända fynd återfanns (kedjan, klockorna, kontaktfältets validering, namnen genom leden, upprepning och
+  plannerspråk), fyra av dem som blockerande eller viktiga, och tjugosju ytterligare fynd lämnades (trettiotvå totalt); 13
+  minuter, 48 turer, 47 filer. Till jämförelse gav tre renderingsläsningar av samma version noll blockerande fynd.
+  Observationssättet avgjorde, som jämförelsen antog. Kalibrering på ett känt fall.
+- *Bildbaserad bedömning (C):* EJ GJORD. Sessionen öppnade ingen bild eftersom prompten saknade anvisningen att börja
+  med fillistan; läsaren avstod korrekt från att beskriva bilder den inte sett. Felet är kedjedrivarens och står
+  bokfört som lärdom; omkörning kräver en session utöver taket.
+
+**Resursåtgång, redovisad separat:** del 3 åtta modellsessioner (fem verktygsgränsförsök, blind granskning, seedfall,
+bildbedömning); övriga paketanrop sex (två registreringsgranskningar, mottagarprovet, två rundor provvägsgranskning,
+en dokumentationsfråga om behörighetsregler). Modellfria körningar: fyra spärrprov av webbläsargränsen, vaktens
+regelprov, startarens driftsättningskontroll, kopieringen och kontrollen av kunskapsfilerna. Dokumentationsfrågan
+står som egen not i det privata underlaget. Inga nya kostnader, konton, anslutningar eller behörigheter.
+
+**Konkret observerad nytta och vad som inte visats:** seedfallet och den blinda granskningen hittade riktiga fynd med
+det nya kunskapsstödet som frågelista, i kalibreringsfall. Ingen justering är "prövad med observerad nytta" över fall;
+det kräver nästa separat accepterade fall (del 4). AI-provvägens värde för scenarier är inte visat.
+
+**Iakttagelser om Norrglänta ur metodproven (observationer och förslag; inga ändringar):** felsidan tar emot en egenskap
+med annat namn än ramverkets, så dess knapp för nytt försök gör troligen inget; höststädning är förkryssad från början
+under rubriken "Ditt önskade säsongsupplägg"; tjänsten heter "Vår- och höststädning" på sidorna men "Vår- eller
+höststädning" i formuläret; slutbeskedet använder byråord och en kortare företagsform än sidhuvudet; tilltalet byter
+från du till ni i ett steg; byte av tjänst i formuläret kastar Säsongsplanens val utan besked; Säsongsplanens remsa
+visar fem markeringar för "enstaka besök"; sidhuvudets telefonnummer syns först vid en bredare skärm än briefen anger;
+briefens punkt om cookiefri statistik är inte genomförd; svävningsstilar är inte skyddade mot pekskärm. Vart och ett
+är ett förslag till ägaren, och flera ska prövas mot koden och renderingen innan de räknas.
+
+**Hinder och beslut:** omprovet av verktygsgränsen med den rättade profilen, de två skyddade scenarierna och den
+omkörda bildbedömningen ryms inte i taket. Beslutet är ägarens: antingen högst fem ytterligare modellsessioner för
+del 3 (omprovet, två scenarier, ett tredje bara vid verktygsfel, och bildbedömningen), i den ordningen och med
+skyddad körning bara efter godkänt omprov, eller att del 3 avslutas med det redovisade resultatet. Inget annat i
+paketet väntar på det. Provkoden är committad lokalt i kundrepot i tre commits (första versionen, rättningarna efter
+granskningsrunda ett och rättningen efter runda två) och pushas när ägaren beslutat; en push utlöser ingen
+driftsättning.
+
+**Plan:** steg 9 är slutfört till taket; beslutet står i ägarens tur.
+
+**Ersätter:** ingen post.

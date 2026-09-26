@@ -31,7 +31,9 @@ webbförvaltningens kunnande, Improvements och aktuella originalkällor, som ett
 (DIGITALA-1-JAMFORELSE-20260926). Den är levererad (DIGITALA-1-JAMFORELSE-RESULTAT-20260926). Ägaren har därefter
 preciserat införandeförslaget och provplanen (DIGITALA-1-PRECISERING-20260926). Preciseringen är levererad
 (DIGITALA-1-PRECISERING-RESULTAT-20260926). Ägaren har därefter beställt genomförandet av det avgränsade
-P1–P5-paketet enligt dokumentets version 4 (DIGITALA-1-GENOMFORANDE-20260926); det pågår i steg 9.
+P1–P5-paketet enligt dokumentets version 4 (DIGITALA-1-GENOMFORANDE-20260926). Införanderesultatet är registrerat
+(DIGITALA-1-GENOMFORANDE-RESULTAT-20260926): del 1 och 2 klara, del 3 delvis, ett beslut om ytterligare sessioner i
+ägarens tur.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`. Kunskapsstödet för dagens flöde står i `evidence/digitala/local/kunskap/REGISTER.md`
@@ -86,15 +88,14 @@ inte krav.
     ägarens tio avsnitt och separat granskade på de ändrade bärande kopplingarna och mandatets gränser. Inget är
     installerat, anslutet, kört mot demon eller ändrat i kundrepot. Ägaren beslutade om paketet genom
     DIGITALA-1-GENOMFORANDE-20260926 (steg 9).
- 9. PÅGÅR från 2026-09-26: genomförandet av det avgränsade P1–P5-paketet (DIGITALA-1-GENOMFORANDE-20260926), i
-    ordningen: del 1, kunskapsstödet i `evidence/digitala/local/kunskap/` med register, tre härledda underlag och
-    lärdomsfil — på plats och kopplat 2026-09-26 (DIGITALA-1-KUNSKAPSSTOD-20260926), planraden ovan publicerad,
-    mottagarprovet med en färsk läsarsession kvar; del 2, ingen installation, bokförd; del 3, provskriptet i kundrepots `scripts/prov/` med privat
-    startare, spärrprov med falska hemligheter, separat granskning före första skyddade körning, sedan seedfallet, den
-    blinda granskningen, två scenarier mot den bevarade leveransens egna adress och en bildbedömning, högst åtta
-    modellsessioner; del 4 och 5 bara förberedda respektive villkorade. Norrgläntas sajt, skydd och drift orörda;
-    ingen driftsättning. Återupptagningspunkt: posten och det privata läget i
-    `evidence/digitala/local/genomforande-20260926/LAGE.md`. Klart-när står i posten.
+ 9. SLUTFÖRT TILL TAKET 2026-09-26: genomförandet av det avgränsade P1–P5-paketet (DIGITALA-1-GENOMFORANDE-20260926,
+    resultat i DIGITALA-1-GENOMFORANDE-RESULTAT-20260926). Del 1 klart med godkänt mottagarprov; del 2 ingen
+    installation; del 3 delvis: provvägen byggd och dess gränser visade mot lokala provmål (webbläsargränsen godkänd
+    i försök 3 och 4, verktygsgränsen i försök 5 med den gamla profilen och ännu inte omprövad med den rättade, alla
+    försök bevarade), seedfallet och den blinda granskningen gjorda med
+    riktiga fynd, bildbedömningen ej gjord, inga skyddade scenarier körda eftersom taket på åtta modellsessioner
+    nåddes. Norrgläntas sajt, skydd och drift orörda; ingen driftsättning. Fortsättningen beror på ägarens beslut i
+    ägarens tur; återupptagningspunkt: posten och `evidence/digitala/local/genomforande-20260926/LAGE.md`.
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -356,6 +357,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 ÄGARENS TUR
 - [beslut] Digitala 1: bedöm den levererade Norrglänta-demon och avgör om ett nästa fiktivt fall behövs — sedan 2026-09-26
 - [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
+- [beslut] Digitala 1: tillåt högst fem ytterligare modellsessioner för paketets del 3 (omprov av verktygsgränsen, två skyddade scenarier mot den bevarade leveransen, ett tredje bara vid verktygsfel, och den omkörda bildbedömningen) eller avsluta del 3 med det redovisade resultatet — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -381,6 +383,8 @@ andra version, godkänd men ersatt före publiceringen av den publicerade tredje
 anmärkningar om gränslistan, del 3:s ram och ordvalet om anroparen);
 `digitala/kunskapsstod-r1` (granskad första version av DIGITALA-1-KUNSKAPSSTOD-20260926, godkänd men ersatt före
 publiceringen av den publicerade andra med ett rättat ordval om lärdomsposterna);
+`digitala/genomforande-resultat-r1` (granskad första version av DIGITALA-1-GENOMFORANDE-RESULTAT-20260926, underkänd för
+ett felräknat antal commits och en driftsättningskontroll utan sparat bevis, ersatt av den publicerade andra);
 `aquarium/arkivdatum-underlag-r1` (första versionen av användningsprovets underlag, underkänd för en kvarlämnad mening och
 ersatt av den publicerade andra); `kontor/stang-granskningsbudget-r1` (första versionen av denna planpost, underkänd för en
 kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, ersatt före granskning av den publicerade
@@ -486,7 +490,8 @@ RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925, 
 DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-LEVERANS-20260926,
 DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926, DIGITALA-1-JAMFORELSE-20260926,
 DIGITALA-1-JAMFORELSE-RESULTAT-20260926, DIGITALA-1-PRECISERING-20260926, DIGITALA-1-PRECISERING-RESULTAT-20260926,
-DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926 och Runtime-planens ingång.
+DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926, DIGITALA-1-GENOMFORANDE-RESULTAT-20260926 och
+Runtime-planens ingång.
 
 ---
 
