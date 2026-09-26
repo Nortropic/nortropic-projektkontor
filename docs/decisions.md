@@ -2634,3 +2634,242 @@ Bedömningen av demon och frågan om ett nästa fiktivt fall står kvar (DIGITAL
 verksamhet har startats.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-JAMFORELSE-20260926 — ägaren beställer en samlad jämförelse, specialistkunskap och konkreta resurser för dagens Digitala
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/digitala/local/owner-words-jamforelse-resurser-20260926.md`. Ingen exakt klocktid tillskrivs ägaren. Posten
+följer beskedets avsnitt i ordning. Det är ett analys- och förslagsuppdrag: ingen rekommenderad installation, flödesändring
+eller produktändring genomförs automatiskt.
+
+**Syftet:** en samlad jämförelse mellan dagens Digitala-flöde och dess faktiska resultat, det användbara kunnandet i den
+gamla webbförvaltningen, relevanta idéer och resurser som tidigare undersökts i Improvements, och vad de relevanta
+originalkällorna erbjuder i dag. Målet är konkreta, motiverade förbättringar av dagens Digitala: research, formgivning,
+innehåll, interaktion, implementation, granskning och lärande mellan uppdrag.
+- Jämförelsen får inte stanna vid allmänna principer. Den ska identifiera vilka konkreta skills, referensbibliotek,
+  kunskapsunderlag och verktyg dagens flöde bör få faktisk tillgång till.
+- Den gamla webbförvaltningen återinförs inte. En bra fristående resurs avfärdas inte enbart för att den tidigare användes
+  eller undersöktes där.
+
+**1. Samordning och utgångspunkt:**
+- Dagens plan och beslut läses innan arbetet börjar.
+- Norrgläntas riktade kontroll behåller sitt mandat och sin prioritet. Dess acceptans, omfattning eller leverans ändras inte
+  genom jämförelsen. Läsande förberedelse får ske när den inte stör det pågående arbetet, och den slutliga kalibreringen mot
+  Norrgläntas fynd görs med den riktade kontrollens redovisade utfall. Är kontrollen redan avslutad tillgodoräknas
+  resultatet, och inget startas om. Vid registreringen är kontrollen avslutad (DIGITALA-1-RIKTAD-RESULTAT-20260926).
+- Dagens fungerande arbete bevaras: inga konkurrerande skrivare och inga ingrepp i sajten eller dess drift.
+- Aquarium och AP-11 återöppnas inte. Runtime-frågor hålls åtskilda från jämförelsen.
+
+**2. Den gjorda undersökningen återanvänds som underlag:**
+- Utgångspunkten är IDEBEDOMNING-20260926, ARBETSKEDJA-20260925, läsarrapporterna A–H med källpekare, gällande
+  Digitala-beslut med senare rättelser och dagens dokumenterade arbetsgång.
+- ARBETSKEDJA är ersatt som plan: dess källpekare och observationer används, inte dess instruktioner om att registrera,
+  installera eller köra webbgrundens kedja.
+- IDEBEDOMNING skrevs före bygget. Dess nio idébedömningar är inte i sig bevis för hur idéerna senare användes eller hur bra
+  de fungerade.
+- Giltiga tidigare läsningar återanvänds. Originalet läses när en slutsats beror på exakt ordalydelse, faktisk kodkoppling,
+  en motsägelse eller bristande underlag.
+- Ingen ny totalinventering av alla repon eller hela Improvements beställs.
+- Befintlig privat dokumenthemvist används, och en ändlig arbetsram anges. Arbetet fortsätter inom mandatet utan
+  rutinmässiga frågor om att få läsa nästa källa.
+
+**3. Underlag, källstatus och täckning:** fyra källgrupper används.
+- A. Tidigare webbkunnande: relevanta delar av `nortropic-webbforvaltning` (researchmetoder, inspirationsbibliotek, roller,
+  skills, VENDORED-poster, kontrakt, checklistor, granskningsflöden, bild- och textarbete och dokumenterade erfarenheter).
+- B. Tidigare undersökningar: relevanta Improvements-original, bilagor, researchresultat och senare rättelser genom den
+  befintliga Intake- och korpusvägen, inklusive kandidater som aldrig installerades i den gamla webbgrunden.
+- C. Dagens tillämpning: Norrgläntas research, brief, referensöversättning, acceptansprov, resultat, granskningsrundor,
+  överlämning, kontorsposter och den riktade kontrollens utfall.
+- D. Aktuella originalkällor: officiella repon och dokumentation för de resurser som är relevanta efter genomgången.
+
+Följande hålls isär: användarens uttryckliga beslut, accepterade krav, dokumenterad metod eller rekommendation, koppling som
+faktiskt finns i kod, rapporterad körning, direkt tillgängligt körbevis och kedjedrivarens egen bedömning.
+- Historiska assistentförslag är inte ägarbeslut. En inventering bekräftar inte sina egna påståenden. Antalet tidigare
+  läsare eller granskningar bevisar inte att varje viktig fråga är täckt.
+- Läst version och relevant omfång anges; fulltext, utdrag, sökträff och otillgänglig källa skiljs åt.
+- Claude Code har inte automatiskt tillgång till hela ChatGPT-projektet. Den lokala korpusen används, och dess slutpunkt
+  och relevanta luckor redovisas.
+- Saknade original begärs samlat och bara när de behövs för en betydelsefull slutsats. Oberoende delar fortsätter. En
+  källlucka fylls inte med antaganden.
+
+**4. Vad som faktiskt togs in:** idébedömningens nio punkter följs framåt till dagens artefakter och resultat. För varje
+relevant idé anges två skilda statusar.
+- Bedömnings- och beslutsstatus: uttryckligen beslutad, rekommenderad, avvisad med redovisat skäl, uppskjuten, eller ingen
+  bedömning återfunnen i det lästa underlaget.
+- Tillämpningsstatus: inte visad, beskriven men inte belagd, delvis tillämpad, belagd i Norrglänta med konkret artefakt
+  eller observation, eller dokumenterad för fortsatt användning men ännu inte prövad över flera fall.
+- "Aldrig bedömt" skrivs inte enbart för att en post inte hittas; det som sökts igenom och det som är okänt anges.
+- En använd idé är inte automatiskt visat nyttig, och ett genomfört steg i en demo är inte automatiskt en etablerad rutin.
+- Avvisat maskineri skiljs från avvisat kompetensinnehåll: att gamla agentdefinitioner inte ska användas betyder inte att
+  varje princip i deras instruktioner har bedömts och förkastats.
+- För en idé som inte användes klarläggs om den avvisades på sakliga grunder, inte behövdes, saknade åtkomst eller inte
+  fick någon tydlig mottagare.
+
+**5. Hur kvalitet skapas:** inte bara fler kontroller i slutet, utan hur dagens flöde kan producera hög kvalitet från
+början. Områdena är research, formgivning och interaktion, innehåll, specialkompetens och överlämning, och erfarenheter,
+med beskedets frågor under varje område.
+- Research: hur frågor och osäkerheter styr källvalet; skillnaden mellan verksamhetsunderlag, designreferenser och
+  professionell fackkunskap; hur fynd påverkar brief, innehåll och lösningsval; om researchbudgeten ger svar eller räknar
+  hämtningar; hur lokala alternativ skiljs från bredare designreferenser och sedda lösningar från lästa beskrivningar. Höga
+  företagsbetyg kan vara en urvalsheuristik men bevisar inte att designen orsakar konvertering eller förtroende.
+- Formgivning och interaktion: hur egna designidéer uppstår och prövas före större bygge; komposition, hierarki, typografi,
+  bildberättande, mobilutformning och meningsfull rörelse; hur ett signaturelement väljs; hur referensgrepp följer med till
+  renderat resultat utan kopiering eller urvattning; egen identitet mot variation för variationens skull. Fasta mål och
+  begränsningar skiljs från designhypoteser som kan prövas, och det bedöms om "briefen bestämmer allt" riskerar att låsa
+  detaljer innan de testats. Det ändrar inte Norrgläntas godkända brief; eventuella förändringar gäller ett föreslaget
+  framtida arbetssätt.
+- Innehåll: om varje sektion tillför något; om röst, mikrotexter och erbjudande hänger ihop; om samma innebörd består genom
+  tjänst, FAQ, interaktivt val, formulär och slutbesked; skillnaden mellan faktakontroll och redaktionell kvalitet; om
+  intern planeringsprosa hamnar i besökarens texter.
+- Specialkompetens och överlämning: vilka professionella perspektiv som används; när ett separat specialistpass tillför
+  värde; vilket kunskapsstöd som når respektive steg; om mottagaren kan öppna brief, referenser, skärmbilder och andra
+  underlag; hur arbetet fortsätter efter ett sessionsbyte utan att ägaren återberättar. En generell huvudsession antas inte
+  bära all specialistkompetens för att den kan skriva kod, och ett nytt agentnamn är inte i sig en ny kompetens.
+- Erfarenheter: vad från Norrglänta som bör påverka nästa fall; var lärdomen finns och hur nästa utförare möter den;
+  generell lärdom mot lokal preferens; hur det syns att en metodändring hjälpte. Inget ämne görs till en permanent agent,
+  tjänst eller ny dokumentationsplattform.
+
+**6. De konkreta resurserna återfinns:** inventeringen begränsas inte till det som råkade vara installerat i den gamla
+webbgrunden. Tidigare research återfinns om skills och specialistinstruktioner, branschsidor, referenslistor och
+designbibliotek, verktyg för observation, implementation och granskning, GitHub-resurser med tidigare identifierade delar
+eller egna sammanställningar, och kandidater som diskuterades men aldrig infördes.
+- Tidigare källpekare används först. Ingen allmän jakt på trendande repon.
+- Sökingångar att kontrollera, inte en installationslista: frontend-design och dess originalkälla; Emil Kowalskis resurser
+  inklusive tidigare identifierade delar för prototyper, mobilinteraktion och animation; Taste, Impeccable, UI UX Pro Max,
+  soft-skill och content-humanizer med rätt ursprung per resurs; vercel-labs/agent-skills; tidigare next-skills och dess
+  eventuellt flyttade eller ersatta innehåll; addyosmani/web-quality-skills; andra redan identifierade kandidater som fyller
+  ett konkret behov; det tidigare inspirationsbiblioteket; SiteInspire, Land-book, One Page Love, Httpster, Siiimple,
+  Mobbin, GoodUI och Baymard; tidigare branschlistor, byråportfolior och komponentkällor.
+- Listan är varken obligatorisk installation eller uttömmande taxonomi. Prioriteringen följer dagens behov och vad den
+  tidigare researchen visar. Ett galleri, en metodreferens, en skill och ett körbart verktyg är olika slags resurser.
+
+**7. Originalresurs, version och användningsform:** för varje relevant kandidat anges exakt källa och varför den var
+intressant, vad som finns i dag, vilket behov i dagens Digitala den möter, hur behovet hanteras nu, vilken del som behövs
+och vad som inte ska följa med, och rekommenderad användningsform (referenslista eller läsunderlag, ett litet avgränsat
+kunskapsunderlag, en fristående skill från originalkällan, ett konkret verktyg eller komponentbibliotek, redan täckt, eller
+avstå eller spara).
+- En branschsidelista behöver inte installeras, en skill behöver inte bli en ny agent, och ett användbart råd innebär inte
+  att hela repot behövs.
+- Aktuellt original kontrolleras: hemvist och identitet, version och förändringar sedan tidigare läsning, licens och
+  villkor, beroenden, verktygsåtkomst och sidoeffekter, språkstöd, överlapp och motstridiga instruktioner, och påverkan på
+  kostnad, underhåll och kontextmängd.
+- Originalversion skiljs från Nortropics äldre lokala fork. Projekt med liknande namn blandas inte ihop. Gamla lokala
+  anpassningar kopieras inte av bekvämlighet, och senaste uppström antas inte vara bäst.
+- En resurs kan ha blivit överflödig därför att ramverket eller ett befintligt verktyg ger samma kunskap; då rekommenderas
+  att det befintliga används rätt, inte en dubblett.
+- Påståenden i en skills README eller instruktioner är leverantörens beskrivning, inte bevisad nytta.
+- Källunderlag inspekteras genom tillgängliga läsvägar. Ingen kandidatkod, inget installationsskript och ingen gammal
+  workflow körs som del av inventeringen.
+
+**8. Hur resursen skulle nå arbetet:** för varje rekommenderad resurs anges befintligt steg, roll eller avgränsat
+arbetspass, vilket underlag den behöver, när och hur den laddas eller konsulteras, vilket konkret resultat den ska förbättra
+och vilken observation som talar för eller emot nyttan.
+- Alla resurser laddas inte i varje session, och överlappande paket rekommenderas inte utan motiverad kombination.
+- Tillstånden hålls isär: identifierad, bedömd, hämtad, installerad eller tillgänglig, laddad, använd, visat nyttig inom
+  prövad räckvidd. En fil på disk är inte en använd kompetens, och en laddad skill bevisar inte ett bättre resultat.
+- Jämförelsen görs först med dagens faktiska arbetssätt: vad resursen skulle ersätta, förbättra eller förenkla, och om ett
+  bättre avgränsat uppdrag och rätt underlag räcker utan ny installation.
+- Resultatet får rekommendera konkreta installationer, och det får rekommendera noll installationer i ett område med en
+  faktisk motivering, inte ett generellt förbud mot externa resurser.
+
+**9. Granskning och kvalitetskontroll:** för varje relevant kontroll anges vad den bedömer, när i flödet, vilket underlag
+och vilka verktyg den kräver, vem eller vad som konsumerar utfallet, och vad som händer vid fel, saknat svar eller
+otillräckligt underlag. Dokumenterad avsikt jämförs med faktisk koppling; orden "grind" eller "oberoende" räcker inte.
+- Särskilt prövas kedjekonsekvens i erbjudandet; löfte, önskemål och faktisk överenskommelse; upprepning och intern
+  plannersvenska i extern text; klient- och servertillstånd, tidsantaganden och felvägar; om proven belägger den påstådda
+  egenskapen; visuell granskning av rendering mot kodläsning; positiv upplevelsekvalitet; och skillnaden mellan
+  modellbedömning och mänskligt användarprov.
+- Två frågor hålls isär: A, om leveransen följer den accepterade briefen, och B, om briefens lösning är tillräckligt bra
+  för användaren. Ett förbättringsförslag i B blir inte automatiskt ett leveransfel i A och ändrar inte acceptansen i
+  efterhand.
+
+**10. Kalibrering utan överdrivna slutsatser:** ChatGPT:s fynd på version `2a84fd3` används tillsammans med den riktade
+kontrollens slutliga klassificering. Avvisade fynd räknas inte som missade fel. Bekräftade fel, förbättringsförslag och
+accepterade begränsningar hålls isär.
+- I båda riktningarna, gammalt mot nytt och nytt mot gammalt, skiljs: regeln nämner feltypen; instruktion och tillgängligt
+  underlag ger konkret möjlighet att upptäcka den; ett befintligt körbevis visar faktisk upptäckt; utfallet går inte att
+  avgöra.
+- Det påstås inte att en metod hade fångat felet enbart för att en checklistpunkt passar. De gamla verktygen körs inte för
+  att framställa sådant bevis.
+- Likvärdiga förutsättningar jämförs: en senare läsning med kända fynd jämförs inte med en tidigare blind granskning som om
+  informationsläget vore detsamma.
+- För varje viktig rekommendation föreslås ett litet prövningsfall som inte bara återger det kända fyndet. Inte bara
+  felupptäckt prövas; en metod kan vara värdefull genom bättre begriplighet, starkare formgivning, mindre omarbetning eller
+  lägre samordningsbörda.
+- Detta är provdesign. Inga nya produktändringar eller utförarkörningar för att mäta kandidaternas nytta ingår.
+
+**11. Granskarseparation och modellval:** det undersöks om en annan modellfamilj kan tillföra värde inom befintliga
+tillåtna tjänster och kostnadsramar. Inget modellbyte, ingen ny anslutning och inget betalt experiment görs i uppdraget.
+- Mer än modellnamnet bedöms: gemensamma antaganden och källor, faktisk åtkomst till sida, kod och bevis, olika
+  professionella perspektiv, förmåga att hitta riktiga fel, falska fynd, extra tid och förbrukning.
+- En annan modellfamilj är ett möjligt experiment, inte ett bevis på oberoende eller automatiskt bättre kvalitet.
+- Det undersöks också om olika observationssätt ger större nytta än fler likadana modellutlåtanden: kodläsning, faktisk
+  interaktion, innehållsjämförelse, visuell jämförelse och mänsklig användarobservation.
+
+**12. Ett litet sammanhållet paket:** de tre till fem mest värdefulla justeringarna av dagens flöde, med resurserna kopplade
+till behoven och inte tvärtom. Varje förslag anger problemet och dess belägg, vad dagens flöde gör, vilken princip eller
+resurs som inspirerar, den konkreta ändringen, vad den ersätter eller förenklar, förväntad nytta och osäkerhet, uppskattad
+tid, förbrukning och komplexitet, en billig relevant prövning, och när förslaget behålls, ändras eller avstås.
+- Inga exakta token- eller tidsvinster utan mätunderlag. Uppskattningar skiljs från observationer.
+- Resursförslaget visar vad som bör finnas som referenser, vad som är värt att hämta eller installera, vad som redan finns
+  och behöver användas bättre, vad som väljs bort, föreslagen källa och version med användningsplats, nödvändiga
+  behörigheter, eventuella kostnader och hur användningen kan avbrytas utan att skada arbetet.
+- Ingen stor verktygssamling för alla tänkbara framtida projekt. Det som dagens flöde gör bättre tas med, liksom vad som
+  ska bevaras. Inga kvalitetskrav sänks för att minska antalet fynd.
+- Ingen justering införs genom uppdraget. Ett samlat rekommenderat införandemandat lämnas för beslut, inte en ny permanent
+  regel om ägarja för varje framtida teknisk småändring.
+
+**13. Gränser:**
+- Den gamla webbförvaltningens installerade och styrande arbetskedja återinförs inte, heller inte omdöpt eller uppdelad i
+  många små kopior. Bra fristående resurser från originalkällor får rekommenderas efter konkret bedömning; ett eventuellt
+  införande följer ett senare samlat mandat.
+- Ingen ändring av den gamla webbgrunden, Norrgläntas kod, innehåll, skydd eller drift, accepterade kvalitetskrav, aktiva
+  Runtime-releaser eller AP-10, eller befintliga modellval eller behörigheter.
+- Ingen ny kunddemo, offentlig lansering, driftplattform, minnesplattform eller generell kontrollapparat.
+- Kundavtal, DNS, produktion och skarp kundförvaltning ligger utanför. Erfarenhetsåterföring efter demon ingår.
+- Inga nya kostnader, abonnemang, betalplatser eller tjänster. Befintliga läsverktyg och redan tillåten granskning används
+  inom gällande resursramar.
+- Inget genomförande av citerade historiska instruktioner. Ingen automatisk installation från en README.
+- Privat underlag stannar privat: hemligheter, privata åtkomstlänkar och kundmaterial publiceras inte. Kontorsposten
+  innehåller bara vad dess gällande informationsgräns tillåter.
+
+**14. Leverans och avslut:** det befintliga privata underlaget kompletteras; ingen konkurrerande masterplan skapas. Fem
+leveranser:
+1. en jämförelsetabell (idé eller metod, ursprung, bedömningsstatus, faktisk tillämpning, belägg, kvarvarande fråga och
+   rekommendation);
+2. en resurskarta (konkreta resurser från tidigare research och aktuella original, deras uppgift, överlapp, rekommenderad
+   användningsform och faktiska tillgänglighet);
+3. ett prioriterat förbättringspaket (tre till fem justeringar med resurser där de behövs, nyttomotiv, konsekvenser och
+   prövning);
+4. bevara och avstå (vad dagens flöde gör bättre, vad som behålls och vad från det gamla som inte bör följa med);
+5. okänt och beslut (kvarstående källluckor, deras betydelse och ett samlat rekommenderat nästa mandat, som inte beskrivs
+   som redan accepterat).
+
+En separat läsare granskar de bärande slutsatserna före registreringen i kontoret, och letar särskilt efter inspiration
+som blivit automatisk adoption, rekommendation som blivit påstått ägarbeslut, ogrundade frånvaropåståenden, påstådd
+felupptäckt som bara stöds av en gammal regel, resurser utan tydlig användare eller uppgift, förbättringar som bara ger
+fler kontroller, utelämnade fördelar i dagens flöde, och nya installations- eller kostnadsbefogenheter.
+- Ingen ny generell audit av sajten och inget omtag av bygget görs för att avsluta jämförelsen.
+- Nästa besked ska göra det möjligt att besluta om ett litet, konkret förbättringspaket för dagens Digitala.
+
+**Slutmålet:** ta vara på den research och det kunnande som redan samlats och komplettera med relevanta aktuella original.
+Resultatet ska märkas i bättre digitala upplevelser: bättre idéer, tydligare innehåll, starkare formgivning, fungerande
+användarresor och mer tillförlitligt arbete. Fler skills, fler agentanrop och mer dokumentation är inte i sig framgång.
+Rätt specialistkunskap och verktyg ska nå rätt steg, användas i verkligt arbete och visa nytta, utan att den gamla
+webbförvaltningen blir det nya systemet.
+
+**Kedjedrivarens deklarerade arbetsram** (beskedets avsnitt 2 kräver en ändlig ram; ramen är kedjedrivarens, inte ägarens):
+- Källgrupp A läses i de delar läsarrapporterna A–H pekar ut, med originalet vid behov: VENDORED-posterna, de egna
+  skillsens referenser, rolldefinitionernas kunskapsdelar, inspirationskällorna, kunskapsbanan, kompetensregistret och
+  överlämningstexten.
+- Källgrupp B är den lokala Improvements-korpusen (30 källor, inventeringsrevision 38) genom riktade sökningar på de
+  namngivna resurserna och läsarrapporternas källpekare, inte hela korpusen.
+- Källgrupp C är Norrgläntas privata kundmapp och kontorsposterna.
+- Källgrupp D läses genom GitHubs läs-API och offentliga sidor: ett läsande svep per resurs (identitet, innehåll, licens,
+  senaste ändring). Inga kloner, inga installationer, ingen körning.
+- En separat läsning av de bärande slutsatserna görs genom Runtimes skrivskyddade granskarprofil, med högst en omgång till
+  vid underkännande.
+- Leveransen är ett privat dokument, `evidence/digitala/local/JAMFORELSE-DIGITALA-20260926.md`, med de fem delarna, och en
+  kontorspost med resultatet. Ramen är slut när ägaren fått beskedet.
+
+**Ersätter:** ingen post.
