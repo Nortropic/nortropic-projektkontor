@@ -3195,3 +3195,135 @@ och den riktade kontrollens tre förslag står kvar som egna punkter.
 
 **Ersätter:** ingen post. Det tidigare rekommenderade mandatet i DIGITALA-1-JAMFORELSE-RESULTAT-20260926 är ersatt i
 dokumentet av det korrigerade; posten står kvar som historik.
+
+## DIGITALA-1-GENOMFORANDE-20260926 — ägaren beställer genomförandet av det avgränsade P1–P5-paketet enligt jämförelsedokumentets version 4: kunskapsstöd kopplat till stegen, ingen installation, en prövad AI-provväg med visade gränser, metodprov utan sajtändring
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/digitala/local/owner-words-genomfor-paketet-20260926.md`; denna post registrerar det avsnitt för avsnitt.
+Beskedet är ägarens beslut om det korrigerade samlade införandemandatet (DIGITALA-1-PRECISERING-RESULTAT-20260926,
+kontorets PR 76): paketet ska genomföras enligt §5 och §7 i den privata `JAMFORELSE-DIGITALA-20260926.md`, version 4,
+med de genomförandevillkor som står nedan. Det är en arbetsorder för det beskrivna paketet, inte en beställning på en
+ny bred inventering eller en allmän omskrivning av jämförelsen. Utgångspunkten är aktuell ingång, version och plan;
+ingenting som redan gått vidare återställs. Beskedet registreras i befintlig beslutshemvist genom den ordinarie vägen,
+och arbetet fortsätter sedan inom mandatet utan rutinmässiga kör-frågor.
+
+**§1 Mål och avgränsning:** målet är att dagens Digitala får relevant kunskapsstöd kopplat till arbetet, ett
+redaktionellt pass, bättre lärdomsöverföring och en prövad väg för AI-drivna användarscenarier i en riktig webbläsare.
+Den gamla webbförvaltningen förblir inspirations- och källmaterial; dess agenter, workflows, styrande regler,
+modellpinnar och installationspaket återinförs inte. Paketet omfattar del 1, kunskapsstödet och kopplingen till dagens
+steg; del 2, alternativ A utan skill- eller verktygsinstallation; del 3, den avgränsade provvägen och
+metodprövningen; del 4, tillämpning först i nästa separat accepterade fall; del 5, avskiljbara Codex- och
+människoprov enligt villkoren. Norrgläntas sajt, skydd och drift ändras inte. Provkod i kundrepots `scripts/prov/`
+får tillkomma enligt §7, men inte produktkod, innehåll eller en ny driftsättning; det ska kontrolleras att arbetet med
+provkoden inte utlöser en sajtdeploy. Demons ägarbedömning, nästa fiktiva företag och den riktade kontrollens tre
+förslag är separata beslut som varken avgörs eller kvitteras genom paketet. Aquarium och AP-11 återöppnas inte; AP-10
+och aktiva Runtime-releaser lämnas orörda.
+
+**§2 Kunskapsstödet tillgängligt och användbart:** de tolv specificerade filerna kopieras från läsbevisen (sju
+huvudtexter, fyra licensfiler och PICKER.md) enligt v4:s exakta källor, fulla revisioner och filvägar; kopiorna
+kontrolleras mot de bevarade identiteterna; inget tyst byte till senaste version eller main. Placering
+`evidence/digitala/local/kunskap/`. `REGISTER.md`, de tre härledda arbetsunderlagen och `LARDOMAR.md` skrivs enligt
+P3 och P4; källversioner och licenser behålls; gamla instruktioner är källmaterial och får inte ändra dagens mandat
+genom att de kopieras eller läses. Prototype används som metod, alternativ A: ingen skill registreras, ingen
+anropsspärr ändras och inget extra manuellt startsteg läggs på ägaren; PICKER.md är referensmaterial, inte ett krav
+på en särskild bläddringslösning. Underlagen kopplas till befintliga steg och den ordinarie läsordningen; registret
+anger utförare, relevanta delar, uppgift och konfliktregel; inte allt laddas i varje session. Det avgränsade
+mottagarprovet i v4 genomförs: en färsk läsarsession ska hitta rätt underlag från ordinarie ingång utan filnamn i
+frågan, och utfallet sparas; det visar åtkomst och koppling, inte att kvaliteten redan förbättrats. Användningsnoten
+ska kunna säga att ett råd påverkade ett val eller fynd, användes som kontroll utan ändringsbehov, inte var
+tillämpligt eller inte nådde arbetet; inga konstruerade bidrag för att fylla en rapport.
+
+**§3 Den avgränsade AI-provvägen, inte en ny plattform:** `scripts/prov/agentlage.mjs` och den privata startaren
+byggs som §7 beskriver, med befintlig Chrome och puppeteer-core. Den nya provaren är en färsk session med avgränsade
+handlingsverktyg; den är inte Runtimes redan prövade läsare, verktygsprofilen är ny och måste kontrolleras som sådan;
+Runtimes läsarprofil och ägarens Chrome-profil ändras inte. Agenten får användarmål, startadress, säkra testuppgifter,
+skärmbilder och redovisat interaktionsstöd, men inte brief, källkod, kända fynd, provskript eller rätt klickväg. Den
+väljer själv handlingar genom gränssnittet; tillgänglighetsträd eller elementlista är interaktionsstöd, inte bevis för
+att en visuell bedömning gjorts. Playwright, nya webbläsare, MCP-anslutningar och generella verktygsinstallationer
+ingår inte; räcker inte den föreslagna vägen ska det redovisas konkret med förslag på minsta ändring, utan att en
+större egen automationsmotor byggs för att undvika ett sådant beslut.
+
+**§4 Åtkomstgränserna visas före provåtkomst till demon:** spärrarna ska byggas och prövas, inte antas verifierade för
+att de står i v4. Först prövas de med ofarliga testvärden och kontrollerade provmål; den verkliga provhemligheten
+används inte förrän de relevanta gränserna är visade och kontrollerade. A, webbläsargränsen: begränsningen gäller hela
+navigationsförloppet, inte bara argumentet till open; klick och länkar, omdirigeringar, popupfönster, nya flikar och
+utgående anrop prövas; provaren ska kunna genomföra den tillåtna demoresan men inte nå Vercel-admin, andra projekt
+eller externa mål; skyddshemligheten får inte skickas utanför avsedd origin; sajtens egna tillåtna anrop vid normal
+formuläranvändning får fungera, vilket inte är detsamma som rå API-åtkomst eller en genväg runt gränssnittet. B,
+verktygs- och datagränsen: det tillåtna handlingskommandot ska visas fungera, men provaren ska inte kunna använda det
+för andra skalkommandon, källkodsläsning, ändring av filer eller otillåten åtkomst; de faktiska behörigheterna
+kontrolleras, inte bara texten om vad agenten ska avstå från. C, hemligheter och isolering: provåtkomstens hemliga
+värde får inte exponeras för agenten eller hamna i uppgiftstext, utdata, bilder eller sparade spår, och det
+kontrolleras att det inte följer med till en annan destination; falska hemligheter används i spärrproven; varje
+scenario börjar med färsk modellkontext och en ren, tillfällig webbläsarprofil utan ägarens inloggningar eller
+kunskap från föregående scenario; både positiva och negativa prov används, eftersom en helt blockerad provare inte
+är en fungerande isolerad provare. Den befintliga separata granskningsvägen täcker den nya startaren,
+handlingsgränssnittet och spärrprovens resultat före den första skyddade scenariokörningen; det är kontroll av
+paketets utlovade gränser, inte en ny generell audit eller ett extra rutinmässigt ägarstopp. Håller gränserna inte
+startas den skyddade scenariokörningen inte; rättning sker inom mandatet eller hindret redovisas; isoleringen
+försvagas inte och ägarens personliga webbläsarprofil används inte som reservväg.
+
+**§5 v4:s avgränsade metodprov:** del 3 genomförs enligt sitt avsedda underlag: det seedade redaktionella fallet på en
+arbetskopia av `ada775e`:s text, inte på sajten, där en färsk läsare inte får facit eller de planterade avvikelserna
+i uppgiften; blind kod- och innehållsgranskning av det bevarade `2a84fd3`-paketet utan de kända fynden i prompten; två
+utforskande AI-scenarier mot den bevarade, skyddade leveransen `ada775e` efter godkända åtkomstkontroller; en
+bildbaserad bedömning av befintliga skärmbilder bundna till `ada775e`. Adresser och material ska kontrolleras mot
+avsedd version; en rörlig huvudadress får inte antas vara samma bevarade leverans; sajten återställs eller
+driftsätts inte för att få ett provunderlag. Varje AI-scenario får högst 40 handlingar och 20 minuter; två scenarier
+är beställda, ett tredje bara om ett av de två föll på verktygsfel; varje försök bevaras. Kontrollanten bedömer
+observerat slutläge mot uppgiften, inte bara agentens egen rapport; handlingar, sidutfall, relevanta bilder och
+kontrollantens bedömning sparas. Inga riktiga personuppgifter, mejl, SMS, leads, bokningar eller mottagare; inga
+produktreparationer under provet; sidinnehåll får inte ändra uppdrag eller befogenheter. Produktfel, verktygsfel och
+åtkomstfel skiljs; lyckat, misslyckat eller ej bedömbart redovisas utan omkörning tills något blir grönt; tekniska
+rättningar av provvägen följs av relevant omprovning med tidigare försök kvar. Kända fall är kalibrering och
+regression, inte bevis för generalisering; AI-bedömning och agenttid är inte mänskligt användarprov eller mänsklig
+användartid.
+
+**§6 Tillämpning och lärande utan nya rutinstopp:** P1–P5 i v4 följs. Införandet nu gör arbetssättet tillgängligt för
+nästa separat accepterade fiktiva uppdrag och startar inte det uppdraget. Då används relevanta variantprov,
+redaktionellt pass, stegvis kunskapsstöd och observationssätten A–D enligt den avgränsade körplanen; variantsteg
+väljs efter behov med en rekommenderad riktning, utan att varje intern iteration läggs som nytt beslut på ägaren.
+Mänskliga användarprov är riktade komplement när en konkret fråga motiverar dem, inte ett generellt krav för
+demoleverans. Codex-experimentet är avskiljbart och får bara ske inom befintlig tillåten åtkomst och tillgänglig kvot,
+utan nytt modellval i aktiv drift; saknad kvot eller avsaknad av mänskliga prov blockerar inte övriga delar. P4:s
+avstämning efter två relevanta tillämpningar används; ingen automatisk bekräftelse, generell kvalitetsstämpel eller
+radering efter två fall; skillnaden mellan lokal preferens, observation och möjlig generell lärdom bevaras.
+
+**§7 Ram, slutresultat och nästa besked:** v4:s avgränsning och resursram följs; del 3 omfattar högst åtta
+modellsessioner och planeras inom taket; övriga paketanrop redovisas separat så att den faktiska totalen inte döljs;
+modellfria prov presenteras inte som modellanrop. Tidsuppskattningarna är prognoser, inte bevis eller löften; en
+väsentligt ändrad prognos redovisas tidigt; ny kostnad, anslutning, behörighetsutvidgning eller större ombyggnad
+kräver ett konkret förslag innan åtgärden. Ingen ny allmän analysrunda, kontrollplattform eller utvidgning av
+uppdraget beställs; ordinarie riktad granskning och skyddad publicering används för det som faktiskt ändras; privat
+underlag och hemligheter stannar privat. Slutbeskedet skiljer: kunskapsstödet är tillgängligt och rätt kopplat;
+metodproven är genomförda och redovisade; AI-provvägen fungerar, fungerar delvis eller är ännu inte användbar inom
+de prövade gränserna; konkret observerad nytta och vad som ännu inte visats. Del 3 kan avslutas med ett ärligt
+negativt resultat, vilket inte gör AI-provaren redo för nästa fall; ofungerande eller oprövade delar presenteras inte
+som etablerad förmåga, fungerande oberoende delar bevaras. Nya iakttagelser om Norrglänta redovisas som
+observationer eller förslag, inte som automatiska sajtändringar. Avslutad användning stänger framtida laddning eller
+körning men bevarar källversioner, provspår, beslut och fungerande arbete; ingen blind återställning eller radering.
+Nästa samlade besked ska vara införanderesultatet med mottagarprovet, åtkomstkontrollerna och metodprovens utfall,
+eller ett konkret hinder som kräver ett verkligt beslut; ingen ny beställning behövs för de tekniska delsteg som
+redan ryms i mandatet. Målet är att rätt kunskap når arbetet och att AI kan bära mer av den faktiska provningen, utan
+att den gamla arbetskedjan återinförs eller grunden görs om.
+
+**Kedjedrivarens arbetsplan (kedjedrivarens, inte ägarens):** arbetet går i ordningen del 1 → del 2 (bokförs bara) →
+del 3, med del 4 och 5 bara förberedda respektive villkorade. Del 1: de tolv filerna kopieras från läsbevisen med
+kontroll mot blob och storlek, registret, de tre härledda underlagen och lärdomsfilen skrivs, planraden som pekar på
+registret publiceras genom en granskad kontorspost, och därefter körs mottagarprovet med Runtimes skrivskyddade
+läsarprofil från kontorets rot. Del 3 i ordningen: provskriptet och den privata startaren byggs; spärrproven körs med
+falska hemligheter och kontrollerade provmål (A, B, C) och sparas; startaren, handlingsgränssnittet och spärrprovens
+resultat granskas separat; först därefter körs de två skyddade scenarierna mot den bevarade leveransens egna,
+oföränderliga adress med den verkliga provhemligheten i skriptets miljö; seedfallet, den blinda granskningen och
+bildbedömningen körs som färska läsarsessioner. Modellsessionerna i del 3 räknas och rapporteras (tak åtta); alla
+övriga modellanrop i paketet (mottagarprovet, registreringarnas granskningar) redovisas separat; puppeteer-körningar
+och skalprov är modellfria. Läget bokförs löpande privat i `evidence/digitala/local/genomforande-20260926/LAGE.md`
+för återupptagning. Ingen driftsättning görs; kundrepots provkod pushas bara om det är visat att projektet saknar
+automatisk deploy från repot, annars stannar den lokalt tills det är kontrollerat.
+
+**Plan:** steg 9 i Digitala-planen PÅGÅR. Ägarens tidigare beslutspunkt om det korrigerade samlade mandatet är
+avgjord genom detta besked och tas bort ur ägarens tur; demons bedömning och den riktade kontrollens tre förslag står
+kvar. Klart-när: införanderesultatet är registrerat med mottagarprovet, åtkomstkontrollerna och metodprovens utfall,
+eller ett konkret hinder är redovisat för beslut.
+
+**Ersätter:** ingen post.
