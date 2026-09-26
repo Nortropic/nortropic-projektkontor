@@ -329,6 +329,8 @@ metodarmarna; effektivisering och minskad ägarbörda är inte belagda.
 befintliga bevis/läsning räcker och tillräckligt nästa steg. Tidigare beslut raderas
 inte. I07b:s bedömning gäller endast denna pilot; A3/A6 och tidigare fynd består.
 **Avslut:** integration och faktiskt slutkvitto enligt planen; ingen nästa fas startas.
+**Delvis ersatt 2026-09-26:** för de tre stående rytmerna för förvaltningarna gäller inte "ingen ny rutin"
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926); arbetsreceptet förblir frivilligt, och inget annat i posten ändras.
 
 ## AP08-ACCEPT — privat leverans- och beslutsbild
 
@@ -4471,3 +4473,91 @@ omdöme (DIGITALA-1-ETAPP2-RESULTAT-20260926) och den riktade kontrollens tre f�
 därmed klart; ingen justering införs utan nytt beslut.
 
 **Ersätter:** ingen post.
+
+## FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926 — ägaren väljer rekommendationerna: de tre rytmerna införs helt och Runtimes rytm bor i kontoret; beslut 3 står öppet; införandet är gjort
+
+**Status:** registrerat 2026-09-26 av den session som lämnade förslaget (Claude Code). Ägarens svar på
+FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, ordagrant: "vi kör enligt dina rekommendationer. Imorgon kommer AP-10 fungera
+då vi åter har kvot". Svaret är sparat privat i
+`evidence/forvaltningsutveckling/local/lopande-20260926/owner-words-kor-enligt-rekommendationer-20260926.md`; ingen exakt
+klocktid tillskrivs ägaren. Posten registrerar beslutet och det införande som beslutet startade.
+
+**Beslutet och kedjedrivarens tolkning.** Förslaget (privat `FORVALTNINGSRYTM-20260926.md`, version 2) rekommenderade
+rytmerna så som de beskrivs, för tre förvaltningar, och uttryckligen form A för Runtime; för beslut 3 gav det ingen
+rekommendation.
+- *Beslut 1:* de tre rytmerna införs helt för Digitala, Runtime och kontoret, med tak, förfallsregel och startdatum enligt
+  förslaget: första månadsomgången i oktober 2026, första genomgången i januari 2027.
+- *Beslut 2:* Runtime enligt A. Lärdomsfil, förslagsrad, månadsomgång och genomgång bor i kontoret; ingen ändring i
+  Runtime, AP-10, modellvalet eller Runtimes `AGENTS.md`.
+- *Beslut 3* (förfallsregeln även för ägarens punkter utanför rytmerna) tolkas inte som avgjort, eftersom ingen
+  rekommendation fanns att följa. Utan beslut gäller regeln bara rytmernas egna punkter. Kedjedrivaren rekommenderar nu ja;
+  punkten står i ägarens tur med förfallstid.
+
+**Ägarens upplysning om AP-10 och kontrollen av den.** Ägaren skriver att AP-10 fungerar i morgon när kvoten är
+tillbaka. Kontroll, bara läsning av rundposterna: i alla fem otillräckliga omgångarna 2026-09-22–26 svarade leverantören
+att användningsgränsen var nådd och att ett nytt försök går "Sep 27th, 2026 7:16 PM". Beskedet anger ingen tidszon. Läst
+i datorns tidszon (CEST) är tiden 2026-09-27 17:16Z, och omgången 2026-09-27 07:00Z ligger före den; så är det också i
+varje tidszon upp till ungefär UTC+12. Under den läsningen blir omgången 2026-09-27 sannolikt otillräcklig igen, och den
+första omgång som kan få kvot är 2026-09-28 07:00Z. Ingenting i AP-10 ändras; månadsomgången för Runtime läser utfallet,
+och observationen står som lärdom R5.
+
+**Införandet, gjort med denna post:**
+- *Arbetssättet* står privat i `evidence/forvaltningsutveckling/local/RYTMER.md`: per fall, per månad, per kvartal,
+  förfallsregeln, filer och läsbevis. Ingången dit är planens rytmblock.
+- *Lärdomsfilerna* i Digitalas P4-form: `evidence/forvaltningsutveckling/local/runtime/LARDOMAR.md` med elva poster och
+  `evidence/forvaltningsutveckling/local/kontoret/LARDOMAR.md` med tio poster. De är fyllda ur Runtimes och kontorets poster
+  och planer, AP-10:s rundposter och tjugo anteckningar i kedjedrivarens användarminne, omskrivna utförarneutralt så att
+  också Codex och granskaren kan läsa dem; övriga anteckningar är redovisade som ej överförda. Digitalas lärdomsfil och
+  register är orörda; Digitala tillämpar rytmen i sitt nästa fall, genom den som driver Digitala.
+- *Planen:* förslagsparagrafen ersätts av en paragraf om införandet och ett rytmblock med nästa datum och förslagsraderna
+  för nästa fall. Digitala: inget satt, sätts av den som driver nästa Digitala-fall. Runtime: publicerarens prov körs
+  genom fångstomslaget vid nästa Runtime-publicering (lärdom R4). Kontoret: modellfri sökning efter det ersatta lägets
+  formuleringar före varje postgranskning (lärdom K1). Ägarens rad om förslaget ersätts av en rad om beslut 3, och postens
+  namn förs in i återupptagningspunkten.
+- *AP07-METOD* får en pekare: dess "ingen ny rutin" ersätts för just dessa tre rytmer. Arbetsreceptet förblir frivilligt,
+  och inget annat i posten ändras.
+- *Klart-när:* den fasta meningen ("Klart-när innefattar också lärdomsposten (eller 'inga nya lärdomar' med skäl),
+  användningsnoterna för kopplade underlag och för planens förslag, och förslagsraden för nästa fall.") skrivs in i varje
+  uppdrag kedjedrivaren registrerar från och med nu. För detta införande: lärdomarna är K7 och K8 (kontoret) och R5
+  (Runtime); inget förslag var satt att pröva, eftersom rytmen inte fanns, men kontorets nya förslagsrad (K1) prövades
+  ändå före denna posts granskning: den modellfria sökningen efter förslagslägets formuleringar i planen gav inga
+  kvarlämnade träffar (användes som kontroll, ingen ändring behövdes); förslagsraderna är satta.
+- *Mottagarprov:* godkänt. En färsk skrivskyddad läsarsession (Runtimes läsarprofil, claude-opus-5) i en kopia av
+  kontorets rot vid main `0b1903d` med kandidatens planändringar och de privata rytmfilerna på sina platser fick tre
+  frågor utan filnamn: vilket förslag nästa Runtime-fall ska pröva och var lärdomen står, när nästa månadsomgång är och
+  vad den läser för Runtime med vilket tak, och vad som händer med en obesvarad beslutspunkt. Den följde ingången
+  (CLAUDE.md, DEFINITION.md, AGENTS.md, uppdraget, planen, arbetssättet, Runtimes lärdomsfil; sju läsningar, 199
+  sekunder) och svarade rätt på alla tre med citat. Provet visar att rytmerna nås från ordinarie ingång, inte att de
+  förbättrar något. Efter provet fick kontorets lärdomsfil rader om K1:s tillämpning, och arbetssättet (förfallstidens
+  form) och Runtimes lärdom R5 (tidszonsformuleringen) rättades efter granskningen; svaret på fråga 3 citerar
+  förfallstidens form i dess äldre lydelse. Underlaget står privat i
+  `evidence/forvaltningsutveckling/local/lopande-20260926/mottagarprov-r1/`.
+
+**Gränser som står kvar.** Inga nya verktyg, konton, kostnader eller behörigheter. Ingen workflow, roll, schemaläggning,
+automatisk loop eller körning genom Runtimes schema: en omgång blir av när en session läser planen och ser att datumet
+passerat, annars noteras den som utebliven. Inga ändringar i Runtime, AP-10, modellvalet eller något kundrepo. Digitalas
+filer och steg rörs bara av den som driver Digitala. Privat material stannar privat. Ett förslag prövas bara inom ett
+accepterat uppdrags mandat; allt som kräver ny kostnad, behörighet, installation eller driftändring blir en beslutspunkt.
+Beslutet är det avgörande som I-07b lämnade till ägaren, för just dessa rytmer.
+
+**Granskning.** Separata läsningar av denna post och planändringen genom Runtimes skrivskyddade läsare (samma
+modellfamilj som författaren: separata läsningar, inte oberoende omdömen), med ägarens ordagranna svar, förslaget, de
+nya privata filerna, mottagarprovet och värdens avläsningar i arbetsytan. Den första versionen underkändes för att den
+påstod att morgondagens omgång ligger före leverantörens klockslag i varje tidszon, vilket inte gäller öster om ungefär
+UTC+12, och drog slutsatsen om den första omgång som kan få kvot utan förbehåll, vilket inte heller gäller vid UTC−12.
+Den andra versionen underkändes för att dess sammanfattning av det fyndet knöt UTC−12 till fel påstående. Den här
+versionen anger läsningen i datorns tidszon med dess gräns, sammanfattar fyndet rätt och för in fyra av granskningarnas
+anmärkningar: filerna som ändrades efter mottagarprovet, förfallstidens form i arbetssättet, en kontrollerbar
+förteckning över de överförda minnesanteckningarna och K1-sökningen på varje version. Den här versionens granskning
+redovisas i publiceringens kvitto.
+
+**Resurser.** Mottagarprovet och denna posts granskning i tre rundor, fyra modellsessioner på abonnemanget, en mer än
+förslagets övre uppskattning på tre för införandet; båda de extra rundorna gällde tidszonsformuleringen om AP-10. Inga
+andra modellsessioner och ingen underagent; inga nya verktyg, konton, kostnader eller behörigheter.
+
+**Plan:** paragrafen om förvaltningarna ersatt av införandet, rytmblocket med förslagsraderna, ägarens rad om beslut 3 i
+stället för raden om förslaget, postens namn i återupptagningspunkten och de två tidigare kandidaternas grenar i
+förteckningen över lokala grenar med namngivet skäl.
+
+**Ersätter:** AP07-METOD:s "ingen ny rutin" för just dessa tre rytmer (pekare i den posten); planens förslagsparagraf och
+ägarens rad från FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, vars post står kvar som historik.
