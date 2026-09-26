@@ -3748,3 +3748,53 @@ sparade skärmbilderna av Norrglänta och de två referenserna.
 står kvar oberoende.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926 — ägaren har valt hela tilläggsmandatet: etapp 1, 2 och 3 verkställs i ordning; etapp 4 ingår inte
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens ord, lämnade i sessionen 2026-09-26 kl.
+16:21Z som svar på DIGITALA-1-RIKTNING-BESKED-20260926, ordagrant: "Kör hela mandatet". De är sparade privat i
+`evidence/digitala/local/owner-words-kor-hela-mandatet-20260926.md`. Ingenting är ännu installerat, pushat eller kört;
+posten registrerar beslutet och öppnar arbetet.
+
+**Beslutet.** Hela tilläggsmandatet i tre etapper enligt beskedspostens punkt 4 och det privata beskedets §6, med de
+former, befogenheter, sessionsramar och klart-när som står där: etapp 1 (kunnande i byggsessionen: installation och
+registrering av namngivna resurser), etapp 2 (kvalitetsprovet med tre riktningar för Norrgläntas första vy och
+Säsongsplan) och etapp 3 (webbläsarvägen till avgörande). Ordning: etapp 1 före 2; etapp 3 är oberoende och får gå
+parallellt. Etapp 4 (ett förbättringsuppdrag för Norrglänta eller nästa fiktiva fall) ingår inte och är ett eget beslut
+efter kvalitetsprovet. Resursram: 7–11 modellsessioner, redovisade separat från P1–P5; 0 kr; inga konton.
+Kedjedrivarens tolkning av beslutets räckvidd: ja till hela mandatet omfattar det som mandatet sade skulle ersättas —
+den generella installationsgränsen, "ingen installation begärs" i jämförelsedokumentets §7 del 2 och beslutspunkten om
+fem sessioner, som nu är ersatt av resursramen.
+
+**Gränser som står kvar.** Demoreglerna i DIGITALA-1-ACCEPT-20260925 (inga verkliga kontaktuppgifter, personer eller
+utförda arbeten som Norrgläntas; inga mejl, SMS, bokningar, leads eller riktiga mottagare; ingen lansering, domän eller
+annonsering; inga köp; inga hemligheter i repo, webbläsarkod eller rapporter; AP-10 orört). Norrgläntas sajt, innehåll,
+skydd och drift ändras inte i etapp 1–2: komps byggs i en privat katalog och ingen driftsättning görs. Impeccables hook
+aktiveras först när det installerade hookmanifestet är läst. Playwright MCP installeras inte före det namngivna valet.
+Den verkliga provhemligheten används först när omprov B visat verktygsgränsen med version 2, och den får aldrig hamna i
+uppgiftstext, utdata, bilder eller spår; varje AI-scenario har högst 40 handlingar och 20 minuter; isoleringen försvagas
+inte och ägarens webbläsarprofil används inte. Ingen ändring av aktiv Runtime, AP-10, kvalificerade modellval, sajtens
+driftsättning eller Vercel-skydd. Provkod pushas till kundrepot utan driftsättning (etapp 3). Inga nya kundrepon eller
+företag. Del 3:s tak på åtta modellsessioner är förbrukat; nya körningar räknas mot mandatets ram och redovisas per
+etapp. Den riktade kontrollens tre förslag står kvar som eget beslut.
+
+**Verkställighet.** Etapp 1 börjar nu som planens steg 11, etapp 2 följer som steg 12 och etapp 3 som steg 13 (får gå
+parallellt). Varje etapp avslutas med en resultatpost efter separat granskning; installationer och registreringar förs
+in i `evidence/digitala/local/kunskap/REGISTER.md` med version när de är gjorda. Hemvistfrågan (kontoret, ett eget repo
+eller operatörens användarnivå) står öppen; tills den är avgjord ligger skills på användarnivå och Impeccable i
+kundrepot. Löpande läge i `evidence/digitala/local/genomforande-20260926/LAGE.md`.
+
+**Rättelser i planen med denna post.** Steg 5 sade att frågan om nästa fall eller förbättringsuppdrag "bereds i steg 10";
+den är besvarad: det är etapp 4 utanför mandatet. Steg 9 sade att webbläsarvägen är fryst "tills valet av väg är avstämt
+i steg 10"; frysningen består tills etapp 3 (steg 13) avgör valet. Steg 10 pekade på ägarens beslut som nästa steg;
+beslutet är taget. Resursredovisning utöver beskedspostens tre granskningsrundor: en tredje granskningsstart av
+beskedsposten inleddes av misstag på en mellanversion och avbröts efter cirka en minut utan dom; den redovisas här som
+extra förbrukning.
+
+**Granskning:** en runda genom Runtimes skrivskyddade läsare (samma modellfamilj som kedjedrivaren) med ägarens
+ordagranna ord, beskedsposten, det privata beskedets §6 och det privata läget i arbetsytan; utfallet står i
+granskningskvittot.
+
+**Kvar för ägaren:** den riktade kontrollens tre förslag (oberoende). Inget nytt beslut begärs.
+
+**Ersätter:** ingen post.
