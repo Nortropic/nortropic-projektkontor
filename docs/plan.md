@@ -34,7 +34,7 @@ uppdrag får i sitt klart-när en lärdomspost, användningsnoter och förslagsr
 
 RYTMER
 - Nästa månadsomgång: 2026-10-01 eller första session därefter. Runtime och kontoret enligt arbetssättet; Digitala enligt
-  inventeringens del b när beslutet D5 är taget.
+  inventeringens del b från oktober 2026 (beslutet D5/C5 taget 2026-09-26, DIGITALA-1-AGARBESLUT-20260926, steg 18).
 - Nästa genomgång: första veckan i januari 2027, en kontorspost per förvaltning med högst tre beslutspunkter.
 - Förfallsregeln gäller rytmernas egna punkter och alla andra rader i ägarens tur som är äldre än ett kvartal
   (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926); operatörshandlingar och säkerhetspunkter förfaller inte.
@@ -57,8 +57,8 @@ webbförvaltningen är inspiration till dagens flöde, inte Digitalas arbetskedj
 godkänt briefen (DIGITALA-1-BRIEF-GODKAND-20260926): CTA-etiketten "Skicka förfrågan", H1-kandidat 1 och målbilden och
 designriktningen. Demon är levererad 2026-09-26 bakom inloggning (DIGITALA-1-LEVERANS-20260926); ägarens bedömning av upplevelsen
 är lämnad 2026-09-26 (inte nöjd; DIGITALA-1-RIKTNING-20260926) och leveransen står som historik. Ägaren har därefter beställt en riktad kontroll och förbättring av fem områden efter en extern
-kodgranskning (DIGITALA-1-RIKTAD-KONTROLL-20260926). Den är genomförd (DIGITALA-1-RIKTAD-RESULTAT-20260926), och tre
-förslag väntar på ägaren. Ägaren har därefter beställt en samlad jämförelse av dagens Digitala-flöde med den gamla
+kodgranskning (DIGITALA-1-RIKTAD-KONTROLL-20260926). Den är genomförd (DIGITALA-1-RIKTAD-RESULTAT-20260926); de tre
+förslagen avgjordes av ägaren 2026-09-26 (DIGITALA-1-AGARBESLUT-20260926). Ägaren har därefter beställt en samlad jämförelse av dagens Digitala-flöde med den gamla
 webbförvaltningens kunnande, Improvements och aktuella originalkällor, som ett analys- och förslagsuppdrag
 (DIGITALA-1-JAMFORELSE-20260926). Den är levererad (DIGITALA-1-JAMFORELSE-RESULTAT-20260926). Ägaren har därefter
 preciserat införandeförslaget och provplanen (DIGITALA-1-PRECISERING-20260926). Preciseringen är levererad
@@ -72,10 +72,10 @@ samlat besked med riktning, tilläggsmandat och nästa synliga kvalitetsprov är
 Ägaren har därefter valt hela tilläggsmandatet (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926): etapp 1, kunnande i
 byggsessionen, är klar (DIGITALA-1-ETAPP1-RESULTAT-20260926, steg 11); ägaren har därefter beställt en inventering av 32
 namngivna repon och fler trendande GitHub-repon (DIGITALA-1-INVENTERING-20260926, steg 14), utökad med fem delar
-(DIGITALA-1-INVENTERING-TILLAGG-20260926); inventeringen är klar i alla fem delar och väntar på ägarens beslut
-(DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926); etapp 2, kvalitetsprovet (steg 12), är levererad och väntar på ägarens omdöme
+(DIGITALA-1-INVENTERING-TILLAGG-20260926); inventeringen är klar i alla fem delar och dess beslut och prov är avgjorda av ägaren
+(DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926); etapp 2, kvalitetsprovet (steg 12), är levererad och ägaren valde rekommendationen
 (DIGITALA-1-ETAPP2-RESULTAT-20260926); etapp 3, webbläsarvägen (steg 13), är avgjord till den egna vägen
-(DIGITALA-1-ETAPP3-RESULTAT-20260926); etapp 4 ingår inte.
+(DIGITALA-1-ETAPP3-RESULTAT-20260926); etapp 4 är beställd av ägaren 2026-09-26 (DIGITALA-1-AGARBESLUT-20260926, steg 15).
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`. Kunskapsstödet för dagens flöde står i `evidence/digitala/local/kunskap/REGISTER.md`
@@ -110,9 +110,9 @@ inte krav.
     Den byggda sajten visas för ägaren; poäng och gröna prov ersätter inte visuell bedömning. Överlämningen står privat i
     `evidence/digitala/local/norrglanta/OVERLAMNING-20260926.md`. Ägarens bedömning av den byggda
     sajten är lämnad 2026-09-26 (inte nöjd med upplevelsen; DIGITALA-1-RIKTNING-20260926). Frågan om ett nästa fiktivt
-    fall eller ett avgränsat förbättringsuppdrag är besvarad: det är tilläggsmandatets etapp 4, som inte ingår i
-    mandatet och är ett eget beslut efter kvalitetsprovet i steg 12 (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926); inget
-    nytt företag väljs före det (DIGITALA-1-ACCEPT §7).
+    fall eller ett avgränsat förbättringsuppdrag är besvarad: det är tilläggsmandatets etapp 4, som ägaren beställde
+    2026-09-26 efter kvalitetsprovet (DIGITALA-1-AGARBESLUT-20260926, steg 15); inget nytt företag väljs före det
+    (DIGITALA-1-ACCEPT §7).
  6. KLART 2026-09-26: den riktade kontrollen (DIGITALA-1-RIKTAD-KONTROLL-20260926, resultat i
     DIGITALA-1-RIKTAD-RESULTAT-20260926). Kundrepots `main` bär den granskade och befordrade versionen.
     - Rabattskötseln ingår genom hela kedjan.
@@ -121,8 +121,8 @@ inte krav.
     - Säsongsplanen visar ett önskat säsongsupplägg.
     - Det redaktionella passet är gjort.
 
-    Huvudrubriken är orörd. Alternativet, två förslag om kontaktfältets validering och en rättelseanteckning i briefen
-    väntar som förslag i ägarens tur.
+    Huvudrubriken är orörd i leveransen. Ägaren avgjorde de tre förslagen 2026-09-26 (DIGITALA-1-AGARBESLUT-20260926): den
+    kortare rubriken med stödtext, ett felmeddelande för kontaktfältet och rättelseanteckningen i briefen — genomförs i steg 15.
  7. KLART 2026-09-26: jämförelsen och resursförslaget (DIGITALA-1-JAMFORELSE-20260926, resultat i
     DIGITALA-1-JAMFORELSE-RESULTAT-20260926). Fem leveranser i ett privat dokument, granskade av en separat läsare.
     Inget är infört. Norrgläntas leverans och drift är orörda. Det rekommenderade mandatet ersätts av det
@@ -157,14 +157,14 @@ inte krav.
     anropade frontend-design själv men inte Emils skills (delvis; L14), detektorn gav tolv varningar som golv.
     Två modellsessioner. Utfall privat i `evidence/digitala/local/genomforande-20260926/etapp1/UTFALL-ETAPP1.md`;
     registret del F.
-12. KLART 2026-09-26, väntar på ägarens omdöme: etapp 2, kvalitetsprovet (DIGITALA-1-ETAPP2-RESULTAT-20260926).
+12. KLART 2026-09-26: etapp 2, kvalitetsprovet (DIGITALA-1-ETAPP2-RESULTAT-20260926); ägaren valde rekommendationen "Ljuset
+    med Planen" och bedömer den färdiga sajten efter etapp 4 (DIGITALA-1-AGARBESLUT-20260926).
     Konceptsteg med Design Read och tvåpass-kontroll; tre komps — A "Ljuset", C "Planen" och B′ "Arbetet" (B i sin
     definierade form utgick: inga fria arbetsfoton med människor klarar demoreglerna) — i 390 och 1440 bredvid dagens
     första vy och närmaste referens; tre kritiksessioner och en samlad; detektorn tio varningar mot dagens tolv;
     rekommendationen är kombinationen "Ljuset med Planen"; sidan för ägaren skriven; lärdomspost L16. Fyra
     modellsessioner. Ingen sajtändring. Allt privat under `evidence/digitala/local/genomforande-20260926/etapp2/`.
-    Nästa handling ligger hos ägaren (omdömet); en andra omgång komps görs bara om ägaren ber om det eller godtar
-    inventeringens prov P-A, P-C eller P-D.
+    Nästa handling: ingen inom steg 12; riktningen byggs in i steg 15 med proven P-A, P-C och P-D.
 13. KLART 2026-09-26: etapp 3, webbläsarvägen till avgörande (DIGITALA-1-ETAPP3-RESULTAT-20260926). Omprov B med
     version 2 godkänt mot granskningens elva krav; kundrepots provkod pushad utan driftsättning; ett modellfritt
     driftsättningsprov fann och rättade hållarens värdregel (en rad, separat granskad efteråt); två skyddade scenarier
@@ -180,7 +180,8 @@ inte krav.
     a) KLART 2026-09-26 (DIGITALA-1-INVENTERING-RESULTAT-20260926): de 32 namngivna och 28 trendande repon lästa i
        original och bedömda; dokumentet godkänt i andra rundan (version tre med precisionsnoterna); fyra avgränsade
        prov (P-A DESIGN.md per riktning, P-C Hallmark som kritikröst, P-D canvas-design vid behov i etapp 2; P-B
-       designlang-mätning i etapp 3) i ägarens tur; ingenting installerat.
+       designlang-mätning i etapp 3) — alla fyra godtagna av ägaren 2026-09-26 (DIGITALA-1-AGARBESLUT-20260926; P-A, P-C, P-D
+       i steg 15, P-B i steg 17); ingenting installerat.
     b–d) KLART 2026-09-26 (DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926): bevakningsrutin med fyra spår, tak och
        läsbevis; Claude Designs produktsida läst som metodbeskrivning (metoden okänd ur det lästa; ingen produkt, inget
        konto); tre sajter i 1440 och delvis 390 med datum, tio av tio sidladdningar redovisade (sex förbrukade av ett
@@ -192,10 +193,34 @@ inte krav.
        nytta, kostnad, risk och passform per funktion; inget aktiverat; dokumentet godkänt i femte rundan (fyra rundor
        underkände uppgifter om planen, rättade mot de lästa sidorna efter en parallell förkontroll; versionerna bevarade). En hygienåtgärd i skyddet föreslås som beslut; skälet står
        privat.
-    Tio justeringar som förslag (J1–J5, F1–F5) och tio beslut (D1–D5, D-F1–D-F5) står i posten; ägarens tur. Ram
-    hållen: kedjedrivarens läsning, modellfria hämtningar, dokument- och postgranskningar, inga modellsessioner i
-    övrigt. Nästa handling: ingen inom steg 14; fortsättningen bestäms av ägarens beslut. Återupptagningspunkt:
+    Tio justeringar som förslag (J1–J5, F1–F5) och tio beslut (D1–D5, D-F1–D-F5) står i posten; besluten togs av ägaren 2026-09-26
+    (DIGITALA-1-AGARBESLUT-20260926) och förs vidare i steg 15–18. Ram hållen: kedjedrivarens läsning, modellfria hämtningar, dokument- och postgranskningar, inga modellsessioner i
+    övrigt. Nästa handling: ingen inom steg 14; fortsättningen står i steg 15–18. Återupptagningspunkt:
     `evidence/digitala/local/genomforande-20260926/LAGE.md` (avsnittet inventering).
+
+15. PÅGÅR 2026-09-26: etapp 4, bygget av "Ljuset med Planen" i Norrglänta (DIGITALA-1-AGARBESLUT-20260926: "Bygg in den nu").
+    Innehåll: DESIGN.md för riktningen med modellfri kontroll (P-A; verktyget hämtas pinnat), bygge enligt etapp 2:s
+    rekommendation (fotofri ljus ram, Säsongsplanen bärande; sida vid sida på dator, rubrik följd av plan på mobil;
+    björkmotiv och parkbild bort; märkta valgrupper, namngivna rader, månader som rader på mobil, knappen i headern
+    tillbaka), den kortare huvudrubriken med stödtext prövad före leverans (A1/B4), kontaktfältets felmeddelande (A2),
+    rättelseanteckning i briefen (A3), scenariernas produktfynd sorterade (fel rättas: förkryssat tillval, nollställda val
+    vid bakåt, klistrad knapp över tabellen; övrigt noteras), funktionsregion Stockholm satt före driftsättningen (C7),
+    den inkluderade krediten får bära serverfunktion och bildoptimering; inget därutöver, Hallmark som extra kritikröst i granskningen (P-C), canvas-design bara om egen grafik behövs (P-D),
+    de ordinarie proven (acceptans, axe/Lighthouse, tre renderingsläsningar, detektorn, två skyddade scenarier med den
+    egna webbläsarvägen), separat granskning, driftsättning bakom åtkomstskyddet med rotation av automationsnyckeln och
+    en nyckel per verktyg (C9), sedan ägarens bedömning på den färdiga sajten. Ram (kedjedrivarens, ägaren angav ingen):
+    6–10 modellsessioner; inga kostnader utöver planen, den inkluderade krediten får bäras; demoreglerna står fast; ingen
+    lansering. Klart när sajten är driftsatt bakom skyddet med gröna prov, granskad,
+    scenarierna körda och redovisade, och resultatposten publicerad efter separat granskning. Klart-när innefattar också
+    lärdomsposten (eller "inga nya lärdomar" med skäl), användningsnoterna för kopplade underlag och för planens förslag,
+    och förslagsraden för nästa fall. Nästa handling: DESIGN.md för riktningen. Återupptagningspunkt:
+    `evidence/digitala/local/genomforande-20260926/LAGE.md` (avsnittet etapp 4).
+16. VÄNTAR (efter 15 eller parallellt utan modellsessioner): checklistan för skarpa fall (del e–f §1.3) som mall i
+    kunskapsregistret, utan punkter som kostar krediter (C8). Klart när mallen står i registret med rad i del F.
+17. VÄNTAR: fem läsande sidladdningar av Claude Designs dokumentation, utan konto (C1), och P-B:s mätning av
+    referenssajterna med den egna webbläsarvägen (verktyget hämtas pinnat; inga modellsessioner). Klart när läsningen och
+    mätningen är sparade med datum och en not i registret säger vad som togs in.
+18. VÄNTAR (rytmen per månad): bevakningsrutinen enligt del b, från oktober 2026 (C5). Ingen egen handling nu.
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -458,10 +483,7 @@ obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller in
 (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926).
 
 ÄGARENS TUR
-- [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
-- [beslut] Digitala 1: lämna omdömet om etapp 2:s tre riktningar på sidan för ägaren (riktning, skäl, vad som förs vidare) och ta ställning till de tre punkterna där (foto eller inte i första vyn; handling först eller löfte först; rubrikens delning) — sedan 2026-09-26
-- [beslut] Digitala 1: ta ställning till inventeringens tio beslut ur del b–f (D1–D5: Claude Designs dokumentation, två mobilvyer, böcker, mänskligt prov, bevakningsrutin; D-F1–D-F5: utgiftsavisering, funktionsregion, checklista som mall, hygienåtgärd i åtkomstskyddets automationsväg, analys i första skarpa fallet) — DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926, sedan 2026-09-26
-- [beslut] Digitala 1: ta ställning till inventeringens fyra avgränsade prov (P-A DESIGN.md per riktning med modellfri lint, P-C Hallmarks audit som kritikröst och P-D canvas-design om Ljuset behöver grafik i etapp 2; P-B designlang-mätning av referenserna i etapp 3) — sedan 2026-09-26
+Inga öppna rader efter DIGITALA-1-AGARBESLUT-20260926 (2026-09-26); nästa kvartalsgenomgång enligt förfallsregeln i januari 2027.
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -505,6 +527,11 @@ månadsomgångens modellsessioner, ägarens del i Digitalas omgång, takets räc
 publika posten, ersatt av den granskade andra);
 `digitala/etapp3-resultat-r1` (granskad första version av DIGITALA-1-ETAPP3-RESULTAT-20260926, underkänd för att den
 namngav den bevarade leveransens commit i den publika texten, ersatt av den publicerade andra);
+`digitala/agarbeslut-r1` (granskad första version av DIGITALA-1-AGARBESLUT-20260926, underkänd för att planens intro och
+steg 6, 12 och 14 fortfarande sade att ägaren väntades, för en rubrik om krediterna som stred mot ägarens val och för att
+kreditvalets källa saknades; ersatt av den tredje);
+`digitala/agarbeslut-r2` (granskad andra version av samma post, underkänd för att steg 5 och rytmblocket fortfarande
+bar det ersatta läget om etapp 4 och beslutet D5; ersatt av den publicerade tredje);
 `kontor/forvaltningar-beslut-r1` (granskad första version av FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926, underkänd
 för ett absolut påstående om tidszonen i leverantörens besked om AP-10:s kvot, ersatt av den publicerade tredje);
 `kontor/forvaltningar-beslut-r2` (granskad andra version av samma post, underkänd för att sammanfattningen av det första
@@ -620,7 +647,7 @@ OVERBLICK-OBSIDIAN-20260926, DIGITALA-1-ETAPP1-RESULTAT-20260926, DIGITALA-1-INV
 DIGITALA-1-INVENTERING-TILLAGG-20260926, DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-ETAPP2-RESULTAT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
-FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926 och Runtime-planens ingång.
+FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926 och Runtime-planens ingång.
 
 ---
 
