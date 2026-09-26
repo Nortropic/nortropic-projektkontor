@@ -4065,3 +4065,78 @@ del 2:s tak på tio sidladdningar, som ägaren satte för referenssajterna (kedj
 **Kvar för ägaren:** inget nytt beslut begärs för registreringen; besluten kommer med resultatposterna.
 
 **Ersätter:** ingen post; ersätter ordningsmeningen om steg 12 i DIGITALA-1-INVENTERING-20260926.
+
+## DIGITALA-1-INVENTERING-RESULTAT-20260926 — del a av inventeringen är gjord: 32 namngivna repon och 28 trendande lästa i original och bedömda mot flödet; tre av de 32 träffar upplevelsen; fyra avgränsade prov föreslås för ett beslut; inget installerat
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Planens steg 14 a (DIGITALA-1-INVENTERING-20260926;
+del b–f enligt DIGITALA-1-INVENTERING-TILLAGG-20260926 pågår). Dokumentet står privat i
+`evidence/digitala/local/genomforande-20260926/inventering/INVENTERING-REPOS-20260926.md` (version 3) med
+läsningsunderlaget bredvid: metadata och README för varje repo, ett kondenserat läsningssammandrag, riktade läsningar
+med pinningar och sökningarnas dokumentation. Ingenting är installerat, registrerat eller anslutet på inventeringens
+grund.
+
+**Så gjordes den.** Varje repo lästes i original via GitHubs läs-API, modellfritt: beskrivning, licens, stjärnor,
+senaste push, aktuell revision och README; för repon vars relevans beror på innehållet dessutom katalogstruktur,
+skillfilers frontmatter och installationsavsnitt. Namnen i skärmbilden gav sju felträffar i den stjärnsorterade
+sökningen, som rättades för hand mot den uppenbara källan. "Trendar" approximerades — GitHub har inget öppet API för
+trendlistan — med 38 sökfrågor och sex ämnestaggar kring formgivning, gränssnitt, kritik, prov, copy, tillgänglighet
+och bild; 540 unika kandidater, varav 28 lästes närmare efter relevans, inte stjärnor. Måttstocken är flödet i
+beskedets §2 med det redaktionella passet, designkritiken och publiceringen som tillägg; resurserna i §4 bedömdes
+inte om, med ett undantag: UI UX Pro Max står i ägarens lista och lästes därför en gång till, nu med installationsform
+och mekanik; utfallet bekräftar §4:s bortval. Rekommendationens värden: ta in, pröva, pröva senare, läsunderlag,
+avstå, utanför, redan bedömd, redan i bruk.
+
+**Utfallet för de 32.** Tre träffar flödet direkt: taste-skill och playwright-mcp (redan bedömda; Playwrights README
+säger nu själv att kodagenter ofta gör bättre med CLI och skills än med MCP, ett argument in i etapp 3:s val) och UI UX
+Pro Max (avstå: katalogdriven mallning ur produkttyp är just det mönster som gjorde Norrglänta generisk). Fem är
+kataloger eller infrastruktur (Anthropics skills-repo, den officiella marknadsplatsen som redan är i bruk, tre
+awesome-listor). Tre är helkedjor eller rollsystem med designdelar (superpowers, gstack, wshobson/agents): avstå som
+helhet enligt korrigeringen, med enskilda filer som läsunderlag för kritikfrågan. Resten är kedjedrivarens verktyg
+för minne, kontext, komprimering, planering och modellväxling: utanför flödet, och flera avstås med skäl —
+komprimerande proxyer står mot bevisregeln, routrar och växlare kolliderar med Runtimes modellval, stilbyten
+försämrar redovisningen. Det enda nya med direkt värde i de 32 är Anthropics `canvas-design` (grafik ur en
+formuleringsfilosofi), som ett avgränsat prov om riktning "Ljuset" behöver egna motiv.
+
+**Utfallet för de trendande.** Två idéer träffar verkliga glapp i kedjan: DESIGN.md-formatet (`google-labs-code/design.md`:
+tokens och prosa om varför, med en modellfri lint- och diff-CLI) som kontrakt mellan briefens §5 och byggsessionen,
+och mätning av referenser i stället för intryck. Mätverktyget `designlang` driver en egen headless webbläsare mot
+externa sajter och är därmed en ny webbläsaryta utanför vår isolering; det prövas först i etapp 3 när webbläsarvägens
+gräns är avgjord, och i etapp 2 görs mätningen av lokala mål med den befintliga verktygslådan. Hallmark
+(`Nutlope/hallmark`, anti-slop-skill med audit, redesign och study) överlappar frontend-design, Taste och Impeccable
+som byggröst men är billig som extra kritikröst. Samlingar av DESIGN.md-filer är läsunderlag för hur identiteter
+formuleras, aldrig mallar. Humanizers mönsterlista och en CRO-lista blir kontrollistor i våra egna svenska underlag;
+inga engelska skills. En MCP-server som mäter gränssnitt live svarar på ett verkligt behov men är en anslutning och
+väntar på etapp 3. Verktyg som kringgår botskydd avstås av princip. Stilkataloger, designsystem-ramverk med roller,
+skrivbordsappar med molntjänst och Figma-kopplingar tas inte in.
+
+**Fyra avgränsade prov, föreslagna för ett enda beslut, alla pinnade till revision och kopieväg.** P-A (etapp 2,
+koncept): en DESIGN.md per riktning enligt formatspecifikationen, lintad modellfritt med den pinnade CLI:n; kostnad
+0 kr och en npm-hämtning, som är den enda nya källan i etapp 2 och därför står som beslut; klart när tre lintade filer
+ligger bredvid komparna och byggsessionen läste dem. P-C (etapp 2, kritik): Hallmarks `audit` som separat kritikröst i
+en av läsarsessionerna, med skillfilen som pinnad kopia och ingen installation. P-D (etapp 2, koncept): Anthropics
+`canvas-design` som metod bara om "Ljuset" behöver egna motiv; skillen bär ingen kod, metoden körs lokalt. P-B (etapp 3):
+designlang-mätning av referenserna och den bevarade leveransen innanför webbläsarvägens gräns när den är avgjord.
+Inga konton, inga MCP-anslutningar, ingen ändring av sajten, skyddet, Runtime eller modellvalet; P-B öppnar en
+webbläsare mot externa sajter och ligger därför i etapp 3. Etapp 2 pågår utan att vänta på beslutet.
+
+**Preciseringar från föregående posts granskning.** Etapp 1:s kontroll var delvis uppfylld (frontend-design
+anropades av byggsessionen själv, Emils skills inte), vilket rubriken där inte sade; en av detektorns tio kantfynd är
+en högerkant; det mandatet pinnade var paketnummer och den installerade revisionen är källrepots HEAD; init-sessionen
+hoppade själv över skillens intervjurunda eftersom briefens svar gavs i prompten, så `PRODUCT.md`:s principer är
+härledda, inte bekräftade i en svarsrunda.
+
+**Granskning.** Tre versioner, två rundor genom Runtimes skrivskyddade läsare med läsningsunderlaget i arbetsytan.
+Runda ett underkände version ett på tre blockerande fynd: en felaktig beskrivning av §4:s tidigare bortval, två
+opinnade CLI-förslag och ett mätförslag som dolde en ny webbläsaryta i etapp 2; version två rättade dem och sju
+restrisker. Runda två godkände version två utan blockerande fynd och med tolv precisionsnoter (bland dem
+måttstocksmeningen, tidsstämplarna, två obelagda detaljer om gstack, ett katalogantal, P-D:s formulering om kod och en
+för absolut återgivning av korrigeringens kriterium); de är införda i version tre utan ny omläsning och utan att något
+omdöme ändrades. Version ett och två är bevarade.
+
+**Resurser.** Inga modellsessioner; kedjedrivarens egen läsning; modellfria hämtningar via GitHubs läs-API och
+npm-registrets metadata; kontorsgranskningar: dokumentet i två rundor, denna post i en runda (kvittot).
+
+**Kvar för ägaren:** ett beslut om de fyra proven, helt, delvis eller inte alls; den riktade kontrollens tre förslag står
+kvar oberoende.
+
+**Ersätter:** ingen post.
