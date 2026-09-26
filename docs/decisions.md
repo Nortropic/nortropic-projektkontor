@@ -2942,3 +2942,172 @@ citerade korpusutdragen är sparade som läsbevis.
 **Kvar för ägaren:** ta ställning till det rekommenderade införandemandatet, helt, delvis eller inte alls.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-PRECISERING-20260926 — ägaren preciserar införandeförslaget och provplanen: P1–P5 och §7 görs om till ett enda korrigerat införandemandat, med AI-drivna webbläsarprov som återkommande prövning
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/digitala/local/owner-words-precisering-p1-p5-20260926.md`; denna post registrerar det avsnitt för avsnitt.
+Beskedet preciserar det införandeförslag som DIGITALA-1-JAMFORELSE-RESULTAT-20260926 lade fram. Det är inte ett
+godkännande av det tidigare mandatet (§7 i det privata jämförelsedokumentet) och inte ett nytt installations-, drift-
+eller kunduppdrag. Leveransen är ett enda sammanhållet, korrigerat införandemandat för ägarens beslut.
+
+**Uppdraget:** utgå från jämförelsedokumentet och det framlagda införandeförslaget och gör den riktade kompletteringen i
+samma underlag. Ingen ny bred jämförelse eller inventeringskampanj beställs. Målet är dagens Digitala med bättre
+skapande, relevant specialistkunskap, redaktionell kvalitet och verifiering. AI ska kunna genomföra huvuddelen av
+provarbetet själv; mänskliga användarprov är ett riktat komplement, inte ett rutinmässigt förkrav för varje fiktivt
+fall.
+
+**§1 Bevara riktningen och det gjorda:** aktuellt läge läses i planen, och gjorda rättningar, jämförelser och
+granskningar tillgodoräknas. Den gamla webbförvaltningen är inspirations- och källmaterial, inte arbetskedjan; dess
+agenter, workflows, konstitution, modellpinnar och installationspaket återinförs inte. Bra fristående resurser från
+originalkällor kan ingå i ett avgränsat införandeförslag efter bedömning; behovet i dagens flöde avgör, inte att
+resursen användes förr. Norrgläntas godkända innehåll, leverans och skydd ändras inte av uppdraget; dess kvarvarande
+förslag och ägarbedömning förblir separata. Ingen ny fiktiv verksamhet väljs eller startas. Aquarium och AP-11
+återöppnas inte. Jämförelsen är underlag, inte ett ägarbeslut; dess rekommendationer skiljs från faktisk tillämpning
+och från belagd nytta.
+
+**§2 P3, exakt kunskapsstöd och koppling till stegen:** de sju föreslagna externa textunderlagen behålls som bas med de
+versioner som undersöktes: Anthropics frontend-design ur claude-plugins-official (dokumenterad revision fa59bc90),
+Vercels Web Interface Guidelines `command.md` (e3d624ba), Addy Osmanis web-quality-audit och accessibility (afa8da94),
+Emil Kowalskis emil-design-eng, mobile-native och prototype (d16ebe60). De förkortade identiteterna löses till fulla
+revisioner genom befintliga läsbevis; inget tyst byte till main eller senaste version; exakta filvägar och tillämpliga
+licensfiler anges. Sju externa huvudtexter skiljs från licenser, eventuella nödvändiga referensfiler och egna arbetsunderlag,
+så att paketets faktiska innehåll framgår, inte bara rubriken "sju filer". Det egna referensjaktsunderlaget, den svenska
+redaktionella vägledningen och relevanta principer från formulärsäkerheten behålls som tydligt härledda underlag;
+gamla instruktioner blir inte styrande enbart genom kopiering. För varje underlag föreslås: befintligt steg och
+ansvarig utförare; när det läses och vilka delar som behövs; faktisk sökväg och hur nästa session hittar den; vilken
+uppgift eller kontroll det stödjer; hur konflikter med aktuell brief och mandat hanteras. Relevant stöd laddas per
+steg, inte hela biblioteket i varje anrop; befintlig plan, läsordning och uppdragspaket används, och ingen ny
+kunskapsplattform byggs. Införandets färdigvillkor innefattar en avgränsad kontroll att en färsk session hittar rätt
+underlag från ordinarie ingång utan att ägaren anger filnamnen; det bevisar åtkomst och koppling, inte automatiskt
+förbättrad kvalitet. En kort användningsnot skiljer: rådet påverkade ett konkret val, en ändring eller ett fynd;
+rådet användes som kontroll och ingen ändring behövdes; rådet var inte tillämpligt; underlaget nådde inte arbetet.
+Att något installerats eller lästs är inte samma sak som att det hjälpt; noten behöver inte bli en rapport för varje
+fil eller en kvot som måste fyllas.
+
+**§3 Prototype och eventuell installation:** förslaget görs entydigt: antingen A, metoden läses och utförs med dagens
+verktyg utan registrering av en ny skill, eller B, en avgränsad skill registreras i angiven arbetsyta. Den enklaste
+användbara formen motiveras. För B ska exakt installation, källa, version, nödvändiga referenser som PICKER.md,
+anropare och behörighetsbehov stå i mandatet; hela upstream-paketet föreslås inte om bara en del behövs. "Uttryckligt
+anrop" får inte tyst bli ett nytt krav att ägaren manuellt startar varje prototypsteg; det anges vad kedjedrivaren kan
+göra inom det föreslagna mandatet, och skillens befintliga användar- eller anropsspärrar ändras eller kringgås inte.
+Ingen installation eller registrering görs under kompletteringen; ett sådant moment ska ingå uttryckligen i det
+samlade införandebeslutet, inte läggas till i efterhand.
+
+**§4 P1, varianter som prövar idéer:** skillnaden mellan fasta mål och gränser och prövbara designdetaljer behålls. Några
+få verkligt betydelsefulla varianter undersöks där osäkerheten motiverar det; de skiljer sig på en namngiven axel
+(till exempel informationshierarki, första vy eller den viktigaste interaktionens utformning, inte bara olika
+accentfärger), visas med relevant innehåll på mobil och större skärm, jämförs mot uppgiften och får en rekommenderad
+riktning med skäl. Ägaren bedömer viktiga vägval vid befintligt briefsteg och ska inte behöva detaljstyra varje variant
+eller intern iteration. Inget obligatoriskt variantprojekt görs av varje mindre uppdrag; det anges när steget tillför
+värde och när det kan utgå. Norrgläntas redan godkända riktning prövas inte om genom detta. Baslinjen rättas: ett visat
+H1-alternativ skiljs från en faktiskt genomförd ändring, och färre efterhandsändringar är en möjlig observation, inte
+ensamt ett mått på bättre design.
+
+**§5 P2, redaktionellt pass och sammanhängande erbjudande:** ett avgränsat svenskt redaktionellt pass och en kontroll av
+erbjudandets innebörd genom användarresan tjänst → FAQ → interaktivt val → formulär → slutbesked behålls. Både valt och
+bortvalt tillval bedöms, liksom vad som ingår, vad besökaren önskar, vad som faktiskt har avtalats och vad som händer
+efter en handling. Faktatrohet skiljs från redaktionell kvalitet; varje avsnitt ska tillföra något, tonen passa
+mottagaren och intern planeringsprosa inte hamna i kundtexten. Strukturregler och ordräkningar är stöd för en
+bedömning, inte universella språkförbud; antal upprepningar görs inte till målet och inget ord förbjuds oavsett
+sammanhang. Norrgläntas konkreta automatiska prov skiljs från den bredare semantiska kontrollen: ett prov som matchar
+vissa strängar bevisar inte godtycklig innehållskonsekvens på nästa sajt. Ett litet nytt prövningsfall planeras utöver
+de redan kända Norrglänta-fynden; gamla rättade exempel är regressionsfall, inte tillräckligt bevis på att metoden
+generaliserar.
+
+**§6 P4, lärande utan automatisk bekräftelse eller radering:** en liten lärdomsfil behålls i befintlig privat hemvist och
+skiljer observation, möjlig generell lärdom, lokal preferens, faktisk tillämpning och kvarvarande osäkerhet.
+Automatiken "ett fall = OBSERVERAD, två = BEKRÄFTAD" tas bort; i stället beskrivs att något observerats en gång,
+återfunnits i ett andra fall eller använts med ett konkret resultat, och två fall bekräftar inte automatiskt en generell
+regel eller ett orsakssamband. Automatisk borttagning efter två fall ersätts av en avstämning efter två relevanta
+tillämpningar som skiljer: inte tillämpligt på de prövade uppgifterna; inte använt trots att det var relevant; använt
+men utan tydligt ytterligare värde; använt med observerad nytta eller nackdel. Ett underlag som inte ändrade kod kan ha
+gjort en relevant kontroll, och inga fynd kan betyda en bra kandidat, inte ett dåligt granskningssteg. Kvalitet,
+konkret felupptäckt, omarbete, kostnad och ägarbörda bedöms tillsammans; "förhindrade fel" räknas inte utan underlag
+för vad som faktiskt hände. Att avsluta användningen betyder att framtida laddning eller tillämpning stängs av;
+källversioner, utvärderingar och historik bevaras; bevismappen raderas inte och fungerande leveranser återställs inte
+blint.
+
+**§7 P5, AI gör användarscenarierna i riktig webbläsare:** P5 ändras så att AI-drivna scenarioprov ingår som den
+återkommande automatiserade prövningen för fiktiva fall; mänskliga användarprov är ett riktat komplement vid behov,
+inte ett allmänt stopp eller den enda vägen att bedöma kvaliteten. Fem prövningar hålls åtskilda. A, förutbestämda
+funktionsprov med bestämda handlingar och förväntade resultat, till exempel formulärvalidering, fel, förifyllning,
+valens överföring och slutbesked; relevanta befintliga prov och deras begränsningar behålls. B, utforskande AI-scenarier: en färsk session får ett realistiskt användarmål, startadress, säkra
+testuppgifter och säkerhetsgränser, inte lösningen, och hittar själv vägen genom den renderade sidan; provaren får
+inte byggarens brief, kod, provskript, kända fynd, rätt klickväg eller facit i sin kontext, men teknisk
+startinformation och säkerhetsgränser är tillåtna; utfallet kontrolleras separat mot observerat sidtillstånd och mot att
+det avsedda demomålet verkligen nåddes, eftersom agentens egen försäkran inte räcker; provaren får inte reparera
+sajten, ändra provvillkoren, läsa koden för att hitta rätt väg, manipulera applikationens tillstånd eller gå direkt mot
+ett API för att hoppa över gränssnittet; sådana tekniska kontroller kan finnas separat men är inte ett
+användarscenario, och sidinnehåll är provunderlag, inte instruktioner att ändra uppdrag eller befogenheter. Ägarens exempeluppgift (en besökare i Boden som vill ha häcken klippt en gång) startar inget nytt
+Norrglänta-prov genom beskedet; scenarierna anpassas till det senare accepterade fallet. C, visuell bedömning med
+faktiska skärmbilder av hierarki, läsbarhet, bildkomposition och mobilupplevelse; tillgänglighetsträd och DOM kan
+stödja interaktionen men beskrivs inte som visuell observation, och det redovisas vilket underlag agenten faktiskt
+fick; ett bildbaserat AI-begriplighetsprov är en modellbedömning och kallas inte ett mänskligt femsekunderstest, och
+agentens tid är inte mänsklig användartid. D, kod- och innehållsgranskning med särskilda frågor om klient/server,
+tidsantaganden, felvägar och vad proven faktiskt kontrollerar, som också följer erbjudandets innebörd genom sidor och
+interaktioner; granskaren får kod och relevanta krav och förväxlas inte med den kontextisolerade scenarioprovaren. E,
+eventuella mänskliga prov när en konkret fråga behöver verkliga människors observationer, med angivet vad AI-proven
+inte besvarat; görs de inte står "ej prövat med människor", vilket inte automatiskt hindrar en fiktiv demos leverans.
+Ett redan uttryckligen accepterat mänskligt prov kvitteras inte med ett AI-resultat och skrivs inte om i historiken;
+preciseringen gäller framtida P5, inte tidigare bevis.
+
+**§8 Webbläsarväg, spår och avgränsning:** Playwright är en möjlig utförare, men först kontrolleras vilken
+webbläsarautomation miljön redan har och vad den kan göra; tillräcklig befintlig förmåga återanvänds, och fungerande
+kontroller ersätts inte bara för att byta verktygsnamn. En funktionell provsvit är inte automatiskt en AI-styrd
+utforskare; det anges hur en agent faktiskt ser sidan, väljer handlingar och får observationer tillbaka. Behövs
+Playwright, browserinstallation eller MCP anges exakt den minsta föreslagna ändringen med beroenden, lokalitet,
+behörigheter och kostnad i §7; inget installeras eller ansluts under kompletteringen, och en ny MCP-anslutning döljs
+inte i formuleringen "AI kan göra det själv". Prov planeras med avgränsat mål, antal körningar, tids- och anropsram;
+ren sessionskontext och tydligt startläge; bunden kod-/driftsättningsversion, viewport och testdata; bevarade
+handlingar, sidutfall, fel och relevanta bilder; tydligt lyckat, misslyckat eller ej bedömbart utfall. Misslyckade
+försök sparas; villkor ändras inte och prov upprepas inte tills något råkar bli grönt utan att det redovisas;
+verktygs- eller åtkomstfel skiljs från fel i produkten. Bara tillåten åtkomst till den skyddade demon används;
+inloggningsskydd och noindex behålls; hemligheter hålls utanför agentens uppgiftstext och maskeras i spår, bilder och
+rapporter; provåtkomsten begränsas till avsett projekt. Inga riktiga mejl, SMS, leads, bokningar eller mottagare; inga
+verkliga personuppgifter; inga besök eller handlingar mot Vercel-admin, andra projekt eller externa tjänster som genväg
+i ett användarscenario. Resultatet skiljer mekaniskt uppmätt funktion, agentens bedömning och sådant bara ett mänskligt
+eller skarpt användningsprov skulle kunna belägga.
+
+**§9 Granskningsinsats och modelljämförelse:** påståendet "samma antal läsningar" rättas till en faktisk föreslagen
+körplan och resursram som skiljer initial granskning, ändringsberoende omkontroll och eventuella experiment; tre
+observationssätt blir inte automatiskt tre fulla granskningar vid varje liten rättning; olika observationssätt kan
+användas i avgränsade pass utan permanent agent eller ny rutin, och giltiga bevis för oförändrade delar tillgodoräknas.
+Codex-experimentet är ett avskiljbart tillägg, bara med befintlig tillåten åtkomst och tillgänglig kvot; varken saknad
+kvot eller uteblivet experiment får blockera de övriga förbättringarna. För en modelljämförelse ska uppgift, underlag och
+verktygsåtkomst vara jämförbara; effekt av annan modell skiljs från effekt av annan fråga eller annat underlag; ett känt
+fall är kalibrering, inte ett oberoende prov på generalisering. Ingen modellfamilj eller extra granskare ger i sig
+oberoende eller en kvalitetsgaranti; riktiga och falska fynd, resursåtgång och vad resultatet faktiskt stödjer redovisas.
+
+**§10 Leveransen, en preciserad §7 och ingen ny kampanj:** berörda delar av P1–P5 och §7 uppdateras sammanhängande i
+samma dokument; den gjorda inventeringen och historiken behålls och det ersatta markeras; tabeller och sammanfattningar
+kontrolleras så att gamla formuleringar inte fortsätter styra. Ett kort ändringsbesked och ett korrigerat samlat
+införandemandat lämnas, som skiljer mellan: 1, tillgängliggöra kunskapsstödet och koppla det till stegen; 2, eventuell
+namngiven skill- eller webbläsarinstallation; 3, avgränsad prövning mot bevarat material utan sajtändring; 4,
+tillämpning i nästa separat accepterade fiktiva uppdrag; 5, frivilliga, villkorade modell- och människoprov. Få
+etapper, resursram, första användbara resultat och klart-när anges; "tillgängligt och kopplat" skiljs från "prövat med
+observerad nytta"; inga generella effekter utlovas efter två fall. Den befintliga separata granskningen täcker de
+ändrade bärande kopplingarna och mandatets gränser; hela jämförelsen görs inte om och oförändrade delar granskas inte
+utan skäl. Sluttexten jämförs med ägarens besked: inspiration är inte återinförande av den gamla arbetskedjan;
+resursförslag är inte redan godkända installationer; AI-scenarier är inte bevis för mänskligt användarbeteende; ingen
+automatisk bekräftelse eller radering efter två fall; inget nytt företag, ingen sajtändring, inget modellbyte och inget
+köp är valt; vanliga steg inom ett senare accepterat mandat blir inte nya rutinmässiga godkännandestopp. Ägarens nästa
+beslut ska kunna gälla ett enda tydligt paket; sådant som redan är beslutat begärs inte på nytt, och ägaren tillskrivs
+inte ett godkännande av delar som fortfarande är förslag. Slutmålet är att rätt kunnande används i dagens Digitala, att
+AI bär det praktiska provarbetet och att nästa leverans blir bättre, utan ett återinfört gammalt system eller en ny
+kontrollapparat runt varje steg.
+
+**Kedjedrivarens deklarerade arbetsram (kedjedrivarens, inte ägarens):** kompletteringen görs i det privata
+jämförelsedokumentet och dess sparade underlag. De enda nya läsningarna är referensfilen PICKER.md vid den redan pinnade
+revisionen och en kontroll att de sparade texterna är filerna vid de pinnade revisionerna. Inventeringen av
+webbläsarautomation är läsande: installerade paket, konfiguration och sessionens verktyg. Ingen körning mot demon,
+ingen installation, ingen anslutning, ingen ändring i kundrepot och ingen ändring av Norrgläntas drift. Den separata
+granskningen gäller de ändrade bärande kopplingarna och mandatets gränser, med ägarens jämförelselista som frågor.
+Utfallet registreras som egen post, och planens ägarpost om det tidigare rekommenderade mandatet ersätts då av det
+korrigerade paketet.
+
+**Plan:** steg 8 i Digitala-planen PÅGÅR. Klart-när: dokumentet är uppdaterat, separat granskat och registrerat, och
+ändringsbeskedet och det korrigerade samlade mandatet är lämnade till ägaren för ett enda beslut.
+
+**Ersätter:** ingen post. Det tidigare rekommenderade mandatet står kvar som historik i jämförelsedokumentet och ersätts
+där av det korrigerade.
