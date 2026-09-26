@@ -25,7 +25,8 @@ webbförvaltningen är inspiration till dagens flöde, inte Digitalas arbetskedj
 godkänt briefen (DIGITALA-1-BRIEF-GODKAND-20260926): CTA-etiketten "Skicka förfrågan", H1-kandidat 1 och målbilden och
 designriktningen. Demon är levererad 2026-09-26 bakom inloggning (DIGITALA-1-LEVERANS-20260926), och ägarens bedömning
 väntar i ägarens tur. Ägaren har därefter beställt en riktad kontroll och förbättring av fem områden efter en extern
-kodgranskning (DIGITALA-1-RIKTAD-KONTROLL-20260926). Den pågår i steg 6.
+kodgranskning (DIGITALA-1-RIKTAD-KONTROLL-20260926). Den är genomförd (DIGITALA-1-RIKTAD-RESULTAT-20260926), och tre
+förslag väntar på ägaren.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`.
@@ -58,16 +59,16 @@ Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med resear
     `evidence/digitala/local/norrglanta/OVERLAMNING-20260926.md`. Nästa steg är ägarens
     bedömning av den byggda sajten och ägarens beslut om ett nästa fiktivt fall. Inget nytt företag väljs före det
     (DIGITALA-1-ACCEPT §7).
- 6. PÅGÅR från 2026-09-26: den riktade kontrollen (DIGITALA-1-RIKTAD-KONTROLL-20260926). Den gäller:
-    - rabattskötseln genom hela kedjan;
-    - tidsfällans två klockor;
-    - vad kontaktfältet validerar;
-    - Säsongsplanens inramning som önskemål;
-    - ett avgränsat redaktionellt pass.
+ 6. KLART 2026-09-26: den riktade kontrollen (DIGITALA-1-RIKTAD-KONTROLL-20260926, resultat i
+    DIGITALA-1-RIKTAD-RESULTAT-20260926). Kundrepots `main` bär den granskade och befordrade versionen.
+    - Rabattskötseln ingår genom hela kedjan.
+    - Tidsfällan mäter med en klocka.
+    - Kontaktfältets längdregel är redovisad som avsiktlig begränsning.
+    - Säsongsplanen visar ett önskat säsongsupplägg.
+    - Det redaktionella passet är gjort.
 
-    Huvudrubriken ändras inte; alternativet visas som förslag. Rättningarna görs i kundrepot och prövas på en ny skyddad
-    förhandsvisning, med separat granskning innan den befordras. Nästa besked redovisar varje område och levererar
-    skärmbilder bundna till den bedömda versionen.
+    Huvudrubriken är orörd. Alternativet, två förslag om kontaktfältets validering och en rättelseanteckning i briefen
+    väntar som förslag i ägarens tur.
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -328,6 +329,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 
 ÄGARENS TUR
 - [beslut] Digitala 1: bedöm den levererade Norrglänta-demon och avgör om ett nästa fiktivt fall behövs — sedan 2026-09-26
+- [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -341,6 +343,8 @@ den första underkänd för en pekare som avgjorde klart-när och en prognos som
 kvarlämnad mening om webbgrundens väg, båda ersatta av den publicerade tredje);
 `digitala/leverans-r1` (granskad första version av DIGITALA-1-LEVERANS-20260926, godkänd men ersatt före publiceringen
 av den publicerade andra med rättade formuleringar om bildernas ursprung, bedömarnas förhandsvisning och befordran);
+`digitala/riktad-resultat-r1` (granskad första version av DIGITALA-1-RIKTAD-RESULTAT-20260926, godkänd men ersatt före
+publiceringen av den publicerade andra med preciserade formuleringar och båda förslagen om kontaktfältet);
 `aquarium/arkivdatum-underlag-r1` (första versionen av användningsprovets underlag, underkänd för en kvarlämnad mening och
 ersatt av den publicerade andra); `kontor/stang-granskningsbudget-r1` (första versionen av denna planpost, underkänd för en
 kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, ersatt före granskning av den publicerade
@@ -444,7 +448,7 @@ RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925
 DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925,
 RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925, DIGITALA-1-TILLAGG-20260925,
 DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-LEVERANS-20260926,
-DIGITALA-1-RIKTAD-KONTROLL-20260926 och Runtime-planens ingång.
+DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926 och Runtime-planens ingång.
 
 ---
 

@@ -2530,3 +2530,107 @@ Ingen ny fiktiv verksamhet startas i passet. Målet är att göra demons erbjuda
 att samla fler gröna prov eller börja om med en ny teknisk grund.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-RIKTAD-RESULTAT-20260926 — den riktade kontrollen av Norrglänta: fyra fynd rättade eller preciserade, ett avvisat, tre förslag till ägaren
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Posten redovisar passet som
+DIGITALA-1-RIKTAD-KONTROLL-20260926 beställde. Underlaget står privat:
+- redovisningen per område i `evidence/digitala/local/norrglanta/RIKTAD-KONTROLL-RESULTAT-20260926.md`;
+- mätningarna i `evidence/digitala/local/norrglanta/matning-20260926/`;
+- de separata granskningarna i `evidence/digitala/local/norrglanta/granskning-r4-riktad/` och
+  `evidence/digitala/local/norrglanta/granskning-r5-riktad/`.
+
+**Bedömd version:**
+- Kundrepot `ada775e` är fyra commits ovanpå den levererade versionen `2a84fd3`:
+  - `0f8322a` — rättningarna;
+  - `f60bf26` — preciseringen av Säsongsplanen;
+  - `3f3ccfb` — det redaktionella passet;
+  - `ada775e` — en precisering i startsidans villaägartext efter den första granskningsrundan.
+- Den nya versionen är prövad på en ny skyddad förhandsvisning och befordrad till produktionsadressen, också den
+  bakom inloggning. Kärnproven är körda om på produktionsadressen.
+- Utgångsläget reproducerades på en lokal byggnad av `2a84fd3`, utan driftsättning och utan att datorns klocka
+  ändrades. Inget skickades.
+
+**1. Rabattskötsel: bekräftat fynd, och briefen är själv motsägelsefull.**
+- Ägarens tjänstedefinition i DIGITALA-1-ACCEPT-20260925 och briefens tjänstetabell säger att skötsel av rabatter ingår
+  i den löpande skötseln. Briefens beskrivning av Säsongsplanen listar den ändå som tillval.
+- På sidan var den ett förvalt tillval. Vald beskrevs den som tillval i slutbeskedet, och bortvald försvann den ur
+  planens mening.
+- **Rekommendation och rättning:** rabattskötsel ingår, eftersom ägarens egen definition säger det. Kedjedrivaren
+  rekommenderar det; ägaren har inte valt det. Tillvalet är borttaget genom kedjan: Säsongsplanen, förfrågan och
+  slutbeskedet.
+- **Prövat:** alla åtta kombinationer av de tre återstående tillvalen, valda och bortvalda, och två äldre adressvärden.
+- **Kvar för ägaren:** briefens tillvalslista är inte ändrad. Förslaget är en rättelseanteckning.
+
+**2. Tidsfällan: bekräftat fynd, rättat.**
+- Webbläsarens starttid jämfördes med serverns klocka.
+- Reproducerat: med klientklockan en minut före fick en människolik ifyllning det tysta robotsvaret. Med klockan en
+  minut efter släpptes ett skript igenom.
+- **Rättning:** ifyllnadstiden mäts nu i webbläsaren med en och samma monotona klocka, och servern jämför bara
+  varaktigheten med golvet. Briefen anger en klientmätt varaktighet med golvet 2,5 s.
+- **Prövat:** normal och snabb ifyllning med klockan rätt, en minut före och en minut efter, och den tidigare rättade
+  fokushanteringen.
+- **Begränsning:** tidsfällan är inte ensam ett bevis för en robot. Värdet kommer från webbläsaren, ett skript utan
+  JavaScript prövas bara av honeypoten, och en mycket snabb människa kan få det tysta svaret.
+
+**3. Kontaktfältet: avvisat som fel.**
+- Längdregeln (minst fem tecken) är ett uttryckligt beslut i den godkända briefen, och acceptansen kräver validering
+  men inget format. Den redovisas som avsiktlig begränsning.
+- Proven belägger de obligatoriska fälten och längdregeln, inte ett rimligt telefon- eller e-postformat.
+- Två namngivna förslag finns: en formatkontroll och ett felmeddelande som beskriver regeln. Inget av dem är infört.
+
+**4. Säsongsplanen: bekräftat fynd, genomfört som precisering inom briefen.**
+- Sidan kallade besökarens val för det man kommer överens om.
+- Resultatet heter nu "Ditt önskade säsongsupplägg", och meningen beskriver önskemålet utan löften. Ingressen säger att
+  valen följer med i förfrågan och att omfattning och tider bestäms senare.
+- Funktionen, förifyllningen och demobeskedet är oförändrade. Preciseringen är inget ägarbeslut och kan backas för sig.
+
+**5. Redaktionellt: bekräftat fynd, avgränsat pass genomfört.**
+- Löftet om en tydlig överenskommelse stod på många ställen. Mätt i sidornas synliga text återkommer det nu på två
+  ställen i stället för sju på startsidan och sidan om löpande skötsel.
+- Sektionsrubriker, målgruppstexter, CTA-bandet och ett kontaktsteg har fått egna syften. Om-sidans andra, nästan
+  likadana citat står nu som löptext.
+- FAQ-formuleringen "en av våra två målgrupper" är ersatt av ett rakt svar.
+- Inga nya uppgifter om företaget: allt bygger på den godkända faktabasen.
+- **Huvudrubriken:** ägarens godkända kandidat 1 är orörd.
+  - Den renderas på fem rader på mobil, vilket avviker från briefens hero-rad om högst tre rader, men ägarens beslut
+    går före.
+  - Alternativet, en kortare H1 och en separat stödtext, är jämfört på mobil och desktop och visas bara som förslag.
+  - Kedjedrivaren rekommenderar alternativet och föreslår att det prövas innan det levereras.
+- **Bilderna:** bedömda utan att lokal proveniens tillskrivs dem. Trädgårdsbilden från en slottsträdgård är den som
+  passar sämst, men den är inget fel och ingen beställning på en ny bild.
+
+**Uppmätt, bedömt och ej prövat:**
+- **Uppmätt:**
+  - reproduktionerna;
+  - formulärets, tidsfällans och kedjans prov;
+  - axe utan överträdelser;
+  - inga anrop utanför sajten;
+  - målytorna;
+  - FAQ-schemat utan fel;
+  - noindex och åtkomstskyddet;
+  - den uppladdade filmängden;
+  - faktakontrollen.
+- **Bedömt:** de redaktionella valen, huvudrubriken och bilderna, och de två separata granskningsrundorna. Båda
+  godkände utan blockerande fynd. De gjordes av samma modellfamilj och är en separat läsning, inte ett oberoende
+  omdöme.
+- **Ej prövat:**
+  - verkligt användarprov av den nya versionen;
+  - Lighthouse, kontrasten över herobilden, reducerad rörelse, femsekunderstestet och toppuppgifterna. Ändringarna berör
+    dem inte.
+
+  De äldre resultaten gäller den levererade versionen.
+
+**Kostnad och åtkomst:** två förhandsvisningar och en befordran till. Förbrukningen utöver den inkluderade krediten är
+0 USD, och teamets budget är orörd. Bara den redan tillåtna provåtkomsten användes. Ingen delbar länk, domän eller
+offentlig lansering.
+
+**Kvar för ägaren:** tre förslag, vart och ett ett eget beslut:
+- huvudrubrikens alternativ;
+- kontaktfältets validering: formatkontroll, ett felmeddelande som beskriver regeln, eller ingen ändring;
+- rättelseanteckningen i briefen.
+
+Bedömningen av demon och frågan om ett nästa fiktivt fall står kvar (DIGITALA-1-ACCEPT-20260925 §7). Ingen ny fiktiv
+verksamhet har startats.
+
+**Ersätter:** ingen post.
