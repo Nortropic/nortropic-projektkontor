@@ -30,8 +30,8 @@ förslag väntar på ägaren. Ägaren har därefter beställt en samlad jämför
 webbförvaltningens kunnande, Improvements och aktuella originalkällor, som ett analys- och förslagsuppdrag
 (DIGITALA-1-JAMFORELSE-20260926). Den är levererad (DIGITALA-1-JAMFORELSE-RESULTAT-20260926). Ägaren har därefter
 preciserat införandeförslaget och provplanen (DIGITALA-1-PRECISERING-20260926). Preciseringen är levererad
-(DIGITALA-1-PRECISERING-RESULTAT-20260926): ett korrigerat samlat införandemandat i fem delar väntar på ett enda
-ägarbeslut i ägarens tur.
+(DIGITALA-1-PRECISERING-RESULTAT-20260926). Ägaren har därefter beställt genomförandet av det avgränsade
+P1–P5-paketet enligt dokumentets version 4 (DIGITALA-1-GENOMFORANDE-20260926); det pågår i steg 9.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`.
@@ -81,8 +81,17 @@ Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med resear
  8. KLART 2026-09-26: preciseringen av införandeförslaget (DIGITALA-1-PRECISERING-20260926, resultat i
     DIGITALA-1-PRECISERING-RESULTAT-20260926). P1–P5 och §7 i det privata jämförelsedokumentet är omskrivna enligt
     ägarens tio avsnitt och separat granskade på de ändrade bärande kopplingarna och mandatets gränser. Inget är
-    installerat, anslutet, kört mot demon eller ändrat i kundrepot. Det korrigerade samlade mandatet i fem delar
-    väntar på ett enda ägarbeslut i ägarens tur; det är ett förslag tills dess.
+    installerat, anslutet, kört mot demon eller ändrat i kundrepot. Ägaren beslutade om paketet genom
+    DIGITALA-1-GENOMFORANDE-20260926 (steg 9).
+ 9. PÅGÅR från 2026-09-26: genomförandet av det avgränsade P1–P5-paketet (DIGITALA-1-GENOMFORANDE-20260926), i
+    ordningen: del 1, kunskapsstödet i `evidence/digitala/local/kunskap/` med register, tre härledda underlag och
+    lärdomsfil, en planrad som pekar på registret (egen granskad kontorspost) och mottagarprovet med en färsk
+    läsarsession; del 2, ingen installation, bokförs bara; del 3, provskriptet i kundrepots `scripts/prov/` med privat
+    startare, spärrprov med falska hemligheter, separat granskning före första skyddade körning, sedan seedfallet, den
+    blinda granskningen, två scenarier mot den bevarade leveransens egna adress och en bildbedömning, högst åtta
+    modellsessioner; del 4 och 5 bara förberedda respektive villkorade. Norrgläntas sajt, skydd och drift orörda;
+    ingen driftsättning. Återupptagningspunkt: posten och det privata läget i
+    `evidence/digitala/local/genomforande-20260926/LAGE.md`. Klart-när står i posten.
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -344,7 +353,6 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 ÄGARENS TUR
 - [beslut] Digitala 1: bedöm den levererade Norrglänta-demon och avgör om ett nästa fiktivt fall behövs — sedan 2026-09-26
 - [beslut] Digitala 1: ta ställning till den riktade kontrollens tre förslag (huvudrubrikens alternativ, kontaktfältets validering, rättelseanteckning i briefen) — sedan 2026-09-26
-- [beslut] Digitala 1: ta ställning till det korrigerade samlade införandemandatet i fem delar (kunskapsstöd kopplat till stegen; ingen installation; avgränsad prövning utan sajtändring; tillämpning i nästa accepterade fall; villkorade modell- och människoprov) — sedan 2026-09-26
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -472,8 +480,8 @@ DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LE
 RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925, DIGITALA-1-TILLAGG-20260925,
 DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-LEVERANS-20260926,
 DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926, DIGITALA-1-JAMFORELSE-20260926,
-DIGITALA-1-JAMFORELSE-RESULTAT-20260926, DIGITALA-1-PRECISERING-20260926, DIGITALA-1-PRECISERING-RESULTAT-20260926 och
-Runtime-planens ingång.
+DIGITALA-1-JAMFORELSE-RESULTAT-20260926, DIGITALA-1-PRECISERING-20260926, DIGITALA-1-PRECISERING-RESULTAT-20260926,
+DIGITALA-1-GENOMFORANDE-20260926 och Runtime-planens ingång.
 
 ---
 
