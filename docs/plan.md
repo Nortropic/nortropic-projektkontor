@@ -26,7 +26,9 @@ godkänt briefen (DIGITALA-1-BRIEF-GODKAND-20260926): CTA-etiketten "Skicka för
 designriktningen. Demon är levererad 2026-09-26 bakom inloggning (DIGITALA-1-LEVERANS-20260926), och ägarens bedömning
 väntar i ägarens tur. Ägaren har därefter beställt en riktad kontroll och förbättring av fem områden efter en extern
 kodgranskning (DIGITALA-1-RIKTAD-KONTROLL-20260926). Den är genomförd (DIGITALA-1-RIKTAD-RESULTAT-20260926), och tre
-förslag väntar på ägaren.
+förslag väntar på ägaren. Ägaren har därefter beställt en samlad jämförelse av dagens Digitala-flöde med den gamla
+webbförvaltningens kunnande, Improvements och aktuella originalkällor, som ett analys- och förslagsuppdrag
+(DIGITALA-1-JAMFORELSE-20260926). Den pågår i steg 7.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`.
@@ -69,6 +71,11 @@ Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med resear
 
     Huvudrubriken är orörd. Alternativet, två förslag om kontaktfältets validering och en rättelseanteckning i briefen
     väntar som förslag i ägarens tur.
+ 7. PÅGÅR från 2026-09-26: jämförelsen och resursförslaget (DIGITALA-1-JAMFORELSE-20260926). Ett analys- och
+    förslagsuppdrag inom kedjedrivarens deklarerade arbetsram: ingen installation, flödesändring eller produktändring.
+    Leveransen är fem delar i ett privat dokument (jämförelsetabell, resurskarta, prioriterat förbättringspaket, bevara
+    och avstå, okänt och beslut), granskade av en separat läsare före registreringen, och ett samlat rekommenderat
+    införandemandat för ägarens beslut. Norrgläntas leverans och drift rörs inte.
 
 Spår 2, den avgränsade diagnosen av Runtimes två oförklarade svitmisslyckanden kring PR 62. Genomförd 2026-09-25
 19:24-19:36Z, inom kedjedrivarens resursram på högst tolv svitkörningar (inga modellanrop, ingen motor): åtta körningar
@@ -448,7 +455,8 @@ RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925, AQUARIUM-V0-AGARPROV-GODKANT-20260925
 DIGITALA-1-BEREDNING-20260925, DIGITALA-1-KOMPLETTERING-20260925, AQUARIUM-V0-LEVERANS-20260925,
 RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925, DIGITALA-1-TILLAGG-20260925,
 DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-LEVERANS-20260926,
-DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926 och Runtime-planens ingång.
+DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926, DIGITALA-1-JAMFORELSE-20260926 och
+Runtime-planens ingång.
 
 ---
 
