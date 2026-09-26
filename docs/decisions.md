@@ -3327,3 +3327,42 @@ kvar. Klart-när: införanderesultatet är registrerat med mottagarprovet, åtko
 eller ett konkret hinder är redovisat för beslut.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-KUNSKAPSSTOD-20260926 — paketets del 1 på plats: kunskapsstödet är tillgängligt och kopplat till stegen; del 2 bokförd utan installation; provkoden utlöser ingen driftsättning
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code) inom DIGITALA-1-GENOMFORANDE-20260926. Posten är den
+planrad som pekar på registret, så att en färsk session hittar kunskapsstödet från ordinarie ingång; mottagarprovet körs
+efter att raden publicerats och redovisas i införanderesultatet. Ingenting är installerat, anslutet eller driftsatt.
+
+**Del 1, tillgängligt och kopplat.** I den privata mappen `evidence/digitala/local/kunskap/` ligger: `externa/` med de
+tolv filerna kopierade byte för byte från läsbevisen (sju huvudtexter, fyra licensfiler och referensfilen PICKER.md),
+varje kopia kontrollerad mot läsbevisens git-blob och storlek och mot revisionskontrollen vid de fulla pinnade
+revisionerna (`KONTROLL.txt`, `KONTROLL.sha256`; tolv av tolv lika, ingen fil hämtad på nytt); `REGISTER.md` med
+reglerna (laddning per steg, briefen och mandatet vinner, källmaterial är inte styrande, pinnade versioner,
+användningsnotens fyra utfall, avstämning efter två relevanta tillämpningar) och kopplingstabellen per underlag: steg
+och utförare, när det läses och vilka delar, uppgift eller kontroll, konfliktregel; de tre härledda arbetsunderlagen
+`referensjakt.md`, `redaktionellt-pass.md` och `formularsakerhet.md`, skrivna i egna ord med källa och rad angivna; och
+`LARDOMAR.md` med elva poster ur Norrglänta och preciseringen i P4:s form: observation, möjlig generell
+lärdom, lokal preferens, tillämpning, kvarvarande osäkerhet och läge utan statusord, med avstämningsregeln och
+avslutsregeln i filens huvud. Prototype står i registret som metod (alternativ A): ingen skill, ingen ändrad spärr,
+inget manuellt startsteg för ägaren; PICKER.md är referensmaterial. Läget är "tillgängligt och kopplat", inte "prövat
+med observerad nytta".
+
+**Del 2, bokförd.** Ingen skill- eller verktygsinstallation görs. Playwright, nya webbläsare och MCP-anslutningar
+ingår inte.
+
+**Kontrollen att provkoden inte utlöser en sajtdeploy.** Läst genom Vercel-verktyget utan ändring: projektet har ingen
+git-koppling (fältet för repokoppling är tomt), så en push till kundrepot bygger inget; driftsättningar sker bara
+genom ett uttryckligt kommando från kedjedrivarens dator, och inget sådant körs i paketet. Kundrepots
+deployeringslista tillåter dessutom bara sajtens kataloger och filer, inte `scripts/`. Produktionsmålet är bundet till
+den levererade versionen, och del 3:s körningar binds till driftsättningens egen, oföränderliga adress, inte till de
+rörliga aliasen. Bindningen står privat i `evidence/digitala/local/genomforande-20260926/driftsattningsbindning-20260926.txt`.
+
+**Del 3, påbörjad.** Provskriptet och webbläsarhållaren finns i kundrepots `scripts/prov/` (okommitterade tills
+spärrproven och den separata granskningen är klara) och den privata startaren i
+`evidence/digitala/local/genomforande-20260926/provvag/`. Spärrproven körs med falska hemligheter och lokala provmål;
+det första försöket föll på ett verktygsfel i provskriptet och är bevarat. Inget har körts mot demon.
+
+**Plan:** Digitala-planen får raden om kunskapsstödet; steg 9 uppdateras med del 1 på plats och mottagarprovet kvar.
+
+**Ersätter:** ingen post.

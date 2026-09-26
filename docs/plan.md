@@ -34,7 +34,10 @@ preciserat införandeförslaget och provplanen (DIGITALA-1-PRECISERING-20260926)
 P1–P5-paketet enligt dokumentets version 4 (DIGITALA-1-GENOMFORANDE-20260926); det pågår i steg 9.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
-`evidence/digitala/local/norrglanta/`.
+`evidence/digitala/local/norrglanta/`. Kunskapsstödet för dagens flöde står i `evidence/digitala/local/kunskap/REGISTER.md`
+(DIGITALA-1-KUNSKAPSSTOD-20260926): registret säger vilket underlag varje steg läser, vilka delar, för vilken uppgift
+och hur konflikter med brief och mandat hanteras; underlagen laddas per steg, aldrig alla i en session, och de är råd,
+inte krav.
  1. Dagens flöde för demon, inte den gamla webbgrundens körväg (DIGITALA-1-KORRIGERING-20260926). Kedjedrivaren bygger i
     kundrepot med Claude Code, Vercel-verktyget och egna kontroller i webbläsaren. Valda idéer ur den gamla
     webbförvaltningen och ur Improvements omsätts enligt bedömningen. Enligt den tidigare tolkningen kördes `npm ci` i
@@ -85,8 +88,8 @@ Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med resear
     DIGITALA-1-GENOMFORANDE-20260926 (steg 9).
  9. PÅGÅR från 2026-09-26: genomförandet av det avgränsade P1–P5-paketet (DIGITALA-1-GENOMFORANDE-20260926), i
     ordningen: del 1, kunskapsstödet i `evidence/digitala/local/kunskap/` med register, tre härledda underlag och
-    lärdomsfil, en planrad som pekar på registret (egen granskad kontorspost) och mottagarprovet med en färsk
-    läsarsession; del 2, ingen installation, bokförs bara; del 3, provskriptet i kundrepots `scripts/prov/` med privat
+    lärdomsfil — på plats och kopplat 2026-09-26 (DIGITALA-1-KUNSKAPSSTOD-20260926), planraden ovan publicerad,
+    mottagarprovet med en färsk läsarsession kvar; del 2, ingen installation, bokförd; del 3, provskriptet i kundrepots `scripts/prov/` med privat
     startare, spärrprov med falska hemligheter, separat granskning före första skyddade körning, sedan seedfallet, den
     blinda granskningen, två scenarier mot den bevarade leveransens egna adress och en bildbedömning, högst åtta
     modellsessioner; del 4 och 5 bara förberedda respektive villkorade. Norrgläntas sajt, skydd och drift orörda;
@@ -376,6 +379,8 @@ publiceringen av den publicerade andra, som återinför två förkortade ägarfo
 en felaktig versionsuppgift och ett för litet redovisat ändringsomfång, ersatt av den publicerade tredje); `digitala/precisering-resultat-r2` (granskad
 andra version, godkänd men ersatt före publiceringen av den publicerade tredje, som för in granskarens kvarstående
 anmärkningar om gränslistan, del 3:s ram och ordvalet om anroparen);
+`digitala/kunskapsstod-r1` (granskad första version av DIGITALA-1-KUNSKAPSSTOD-20260926, godkänd men ersatt före
+publiceringen av den publicerade andra med ett rättat ordval om lärdomsposterna);
 `aquarium/arkivdatum-underlag-r1` (första versionen av användningsprovets underlag, underkänd för en kvarlämnad mening och
 ersatt av den publicerade andra); `kontor/stang-granskningsbudget-r1` (första versionen av denna planpost, underkänd för en
 kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, ersatt före granskning av den publicerade
@@ -481,7 +486,7 @@ RUNTIME-GRANSKNINGSBUDGET-ANVANDNINGSPROV-20260925, DIGITALA-1-ACCEPT-20260925, 
 DIGITALA-1-KORRIGERING-20260926, DIGITALA-1-BRIEF-GODKAND-20260926, DIGITALA-1-LEVERANS-20260926,
 DIGITALA-1-RIKTAD-KONTROLL-20260926, DIGITALA-1-RIKTAD-RESULTAT-20260926, DIGITALA-1-JAMFORELSE-20260926,
 DIGITALA-1-JAMFORELSE-RESULTAT-20260926, DIGITALA-1-PRECISERING-20260926, DIGITALA-1-PRECISERING-RESULTAT-20260926,
-DIGITALA-1-GENOMFORANDE-20260926 och Runtime-planens ingång.
+DIGITALA-1-GENOMFORANDE-20260926, DIGITALA-1-KUNSKAPSSTOD-20260926 och Runtime-planens ingång.
 
 ---
 
