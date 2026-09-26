@@ -4603,3 +4603,72 @@ läsning, inte ett oberoende omdöme); utfallet står i publiceringens kvitto.
 **Resurser.** En modellsession på abonnemanget, för granskningen. Inga andra.
 
 **Ersätter:** förslagets standardläge för beslut 3 ("regeln gäller bara rytmernas egna punkter") och ägarens rad om beslut 3.
+
+## DIGITALA-1-ETAPP3-RESULTAT-20260926 — webbläsarvägen är avgjord: den egna vägen (hållare, vakt, startare) väljs för scenarioprovaren efter omprov B, två lyckade skyddade scenarier mot den bevarade leveransen och samma spärrprov mot agent-browser; Playwright MCP väljs inte
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Planens steg 13 (DIGITALA-1-TILLAGGSMANDAT-BESLUT-20260926,
+etapp 3), påbörjat efter ägarens ord "fortsätt" (sparat ordagrant privat). Allt står privat under
+`evidence/digitala/local/genomforande-20260926/`: utfallet (`UTFALL-ETAPP3.md`), valet (`VAL-WEBBLASARVAG-20260926.md`),
+körkatalogerna med RUN.json och kontrollantens KONTROLL.md, och den pinnade agent-browser-kopian. Ingen sajtändring,
+ingen driftsättning, inga Vercel-inställningar ändrade, ingen hemlighet i uppgift, utdata, bild eller spår. Ram 3–5
+modellsessioner: fem använda.
+
+**Körningarna.** (1) Omprov B med version 2 av provaren: alla elva krav ur provvägsgranskningens andra runda uppfyllda,
+tre rester redovisade (däribland Read-regelns dubbla snedstreck, utan observerad verkan). (2) Kundrepots provkod pushad
+utan driftsättning; pushen tog med etapp 1:s två verktygscommits som låg på samma gren; kontroll före och efter genom
+läsning visade ingen ny driftsättning. (3) Ett modellfritt driftsättningsprov av hållaren mot den bevarade leveransen
+föll först: hållarens värdregel undantog bara sajtens värdnamn, så webbläsaren nådde inte sin egen
+proxy när målet inte längre låg på loopback; rättningen är en rad i kundrepot, gränsen är oförändrad i sak (proxyn
+avgör), regressionsprovet A och driftsättningsprov 2 var gröna, och ändringen granskades separat efteråt (godkänd utan
+blockerande fynd). Driftsättningsprov 2 visade också att undantaget i åtkomstskyddet är nödvändigt (utan det nås
+sajten inte och omdirigeringen mot inloggningen nekas av proxyn), att https-vägen håller och att sajten inte laddar
+tredjepartsvärdar. (4) Skyddade scenarier med `--verify-deployment` och tvingande bindning till den bevarade
+driftsättningen: scenario 1 (villaägare, mobil) föll som verktygsfel, eftersom uppgiften saknade startadressen och
+kommandot stod med ellips — noll handlingar, gränsen höll; scenario 1b, samma uppgift med adress och exakt kommando
+(tredje session enligt regeln "en tredje bara vid verktygsfel"), lyckades: 26 handlingar, förfrågan skickad,
+demosvaret återgav testuppgifterna; scenario 2 (bostadsrättsförening, dator) lyckades: 16 handlingar, kvittensen
+återgav valen. Kontrollanten bedömde slutläget ur sista skärmbild, sidtext och spår, inte ur provarens rapport.
+(5) agent-browser 0.38.1 hämtad pinnad (paketets kontrollsumma verifierad, inget installationsskript, inget globalt;
+bara den infödda binären, eftersom omslaget kräver en Node-version som inte finns lokalt) och prövad med samma fällor:
+fyra modellfria försök (det första föll på riggen, det andra och tredje på policyn och gav därmed fynden om den, det
+fjärde bedömbart) och en modellsession genom en ny startare och en ny vakt, utan ändring i den egna vägen.
+
+**Fynd om agent-browser.** Domänlistan är värdnamnsnivå och portblind (samma värdnamn på annan port släpps igenom);
+länk, popup och omdirigering mot ett främmande värdnamn blockeras på förfrågningsnivå men lämnar flikar öppna;
+åtgärdspolicyn "default deny" verkar på åtgärdsnamn som dokumentationens kategoritabell inte nämner (bland annat
+själva webbläsarstarten); ingen egen spårfil; inget skrevs under en isolerad hemkatalog; tillgänglighetssnapshot med
+referenser är en bättre observation än vår elementlista. Gränsen i modellsessionen hölls därför att vår vakt höll.
+
+**Det namngivna valet.** Den egna vägen väljs: den enda som i dag visar en origin-gräns, ett spår utanför provarens
+räckhåll och en väg för åtkomstskyddets undantag som aldrig passerar modellen, och den har körts hela vägen mot den
+bevarade, skyddade leveransen utan läcka. agent-browser förs vidare som ett avgränsat förslag för nästa fall (bakom vår
+proxy, som observationslager, jämfört mot dagens handlingsgränssnitt på samma uppgift), inte som val. Playwright MCP
+väljs inte och installeras inte. Frysningen av den egna vägen hävs för scenarioprovaren; den gamla webbgrundens verktyg
+berörs inte.
+
+**Produktiakttagelser ur scenarierna** (observationer för ägaren, inga ändringar): höststädning förkryssad i
+Säsongsplanen utan val; valen nollställs vid bakåt-navigering; den klistrade knappen täcker säsongstabellen i mobilvyn;
+häckklippning saknar egen sida, tidsangivelse och plats i startsidans säsongsöversikt; "fem korta frågor" stämmer inte
+med fyra val plus kontaktväg; kontaktformuläret utan ingång via Säsongsplanen saknar tillvalsfält; ingen fritext;
+felsammanfattningen visas innan kontaktvägen fyllts i; kontaktvägen återges inte i kvittensen; "mindre" förening
+definieras inte; inget om pris, avtalslängd, försäkring eller F-skatt. Båda provarna nådde målen.
+
+**Rytmerna (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926, per fall).** Lärdomsposter L18 (pröva målklassen
+modellfritt före modellsession; uppgiften bär exakt kommando och adress; processvakter får inte matcha sig själva),
+L19 (agent-browsers gränser och dokumentation) och L20 (tester, kontrollant och granskare är tre läsningar) i
+kunskapsregistrets lärdomsfil. Användningsnoter: provvägsgranskningens checklista påverkade driftsättningsprovets
+punkter; riktningsdokumentets ram för de tre vägarna och inventeringens pinning användes; agent-browsers egen
+dokumentation användes som kontroll och visade sig inte stämma med beteendet; kartläggningsarbetsflödets plan användes
+som kontroll och gav ändringsgranskningen; planens förslag att pröva agent-browser med dess flaggor är prövat.
+Förslagsraden för Digitala är satt i planen.
+
+**Resurser.** Fem modellsessioner (omprov B, scenario 1 med verktygsfel, scenario 1b, scenario 2, spärrprov B mot
+agent-browser), inom ramen 3–5. Övriga modellanrop, separat: ett kartläggningsarbetsflöde före körningarna (sex
+läsande agentanrop), granskningen av hållarändringen (en runda) och denna posts granskning. Modellfria körningar:
+driftsättningsprov 1–2, regressionsprov A, primingkontroll, fyra försök av spärrprov A mot agent-browser. 0 kr; ett
+paket hämtat pinnat till en privat katalog, inget installerat globalt.
+
+**Kvar:** ägarens beslut om Digitala-raderna kom in under kvällen genom kontorets genomgång och registreras i en egen
+post; inget i denna post föregriper dem. Etapp 4 ingår inte i mandatet.
+
+**Ersätter:** ingen post.

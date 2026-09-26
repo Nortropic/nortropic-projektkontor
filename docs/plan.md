@@ -40,7 +40,9 @@ RYTMER
   (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926); operatörshandlingar och säkerhetspunkter förfaller inte.
 
 FÖRSLAG ATT PRÖVA I NÄSTA FALL
-- Digitala: inget satt vid införandet; sätts av den som driver nästa Digitala-fall.
+- Digitala: i nästa fall körs agent-browser bakom vår proxy som observationslager (tillgänglighetssnapshot med
+  referenser) och jämförs mot dagens handlingsgränssnitt på samma uppgift — en modellsession, 0 kr; belägg L19; ersätter
+  i så fall bara handlingsgränssnittet, inte gränsen; ryms i ett vanligt mandat (DIGITALA-1-ETAPP3-RESULTAT-20260926).
 - Runtime: vid nästa Runtime-publicering körs publicerarens prov genom fångstomslaget, så att ett nytt fall av provet som
   föll i 2 av 16 körningar bevaras med utdata, returkod och miljö (lärdom R4; ryms i ett vanligt mandat).
 - Kontoret: före varje granskning av en kontorspost söks modellfritt efter det ersatta lägets formuleringar i posten och i
@@ -72,8 +74,8 @@ byggsessionen, är klar (DIGITALA-1-ETAPP1-RESULTAT-20260926, steg 11); ägaren 
 namngivna repon och fler trendande GitHub-repon (DIGITALA-1-INVENTERING-20260926, steg 14), utökad med fem delar
 (DIGITALA-1-INVENTERING-TILLAGG-20260926); inventeringen är klar i alla fem delar och väntar på ägarens beslut
 (DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926); etapp 2, kvalitetsprovet (steg 12), är levererad och väntar på ägarens omdöme
-(DIGITALA-1-ETAPP2-RESULTAT-20260926); etapp 3,
-webbläsarvägen till avgörande (steg 13), är oberoende; etapp 4 ingår inte.
+(DIGITALA-1-ETAPP2-RESULTAT-20260926); etapp 3, webbläsarvägen (steg 13), är avgjord till den egna vägen
+(DIGITALA-1-ETAPP3-RESULTAT-20260926); etapp 4 ingår inte.
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`. Kunskapsstödet för dagens flöde står i `evidence/digitala/local/kunskap/REGISTER.md`
@@ -163,15 +165,15 @@ inte krav.
     modellsessioner. Ingen sajtändring. Allt privat under `evidence/digitala/local/genomforande-20260926/etapp2/`.
     Nästa handling ligger hos ägaren (omdömet); en andra omgång komps görs bara om ägaren ber om det eller godtar
     inventeringens prov P-A, P-C eller P-D.
-13. VÄNTAR (oberoende av 11–12, får gå parallellt): etapp 3, webbläsarvägen till avgörande — omprov B med version 2 av
-    provaren; den första skyddade scenariokörningen mot den bevarade leveransen med `--verify-deployment` (2 sessioner,
-    en tredje bara vid verktygsfel; den verkliga provhemligheten först när omprov B visat gränsen); kundrepots provkod
-    pushad utan driftsättning; samma spärrprov A/B mot agent-browser med `--allowed-domains`, `--session`,
-    `--no-webmcp` och åtgärdspolicy (installation pinnad, 1–2 sessioner); därefter ett namngivet val mellan egen väg,
-    agent-browser bakom vår gräns och Playwright MCP bakom vår gräns (Playwright MCP installeras inte före valet).
-    Frysningen av den egna vägen hävs bara för dessa steg. Klart när körningarna är redovisade som lyckade,
-    misslyckade eller ej bedömbara och valet motiverat, med resultatpost efter separat granskning. Ram: 3–5
-    modellsessioner.
+13. KLART 2026-09-26: etapp 3, webbläsarvägen till avgörande (DIGITALA-1-ETAPP3-RESULTAT-20260926). Omprov B med
+    version 2 godkänt mot granskningens elva krav; kundrepots provkod pushad utan driftsättning; ett modellfritt
+    driftsättningsprov fann och rättade hållarens värdregel (en rad, separat granskad efteråt); två skyddade scenarier
+    mot den bevarade leveransen med `--verify-deployment` lyckade (den tillåtna tredje sessionen behövdes, eftersom det
+    första försöket föll på ett verktygsfel i uppgiftstexten); agent-browser 0.38.1 pinnad och prövad med samma
+    spärrprov A/B (portblind domänlista, policy på odokumenterade åtgärdsnamn, inget eget spår). Valet: den egna vägen; agent-browser som förslag bakom vår gräns för
+    nästa fall; Playwright MCP inte. Fem modellsessioner av 3–5. Frysningen av den egna vägen hävd för scenarioprovaren.
+    Läge och utfall privat i `evidence/digitala/local/genomforande-20260926/` (`UTFALL-ETAPP3.md`,
+    `VAL-WEBBLASARVAG-20260926.md`, `LAGE.md`). Nästa handling: ingen inom steg 13.
 14. KLART 2026-09-26: inventeringen (DIGITALA-1-INVENTERING-20260926), utökad med fem delar
     (DIGITALA-1-INVENTERING-TILLAGG-20260926). Ingenting installerades, anslöts, köptes eller aktiverades; allt som
     föreslås tas in bara genom nytt beslut. Delar:
@@ -501,6 +503,8 @@ månadsomgångens modellsessioner, ägarens del i Digitalas omgång, takets räc
 `digitala/inventering-tillagg-resultat-r0` (ogranskad första kandidat av DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926,
 återkallad efter en minut för att posten namngav åtkomstskyddets nyckel, som e–f-dokumentets granskare bett hålla utanför den
 publika posten, ersatt av den granskade andra);
+`digitala/etapp3-resultat-r1` (granskad första version av DIGITALA-1-ETAPP3-RESULTAT-20260926, underkänd för att den
+namngav den bevarade leveransens commit i den publika texten, ersatt av den publicerade andra);
 `kontor/forvaltningar-beslut-r1` (granskad första version av FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926, underkänd
 för ett absolut påstående om tidszonen i leverantörens besked om AP-10:s kvot, ersatt av den publicerade tredje);
 `kontor/forvaltningar-beslut-r2` (granskad andra version av samma post, underkänd för att sammanfattningen av det första
@@ -616,7 +620,7 @@ OVERBLICK-OBSIDIAN-20260926, DIGITALA-1-ETAPP1-RESULTAT-20260926, DIGITALA-1-INV
 DIGITALA-1-INVENTERING-TILLAGG-20260926, DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-ETAPP2-RESULTAT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
-FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926 och Runtime-planens ingång.
+FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926 och Runtime-planens ingång.
 
 ---
 
