@@ -3111,3 +3111,87 @@ korrigerade paketet.
 
 **Ersätter:** ingen post. Det tidigare rekommenderade mandatet står kvar som historik i jämförelsedokumentet och ersätts
 där av det korrigerade.
+
+## DIGITALA-1-PRECISERING-RESULTAT-20260926 — preciseringen är levererad: P1–P5 och §7 omskrivna, ett korrigerat samlat införandemandat i fem delar väntar på ett enda ägarbeslut
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Posten redovisar utfallet av DIGITALA-1-PRECISERING-20260926.
+Ingenting är installerat, anslutet, kört mot demon eller ändrat i kundrepot eller i Norrgläntas drift. Underlaget står
+privat: det uppdaterade dokumentet `evidence/digitala/local/JAMFORELSE-DIGITALA-20260926.md` (version 4), den ersatta
+versionen `jamforelse-underlag/JAMFORELSE-DIGITALA-20260926-r2.md`, den separat granskade version 3 i samma mapp
+(`-r3.md`), de nya läsbevisen och granskningen i `evidence/digitala/local/review-digitala-precisering-dokument-r1/`.
+
+**Vad som gjordes, inom den deklarerade arbetsramen:** ägarens besked sparades ordagrant och registrerades; de förkortade
+revisionerna löstes till fulla revisioner ur de befintliga läsbevisen, och var och en av de tolv sparade filerna (sju
+huvudtexter, fyra licensfiler, referensfilen PICKER.md) kontrollerades mot filen vid sin fulla revision med samma
+resultat; PICKER.md lästes vid den redan pinnade revisionen som enda nya källfil; webbläsarautomationen i dagens miljö
+inventerades läsande; §5 och §7 skrevs om; fem ställen rättades där en gammal formulering annars skulle fortsätta
+styra (två rader i §1.1, prototype-formen i §3.1, pekaren i §4.3 och sista punkten i §4.4), och ett ändringsbesked står
+överst med pekare till de ersatta lydelserna. Inget annat i §0–§4 och inget i §6 ändrades.
+
+**Det korrigerade samlade mandatet (förslag, inte accepterat, inte påbörjat), fem delar:**
+1. **Tillgängliggöra kunskapsstödet och koppla det till stegen**: sju externa huvudtexter vid de lästa revisionerna
+   (Anthropics frontend-design, Vercels Web Interface Guidelines, Addy Osmanis web-quality-audit och accessibility,
+   Emil Kowalskis emil-design-eng, mobile-native och prototype), fyra licensfiler och referensfilen PICKER.md, kopierade
+   från de sparade läsbevisen till en privat kunskapsmapp; ett register som för varje underlag anger steg, utförare, när
+   och vilka delar som läses, uppgift eller kontroll och konfliktregel; tre egna härledda underlag (referensjakt,
+   redaktionellt pass, formulärsäkerhet) och en lärdomsfil utan automatisk bekräftelse eller radering. Klart-när
+   innefattar att en färsk session hittar rätt underlag från ordinarie ingång utan angivna filnamn. Uppskattning 3–4
+   timmar.
+2. **Namngiven skill- eller webbläsarinstallation: ingen begärs.** Prototype tas in som metod, inte som skill; ingen
+   spärr ändras. Webbläsarvägen använder befintlig Chrome och puppeteer-core; det enda nya är ett provskript i
+   kundrepots provkatalog och en privat startare för den isolerade sessionen. Playwright och varje MCP-anslutning
+   ligger utanför; behövs de återkommer kedjedrivaren med den minsta ändringen som eget beslut.
+3. **Avgränsad prövning mot bevarat material utan sajtändring**: ett seedat prövningsfall för det redaktionella passet
+   på en kopia av Norrgläntas text; en blind kodgranskning av den levererade versionen före rättningarna som
+   kalibrering; provvägen för AI-scenarier som metodprov mot den bevarade, skyddade leveransen, två körningar
+   läsande och först efter ägarens beslut om paketet, med spår och separat utfallskontroll; en bildbedömning med den
+   nya benämningen. Alla körningar sparas, även misslyckade; ett tredje scenario bara om ett av de två föll på
+   verktygsfel. Uppskattning en arbetsdag och högst åtta modellsessioner.
+4. **Tillämpning i nästa separat accepterade fiktiva uppdrag**: variantsteget vid det befintliga briefsteget när
+   kriterierna är uppfyllda, det redaktionella passet, laddning per steg med användningsnot, lärdomsposter och
+   granskningen A–D enligt körplanen, utan nya godkännandestopp; "ej prövat med människor" när mänskliga prov inte
+   görs.
+5. **Frivilliga, villkorade modell- och människoprov**: Codex-granskning bara med befintlig åtkomst och tillgänglig kvot,
+   först kalibrering; mänskliga prov bara på en konkret fråga. Uteblivna prov blockerar ingenting.
+
+Ramen: inga nya tjänster, konton, kostnader, anslutningar eller behörigheter; ingen ändring av Norrgläntas sajt eller
+drift; "tillgängligt och kopplat" skilt från "prövat med observerad nytta"; inga generella effekter utlovas efter två
+fall. Redan beslutat begärs inte på nytt, och ägarens två öppna beslutspunkter är oberoende av paketet.
+
+**Hur beskedets avsnitt är omsatta:** P3 anger fulla revisioner, exakta filvägar och licensfiler och skiljer huvudtexter,
+licenser, referensfil och egna underlag. Prototype-frågan är avgjord som alternativ A med motivering: skillens egen
+spärr mot modellanrop skulle med alternativ B kräva att en människa startar varje prototypsteg manuellt, eller att spärren
+kringgås, vilket inte görs. P1 anger när variantsteget tillför värde och när det utgår, kräver en namngiven axel och
+rättar baslinjen: huvudrubrikens alternativ är visat, inte infört. P2 gör strukturregler till stöd för bedömning,
+skiljer Norrgläntas strängprov från den semantiska kontrollen och planerar ett nytt litet prövningsfall. P4 tar bort
+automatiken för bekräftelse och borttagning och ersätter den med en avstämning efter två relevanta tillämpningar med
+fyra utfall; avslut stänger laddning men raderar inget. P5 håller fem prövningar isär, gör AI-drivna scenarioprov till
+den återkommande automatiserade prövningen, kräver separat utfallskontroll, benämner bildbaserade prov som
+modellbedömning och ger mänskliga prov rollen av riktat komplement. Webbläsarvägen inventerades först: Chrome,
+puppeteer-core, Lighthouse och axe finns; Playwright och webbläsar-MCP finns inte; Runtimes läsarprofil kan läsa men
+inte handla i en webbläsare; tilläggsverktygen i kedjedrivarens session kör i ägarens webbläsarprofil och lämpar sig
+inte som isolerad provare. Körplanen ersätter "samma antal läsningar" med initial granskning, ändringsberoende
+omkontroll och avskiljbara experiment.
+
+**Granskning:** en separat läsning av de ändrade bärande kopplingarna och mandatets gränser genom Runtimes skrivskyddade profil (samma
+modellfamilj som författaren: en separat läsning, inte ett oberoende omdöme), med ägarens tio avsnitt och
+jämförelselista som frågor, och med läsbevisen, revisionskontrollen, inventeringen, kundrepots pinnade verktyg och
+deployeringslista, Runtimes läsarprofil och den riktade kontrollens rapport i arbetsytan. Läsningen godkände utan
+blockerande fynd och prövade de bärande sakuppgifterna mot underlaget: revisioner, sökvägar, storlekar, blob-kontrollen
+tolv av tolv, licensfiler, referensfilen, avsnittsnamnen i de sparade texterna, inventeringen, deployeringslistan och
+den rättade baslinjen. Åtta förbättringsförslag lämnades, två med hög vikt: den isolerade provaren kräver en ny privat
+startare, eftersom Runtimes läsarprofil inte kan ge ett kommandoverktyg och inte ändras, och provarens spärrar ska
+beskrivas som något som byggs och prövas, med validerade argument och en adressvitlista i skriptet, inte som något som
+redan gäller. Alla åtta är införda i dokumentets version 4; den granskade version 3 är bevarad; ingen ny omläsning är
+gjord. Det granskaren inte kunde pröva står i dess utlåtande och är inte godkänt: den ersatta versionen lästes bara genom
+diffen; licensfilernas text lästes inte; filer utanför arbetsytan (planen, ingången, Norrgläntas prov och mätfiler, den
+ännu inte skapade kunskapsmappen) bedömdes bara genom rapporten; miljöläget lästes bara genom den sparade inventeringen;
+Runtimes releasekonfiguration låg utanför; oförändrade delar av §1–§4 och §6 lästes bara delvis, så fler kvarlämnade
+gamla P5-bokstäver kan finnas utanför det lästa; och om Claude Codes behörighetsmönster faktiskt hindrar kommandokedjning i det
+föreslagna skriptanropet är oprövat.
+
+**Kvar för ägaren:** ett enda beslut om det korrigerade samlade mandatet, helt, delvis eller inte alls. Demons bedömning
+och den riktade kontrollens tre förslag står kvar som egna punkter.
+
+**Ersätter:** ingen post. Det tidigare rekommenderade mandatet i DIGITALA-1-JAMFORELSE-RESULTAT-20260926 är ersatt i
+dokumentet av det korrigerade; posten står kvar som historik.
