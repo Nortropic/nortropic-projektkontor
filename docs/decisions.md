@@ -3482,3 +3482,159 @@ driftsättning.
 **Plan:** steg 9 är slutfört till taket; beslutet står i ägarens tur.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-RIKTNING-20260926 — ägaren rättar uppdragets tolkning: kvalitetsåterkoppling lämnad (inte nöjd med Norrgläntas upplevelse), gamla förbud upphör som argument, den egna webbläsarvägen avstäms mot standardlösningar före mer arbete, och ett samlat besked med riktning och nästa steg beställs
+
+**Status:** registrerat 2026-09-26 av kedjedrivaren (Claude Code). Ägarens besked står ordagrant privat i
+`evidence/digitala/local/owner-words-ratta-riktningen-20260926.md`; denna post registrerar det avsnitt för avsnitt.
+Det är en korrigering av uppdragets tolkning och en riktad avstämning av vägen framåt, som hanteras tillsammans med
+det pågående P1–P5-arbetet, inte som en omstart. Lägesavstämningen mot verkliga räknare och processer står privat i
+`evidence/digitala/local/genomforande-20260926/LAGESAVSTAMNING-korrigering-20260926.md`.
+
+**§1 Ägarens mål och återkoppling:** ägaren är inte nöjd med Norrgläntas kvalitet som digital upplevelse och vill att
+Digitala ska kunna skapa betydligt bättre resultat med ett professionellt och automatiserat arbetssätt som bygger på
+relevant praxis, litteratur, metoder, specialistkompetens och verktyg. Projekt- och innovationskontoret ska bidra till
+att förstå behov, välja lämplig metod, bereda riktning och föra arbetet vidare, inte reduceras till ett register över
+beslut som ägaren och en allmän kodningssession redan kommit fram till. Ägaren ska inte behöva välja varje skill,
+koppla ihop specialister, påminna om research eller skriva nästa prompt mellan normala steg; viktiga mål-, kvalitets-,
+kostnads- och behörighetsbeslut är fortfarande ägarens. **Missnöjet bokförs som lämnad kvalitetsåterkoppling.**
+Tidigare godkännanden, leveransbevis och tekniska resultat bevaras som historik och skrivs inte om till misslyckade
+prov; den tekniska leveransen presenteras inte som att ägaren är nöjd med upplevelsen, och ägaren tillfrågas inte igen
+om ett omdöme har lämnats. Återkopplingen avgör inte automatiskt de tre tidigare förbättringsförslagen och ger inget
+mandat att bygga om den driftsatta sajten.
+
+**§2 Börja i det verkliga pågående läget:** ordinarie ingång, aktuell plan och det privata läget läses
+(DIGITALA-1-GENOMFORANDE-20260926; `JAMFORELSE-DIGITALA-20260926.md` version 4 eller en senare uttryckligen gällande
+revision; `evidence/digitala/local/genomforande-20260926/LAGE.md`; `evidence/digitala/local/kunskap/REGISTER.md`). Den senast redovisade planen är en startuppgift för kontroll, inte facit.
+Vad som är färdigt, vad som kör, vad som är ändrat men opublicerat och hur mycket av resursramen som återstår
+fastställs kort ur verkliga räknare och processer; äldre rapporterade värden skrivs inte tillbaka. Därefter:
+**bevara och tillgodoräkna** fungerande kunskapsstöd, referenser, kod, prov, fynd, granskningar och beslut, utan att
+kopiera om eller göra om giltigt arbete för en ny formulering; **fortsätt det som är oberoende av vägvalet** (redan
+tillåtna moment som mottagarprov, redaktionell kalibrering och relevant kodgranskning, inom sina gränser; inga extra
+prov enbart för avstämningen); **hantera berört arbete vid säker delgräns**: en pågående skrivning eller provsession
+avbryts inte abrupt, dess utfall bevaras, och innan ytterligare arbete på den egna webbläsarvägen beställs eller
+utvidgas ska valet av den vägen avstämmas enligt §6; nödvändig säker avstängning och städning görs genom befintlig
+väg. Det är inte en generell paus av Digitala och inte en instruktion att färdigställa en olämplig lösning för att
+arbete redan lagts på den; berört arbete avgörs och redovisas kort, och tillåtna oberoende delar fortsätter utan
+nytt ja. En ansvarig skrivare per berörd arbetsyta; dokumentpublicering ändrar inte ett fruset provunderlag; inget
+återställs, flyttas, raderas eller avinstalleras blint.
+
+**§3 Feltolkningar som upphör:** (a) "inspiration från det gamla betyder att vi använder den gamla kedjan" är fel: den
+äldre webbförvaltningen är källmaterial, och dess tekniska struktur och styrande regler ska inte bli dagens
+arbetskedja genom kopiering, omdöpning eller indirekta beroenden; (b) "vi ska inte använda gamla kedjan, alltså ska
+inga skills eller verktyg installeras" är också fel: bra fristående resurser, anropbara skills, specialister och
+standardverktyg får föreslås och väljas efter faktisk nytta för dagens flöde; (c) "ingen installation är den enklaste
+lösningen" är inte visat: egen kod kan vara dyrare och mer komplex än ett etablerat verktyg, och hela lösningen
+jämförs, inte antalet installerade paket; (d) "sju texter och en AI-provbesökare uppfyller hela Digitala-målet" är
+nej: P1–P5 är ett avgränsat bidrag, inte en färdig professionell, automatiserad avdelning eller bevis på god
+formgivning. Den gamla arbetsorderns installationsgräns används inte längre som generellt argument för vad framtidens
+Digitala får innehålla; korrigeringen är ändå inte ett godkännande att omedelbart installera valfria resurser, byta
+verktyg eller utöka åtkomsten: namngivna tillägg som saknar mandat bereds samlat enligt §8. Säkerhets-, integritets-
+och kostnadsgränserna behålls; gamla ägarstopp återinförs inte; varken "använd allt gammalt" eller "en generell
+session ska improvisera allt själv".
+
+**§4 Klargör vad som finns och var arbetet sker:** följande hålls isär: det bevarade repot nortropic-webbforvaltning;
+Norrgläntas kundrepo och faktiskt använda bygg- och provväg; kontorets nuvarande planerings- och uppdragsfunktion;
+gemensamma Digitala-förmågor som verkligen är implementerade och anropbara; förmågor som bara är beskrivna eller
+föreslagna. En mapp bevisar att filer finns, inte att de laddas eller körs; ett plansteg bevisar ingen automatisk
+routing; faktisk ingång, anropare, verktygsåtkomst, underlag och leverans till nästa steg undersöks där det behövs.
+En kompakt karta över dagens kedja ska visa vem eller vad som driver varje huvudsteg, var det ligger, vad som är
+automatiserat, vad kedjedrivaren gör och vad som kräver ägaren, med agentens verktygsarbete skilt från manuella
+operatörssteg och från verkligt fortsatt arbete efter ett sessionsbyte. Ingen separat färdig "ny Digitala-avdelning"
+påstås finnas om underlaget bara visar en demokörning och några gemensamma stöd; gamla automationer sägs inte sakna
+värde bara för att deras beroenden inte passar dagens miljö. Ingen repoflytt, namnändring eller ny
+organisationsstruktur föreslås för kartans skull; är hemvisten för det gemensamma arbetssättet oklar namnges frågan
+i stället för att döljas i kundrepot eller lösas med en automatisk ny plattform.
+
+**§5 Använd den research vi har till den verkliga kvalitetsfrågan:** utgångspunkt är DEFINITION.md, ägarens senare
+rättelser, idébedömningen, källgenomgången ARBETSKEDJA, jämförelsedokumentet v4, relevanta läsarrapporter A–H med
+originalpekare och tillgängligt Improvements-underlag. Redan gjord läsning återanvänds; komplettering bara där en
+konkret slutsats saknar stöd eller där en tidigare bedömning gjordes under den nu korrigerade förutsättningen. Ingen
+ny totalinventering, full projektsweep eller återgång till Bootstrap/Trust Kernel. Gamla instruktioner är historik;
+assistentförslag och sammanfattningar är inte ägarens beslut; saknade källor redovisas med vilken slutsats de
+påverkar, utan påhittat innehåll. Huvudfrågan: vad i dagens skapande behöver ändras för att ge en bättre
+webbupplevelse, inte bara fler godkända kontroller, följt genom sambanden behov och osäkerheter → vald metod →
+research och referenser → informationsarkitektur och koncept → formgivning, innehåll, bilder och interaktion →
+implementation → faktisk prövning → lärande. För de viktigaste luckorna visas vad dagens flöde gör, vilken konkret
+svaghet eller kvalitetsrisk som finns, vilken professionell princip eller resurs som kan hjälpa, vem eller vad som
+ska använda den och när, och vilket synligt resultat och vilken prövning som visar om förbättringen hjälper; för
+bärande kvalitetsfrågor, inte varje rad i gamla instruktioner. Metoder väljs efter uppgiftens osäkerhet och behov;
+ingen bok, skill eller poängmodell blir ensam facit. Specialister, skills, automatiska överlämningar och
+verktygsanrop är tillåtna lösningsformer att överväga, varken obligatoriska eller förbjudna; kunskapens innehåll,
+aktivering och faktiska användning bedöms, inte bara att filen finns. Norrgläntas missnöjda ägarbedömning är en
+viktig signal vars orsak ska undersökas: avsaknad av en viss skill antas inte förklara resultatet; den aktuella
+renderingen, innehållet, designavsikten och relevanta referenser granskas med redan tillåten åtkomst, och skapandet
+bedöms, inte bara kända kodfel. Behöver ägarens smak preciseras ges en rekommenderad riktning och konkreta visuella
+exempel inom tillåten beredning, inte en ny lång enkät eller en teknikuppgift; saknad sidåtkomst anges och ersätts
+inte med ett påhittat visuellt omdöme.
+
+**§6 Välj resurser och automation efter nytta:** den gjorda resurskartan används; för relevanta fristående kandidater
+kontrolleras originalkälla, version, licens, nödvändiga beroenden, faktisk anropsform, överlapp och underhåll, och
+den användningsform som löser behovet bäst rekommenderas (läsunderlag, registrerad skill, avgränsat specialistpass,
+befintligt verktyg, standardintegration eller liten egen kod), med motivering och med faktisk installation och
+inkoppling när det är bäst, inte enbart läslistor. Att Norrglänta inte behövde en resurs betyder inte att Digitala
+aldrig behöver den, och är inget skäl att installera den nu utan behov. Inga globala bortval efter bara en
+filtoppsläsning eller ett antagande om storlek; fördjupning bara där en rimlig, konkret förbättring kan ändra
+rekommendationen; inte installera allt, inte söka om hela internet. **Den egna webbläsarvägen avstäms särskilt**:
+det som är byggt och återstår jämförs med relevanta färdiga agentgränssnitt för Playwright eller annan lämplig
+standardlösning, mot aktuella original och utan att anta att ett verktyg löser isolering, åtkomstskydd eller
+agentstyrning genom sitt namn; verklig funktion, säkerhetsgränser, provbarhet, återstående arbete, framtida underhåll
+och total kostnad bedöms; den egna lösningen behöver inte först misslyckas; en liten, användbar och prövad befintlig
+lösning får väga tungt, nedlagd tid är inte ensam ett skäl, och ett byte är inte automatiskt bättre; rekommendationen
+grundas i aktuellt läge och arbetet bevaras tills ett eventuellt byte är beslutat. Ingen skillspärr kringgås; en
+anropsbegränsning för en särskild skill generaliseras inte till att alla skills kräver manuell start.
+
+**§7 Håll ihop förbättringen med det pågående paketet:** per berörd del: fortsätt inom befintligt mandat; tillgodoräkna
+som färdig; behåll som underlag utan ytterligare utbyggnad utan nytt vägval; eller föreslå en namngiven ändring
+eller ersättning. Redan genomförda provs innebörd ändras inte; AI-scenarier får automatiseras men redovisas inte som
+mänskligt användarbeteende; en pausad eller oprövad del kallas inte färdig, och ett avslutat metodprov med negativt
+utfall är inte en fungerande förmåga. P1–P5:s anrops- och resursgränser behålls, inklusive del 3:s sessionstak;
+avstämningens arbete redovisas separat; ingen ny mätkampanj för att kunna skriva en rekommendation. Tekniska steg som
+ryms i ett giltigt mandat fortsätter utan nya rutinfrågor; förändringar av installation, anslutning, befogenheter,
+kostnad eller väsentligt arbetssätt som inte ryms där ingår i ett enda tydligt tilläggsförslag; ett befintligt
+giltigt tillstånd begärs inte igen. Ingen förändring av aktiv Runtime, AP-10, kvalificerade modellval, sajtens
+driftsättning, Vercel-skydd eller riktiga mottagare genom beskedet; inga nya kundrepon eller företag; en senare
+förbättring av Norrglänta kan rekommenderas som ett avgränsat uppdrag men genomförs eller driftsätts inte tyst.
+
+**§8 Nästa besked:** korrigeringen registreras i befintlig beslutshemvist och berörda aktuella planrader uppdateras;
+ersatta tolkningar markeras och följs till berörda arbetsunderlag; historiken bevaras; nästa session får inte styras
+av ett generellt "inga installationer" eller "återanvänd gamla kedjan". Därefter ett samlat besked med (1) pågående
+arbete: färdigt, fortsätter, inväntar vägval och varför, nästa handling; (2) faktisk arbetskedja: en kompakt karta
+över kontoret, dagens Digitala, kundrepot och relevanta verktyg med förmågor som finns respektive saknas; (3)
+rekommenderad förbättring: de få förändringar som bäst angriper den otillräckliga kvaliteten, med konkreta resurser
+och automatisering där de hjälper, observerade orsaker skilda från hypoteser; (4) ett samlat tilläggsmandat där det
+behövs: namngivna ändringar, installations- och anropsform, befogenheter, kostnader, vad som bevaras eller ersätts,
+få etapper och ett tydligt klart-när, utan att beskriva det redan accepterade; (5) nästa synliga kvalitetsprov: hur
+bättre skapande visas på ett avgränsat exempel, helst med befintligt underlag, med skillnad i upplevelsen och inte
+bara fler filer eller gröna tester; ett produktändrande prov är ett förslag tills det omfattas av ett beslut.
+Befintlig separat granskning används proportionerligt för de ändrade bärande slutsatserna och mandatet, utan ny
+allmän granskning av oförändrat material, och granskaren får ägarens faktiska korrigeringar, inte bara en
+sammanfattning. Arbetet börjar med lägesavstämningen och fortsätter oberoende tillåtet arbete; beskedet slutar inte
+med enbart en fråga eller ett långt dokument om varför inget kan göras, utan ger en rekommenderad väg, dess verkliga
+konsekvenser och det beslut som faktiskt återstår. **Slutmålet står fast**: ett Digitala som använder relevant
+professionellt kunnande och automation för att skapa mycket bra digitala upplevelser med mindre samordning från
+ägaren; P1–P5, skills, verktyg och dokument är medel, inte ersättningar för resultatet.
+
+**Ersatta tolkningar, följda till underlagen:** (i) den generella installationsgränsen ur DIGITALA-1-GENOMFORANDE-20260926
+§1–§3 och jämförelsedokumentets §7 del 2 ("ingen installation begärs") gäller inte längre som argument; jämförelse-
+dokumentet får en korrigeringsnot överst som pekar på detta; (ii) ägarens beslutspunkt om ytterligare sessioner för
+del 3 (DIGITALA-1-GENOMFORANDE-RESULTAT-20260926) dras tillbaka: valet av webbläsarväg ska avstämmas mot
+standardlösningar innan mer arbete på den egna vägen beställs; (iii) ägarens beslutspunkt "bedöm den levererade
+Norrglänta-demon" är besvarad genom denna återkoppling (inte nöjd med upplevelsen) och tas bort; frågan om ett nästa
+fiktivt fall eller ett avgränsat förbättringsuppdrag för Norrglänta bereds i det samlade beskedet; (iv) skälet för
+prototype som metod (alternativ A) i jämförelsedokumentets P1 — att en anropsspärr skulle tvinga ägaren att starta
+varje steg — generaliseras inte: spärren gäller den skillen, valet mellan metod och registrerad skill görs efter nytta.
+
+**Berört och oberoende arbete (kedjedrivarens avgörande enligt §2):** berört: den egna webbläsarvägen (provskript,
+hållare, startare, vakt) fryses vid säker delgräns efter granskningsrunda 2 med koden bevarad och kundrepots tre
+lokala commits opushade tills vägvalet är gjort; inga fler spärrprov, omprov eller scenarier på den vägen. Oberoende
+och redan klart: kunskapsstödet, mottagarprovet, seedfallet, den blinda granskningen. Oberoende av vägvalet men
+inte gjord: bildbedömningen (C); den kräver en modellsession, startas inte för avstämningen och tas in i det samlade
+beskedets kvalitetsprov i stället för som fristående omkörning. Oberoende och pågående vid
+korrigeringen: den separata granskningen av resultatposten löper klart och posten publiceras som historik. Inga extra
+prov startas för avstämningen. Avstämningens modellanrop redovisas separat från P1–P5.
+
+**Plan:** steg 10 i Digitala-planen PÅGÅR: avstämningen med det samlade beskedets fem delar. Klart-när: beskedet är
+lämnat med registrerad riktning, granskat tilläggsmandat och ett konkret nästa steg.
+
+**Ersätter:** ingen post; ersätter tolkningar enligt ovan.
