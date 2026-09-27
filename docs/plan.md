@@ -43,15 +43,15 @@ FÖRSLAG ATT PRÖVA I NÄSTA FALL
 - Digitala: i nästa fall körs agent-browser bakom vår proxy som observationslager (tillgänglighetssnapshot med
   referenser) och jämförs mot dagens handlingsgränssnitt på samma uppgift — en modellsession, 0 kr; belägg L19; ersätter
   i så fall bara handlingsgränssnittet, inte gränsen; ryms i ett vanligt mandat (DIGITALA-1-ETAPP3-RESULTAT-20260926).
-- Runtime: ge varje nytt värdprov en mutation som tar bort just dess mekanism, och läs felorsaken innan granskningen
-  startar (lärdom R16; ryms i ett vanligt mandat). Föregående förslag, fångstomslaget (R4), är prövat i
-  RUNTIME-PROFILER-KANDIDAT-20260926.
+- Runtime: mutationsdrivaren städar varje process som startats under en mutation (processlistan före och efter), och en
+  mutation som inte fälls förklaras i beslutstexten före granskningen (lärdom R16; ryms i ett vanligt mandat). Föregående
+  förslag, en mutation per nytt värdprov, är prövat i RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927.
 - Kontoret: före varje granskning av en kontorspost söks modellfritt efter det ersatta lägets formuleringar i posten och i
   hela planen, och varje träff läses (lärdom K1; ryms i ett vanligt mandat).
 
-RUNTIME-PROFILER FÖR DIGITALA (RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926 och
-RUNTIME-PROFILER-KANDIDAT-20260926), ett eget Runtime-uppdrag parallellt med Digitala och förvaltningarnas
-utvecklingsrytm, utfört av en separat session. Uppdraget ger Digitala de profiler som saknas i motorn: mätning, kritik och
+RUNTIME-PROFILER FÖR DIGITALA (RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926,
+RUNTIME-PROFILER-KANDIDAT-20260926 och RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927), ett eget Runtime-uppdrag
+parallellt med Digitala och förvaltningarnas utvecklingsrytm, utfört av en separat session. Uppdraget ger Digitala de profiler som saknas i motorn: mätning, kritik och
 provare, byggda en gång och utförarneutralt. Konceptsteget och bygget stannar i dagens flöde. Ägarens besked står
 ordagrant privat i `evidence/runtime-profiler/local/`, och återupptagningspunkten är
 `evidence/runtime-profiler/local/LAGE.md`. Stegen:
@@ -64,7 +64,10 @@ ordagrant privat i `evidence/runtime-profiler/local/`, och återupptagningspunkt
     den första integrationen. Integrationerna aktiverar ingenting.
  5. KLART 2026-09-27: separat granskning genom läsarprofilen, av D034 och D035 i två rundor var och av varje
     kontorspost.
- 6. STANNAR före övergången: release, isolerad startövning och aktivering väntar på ägarens beslut (ägarens tur).
+ 6. FÖRBEREDD 2026-09-27 på ägarens beslut (RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927): städrättningen D036
+    integrerad (Runtimes PR 66), release 17 stegad och kontrollerad, isolerad startövning genomförd. Aktiveringen är
+    ägarens och väntar på den (ägarens tur); ägaren har ett komplett kommando, privat i
+    `evidence/runtime-profiler/local/AKTIVERINGSKOMMANDO-OVERGANG-17.md`.
 Aktiv release, konfiguration, daemon, AP-10, modellvalet och Digitalas filer är orörda. Raden i ägarens tur står sedan
 RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927 direkt under rubriken, så att Aquarium läser den.
 
@@ -506,7 +509,7 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
 ÄGARENS TUR
-- [beslut] Runtime-profilerna: övergången till aktiv release (release med de nya filerna, egen isolerad startövning, aktivering med ett komplett kommando; RUNTIME-PROFILER-KANDIDAT-20260926) — sedan 2026-09-27
+- [operatörshandling] Runtime-profilerna: aktivera övergång 17 med det kompletta kommandot, utanför AP-10:s fönster (RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927) — sedan 2026-09-27
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -672,7 +675,7 @@ FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULT
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
 RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
-RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927 och Runtime-planens ingång.
+RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927 och Runtime-planens ingång.
 
 ---
 
