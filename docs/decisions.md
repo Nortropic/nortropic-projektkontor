@@ -6268,3 +6268,169 @@ privata `evidence/nasta-uppdrag/local/helhet-20260927/LAGE.md`.
 **Plan.** Blocket HELHET: punkt 3, 5 och 6 utökade med tilläggen; punkt 1 KLAR.
 
 **Ersätter.** Inget; tilläggen kompletterar HELHET-20260927.
+
+## KUNDSTART-20260927 — ägarens beställning av Digitala Kundstart registrerad och kundstarten levererad som skyddad förhandsvisning: kundlänk för AI-ledd intervju och materialinlämning, ansluten till Digitalas kundunderlag
+
+**Status:** registrerat och levererat 2026-09-27 av en separat session (Claude Code, sessionen nortropic-repos-0a),
+parallellt med HELHET-20260927 (sessionen nortropic-repos-f0). Beställningen klistrades in i sessionen av ägaren och
+sparades ordagrant först av allt i kontorets privata uppdragsmapp
+(`evidence/nasta-uppdrag/local/kundstart-20260927/bestallning-kundstart-20260927.md`). Beställningen anger själv att
+bara ett citat är ordagrant ägaruttalande: "Precis, ge mig en prompt för detta, jag tänker jag kan starta detta i separat
+Claude session från den nuvarande som arbetar. Brainstorma mer och omvärldsbevaka ifall du behöver det men ja, i det
+enkla bor det vackra." — resten är assistentformulerad arbetsorder; den behandlas som ägarens riktning med den
+reservationen.
+
+**Beställningen i sammandrag** (ordagrant i den privata filen). Ett genomförandeuppdrag i fyra etapper utan
+rutinmässiga ägarstopp: (1) samordning och gränssnitt mot huvudspåret, (2) kundupplevelse, (3) integration och drift,
+(4) slutverifiering och införande. Kundytan ska vara ett lugnt samtal, inte en portal: börja eller fortsätt med
+personlig länk, berätta och komplettera med relevanta frågor och material, se och rätta förståelsen. Huvudspåret
+äger intervju- och researchlogik, research.md, brief och kedjan; detta spår äger kundupplevelsen, kundnära server,
+säker materialinlämning och anslutningen; ett auktoritativt hem per informationstyp. Tjänsten ska fungera när
+ägarens Mac sover, utan förtäckt terminalkoppling, inom befintligt mandat för modell och kostnad.
+
+**Beställningens gränser, alla registrerade.** *Avsnitt 1:* genomförande, inte designförslag; ärligt redovisade
+externa beroenden; huvuduppdraget startas inte om; produktens löfte är att kunden ska känna att Nortropic kommer
+förberett, förstår verksamheten och tar ansvar för att reda ut resten, utan att behöva skriva en brief, förstå
+AI-verktyg eller samordna interna funktioner; "Kundstart" är en etikett, inte ett produkt- eller varumärkesbeslut.
+*Avsnitt 2:* börja vid ordinarie ingång; identifiera den faktiskt aktiva sessionen; använd original, låt inte ägaren
+återberätta; uttrycklig implementeringsägare per gemensam yta, klargjord innan samma filer ändras; registrera uppdrag,
+skrivområden och beroenden kort i befintlig plan; separat gren och isolerad arbetskopia, där en worktree inte
+automatiskt isolerar processer, tjänster eller databaser; rätt repohemvist utan att automatiskt skapa plattform eller
+repo och utan att pressa kunddata eller applikationsdrift in i professionsbiblioteket; tekniska val inom mandatet är
+sessionens; återanvänd byggd funktion, och saknas ett gemensamt gränssnitt definieras den minsta överenskomna
+kontraktsytan och implementationen fördelas; en ändring av arbetsdelningen dokumenteras; ingen konkurrerande
+intervjumotor, researchkompilator eller kunddatabas; nås den andra sessionen inte används överlämningsvägen och
+integrationsberoendet redovisas; ett lämnat meddelande är inte bevis för mottagen överlämning; ägaren är inte
+meddelandeförmedlare. *Avsnitt 3:* textdialog, formulärfält, länkar, säker filuppladdning,
+sparade svar, återupptagning, redigerbar förståelse; kunden möter en sammanhållen Nortropic-kontakt och det är
+tydligt att AI hjälper till; ingen påhittad projektledare,
+agentensemble, terminalvy, modellväljare eller kravkatalog; inget AI-konto eller egen nyckel för kunden; tre moment,
+inte nödvändigtvis tre skärmar; avsiktligt visuellt arbete (typografi, rytm, luft, radlängder, diskret återkoppling)
+från mobilen, där enkelhet inte får bli en ofärdig standardsida och uttrycket ska kännas genomarbetat utan onödig
+dekoration; lämpliga designresurser från Digitala återanvänds efter bedömning och de som faktiskt användes visas;
+inga Norrglänta-normer; ingen generell kundportal; röst, telefonagent, WhatsApp, e-postautomatik och transkribering
+är separata förslag, inte beroenden. *Avsnitt 4:* kom förberedd med källa och status, säg inte "vi har undersökt"
+utan att ha gjort det; kunden ska kunna börja även om förberedande research inte är färdig, och Digitala ska varken
+låtsas veta eller fråga om allt från noll; starta i verksamheten, inte i färger, sidantal eller teknikval; följdfrågor
+beror på svaren och på vilka beslut informationen påverkar; ett öppet svar bevaras och frågas inte om igen; en fråga
+eller liten grupp åt gången med öppet svar, val eller fält efter behov; "vet inte", återkomma och rätta utan omstart;
+ingen lång obligatorisk checklista, förmågekartan är intern täckning; kunden beskriver arbetssättet och Digitala
+översätter till lösningskrav; modellen väljer nästa fråga genom den gemensamma intervjulogiken medan servern och
+gränssnittet ansvarar för komponenter, datatyper, validering, sparande och åtkomst; modellen får inte generera körbar
+kod, avgöra åtkomst eller skriva över kundfakta; ogiltiga modellsvar hanteras utan att kundens text tappas; visa vad
+som återstår när det är känt, inga påhittade procent, tider eller dekorativ AI-status, och sparande, väntan på AI,
+pågående research och verkligt fel skiljs; den gemensamma intervjuvägen avgör vilka luckor som behöver besvaras nu och
+frågar inte tills varje fält är ifyllt; bekräftelsen visar vad som lämnats och vad som händer härnäst och är inget
+design- eller avtalsgodkännande och ingen ny briefgrind; följdfrågor senare samlas efter betydelse och går genom
+tillåten kontaktväg, och intervjuns avslut betyder inte att researcharbetet är gjort. *Avsnitt 5:* befintliga ärendeidentiteter, kontrakt och källstatusar, kompletterade endast med det integrationen
+behöver och tillsammans med ansvarig session; svar, meddelanden, rättelser, material och
+researchobservationer med källa, tid och revision; AI-sammanfattning är inte kundutsaga; sena AI-svar får inte
+återställa en kundrättelse; konflikter syns, inte tyst överskrivning; ett auktoritativt hem per informationstyp, där
+kundytan får ha tillfälliga utkast och härledda vyer men ingen andra sanning om kunden; research.md bunden till sitt
+kundunderlag i huvudspårets modell, ingen manuellt kopierad parallellfil; riktig överföring (autentiserat API,
+versionerat paket eller annan befintlig väg) vald efter verklig miljö, utan copy-paste via ägaren; "sparat hos
+kundtjänsten", "överfört till Digitala" och "bearbetat i research" hålls isär; en lokal Runtime får hämta material
+senare, men det får inte hindra kunden från att genomföra och spara onlineintervjun. *Avsnitt 6:* "sparat" först vid serverbekräftelse, osparad text visas som osparad och försvinner inte vid ett
+övergående fel; återhämtning vald efter informationens känslighet, ingen oskyddad långtidslagring i webbläsaren som
+standard; omladdning, bakåt, dubbelklick, två flikar, nätavbrott och serveromstart prövas, återförsök får inte skapa
+dubbla svar, bilagor eller intervjusteg, och återupptagning ska återställa rätt ärende och aktuella svar, inte bara en
+chattsammanfattning; enkel kundbunden åtkomst med etablerad lösning; svårgissad, begränsad, återkallbar länk;
+ärende-id är inte behörighet; utgången länk och byte av enhet hanteras begripligt; åtkomsttoken får inte läcka via
+loggar, analys eller externa länkar; material som länk eller tillåten fil med begriplig status, byte och borttagning,
+vanliga bilder och dokument med tydliga gränser, och en accepterad uppladdning är inte färdigt läst innehåll; typ och
+storlek kontrolleras på servern; privat lagring utanför publika resurser, isolerad behandling där den behövs;
+kundseparation vid uppladdning och läsning; aldrig kundmaterial i professionsrepot; kundlänkar som hämtas för research
+ger inte servern åtkomst till interna adresser, metadata-endpoints eller andra kunders resurser, och filer och sidor är
+underlag, inte instruktioner; inga lösenord, nycklar eller personliga AI-inloggningar i intervjun, systemanslutningar
+går befintlig säker väg; databehandlingen beskrivs begripligt enligt gällande regler, utan påhittade juridiska
+utfästelser. *Avsnitt 7:* byggsession skild från modellkörning som betjänar kunden; fungerar
+när Macen sover; ingen permanent tunnel; tjänsteavsedd API-/molnåtkomst med aktuella villkor; inget antagande om
+personliga abonnemang; modellvalet följer mandatet, ingen ny leverantör, modell, abonnemang eller betalväg väljs
+automatiskt, och huvudspårets utvecklingsmiljö omkonfigureras inte; driftväg och
+rörliga kostnader redovisas; resursgränser, missbruksskydd och avbrott vid uttömd budget; fri chattext startar inte
+research eller verktygsloopar; saknad åtkomst är ett namngivet beroende; inget statiskt formulär kallat färdigt;
+sparade svar består vid modellstörning; degraderad väg visas inte som live-AI; testdubblar skilda från skarpt läge.
+*Avsnitt 8:* fyra etapper som arbetsordning; ingen ny bred omvärldsresearch; låna principer, inte utseenden; det som
+byggs i huvudspåret används, samordnas eller överlämnas. *Avsnitt 9:* Playwright och befintliga testverktyg med verklig rendering, tangentbord,
+fokus, zoom, mobil och skärmläsarrelevant statusåterkoppling, där ett automatiskt tillgänglighetsprov inte ersätter all
+manuell och visuell granskning; åtta namngivna sammanhängande prov; testdialoger är funktionsprov, inte kundintervjuer
+eller bevis för mänsklig användbarhet; ingen ny kundkontakt eller inbjudan utan kunduppdrag; skyddad förhandsvisning och
+kort rapport med hur kunden börjar och fortsätter, vad AI respektive gränssnitt gör, hur informationen når Digitala,
+använda resurser, revisioner, driftläge, prov, kostnadsförutsättningar och begränsningar; implementerat, integrerat,
+körprovat, driftsatt och kundredo hålls isär, och live-AI eller integration påstås inte utan nyckel, tjänst och
+integration på plats; integrationsluckor följs till lösning, ingen överlämningsnot; avstämning mot beställningen.
+
+**Samordning och arbetsdelning (bekräftad av huvudspårets session 2026-09-27 14:4xZ).** Kundstart är en kanal i
+huvudspårets intervjumodell (`kanal` i INTERVJU.json = "Kundstart-länk"), inte en egen intervjumotor: frågebanken
+(fråge-id, texter, prioriteter, följdregler, negationsregel) är en snapshot ur `nortropic-digitala/verktyg/intervju.py`
+(main 94dcb0e, sha256 575c6b0b…), och kundmappens INTERVJU.json förblir det auktoritativa hemmet. Huvudspåret äger
+intervju.py, kundintervju.md, integrationer.md, research-underlag, steg och mandat; Kundstart-sessionen äger det nya
+privata repot `Nortropic/nortropic-kundstart` och Digitala-verktyget `verktyg/kundstart.py` (egen PR). Kontraktet:
+kundens svar exporteras ordagrant per omgång i den form intervju.py:s svar-funktion läser; AI-tolkningar blir
+fakta-rader med status `tolkning`; kundens rättelser blir `kunden uppger`. Två iakttagelser lämnades till huvudspåret
+och togs in i intervju.py (bokningsregeln utan negationsspärr; en bokningsträff på "kalender").
+
+**Kedjedrivarens val (reversibla, märkta som sådana).** Repohemvist: ett nytt privat repo
+`Nortropic/nortropic-kundstart`, eftersom en driftsatt kundtjänst med kunddata varken hör hemma i professionsbiblioteket,
+kontoret eller Runtime; inget nytt repo för plattform, bara för den beställda kundytan. Modell på servern:
+`openai/gpt-5-mini` genom Vercel AI Gateway på fri nivå, eftersom Claude-modeller kräver köpta krediter och
+OpenAI-familjen redan är en utförarfamilj i mandatet genom Codex; ingen ny leverantör, inget köp; valet byts med en
+miljövariabel. Lagring: privat Vercel Blob som enda lager, inga marketplace-resurser. Frågebankens snapshot togs först ur
+arbetsgrenen kundstart/verktyg (innehåll lika med main e7c3bdf) och togs om ur Digitalas main 94dcb0e i 3944b28, där
+intervju.py hade ändrats i huvudspårets PR 8 (ny sha256 575c6b0b…).
+
+**Leverans.** *Implementerat:* Next.js-app med start/fortsätt (personlig länk i URL-fragmentet, bara hashen lagras,
+signerad httpOnly-kaka, utgång och återkallning från Digitala), adaptivt samtal (en fråga i taget, "vet inte",
+"återkom senare", rätta utan omstart, ärlig status: inte sparat, sparar, sparat, väntar på nästa fråga, AI-stödet
+nåddes inte), vår bild av kunden (kundens ord, AI:ns tolkningar märkta, förifyllt med källa; rättelser vinner alltid
+över tolkningar; en orörd förifylld uppgift skrivs inte om som tolkning), material (typ ur innehållet, 4 MB per fil,
+privat lagring, nedladdning bara genom funktionen för rätt ärende, länkar hämtas aldrig av servern), inlämning med
+bekräftelse utan godkännande. Intervjuledaren väljer bland frågebankens kandidater med strukturerad utdata som
+valideras på servern; ogiltiga svar faller tillbaka till den regelstyrda vägen; budget per ärende och paus efter fel.
+*Integrerat:* intern API (skapa ärende ur kundmappen, export `kundstart-export/1`, nya och återkallade länkar,
+materialhämtning) och Digitala-verktyget `verktyg/kundstart.py` (skapa, status, hamta, lank, aterkalla), i Digitalas
+main sedan PR 9 (0c5e987), som för in exporten i INTERVJU.json genom intervju.py:s egna funktioner; rundgången
+kundyta → export → INTERVJU.json är prövad med stubbad HTTP i Digitalas svit och med tjänstens verkliga export i
+Kundstarts svit, inte ännu i en och samma körning mot en riktig kundmapp. *Körprovat:* Playwright-svit med åtta prov (två märkta
+testdialoger med olika följdfrågor, återupptagning efter omladdning, bakåt, dubbelklick, två flikar och ny enhet,
+rättelse och "vet inte", material, kundseparation och återkallad länk, inlämning, tangentbord/fokus/zoom/statusregion,
+verkligt AI-anrop) gröna lokalt (mobil- och datorprofil) och mot förhandsvisningen med live-modell; AI-vägen
+verifierad genom Vercel AI Gateway (openai/gpt-5-mini) och lokalt genom claude-cli (sonnet); Digitala-verktyget med
+tio egna prov i `verktyg/test_kundstart.py` (hela sviten 118 prov gröna vid r5). *Driftsatt:* skyddad förhandsvisning på Vercel (team nortropic, projekt
+`nortropic-kundstart`, funktioner och privat Blob-lager i Stockholm, Vercel Authentication på alla deployer, ingen
+kund inbjuden). *Kundredo:* nej — se beroenden.
+
+**Nya resurser, alla inom Vercel-teamet nortropic (gränsfall som ägaren bör se; inget köpt, inget nytt abonnemang):**
+Vercel-projektet `nortropic-kundstart`; Blob-lagret `nortropic-kundstart` (privat, arn1; storlek och operationer räknas
+mot Pro-krediten); AI Gateway på fri nivå med OIDC (ingen API-nyckel; Claude-modeller kräver köpta krediter, 403
+uppmätt; `openai/gpt-5-mini` fungerar på fri nivå, 0,00054 USD för ett anrop om 372 tokens enligt gatewayns egen
+kostnadsräkning i svaret, alltså i storleksordningen 0,02 USD för en genomgång om 30 anrop); tre serverhemligheter (Vercel sensitive + 0600 lokalt). Uppmätt ur egen kvot: byggsessionen och
+granskningarna genom Runtimes läsarprofil.
+
+**Beroenden och frågor till ägaren (samlat, inga stopp):** (1) kundredo kräver att förhandsvisningens inloggningsskydd
+lyfts för kundlänkar, vilket är "delbar länk till utomstående" enligt MANDAT §2 och därmed en beställning; (2)
+modellen på servern är OpenAI-familjen på gatewayns fria nivå — vill ägaren ha Claude på servern krävs köpta AI
+Gateway-krediter (betalväg); (3) bevarandetid och radering för kundmaterial är inte beslutade; (4) vid läsning av
+tidigare rotationsbevis visades tre av Norrglänta-projektets bypass-nycklar i byggsessionens sammanhang — de finns i
+sessionens transkript, rotera vid behov; (5) en produktionsdeploy nekades av byggmiljöns klassificerare; förhandsvisning
+räcker för leveransen.
+
+**Granskning (Runtimes läsarprofil, claude-opus-5, en separat läsning inom samma modellfamilj).** Kundstart-appen:
+r1 underkänd (tre fynd: rättelser delade idempotensnyckel, "vet inte" utan stabil nyckel, tvåfliksprovet räknade inte
+svar), rättat, r2 godkänd på commit efe41b8; restnoterna rättades därefter i 88b78dc (förlorat svar på svar,
+materialdubblett på innehåll, "vet inte" i bilden, räknare, https) och frågebankens kvitto pekar sedan 3944b28 på
+Digitalas main — dessa två commits är körprovade (sviten grön lokalt och mot förhandsvisningen) men inte omgranskade.
+Digitala-verktyget: r1 underkänd på fem verkliga fynd och ett artefakt (avgränsare i svarsfil, ändrade svar tappade,
+textjämförelse, /tmp-kontrollen på macOS, exportpaketet som betrodd sökväg; diffen tagen mot en main som flyttat),
+r2–r4 underkända på ett vardera (paketets toppnivålistor lästes inte; ersatt tolkning kunde återuppstå;
+dubblettkontroll mot osanerad källa), alla rättade med prov; r5 godkänd på
+f43a0b6 och integrerad genom Digitalas publiceringsväg (PR 9, main 0c5e987, 17:05Z); r5:s restnoter (bland annat en
+mening i kundintervju.md om länkfilens plats, som verktyget redan gör rätt) är lämnade till huvudspårets nästa ändring av
+filen och bokförda i det privata läget.
+Denna post och planändringen granskas separat på samma sätt; kvittot i publiceringen.
+
+**Plan:** ett block KUNDSTART med de fyra etapperna och deras läge efter blocket HELHET, postens namn i
+återupptagningslistan, och tre rader i ÄGARENS TUR (kundredo kräver beställning av delbar länk; Claude på servern
+kräver köpta AI Gateway-krediter; bevarandetid och radering för kundmaterial). Ingen annan planändring.
+
+**Ersätter:** ingen post. Kompletterar HELHET-20260927 och HELHET-TILLAGG-20260927 (intervjuvägen) utan att ändra dem.
