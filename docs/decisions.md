@@ -5312,3 +5312,67 @@ Efter aktiveringen läser kedjedrivaren tillbaka och registrerar övergången h�
 **Granskning:** en separat läsning genom Runtimes skrivskyddade läsare, redovisad i publiceringens kvitto.
 
 **Ersätter:** ingen post.
+
+## RUNTIME-PROFILER-OVERGANG-AKTIV-20260927 — ägaren aktiverade övergång 17: mät-, kritik- och provarprofilerna körs nu som den aktiva releasens egen kopia (konfiguration 03e776bd); uppdraget är avslutat
+
+**Status:** registrerat 2026-09-27 av den session som fick beställningen av Runtime-profilerna (Claude Code). Ägaren
+körde den färska kontrollen och aktiveringen i sin egen Terminal efter dagens AP-10-körning (07:00:02–07:02:48Z).
+Aktiveringen slutade 07:15:36Z med `"completed": true` och inga problem, och skriptets sista besked var att den nya
+versionen kör med oförändrat modellval och att AP-10:s schema pekar på den. Ägarens utskrift står ordagrant privat i
+`evidence/runtime-profiler/local/`.
+
+**Återläst efter aktiveringen.**
+- Aktiv konfiguration är `03e776bd` (runtime `3fdf7f21`, kontoret `df5ed5dc`). Den ersätter `e814c757` (runtime
+  `a9a5eca1`).
+- Tjänstens tre processer (daemon, motor och arbetare) lever och stämmer med tjänstekvittot för `03e776bd`.
+- AP-10:s schema är ombundet till `03e776bd`, inte pausat (fältet för paus saknas i posten) och har nästa körning
+  2026-09-28 07:00Z. Ingen körning pågick.
+- Skriptets egen återläsning fann inget problem: AP-11 är stängt och orört, AP-10:s kommando är oförändrat och
+  webbverktygen stämmer under den aktiva releasen.
+- Bytet tog omkring sju sekunder, från begärt stopp 07:15:29Z till bekräftad drift 07:15:36Z.
+
+**Profilprov som den aktiva releasens egen kopia.** En mätning utan modell mot en lokal provsajt, körd ur den aktiva
+releasens katalog med värdroten angiven, slutade `klar`. Kvittot anger den aktiva releasen som kodrot, Chrome var
+avslutad och profilen borttagen. Inget kördes mot en kunds sajt.
+
+**Runtime.** D036 fick en anteckning om vad som visats efter integrationen (releasen, startövningen och aktiveringen), och
+planens ingång säger att inget steg återstår. Ändringen är bara dokumentation, granskades separat och integrerades som
+Runtimes PR 67 (main `b603d91`).
+
+**För Digitala.** Profilerna kan nu köras som den aktiva releasens egen kopia enligt Runtimes runbook, avsnittet om
+webbprofilerna: mätningen utan modell, och kritiken och provaren med modellen som parameter. Digitalas pågående kedja byter
+inte väg av detta. Om och när Digitalas steg ska gå genom profilerna avgörs i Digitalas eget fall.
+
+**Uppmätt, bedömt, ej prövat och okänt.**
+- *Uppmätt:* allt ovan.
+- *Ej prövat:* profilerna mot en verklig skyddad sajt (Digitalas nästa fall), och i drift den väg där hållaren måste
+  dödas med SIGKILL.
+- *Öppet, inte åtgärdat (D036:s granskning):* på den vägen skrivs kvittot innan profilen tas bort, och om processlistan
+  inte kan läsas tas profilen bort medan en olistad Chrome kan köra. Dessutom är verktygskontrollen enkelriktad: en extra
+  paketkatalog i verktygskopian skulle passera obemärkt. Inget av detta är uppmätt som fel i drift.
+- *Okänt:* inget nytt.
+
+**Resurser.**
+- Aktiveringen och efterkontrollen använde inga modellsessioner.
+- Två läsande granskningar: Runtime-texten (120 sekunder) och denna post.
+- Sedan beställningen 2026-09-26: 23 modellsessioner och 13 läsande granskningar, allt inom abonnemangen. Inga nya
+  verktyg, konton, kostnader eller behörigheter.
+
+**Rytmen (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926).**
+- *Lärdomar:* en ny post, R17: en övergångs arbetsyta står kvar efter aktiveringen, eftersom skriptets återhämtningsvägar
+  läser den. Kedjedrivaren tog bort den som städning och återskapade den på samma träd inom någon minut.
+- *Användningsnoter:* R10 nådde arbetet, eftersom startövningen gick före aktiveringen, och R15 styrde valet av
+  `localhost` där. Planens förslagsrad för Runtime (mutationsdrivarens städning, R16) står kvar oprövad till nästa fall.
+- *Förslagsrad för nästa Runtime-fall:* oförändrad.
+
+**Uppdraget.** Klart-när är uppfyllt: beredningen, kontraktet, kandidaten med sina rättningar, granskningarna, posterna,
+förberedelsen och ägarens aktivering. Nästa bygge behöver ett eget accepterat uppdrag.
+
+**Plan:**
+- blocket RUNTIME-PROFILER FÖR DIGITALA är avslutat;
+- ägarens tur har inga rader;
+- postens namn står i återupptagningspunkten.
+
+**Granskning:** en separat läsning genom Runtimes skrivskyddade läsare, redovisad i publiceringens kvitto.
+
+**Ersätter:** ingen post.
