@@ -102,7 +102,8 @@ namngivna repon och fler trendande GitHub-repon (DIGITALA-1-INVENTERING-20260926
 (DIGITALA-1-INVENTERING-RESULTAT-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926); etapp 2, kvalitetsprovet (steg 12), är levererad och ägaren valde rekommendationen
 (DIGITALA-1-ETAPP2-RESULTAT-20260926); etapp 3, webbläsarvägen (steg 13), är avgjord till den egna vägen
 (DIGITALA-1-ETAPP3-RESULTAT-20260926); etapp 4, bygget av "Ljuset med Planen" (steg 15), är
-levererad bakom åtkomstskyddet och väntar på ägarens bedömning (DIGITALA-1-ETAPP4-RESULTAT-20260927).
+levererad bakom åtkomstskyddet (DIGITALA-1-ETAPP4-RESULTAT-20260927) och godtagen av ägaren som ett första bygge; arbetet
+på Norrglänta är avslutat och ägarens ändringar tas till nästa fiktiva fall (DIGITALA-1-AGARBEDOMNING-20260927).
 
 Spår 1, demon Norrglänta Utemiljö (fiktiv, TESTKLIENT). Kundmappen med research, brief och referenser står privat i
 `evidence/digitala/local/norrglanta/`. Kunskapsstödet för dagens flöde står i `evidence/digitala/local/kunskap/REGISTER.md`
@@ -139,8 +140,8 @@ inte krav.
     sajten är lämnad 2026-09-26 (inte nöjd med upplevelsen; DIGITALA-1-RIKTNING-20260926). Frågan om ett nästa fiktivt
     fall eller ett avgränsat förbättringsuppdrag är besvarad: det är tilläggsmandatets etapp 4, som ägaren beställde
     2026-09-26 efter kvalitetsprovet (DIGITALA-1-AGARBESLUT-20260926, steg 15) och som är levererad 2026-09-27
-    (DIGITALA-1-ETAPP4-RESULTAT-20260927); inget nytt företag väljs före det
-    (DIGITALA-1-ACCEPT §7).
+    (DIGITALA-1-ETAPP4-RESULTAT-20260927). Ägaren godtog den 2026-09-27 som ett första bygge och tar sina ändringar till
+    nästa fiktiva fall, som väljs först på ägarens beställning (DIGITALA-1-AGARBEDOMNING-20260927, DIGITALA-1-ACCEPT §7).
  6. KLART 2026-09-26: den riktade kontrollen (DIGITALA-1-RIKTAD-KONTROLL-20260926, resultat i
     DIGITALA-1-RIKTAD-RESULTAT-20260926). Kundrepots `main` bär den granskade och befordrade versionen.
     - Rabattskötseln ingår genom hela kedjan.
@@ -187,7 +188,7 @@ inte krav.
     Två modellsessioner. Utfall privat i `evidence/digitala/local/genomforande-20260926/etapp1/UTFALL-ETAPP1.md`;
     registret del F.
 12. KLART 2026-09-26: etapp 2, kvalitetsprovet (DIGITALA-1-ETAPP2-RESULTAT-20260926); ägaren valde rekommendationen "Ljuset
-    med Planen" och bedömer den färdiga sajten efter etapp 4 (DIGITALA-1-AGARBESLUT-20260926).
+    med Planen" och godtog den färdiga sajten efter etapp 4 som ett första bygge (DIGITALA-1-AGARBEDOMNING-20260927).
     Konceptsteg med Design Read och tvåpass-kontroll; tre komps — A "Ljuset", C "Planen" och B′ "Arbetet" (B i sin
     definierade form utgick: inga fria arbetsfoton med människor klarar demoreglerna) — i 390 och 1440 bredvid dagens
     första vy och närmaste referens; tre kritiksessioner och en samlad; detektorn tio varningar mot dagens tolv;
@@ -234,9 +235,10 @@ inte krav.
     rubriken med stödtext, inget förvalt tillval, valen kvar vid bakåt, flytknappen undan planen, felmeddelandet och
     rättelseanteckningen; DESIGN.md lintad; de ordinarie proven gröna på produktionens adress; separat granskning, tre
     renderingsläsningar (den andra godkänd i andra rundan), Hallmark som kritikröst och två skyddade scenarier med den
-    egna webbläsarvägen. Förslaget om "fem korta frågor" ligger obeslutat i egna commits. Lärdomsposter L21–L23,
-    användningsnoter och förslagsrad gjorda. Elva modellsessioner, en över ramen 6–10. Nästa handling: ägarens bedömning av den färdiga
-    sajten (ägarens tur). Återupptagningspunkt: `evidence/digitala/local/genomforande-20260926/LAGE.md` (avsnittet
+    egna webbläsarvägen. Förslaget om "fem korta frågor" följer med i det godtagna bygget (DIGITALA-1-AGARBEDOMNING-20260927). Lärdomsposter L21–L23,
+    användningsnoter och förslagsrad gjorda. Elva modellsessioner, en över ramen 6–10. Ägarens bedömning 2026-09-27:
+    godtagen som ett första bygge, arbetet på sajten avslutat, ändringarna till nästa fiktiva fall; kundrepots
+    huvudgren bär den godtagna versionen (DIGITALA-1-AGARBEDOMNING-20260927). Nästa handling: ingen inom steg 15. Återupptagningspunkt: `evidence/digitala/local/genomforande-20260926/LAGE.md` (avsnittet
     etapp 4) och `etapp4/UTFALL-ETAPP4.md`.
 16. VÄNTAR (efter 15 eller parallellt utan modellsessioner): checklistan för skarpa fall (del e–f §1.3) som mall i
     kunskapsregistret, utan punkter som kostar krediter (C8). Klart när mallen står i registret med rad i del F.
@@ -503,13 +505,13 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter DIGITALA-1-ETAPP4-RESULTAT-20260927 (2026-09-27) är en rad
-öppen: ägarens bedömning av Digitalas etapp 4; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27) är en rad
+öppen: Digitalas nästa fiktiva fall med ägarens ändringar; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
 ÄGARENS TUR
-- [beslut] Digitala: bedöm den färdiga Norrglänta-sajten efter etapp 4, bakom åtkomstskyddet och utan lansering, och ta ställning till förslaget om "fem korta frågor" (DIGITALA-1-ETAPP4-RESULTAT-20260927) — sedan 2026-09-27
+- [beslut] Digitala: nästa fiktiva fall — välj och beställ det med dina ändringar från Norrglänta (DIGITALA-1-AGARBEDOMNING-20260927) — sedan 2026-09-27
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -679,7 +681,7 @@ FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
 RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
 RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927,
-RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927 och Runtime-planens ingång.
+RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927 och Runtime-planens ingång.
 
 ---
 
