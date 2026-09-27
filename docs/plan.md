@@ -49,9 +49,10 @@ FÖRSLAG ATT PRÖVA I NÄSTA FALL
 - Kontoret: före varje granskning av en kontorspost söks modellfritt efter det ersatta lägets formuleringar i posten och i
   hela planen, och varje träff läses (lärdom K1; ryms i ett vanligt mandat).
 
-RUNTIME-PROFILER FÖR DIGITALA (RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926,
-RUNTIME-PROFILER-KANDIDAT-20260926 och RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927), ett eget Runtime-uppdrag
-parallellt med Digitala och förvaltningarnas utvecklingsrytm, utfört av en separat session. Uppdraget ger Digitala de profiler som saknas i motorn: mätning, kritik och
+RUNTIME-PROFILER FÖR DIGITALA — AVSLUTAT (RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926,
+RUNTIME-PROFILER-KANDIDAT-20260926, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927 och
+RUNTIME-PROFILER-OVERGANG-AKTIV-20260927), ett eget Runtime-uppdrag parallellt med Digitala och förvaltningarnas
+utvecklingsrytm, utfört av en separat session. Uppdraget ger Digitala de profiler som saknas i motorn: mätning, kritik och
 provare, byggda en gång och utförarneutralt. Konceptsteget och bygget stannar i dagens flöde. Ägarens besked står
 ordagrant privat i `evidence/runtime-profiler/local/`, och återupptagningspunkten är
 `evidence/runtime-profiler/local/LAGE.md`. Stegen:
@@ -64,12 +65,11 @@ ordagrant privat i `evidence/runtime-profiler/local/`, och återupptagningspunkt
     den första integrationen. Integrationerna aktiverar ingenting.
  5. KLART 2026-09-27: separat granskning genom läsarprofilen, av D034 och D035 i två rundor var och av varje
     kontorspost.
- 6. FÖRBEREDD 2026-09-27 på ägarens beslut (RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927): städrättningen D036
-    integrerad (Runtimes PR 66), release 17 stegad och kontrollerad, isolerad startövning genomförd. Aktiveringen är
-    ägarens och väntar på den (ägarens tur); ägaren har ett komplett kommando, privat i
-    `evidence/runtime-profiler/local/AKTIVERINGSKOMMANDO-OVERGANG-17.md`.
-Aktiv release, konfiguration, daemon, AP-10, modellvalet och Digitalas filer är orörda. Raden i ägarens tur står sedan
-RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927 direkt under rubriken, så att Aquarium läser den.
+ 6. KLART 2026-09-27: förberedd på ägarens beslut (RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927) och aktiverad av
+    ägaren med övergång 17 kl. 07:15Z (RUNTIME-PROFILER-OVERGANG-AKTIV-20260927). Aktiv konfiguration `03e776bd`;
+    profilerna körs som den aktiva releasens egen kopia.
+Aktiv release och konfiguration är bytta genom ägarens övergång 17. Modellvalet, AP-10:s inställningar utom schemats
+konfigurationshash och Digitalas filer är orörda. Nästa bygge behöver ett eget accepterat uppdrag.
 
 DIGITALA 1 — FIKTIV KVALITETSDEMO OCH RUNTIME-DIAGNOS (DIGITALA-1-ACCEPT-20260925, ägarens besked privat i
 `evidence/digitala/local/`; gränserna står avsnitt för avsnitt i beslutsposten). Två spår, med en skrivare åt gången.
@@ -503,13 +503,12 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter DIGITALA-1-AGARBESLUT-20260926 (2026-09-26) är bara raden om
-Runtime-profilernas övergång öppen; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Inga rader är öppna efter RUNTIME-PROFILER-OVERGANG-AKTIV-20260927
+(2026-09-27); nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
 ÄGARENS TUR
-- [operatörshandling] Runtime-profilerna: aktivera övergång 17 med det kompletta kommandot, utanför AP-10:s fönster (RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927) — sedan 2026-09-27
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -675,7 +674,8 @@ FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULT
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
 RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
-RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927 och Runtime-planens ingång.
+RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927,
+RUNTIME-PROFILER-OVERGANG-AKTIV-20260927 och Runtime-planens ingång.
 
 ---
 
