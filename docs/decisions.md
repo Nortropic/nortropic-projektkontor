@@ -5730,3 +5730,105 @@ etapp 3; kvittot i publiceringen.
 återupptagningspunkten. Ägarens tur ändras inte.
 
 **Ersätter:** ingen post.
+
+## OMBYGGNAD-RESULTAT-20260927 — slutrapport för ombyggnaden till målbilden: etapp 1–5 genomförda inom gällande behörighet; kvar för ägaren är aktiveringen av övergång 18 och tre frågor
+
+**Före och efter.** Före: Digitalas förmåga låg i kontorets privata mappar, i skills på användarnivå och i kedjedrivarens
+egna skript; mätprofilens vyer och taggar var konstanter i Runtime; kontorets beredning hade inga fält för
+förvaltningens metod och kvalitetsbild; utförarbytet var ett framtida prov. Efter: Digitala har ett eget privat repo
+(`Nortropic/nortropic-digitala`, main `6692877`) med mandat, arbetssätt, kvalitetsregler, stegdefinition med pinnar,
+migrerad kunskap med proveniens, mallar, laddning med kvitto och vägran, körverktyg mot Runtimes profiler och adaptrar
+för båda utförarna; Runtimes mätprofil tar vyer och axe-taggar som parametrar (D037, integrerad, release 18 stegad och
+övad, inte aktiverad); kontorets beredning bär förvaltningens metod, proportion, laddningskvitto, kriterier och
+bedömning i tre kolumner (KONTORET-FORVALTNINGSFALT-20260927); utförarbytet är genomfört i motorn (femsekunderstestet med Codex genom kritikprofilen på laddat underlag) och som
+session (Codex-mottagarprovet, läsande, med repots egen ingång);
+slutprovet på Norrglänta gick genom den nya vägen.
+
+**Ordinarie ingång.** Digitala: `README.md` → `AGENTS.md` → `MANDAT.md` → `ARBETSSATT.md` → `steg/steg.json` genom
+`verktyg/ladda_steg.py`; Codex läser samma `AGENTS.md` i repots rot. Kontoret: planens block OMBYGGNAD TILL MÅLBILDEN och
+denna post. Runtime: planposten MÄTPROFILENS PARAMETRAR och D037. Ingen muntlig överlämning, inget dolt minne.
+
+**Revisioner.** Kontoret: OMBYGGNAD-20260927 (PR 100), KONTORET-FORVALTNINGSFALT-20260927 (PR 101), denna
+post. Runtime: D037 (PR 68, main `3bea86e`); release 18 stegad med konfiguration `eb102e4e` (runtime `3bea86ef`,
+kontoret `df5ed5dc`). Digitala: initial commit `a5e0488`, därefter `44d81de`, `6726fd8`, `37543de`, `b936ce7` och `6692877`; från
+`37543de` varje steg efter separat granskning (fyra rundor på grenarna, alla godkända). **Aktiv version:** Runtimes aktiva konfiguration
+är oförändrat `03e776bd` (övergång 17); övergång 18 aktiveras av ägaren.
+
+**Prov och bevis.** Runtime: sviten 599 grön vid publiceringen av D037, tre mutationer fällda, värdkontroller 28 + 13,
+en verklig mätning med tre vyer och tre taggar, isolerad startövning (motor, två daemonstarter, spärrprov A och C,
+mätning med tre vyer ur releasens egen kopia; alla faser gröna). Kontoret: sviten 395 vid registreringen, 400 med
+AP-06-utbyggnaden. Digitala: 32 prov och 28 pinnar
+gröna (grenens fjärde granskningsrundas provlogg); sex negativa fall vägrade; mottagarprov från ordinarie ingång
+godkända med Claude (läsarprofilen) och med Codex (Codex-profilen i skrivskyddad sandlåda). Slutprovet: mätning mot
+Norrgläntas produktion genom den aktiva releasen (utfall klar, nyckeln i inget utdata, axe utan överträdelser,
+Lighthouse prestanda, tillgänglighet och god praxis 100), renderingsläsning (Claude) och femsekunderstest (Codex) genom
+kritikprofilen på samma laddade underlag, kvalitetsbild i tre kolumner. Separata granskningar: sexton (före denna posts egen) läsande
+rundor i ombyggnaden, alla genom Runtimes läsarprofil (samma modellfamilj: separat läsning, inte oberoende omdöme).
+
+**Läge enligt ägarens §5.** *Implementerat:* allt ovan. *Integrerat:* D037 i Runtimes main; posterna i kontorets main;
+Digitala-repots main; AP-06-utbyggnaden i kontoret. *Aktiverat:* ingenting nytt i Runtime (aktiv konfiguration
+`03e776bd`); Digitala-repot och AP-06-fältet kräver ingen aktivering i Runtimes mening utan är tillgängliga från
+sina ingångar sedan integrationen. *Körprovat:* laddning, mätning,
+kritik och kvalitetsbild mot Norrglänta genom aktiv release; negativa fall; mottagarprov med båda utförarna;
+startövningen av release 18 på en förskjuten kopia; AP-06-fältet mot ett verkligt laddningskvitto på en kopia.
+*Ännu inte verifierat:* mätning med parametrar genom den AKTIVA releasen (kräver ägarens aktivering); AP-06-fältet i en
+skarp beredning; provarprofilen i ett skarpt Digitala-steg; täckning "visad" i mätkonsolideringen (inget prov borttaget);
+professionell effekt hos verkliga användare (kolumn 3 i kvalitetsbilden, tom av rätt skäl).
+
+**Begränsningar.** Grenskydd på Digitala-repot vägrades av GitHub (403, gratisplan): integrationsdisciplinen där är
+sessionsburen och dokumenterad i `KEDJA.md`, inte mekaniskt skyddad. Granskarna är av författarens modellfamilj.
+Startövningens första W3-körning föll på harnessets egen ordningskänsliga kontroll (kvittot skrivs sorterat), rättad
+och omkörd (R18). Registreringspostens första fem versioner bar uppskattade tidsstämplar och ett läge i tre olika lägen;
+det kostade sex granskningsrundor (K12); en läsare startades en gång på ett läge med rött prov och dödades (K13). Codex
+som session prövades genom Runtimes Codex-profil på en kopia av repot, inte i ägarens egen Codex-konfiguration. En
+läsning räknas mot modellkvoten utan att ha gett något: den dödade läsaren; harnessets vägrade andra W3-start var modellfri.
+
+**Aktiveringshinder och återgång.** Övergång 18 är ägarens handling (operatörsraden nedan; kommandot ordagrant i den
+privata filen `AKTIVERINGSKOMMANDO-OVERGANG-18.md`, utanför AP-10:s fönster, huvudgrenen måste vara exakt `3bea86e`).
+Återgång: Runtime — release 18 är inte aktiv, aktiveringsskriptet återställer själv vid misslyckad start, `forward` och
+`rebind` finns; Digitala — git-historik, proveniens med källhashar, kontorets kopia av `kunskap/` står kvar (märkt
+flyttad, inte raderad); kontoret — AP-06-fältet är valfritt, tidigare specar och paket är byte för byte oförändrade,
+poster raderas inte. Ingen källhistorik är raderad någonstans.
+
+**Jämförelse mot beställningen.** Etapp 1: klar (registrering, ändringsbild, samordning, markering). Etapp 2: klar
+(hemvist, migrering med proveniens, laddning med kvitto och vägran, samma institutionella innehåll för båda utförarna,
+skills och Codex-utdrag som leveransformer, mallar, verktyg). Etapp 3: klar (metodkompetens i AP-06, stående mandat i
+`MANDAT.md` med saknade gränser namngivna, kvalitetsbild i tre kolumner; inga budgettak, lanseringsrättigheter eller
+underhållsåtaganden). Etapp 4: klar så långt behörigheten når (D037 integrerad, release övad; aktivering kvar för
+ägaren; överlappande mätning konsoliderad bara som täckningskarta, inget prov borttaget; modellval oförändrade;
+kundrepot inte Runtime-mål; mekaniskt kontra sessionsburet i `KEDJA.md`). Etapp 5: klar (slutprov, mottagarprov,
+utförarbyte nu, negativa fall, separata granskningar, integration genom skyddade vägar, det ägaraktiverade steget berett
+exakt, återgång bevarad). **Avvikelser och rekommendationer som inte är beslut:** de sex tekniska valen i
+OMBYGGNAD-20260927 är kedjedrivarens och reversibla; analysens förslag om gemensam styrplattform, namnbyten och
+mätkonsolidering med borttagna prov är inte genomförda; nästa kund, nästa profession och all aktivering är ägarens.
+
+**Ägarens frågor.** (1) Aktivera övergång 18 (operatörsraden). (2) Namnbyte av `nortropic-webbforvaltning`: ägarens
+förslag `nortropic-digtala` ligger ett tecken från det nya repots namn `nortropic-digitala`; ett byte till exempelvis
+`nortropic-webbforvaltning-arkiv` skulle undvika förväxling; inget är döpt om, och DIGITALA-1-KORRIGERING-20260926 gäller
+(inget namnbyte för att göra den gamla webbförvaltningen till körväg). (3) De två saknade gränserna i Digitalas
+`MANDAT.md` §3, underhåll av en levererad sajt mellan beställningar och tak för stående arbete (beslutsrad). (4)
+Kontorets kopia av `evidence/digitala/local/kunskap/` är märkt flyttad och står kvar; det kräver inget beslut nu, och
+radering görs inte utan ett.
+
+**Rytmen.** Lärdomsposter: K12 (ett tidsbundet lägesstycke i tre ställen, tider ur klockan) och K13 (kedjade kommandon
+förbi ett rött steg) i kontorets lärdomsfil, R18 (startövningens egen kontroll mot ett sorterat kvitto) i Runtimes;
+inga nya Digitala-lärdomar, eftersom fallet var en ombyggnad och inte ett kundfall. Användningsnoter för planens förslag:
+Digitalas (första vyn mäts modellfritt före läsning) användes — mätningen kördes före läsningarna i slutprovet; kritikrösten
+med egen metod var inte tillämplig (inget kundsteg kördes); Runtimes (mutationsdrivarens städning) var inte tillämplig —
+D037:s tre mutationer fälldes och startade inga processer; kontorets (K1-sökning före granskning) användes som kontroll
+före varje runda utan att fånga rundhistorikens släpning, kompletterad av K12. Användningsnoter för slutprovets kopplade
+underlag står i laddningarnas `ANVANDNINGSNOTER.md` (privat). Förslagsrader: se planens block.
+
+**Resurser.** Tjugoen påbörjade läsande modellsessioner i ombyggnaden till 10:18Z (granskningar, kritikläsningar,
+mottagarprov), varav en utan svar (en läsare startad på ett läge med rött prov och dödad); denna posts egen granskning
+tillkommer. Inga byggmodeller utöver kedjedrivarens session; inga nya verktyg, konton, kostnader eller behörigheter.
+
+**Granskning.** Separat läsning genom Runtimes läsarprofil av denna post, planändringen och det privata läget mot
+ägarens besked; kvittot i publiceringen.
+
+**Plan:** blocket OMBYGGNAD TILL MÅLBILDEN avslutas och planens inledning märks avslutad utom aktiveringen; tre rader
+läggs i ägarens tur (operatörshandlingen, namnfrågan och mandatgränserna), så att fyra rader är öppna med Digitalas nästa
+fall, och stycket ovanför rubriken säger detsamma; tre förslagsrader; kunskapsstödets hemvist i Digitala-planens
+inledning och i stegen 16–17, lärdomsfilens plats i rytmstycket; postens namn i återupptagningspunkten.
+
+**Ersätter:** ingen post. OMBYGGNAD-20260927 står som registrering.
