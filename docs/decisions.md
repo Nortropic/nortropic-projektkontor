@@ -5456,3 +5456,28 @@ syntes). Inga kostnader utöver den inkluderade krediten; ingenting köpt, inga 
 16–18 väntar som planen säger.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-AGARBEDOMNING-20260927 — ägaren godtog Norrglänta efter etapp 4 som ett första bygge och avslutade arbetet på sajten; ägarens ändringar tas till nästa fiktiva fall
+
+**Status:** registrerat 2026-09-27 av kedjedrivaren (Claude Code). Ägarens ord i sessionen, efter att etapp 4 publicerats
+(DIGITALA-1-ETAPP4-RESULTAT-20260927) och sidan för bedömningen lämnats (sparade ordagrant privat i
+`evidence/digitala/local/owner-words-etapp4-bedomning-20260927.md`): "Vi kan avsluta hemsidan, det är OK för ett första
+bygge, jag har ändringar men det tar vi till nästa fiktiva."
+
+**Ägarens beslut.** Norrgläntademon avslutas: bygget efter etapp 4 är godtaget som ett första bygge, och inget mer byggs
+på Norrglänta. Ägaren har ändringar; de tas in i nästa fiktiva fall, inte i Norrglänta.
+
+**Kedjedrivarens läsning, bokförd som läsning.** Förslaget om "fem korta frågor" står i det bygge ägaren godtog och
+behålls; det är därmed inte längre obeslutat. Sajten ligger kvar som den är, bakom åtkomstskyddet, noindex och utan
+lansering: "avsluta" läses som att arbetet på sajten är klart, inte som att driftsättningen tas ned. Nästa fiktiva fall
+är inte beställt i orden, och inget nytt företag väljs utan ägarens beslut (DIGITALA-1-ACCEPT §7); fallet och ägarens
+ändringar står därför som en rad i ägarens tur. Steg 16–18 berörs inte. Säger ägaren annat om någon av punkterna gäller
+hans ord.
+
+**Genomfört.** Kundrepots huvudgren är snabbspolad till den godtagna versionen, samma commit som produktionen, med en
+pull request för spårbarhet. Ingen driftsättning, ingen inställning ändrad, inget byggt.
+
+**Resurser.** En separat granskning av denna post; inga kostnader.
+
+**Ersätter:** ingen post; uppgiften i DIGITALA-1-ETAPP4-RESULTAT-20260927 att förslaget om "fem korta frågor" väntar på
+ägaren är avgjord här.
