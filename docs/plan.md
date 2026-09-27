@@ -46,11 +46,12 @@ RYTMER
   (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926); operatörshandlingar och säkerhetspunkter förfaller inte.
 
 FÖRSLAG ATT PRÖVA I NÄSTA FALL
-- Digitala: i nästa fall mäts första vyn modellfritt innan någon läsning (rubrikrader, en solgul handling per vy,
-  handlingen inom vikningen; provet finns) och en kritikröst med egen metod körs vid sidan av renderingsläsningarna —
-  i etapp 4 såg Hallmark flera saker som ingen annan läsning såg; belägg L21–L23 och åtgärdslistan; ryms i ett vanligt
-  mandat (DIGITALA-1-ETAPP4-RESULTAT-20260927). Etapp 3:s förslag (agent-browser bakom vår proxy som observationslager)
-  står kvar till nästa scenariokörning i ett nytt fall.
+- Digitala (hypotes, Norrglänta-härledd, omskriven 2026-09-27 enligt HELHET-20260927): i nästa fall mäts första vyn
+  modellfritt innan någon läsning (rubrikrader och den handling briefen anger; provet finns) och en kritikröst med
+  egen metod körs vid sidan av renderingsläsningarna; i Norrgläntas etapp 4 såg en sådan röst saker som ingen annan
+  läsning såg (L21–L23), men Norrglänta är underkänt som kvalitetsresultat och inget där är praxis; ryms i ett
+  vanligt mandat. Etapp 3:s förslag (agent-browser bakom vår proxy som observationslager) står kvar till nästa
+  scenariokörning i ett nytt fall.
 - Runtime: mutationsdrivaren städar varje process som startats under en mutation (processlistan före och efter), och en
   mutation som inte fälls förklaras i beslutstexten före granskningen (lärdom R16; ryms i ett vanligt mandat). Föregående
   förslag, en mutation per nytt värdprov, är prövat i RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927.
@@ -65,6 +66,27 @@ FÖRSLAG ATT PRÖVA I NÄSTA FALL
 - Runtime: startövningens harnesskontroller jämför mängder och antal mot parametersträngen, aldrig kvittots
   nyckelordning (lärdom R18, belägg REHEARSAL.md för övergång 18; billigt prov: nästa startövning; ersätter
   ordningskänsliga jämförelser i harness-17/18; ryms i ett vanligt mandat).
+
+HELHET (HELHET-20260927) — genomförandeuppdrag i sex etapper, utfört av sessionen nortropic-repos-f0. Etapperna är
+arbetsordning, inte ägarstopp; läge och nästa kommando privat i `evidence/nasta-uppdrag/local/helhet-20260927/LAGE.md`.
+ 1. PÅBÖRJAD 2026-09-27: käll- och ändringsbild — revisioner lästa, skrivansvar samordnat; grenskydd på Digitala-repot
+    genom rulesetet `main-skydd` (deletion, non_fast_forward, pull_request med noll godkännanden, merge/squash/rebase,
+    inga bypass-aktörer, GitHubs extra godkännande för oattribuerade ändringar), verifierat genom API-läsning och en
+    attribuerad PR sammanslagen utan godkännande (Digitala PR 1); ÖPPET: ett levande vägransprov med direkt push
+    (kedjedrivarens verktyg nekade försöket; ägaren kan köra det). Gamla repot klonat till läsyta, genomgång pågår;
+    konton kartlagda (ingen Google- eller Meta-behörighet på kända platser); beviskedjans tre fynd bekräftade och
+    rättade i kandidat. Kvar: täckningskarta (förmåga, källa, tidigare innehåll, dagens motsvarighet, lucka,
+    disposition, anropsväg), resultatpost.
+ 2. PÅBÖRJAD 2026-09-27: korrigerade mandat och kunskapsgränser — Digitala-kandidat (gren helhet/etapp2-mandat) i sin
+    andra granskningsrunda efter en första underkänd (en beställning bär hela uppdraget, inga ägarstopp, Norrglänta inte
+    referens, klassning i stället för praxis av antal, uppgiftsmotiverade kriterier och mallar; samma kandidat bär
+    beviskedjans rättelser A, B och C med prov); kontorets privata rytm- och lärdomsfiler bär klassningsregeln.
+ 3. VÄNTAR: professionellt flöde och specialistintegrationer (strategi, upplevelse, innehåll, produktion, SEO, sökkonsol,
+    lokal synlighet, annonsberedning, mätning och uppföljning, leverans och drift) med kontrakt mot officiella API:er.
+ 4. VÄNTAR: Playwright-baserad webbläsarväg med tre användningar; beviskedjans fynd A, B och C rättade med negativa prov.
+ 5. VÄNTAR: självständig genomföring — ordinarie start- och fortsättningsväg, utförarbyte på ett representativt steg,
+    maskinell publiceringsväg för Digitala-repot, kontorets beredning verksam.
+ 6. VÄNTAR: sammanhängande slutverifiering med ett beställt fall eller neutrala märkta testunderlag; slutrapport.
 
 OMBYGGNAD TILL MÅLBILDEN (OMBYGGNAD-20260927) — AVSLUTAT 2026-09-27 (OMBYGGNAD-RESULTAT-20260927; övergång 18 aktiverad
 av ägaren 10:44Z, RUNTIME-OVERGANG-18-AKTIV-20260927). Ett genomförandeuppdrag utfört av en separat session (peer-namn
@@ -727,7 +749,7 @@ FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
 RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
 RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927,
-RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927, KONTORET-FORVALTNINGSFALT-20260927, OMBYGGNAD-RESULTAT-20260927, RUNTIME-OVERGANG-18-AKTIV-20260927, OMBYGGNAD-AGARSVAR-20260927 och Runtime-planens ingång.
+RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927, KONTORET-FORVALTNINGSFALT-20260927, OMBYGGNAD-RESULTAT-20260927, RUNTIME-OVERGANG-18-AKTIV-20260927, OMBYGGNAD-AGARSVAR-20260927, HELHET-20260927 och Runtime-planens ingång.
 
 ---
 

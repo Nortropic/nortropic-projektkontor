@@ -5891,3 +5891,145 @@ och underhållsformen (ägaren arbetar fram den); raden om nästa fall står kva
 säger detsamma.
 
 **Ersätter:** ingen post. Kompletterar OMBYGGNAD-RESULTAT-20260927 och RUNTIME-OVERGANG-18-AKTIV-20260927.
+
+## HELHET-20260927 — arbetsordern "genomför professionell helhet och rätta den befintliga kedjan" registrerad; ägarens rättelser gäller (Norrglänta underkänt som kvalitetsresultat, inga rutinmässiga ägarstopp, grenskydd, verklig webbläsarförmåga, det bredare digitala flödet); etapp 1 påbörjad, etapp 2 i granskning
+
+**Status:** registrerat 2026-09-27 av kedjedrivaren (Claude Code, sessionen nortropic-repos-f0). Ordern klistrades in i
+sessionen av ägaren och är sparad ordagrant privat (`evidence/nasta-uppdrag/local/helhet-20260927/`
+`arbetsorder-helhet-20260927.md`). Ordern säger själv att den är en assistentformulerad arbetsorder utifrån ägarens
+besked, inte ett ordagrant ägaruttalande; ägarens underliggande ord finns inte i sessionen. Det som ordern kallar
+"ägarens senaste rättelser" behandlas som ägarens riktning med den reservationen, och ägaren kan lägga in sina egna ord
+i efterhand utan att något stannar.
+
+**Ordern i sammandrag** (ordagrant i den privata filen). Ett sammanhängande genomförandeuppdrag i sex etapper, utan
+rutinmässiga ägargodkännanden mellan dem: (1) käll- och ändringsbild; (2) korrigerade mandat och kunskapsgränser;
+(3) professionellt flöde och specialistintegrationer (strategi, upplevelse och innehåll; produktion; SEO; Search
+Console; Google Business Profile och lokal synlighet; Google Ads och Meta Ads; mätning och uppföljning; leverans,
+drift och förbättring); (4) verklig interaktiv webbläsarförmåga (Playwright-baserad utvecklings- och QA-väg med tre
+användningar: utvecklarens rendering med kontext, utforskande QA, avskärmad förstagångsbesökare) och rättning av
+beviskedjans tre kända brister (laddning kontra faktisk användning; läckage av brief till blind bedömning;
+kvalitetsbildens giltighet); (5) självständig genomföring (en beställning bär hela uppdraget till färdig privat
+förhandsvisning; ordinarie start- och fortsättningsväg ansvarig för laddning, nästa handling, granskningsutfall,
+rättning, bevis och återupptagning; utförarbyte verifierat på ett representativt steg; grenskydd konfigurerat och
+verifierat; maskinell publiceringsväg utan manuellt godkännande); (6) sammanhängande slutverifiering och införande
+med ett beställt fall eller neutrala, tydligt märkta testunderlag, och en slutrapport med den färdiga sidan.
+
+**Ägarens rättelser enligt ordern**, var och en registrerad som gräns:
+- Fungerande arbete bevaras, men befintlig implementation är inte ett tak för ambitionen; otillräckliga lösningar
+  förbättras eller ersätts där det behövs.
+- Norrglänta är underkänt som kvalitetsresultat: inte positiv kvalitetsreferens, designmall eller professionspraxis;
+  ingen egen leverans definierar hur Digitala bygger; lärdomar är tillåtna, automatisk upphöjning till praxis inte.
+  Detta kompletterar DIGITALA-1-AGARBEDOMNING-20260927 (arbetet på sajten avslutat, godtagen som ett första bygge) utan
+  att ändra den. Norrgläntas tekniska körbevis och felreproduktioner får användas; ett lyckat integrationsprov är inte
+  ett godkännande av sajten; undermålig design bevaras inte som golden baseline.
+- Alla brister i den föregående granskningen behandlas och åtgärdas där de bekräftas; belägg redovisas när ett fynd
+  redan är löst eller inte håller. Den granskningen finns inte i sessionen; dess tre kända startpunkter står i orderns
+  avsnitt 7 (källucka bokförd).
+- Digitala ska ha verklig interaktiv webbläsarförmåga, relevant specialistkompetens och det bredare digitala flödet,
+  inklusive SEO, Search Console, Google Business Profile samt Google Ads och Meta Ads.
+- Inga rutinmässiga ägarstopp före färdig sida; ägaren får färdig leverans och rapport och lämnar därefter sin bedömning
+  och sina synpunkter; brief, koncept, interna kvalitetsval och vanliga rättningar kräver inte ägarens mellanhand.
+- Grenskydd konfigureras och verifieras utifrån dagens förutsättningar, inte avfärdas med den tidigare uppgiften om
+  privat repo.
+- Äldre planer, analyser och förslag är källor, inte nya arbetsorder.
+
+**Orderns gränser avsnitt för avsnitt**, alla registrerade:
+- *Avsnitt 1:* befintliga planer och återupptagningsunderlag används, ingen parallell kontrollapparat; ocommittat arbete
+  bevaras; ersatta tolkningar märks och deras aktiva konsumenter uppdateras; historiken raderas inte; erfarenhet
+  klassas som observation, kundpreferens, hypotes eller dokumenterad felorsak, och regler som gör ett visst antal
+  tillämpningar till automatisk praxis avskaffas; gemensamma arbetssätt behöver egen motivering, tillämpningsområde,
+  stöd och prövning; ett etablerat arbetssätt blir inte ogiltigt bara för att det också användes i Norrglänta.
+- *Avsnitt 2:* tillkommande assistentförslag märks som förslag, inte ägarbeslut; ingen ny fullständig recompile och
+  inget beroende av historiska Kernel-planer; minnesanteckningar och sammanfattningar ersätter inte original när ett
+  beslut ska avgöras; ett gammalt filnamn visar inte att något fungerade; kopierad text, installerad resurs,
+  tillgängligt verktyg och verifierad användning hålls isär; den gamla körkedjan, dess privilegier och hårdkodade stil
+  återinförs inte som paket; ingen oinspekterad bulkinstallation, inga nya abonnemang; ursprung, licens, version,
+  beroenden och säkerhet kontrolleras; ladda efter uppgift, inte hela biblioteket; ingen ny skill-marknadsplats eller
+  plattform.
+- *Avsnitt 3:* kontoret ska hjälpa till att förstå rätt problem och välja proportion, inte bara fylla metodfält;
+  research får inte stanna vid visuell referensjakt; inget obligatoriskt framework för alla kunder; ett metodnamn eller
+  ifyllt schema är inte tillräcklig leverans; avsaknad av användarintervjuer döljs inte med påhittade insikter.
+- *Avsnitt 4:* förmågorna används när kundens uppdrag motiverar dem, alla kunder får inte alla kanaler; riktning väljs
+  internt utan ägarstopp; webbläsargranskning integreras under bygget, inte bara efteråt; annonsberedningen är en
+  återanvändbar arbetsväg, inte bara en checklista; metadata eller Lighthouse-SEO ensamt är inte en SEO-funktion; privat förhandsvisning skiljs
+  från lanseringskonfiguration; ranking eller indexering lovas inte; för Search Console implementeras det aktuellt API
+  faktiskt stöder, inga påhittade möjligheter eller positiva data för en oindexerad demo; ingen verklig företagsprofil
+  skapas för Norrglänta eller annan fiktiv verksamhet; lokala krav tvingas inte på nationella eller icke-lokala uppdrag;
+  ingen automatisk annonseringsstart eller spendering utan befintligt uttryckligt mandat; samtyckes-, integritets- och
+  plattformskrav följs och serverbaserad spårning är ingen genväg runt dem; verklig affärsnytta skiljs från tekniska
+  proxyvärden; lansering endast enligt gällande mandat; drift kopplas till Runtime och kunduppdrag, inte bara
+  månadsrubriker, och det redovisas när drift faktiskt körs och vad som händer när värdmaskinen eller en integration är
+  otillgänglig; officiella SDK:er, API:er, CLI:er och connectorer används, inga egna kopior av hela plattformar;
+  saknade credentials gör inte en förmåga till en framtida idé, kontraktet implementeras och testas och kvarvarande
+  extern aktivering redovisas exakt; mockade svar är aldrig verifierad live-integration.
+- *Avsnitt 5:* Norrglänta-härledda generella designregler ersätts (fasta färger, obligatorisk handling ovanför
+  vikningen, universella dial-värden, fast antal koncept, "designspecificitet före allt annat"); särprägel ersätter
+  inte funktion eller saklighet; externa referenser för jämförelse med motivering, inte kopiering; ingen ensam
+  referens, egen leverans eller automatisk stilpoäng definierar god kvalitet; fokus inte på att undvika vissa färger,
+  kort eller gradienter; bildkompetens med val, licens, autenticitet, art direction, beskärning, responsiva storlekar
+  och optimering; genererade människor, projekt, meriter eller omdömen framställs inte som verkliga kundbevis;
+  underkända resultat leder till diagnos, åtgärd och omprov före ägarleverans; fler agentnamn eller fler godkännanden
+  från samma antaganden är inte bättre granskning.
+- *Avsnitt 6:* verifierade skydd bevaras, men dagens begränsningar är inte professionella krav; ingen ny egen
+  generell webbläsarmotor; skärmbilder kompletterar interaktion, ersätter den inte; layout bedöms visuellt, en
+  textrepresentation är inte bildseende; avskärmade besökarprov får inte intern appstate eller källkod; emulerad mobil
+  skiljs från prov på fysisk enhet; kommandogrammatiken får inte förhindra realistiska tecken eller negativa
+  formulärprov; legitima popup-, nyflödes- och tredjepartsberoenden hanteras uttryckligt, och blockerade nödvändiga
+  resurser misstolkas inte som produktens beteende; fri utforskning är inte fri
+  åtkomst till konton, köp, riktiga meddelanden eller kunddata; isolerade kontexter, testdata och värdverkställda
+  gränser, hemligheter skyddas även i trace, nätverkslogg och bilder; säkerhetsbrister döljs inte med en
+  promptinstruktion; upptäckta produktfel blir regressionstester; modellbaserad begriplighetsbedömning är inte ett
+  uppmätt mänskligt femsekunderstest.
+- *Avsnitt 7:* de statiska fynden återkontrolleras mot dagens kod och reproduceras i isolerad testmiljö; laddningen
+  binder rätt steg, kund, uppdrag, mandat, utförare, verktygsversioner och indata och vägrar fel stegs kvitto, ändrade
+  filer och otillåtna blandningar; kvitto på förberedda filer är inte bevis för förståelse; kontextpolicy per granskning med negativa prov;
+  briefstyrd designkritik får relevant brief; slutrapporten binds till exakt revision, driftsättning, konfiguration,
+  kriterier och miljö; korrupta, saknade, underkända och inaktuella bevis visas, döljs inte; hashar och täckning
+  valideras; historiska körningar hålls åtskilda; efter en ändring omprövas berörda resultat, återanvändning kräver
+  visad giltighet, inte allt körs om mekaniskt; mätning, modellomdöme, mänsklig observation och externa
+  plattformsutfall skiljs; en kontrollants tolkning är inte deterministisk mätning; faktisk modell och utförare och
+  granskarens tillgångar redovisas, varken samma familj eller oberoende antas utan belägg; gröna verktygsprov bevisar
+  inte full tillgänglighet, mänsklig användbarhet eller affärsresultat.
+- *Avsnitt 8:* en beställning bär hela uppdraget; inga nya ägarposter för normala operationer eller omtag inom samma
+  mandat; briefstopp och andra rutinmässiga mellanliggande godkännanden tas bort ur aktiv kod, instruktioner och prov;
+  den verkliga beställningen läses och binds, ett syntaktiskt giltigt post-id är inte bevis för mandat; ingen separat
+  orkestrerare, ingen Kernel; publiceringsåtkomst utvidgas inte automatiskt till alla kundrepon; kundbygge utanför
+  Runtime får inte lämna ett oadresserat beroende av ägarens manuella samordning; avbrott och fortsättning verifieras
+  med annan stödd utförare på ett representativt steg; arbetsläge, beslut, felorsak, nästa handling och sidoeffekter
+  bevaras så att återupptagning inte duplicerar; befintlig kvot respekteras, misslyckanden diagnostiseras, inga blinda
+  omtag; kandidaten ändrar inte sin egen frusna acceptans och ger sig inga nya rättigheter; en saknad extern behörighet
+  är ett namngivet beroende, inte ett ägarstopp; skydd kringgås inte och blockerad funktion kallas inte klar;
+  skyddad integration och nekad otillåten direktändring verifieras; en tillåten maskinell publiceringsväg bevaras utan
+  nytt krav på manuellt PR-godkännande; repo-synlighet ändras inte och privat material exponeras inte för att få
+  skyddet att fungera.
+- *Avsnitt 9:* etapperna är arbetsordning, inte ägarstopp; nya abonnemang, obeställd annonsbudget, nya
+  kundförpliktelser och publik kundlansering ingår inte automatiskt; kontoåtkomst och plattformsverifiering samlas
+  konkret utan låtsasdata; ägarens designbeslut begärs inte i förtid som behörighetsfråga; slutverifiering med ett
+  redan beställt fall eller neutrala, tydligt märkta testunderlag; ingen ny kundverksamhet startas; Norrglänta bara för
+  isolerad felreproduktion; inget andra kundfall krävs som förvillkor; en mapp med mallar, en mottagarläsning eller
+  ett mockat API räcker inte som bevis; teknisk integrationsframgång döps inte om till världsklass eller
+  ägargodkännande; ingenting får tyst bli mindre omfattande, inga nya befogenheter, ingen återinförd Norrglänta-praxis;
+  kvarstående hinder namnges; fungerande arbete och en kontrollerad återgångsväg bevaras.
+
+**Läge.** Denna registreringspost bär inget lägesstycke (lärdom K12: en registreringspost pekar på det privata
+läget). Etappernas läge står i planens block HELHET, som är levande text med datum, och i det privata
+`evidence/nasta-uppdrag/local/helhet-20260927/LAGE.md`; varje etapp får en egen resultatpost med bevis.
+
+**Kedjedrivarens val inom ordern** (reversibla; märkta som kedjedrivarens): etappernas ordning med parallellitet där
+skrivansvar tillåter; Playwright som QA-väg vid sidan av den befintliga Puppeteer-provaren; nya Digitala-steg för
+SEO, sökkonsol, lokal synlighet, annonsberedning och uppföljning som "beställning" utom rena läsningar; kontrakt mot
+officiella API:er med inspelade fixturer för prov och verklig anslutning bara där behörighet finns.
+
+**Klart-när.** Orderns avsnitt 9: slutrapport med den färdiga sidan när ett sajtuppdrag omfattas, det verkliga flödet,
+revisioner och aktiv release, källtäckning, skillsens disposition, kvalitetsbedömning, tekniska bevis,
+integrationsstatus, kända begränsningar och exakt vad ägaren tar ställning till; jämförelse mot ordern och
+rättelserna; kvarstående hinder namngivna. Rytmens krav (lärdomspost, användningsnoter, förslagsrad) ingår.
+
+**Granskning.** Denna post och planändringen granskas separat genom Runtimes skrivskyddade läsare (samma modellfamilj
+som författaren: en separat läsning, inte ett oberoende omdöme) mot ordern ordagrant; kvittot i publiceringen.
+
+**Plan:** ett block HELHET med de sex etapperna och deras läge; den Norrglänta-härledda förslagsraden för Digitala
+skrivs om till en hypotes; postens namn i återupptagningspunkten. Ägarens tur ändras inte.
+
+**Ersätter:** ingen post. Kompletterar DIGITALA-1-AGARBEDOMNING-20260927 (Norrgläntas status) och
+OMBYGGNAD-RESULTAT-20260927 (nästa uppdrag efter ombyggnaden).
