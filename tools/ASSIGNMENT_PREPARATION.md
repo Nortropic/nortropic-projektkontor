@@ -68,7 +68,8 @@ duplicate timestamp, manifest, hash or per-source observation semantics. See
 
 ### Preparation specification
 
-`spec` has exactly these eight fields, all required:
+`spec` has exactly these eight fields, all required, plus one optional ninth field, `forvaltning`
+(OMBYGGNAD-20260927, etapp 3; see below):
 
 | Field | Value |
 | --- | --- |
@@ -133,6 +134,29 @@ Export has exactly `{title, context, scope, limitations}`:
 Empty context/scope/limitations lists each create a gap. This context is authored
 for export, separate from private AP05 content, and grouped by kind in the brief.
 Fixed caveats are always included even when authored limitations are empty.
+
+### Förvaltning (optional)
+
+The office's method competence travels with the assignment. `forvaltning` has exactly
+`{namn, steg, proportion, metod, underlag, kriterier, bedomning}`:
+
+- `namn`, `steg`: nonempty, `[a-z][a-z0-9-]{1,39}` (for example `digitala` and a step of its
+  `steg/steg.json`).
+- `proportion`: exactly `liten`, `mellan` or `stor` — the proportion the office chose for the need.
+- `metod`: exactly `{val, skal}`, strings; an empty `val` is a gap; an empty `skal` is a gap except for `liten`.
+- `underlag`: exactly `{laddningskvitto_sha256, steg, sha256_over_underlag}`: the SHA-256 of the förvaltning's
+  loading receipt (`LADDNING.json`) and its hash over the loaded underlag, each a 64-character lowercase
+  hexadecimal digest or empty, whitespace counting as empty (gap); `steg` must equal the förvaltning step (a contradiction is an error).
+- `kriterier`: list of nonempty strings naming the quality criteria files or rules that apply; empty is a gap.
+- `bedomning`: exactly `{tekniskt, professionellt, ej_observerat}`, lists of nonempty strings saying how the
+  result will be assessed in each column of the quality picture; an empty list is a gap, except
+  `professionellt` for `liten`.
+
+Absent, the spec is exactly as before, no gap is emitted and the package has no `forvaltning` key at all (so every
+earlier packet hashes exactly as before). Present,
+the object is copied to `package.forvaltning` and rendered as a "## Förvaltning" section in the brief. The
+core verifies shape, contradictions and presence only; whether the receipt exists, the method fits or the
+criteria are the right ones is the host's and the separate reviewer's judgment.
 
 ### Runtime task draft
 
@@ -215,6 +239,7 @@ Exactly five top-level keys:
 - `tests`: deep copy of the supplied tests.
 - `gaps`: detached copy of the top-level gaps.
 - `limitations`: nonempty list of fixed caveats followed by authored limitations.
+- `forvaltning`: deep copy of the supplied förvaltning object; the key is absent when the spec has none.
 
 No raw AP05 facts/decisions/authority, source IDs/metadata/paths, private claim IDs,
 reference IDs/quotes or checks are rendered into this package. The explicit
@@ -248,13 +273,21 @@ Codes carry the specific missing condition; private traces provide source detail
 | `export_context_empty` | `brief` | No authored context |
 | `export_scope_empty` | `brief` | No authored scope |
 | `export_limitations_empty` | `brief` | No authored limitations |
+| `forvaltning_metod_val_empty` | `forvaltning` | No method named |
+| `forvaltning_metod_skal_empty` | `forvaltning` | No reason for the method (not for `liten`) |
+| `forvaltning_underlag_missing` | `forvaltning` | No loading receipt digest |
+| `forvaltning_underlag_unbound` | `forvaltning` | No digest over the loaded underlag |
+| `forvaltning_kriterier_empty` | `forvaltning` | No criteria named |
+| `forvaltning_bedomning_tekniskt_empty` | `forvaltning` | No technical assessment named |
+| `forvaltning_bedomning_professionellt_empty` | `forvaltning` | No professional assessment named (not for `liten`) |
+| `forvaltning_bedomning_ej_observerat_empty` | `forvaltning` | Nothing named as not observed with real users |
 | `task_field_missing` | Task field name | Key absent |
 | `task_field_empty` | Task field name | Supplied empty/null value |
 | `action_authority_missing` | `brief` | Selected action has no authored grant |
 | `action_dependencies_need_reassessment` | `brief` | Selected action's AP05 dependency coverage is not unchanged |
 
 Gaps are emitted deterministically: test fields, requirement link lists, empty
-requirements/tests, export lists, task fields in the table's order, action gaps,
+requirements/tests, export lists, förvaltning gaps in the order above, task fields in the table's order, action gaps,
 references in input order, then requirement dependency/verification gaps in input
 order. Multiple distinct conditions may coexist for one subject.
 

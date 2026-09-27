@@ -5680,3 +5680,53 @@ postens namn i återupptagningspunkten och en bisats i Digitala-planens steg 11 
 
 **Ersätter:** ingen post. Den öppna hemvistfrågan (DIGITALA-1-RIKTNING-BESKED-20260926 §2, planens steg 11) är avgjord
 genom ägarens beställning och kedjedrivarens val 1; posterna står kvar som historik.
+
+## KONTORET-FORVALTNINGSFALT-20260927 — AP-06:s beredning bär förvaltningens metodkompetens: en valfri del `forvaltning` med egna gap-koder och en brief-sektion (etapp 3 i OMBYGGNAD-20260927)
+
+**Vad.** Beredningsverktyget `tools/assignment_preparation.py` (AP-06, den rena funktionen `prepare(case, check, spec)`)
+tar nu en valfri nionde spec-del, `forvaltning`, med exakt sju fält: `namn` (förvaltningen, till exempel Digitala),
+`steg` (stegets namn i förvaltningens stegdefinition), `proportion` (liten, mellan eller stor), `metod` (`val` och
+`skal`), `underlag` (`laddningskvitto_sha256`, `steg` och `sha256_over_underlag` ur förvaltningens laddningskvitto),
+`kriterier` (lista) och `bedomning` med tre listor som aldrig blandas: `tekniskt` (uppmätt), `professionellt` (bedömt,
+märkt som sådant) och `ej_observerat` (hos verkliga användare). Delen kopieras till paketet och renderas som avsnittet
+"## Förvaltning" i briefen. Saknad substans blir stabila gap-koder med ämnet `forvaltning`: `forvaltning_metod_val_empty`,
+`forvaltning_metod_skal_empty` (inte för liten), `forvaltning_underlag_missing`, `forvaltning_underlag_unbound`,
+`forvaltning_kriterier_empty`, `forvaltning_bedomning_tekniskt_empty`, `forvaltning_bedomning_professionellt_empty`
+(inte för liten) och `forvaltning_bedomning_ej_observerat_empty`. Proportionen avgör vad som krävs: en liten uppgift
+behöver varken metodskäl eller professionell bedömning, en mellan eller stor behöver båda. Fel form (okänt fält, fel
+steg i kvittot, ogiltig proportion, fel hashlängd) vägras som förut med `ValueError`; en spec utan delen är exakt som
+förut, och paketet får då ingen `forvaltning`-nyckel alls, så varje tidigare paket hashar precis som tidigare
+(bevakningens jämförelser i `tools/bevakning.py` läser paketets hash; tre av dess prov föll när nyckeln alltid fanns
+och är gröna med nyckeln villkorad).
+
+**Varför.** Ägarens etapp 3 (OMBYGGNAD-20260927): kontorets metodkompetens ska integreras i den befintliga
+beredningen så att problemformulering, osäkerheter, proportionerligt metodval och beslutsunderlag stöds som en del av
+förvaltningsarbetet, inte som separata artefakter; det stående mandatet formaliseras och kvalitetsbilden skiljer
+tekniskt prövat, professionellt bedömt och ej observerat. Beredningen är kontorets ordinarie väg; nu kan ett
+förvaltningsuppdrag bära sitt steg, sin proportion, sitt metodval med skäl, sitt laddningskvitto och sina kriterier
+genom samma funktion och samma gap-mekanik som alla andra uppdrag. Inget nytt verktyg, ingen ny artefakt.
+
+**Vad som inte ändras.** Befintliga fält, ordningen på gap-koder och deras namn; briefens övriga avsnitt; det privata
+underlaget; verktygets rena form (ingen fil, inget nät). Det stående mandatet skrivs inte här: det står i
+förvaltningens egen hemvist (Digitala-repots `MANDAT.md`, härlett ur registrerade ägarbeslut, med saknade gränser
+namngivna som frågor) och beredningen pekar på steget, inte på mandatet. Inga budgettak, lanseringsrättigheter eller
+underhållsåtaganden uppfinns; ingen ny styrplattform; kontoret blir varken register eller obligatorisk passage.
+
+**Prov.** Hela kontorssviten med kontorets tolk: 400 prov gröna (395 före, 5 nya i `test_assignment_preparation.py`:
+komplett del utan gap och renderad i briefen; frånvarande del lämnar varje tidigare spec giltig och paketet
+oförändrat; saknad substans ger gap-koder och proportionen avgör vilka; förvaltningens gap kommer efter exportens och
+före uppgiftens; fel form vägras). Dokumentationen `tools/ASSIGNMENT_PREPARATION.md` beskriver delen, koderna och
+brief-avsnittet.
+
+**Läge.** Implementerat; integreras i kontoret med denna publicering; körprovat mot ett verkligt laddningskvitto
+i slutprovet på Norrglänta (mätningens `LADDNING.json`) på en kopia; inte använt i en skarp beredning ännu. Effekten på
+en verklig beredning är ännu inte verifierad.
+
+**Granskning.** Separat, skrivskyddad läsning genom Runtimes läsarprofil (samma modellfamilj som författaren: en
+separat läsning, inte ett oberoende omdöme) av kandidatens diff, dokumentation, prov och denna post mot ägarens
+etapp 3; kvittot i publiceringen.
+
+**Plan:** punkt 3 i blocket OMBYGGNAD TILL MÅLBILDEN markeras klar med denna post, och postens namn läggs i
+återupptagningspunkten. Ägarens tur ändras inte.
+
+**Ersätter:** ingen post.
