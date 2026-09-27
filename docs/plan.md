@@ -104,6 +104,25 @@ nortropic-repos-f0. Etapperna är arbetsordning, inte ägarstopp; läge och näs
     länkar där mer beställts, frånvaro av data har inte blivit påstådd förståelse; sambandet visas genom bärande exempel
     ur det verkliga underlaget, inte påhittade berättelser.
 
+KUNDSTART (KUNDSTART-20260927) — ägarens separata genomförandespår för kundupplevelsen, utfört av sessionen
+nortropic-repos-0a parallellt med HELHET; en kanal i huvudspårets intervjumodell, inte en egen intervjumotor. Etapperna
+är arbetsordning, inte ägarstopp; läge och nästa kommando privat i `evidence/nasta-uppdrag/local/kundstart-20260927/LAGE.md`.
+ 1. KLAR 2026-09-27: samordning och gränssnitt — arbetsdelning bekräftad av huvudspårets session; frågebanken snapshottad
+    ur Digitalas `verktyg/intervju.py` (först ur arbetsgrenen, sedan ur main 94dcb0e med rättat kvitto); kontrakt: svar ordagrant per omgång i intervju.py:s form,
+    AI-tolkningar som fakta `tolkning`; driftberoenden kontrollerade (Vercel-teamet nortropic, inget lagrings- eller
+    modellkonto fanns; AI Gateways fria nivå saknar Claude, OpenAI-familjen fungerar).
+ 2. KLAR 2026-09-27: kundupplevelse — repot `Nortropic/nortropic-kundstart`: start/fortsätt med personlig länk, adaptivt
+    samtal, vår bild av kunden med rättelser, material, inlämning; mobil först; designresurser från Digitalas register
+    använda: frontend-design (fil 1) för planen och kritiken, mobile-native för plattformsdetaljerna; Norrglänta ingen norm.
+ 3. KLAR 2026-09-27: integration och drift — intern API och Digitala-verktyget `verktyg/kundstart.py` (gren
+    kundstart/verktyg, PR 9 mergad, Digitala main 0c5e987) för överföring till kundmappens INTERVJU.json; privat Blob-lager och funktioner i
+    Stockholm; modell genom Vercel AI Gateway med OIDC (openai/gpt-5-mini, fri nivå); tre serverhemligheter.
+ 4. KLAR 2026-09-27: slutverifiering och införande — Playwright-svit (åtta prov) grön lokalt och mot den skyddade
+    förhandsvisningen med live-modell; verkligt AI-anrop verifierat genom gateway och lokalt claude-cli; separata
+    granskningar genom Runtimes läsarprofil (appen r1 underkänd → r2 godkänd; Digitala-verktyget r1–r4 underkända → r5
+    godkänd); skyddad förhandsvisning på Vercel (Vercel Authentication på alla deployer). Kundredo: nej, tills ägaren
+    beställer delbar länk (MANDAT §2).
+
 OMBYGGNAD TILL MÅLBILDEN (OMBYGGNAD-20260927) — AVSLUTAT 2026-09-27 (OMBYGGNAD-RESULTAT-20260927; övergång 18 aktiverad
 av ägaren 10:44Z, RUNTIME-OVERGANG-18-AKTIV-20260927). Ett genomförandeuppdrag utfört av en separat session (peer-namn
 nortropic-repos-f0), parallellt med Digitala. Etapperna är arbetsordning, inte godkännandestopp; tekniska val är
@@ -596,6 +615,9 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [beslut] Digitala: tak för stående arbete per månad, i antal läsande modellsessioner; kedjedrivarens förslag är 20, redovisade i månadsomgången (OMBYGGNAD-AGARSVAR-20260927) — sedan 2026-09-27
 - [beslut] Digitala: underhållsform för levererade sajter; du skrev "vi ska arbete fram åt slags underhåll tänker jag, ja", och tills den är beslutad är varje ändring en beställning (OMBYGGNAD-AGARSVAR-20260927) — sedan 2026-09-27
 - [beslut] Digitala: nästa fiktiva fall — välj och beställ det med dina ändringar från Norrglänta (DIGITALA-1-AGARBEDOMNING-20260927) — sedan 2026-09-27
+- [beslut] Digitala Kundstart: kundredo kräver att förhandsvisningens inloggningsskydd lyfts för kundlänkar, en delbar länk till utomstående enligt MANDAT §2; beställ när ett kunduppdrag finns (KUNDSTART-20260927) — sedan 2026-09-27
+- [beslut] Digitala Kundstart: modell på servern är OpenAI-familjen på AI Gateways fria nivå; Claude på servern kräver köpta AI Gateway-krediter, en betalväg (KUNDSTART-20260927) — sedan 2026-09-27
+- [beslut] Digitala Kundstart: bevarandetid och radering för kundmaterial i Blob-lagret är inte beslutade (KUNDSTART-20260927) — sedan 2026-09-27
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -765,7 +787,7 @@ FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
 RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
 RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927,
-RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927, KONTORET-FORVALTNINGSFALT-20260927, OMBYGGNAD-RESULTAT-20260927, RUNTIME-OVERGANG-18-AKTIV-20260927, OMBYGGNAD-AGARSVAR-20260927, HELHET-20260927 och Runtime-planens ingång.
+RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927, KONTORET-FORVALTNINGSFALT-20260927, OMBYGGNAD-RESULTAT-20260927, RUNTIME-OVERGANG-18-AKTIV-20260927, OMBYGGNAD-AGARSVAR-20260927, HELHET-20260927, KUNDSTART-20260927 och Runtime-planens ingång.
 
 ---
 
