@@ -32,8 +32,8 @@ att datumet passerat, annars noteras den som utebliven. Arbetssättet står priv
 och `evidence/forvaltningsutveckling/local/kontoret/LARDOMAR.md`; Digitalas lärdomsfil står sedan 2026-09-27 i Digitala-repots `kunskap/LARDOMAR.md`. Varje nytt
 uppdrag får i sitt klart-när en lärdomspost, användningsnoter och förslagsraden för nästa fall.
 
-OMBYGGNAD TILL MÅLBILDEN, BESTÄLLD 2026-09-27 (OMBYGGNAD-20260927) OCH AVSLUTAD 2026-09-27 UTOM ÄGARENS AKTIVERING
-(OMBYGGNAD-RESULTAT-20260927): ägaren har beställt en sammanhängande ombyggnad i
+OMBYGGNAD TILL MÅLBILDEN, BESTÄLLD 2026-09-27 (OMBYGGNAD-20260927) OCH AVSLUTAD 2026-09-27 (OMBYGGNAD-RESULTAT-20260927,
+RUNTIME-OVERGANG-18-AKTIV-20260927): ägaren har beställt en sammanhängande ombyggnad i
 fem etapper — Runtime som gemensam mekanik, kontoret som organisationens förvaltning, Digitala som bestående professionell
 förmåga med en tydlig, versionshanterad hemvist — utan att invänta ett andra kundfall; blocket OMBYGGNAD TILL MÅLBILDEN nedan
 bär etapperna och deras läge, och det privata läget står i `evidence/nasta-uppdrag/local/ombyggnad-20260927/`.
@@ -66,8 +66,8 @@ FÖRSLAG ATT PRÖVA I NÄSTA FALL
   nyckelordning (lärdom R18, belägg REHEARSAL.md för övergång 18; billigt prov: nästa startövning; ersätter
   ordningskänsliga jämförelser i harness-17/18; ryms i ett vanligt mandat).
 
-OMBYGGNAD TILL MÅLBILDEN (OMBYGGNAD-20260927) — AVSLUTAT 2026-09-27 (OMBYGGNAD-RESULTAT-20260927) utom ägarens
-aktivering av övergång 18 (operatörsraden i ägarens tur). Ett genomförandeuppdrag utfört av en separat session (peer-namn
+OMBYGGNAD TILL MÅLBILDEN (OMBYGGNAD-20260927) — AVSLUTAT 2026-09-27 (OMBYGGNAD-RESULTAT-20260927; övergång 18 aktiverad
+av ägaren 10:44Z, RUNTIME-OVERGANG-18-AKTIV-20260927). Ett genomförandeuppdrag utfört av en separat session (peer-namn
 nortropic-repos-f0), parallellt med Digitala. Etapperna är arbetsordning, inte godkännandestopp; tekniska val är
 kedjedrivarens; granskning, integration och aktivering följer befintliga vägar. Kundrepot rörs inte; Digitalas
 etappmappar rörs inte. Läge och nästa kommando privat i `evidence/nasta-uppdrag/local/ombyggnad-20260927/LAGE.md`.
@@ -84,10 +84,10 @@ etappmappar rörs inte. Läge och nästa kommando privat i `evidence/nasta-uppdr
     del `forvaltning` (namn, steg, proportion, metod med skäl, laddningskvitto, kriterier, bedömning i tre kolumner) med
     egna gap-koder och en brief-sektion; utan delen är paketet byte för byte som förut. Det stående mandatet står i
     Digitala-repots `MANDAT.md`; kvalitetsbilden byggs av Digitala-repots verktyg och redovisas i etapp 5.
- 4. KLART 2026-09-27 utom aktiveringen: Runtime D037 integrerad (PR 68, main `3bea86e`); release 18 stegad
-    (konfiguration `eb102e4e`), kontrollerad, skriptet granskat, startövning genomförd (alla faser gröna; harnessets
-    egen vykontroll rättad, R18). Aktiveringen är ägarens (operatörsraden); därefter mäts med parametrar genom den
-    aktiva releasen. Täckningskartan och `KEDJA.md` i Digitala-repot; inget prov borttaget; modellval oförändrade.
+ 4. KLART 2026-09-27: Runtime D037 integrerad (PR 68, main `3bea86e`); release 18 stegad, kontrollerad, skriptet granskat,
+    startövning genomförd (alla faser gröna; harnessets egen vykontroll rättad, R18); aktiverad av ägaren 10:44Z
+    (konfiguration `eb102e4e`), läst tillbaka och mätt genom den aktiva releasen med parametrar (Runtime PR 69;
+    RUNTIME-OVERGANG-18-AKTIV-20260927). Täckningskartan och `KEDJA.md` i Digitala-repot; inget prov borttaget.
  5. KLART 2026-09-27: slutprov på Norrglänta genom den nya vägen (laddning → mätning genom aktiv release → kritik med
     Claude och Codex → kvalitetsbild), sex negativa fall vägrade, mottagarprov med båda utförarna, separata granskningar,
     integration genom skyddade vägar, det ägaraktiverade steget berett exakt, slutrapport i OMBYGGNAD-RESULTAT-20260927.
@@ -548,14 +548,13 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-RESULTAT-20260927 (2026-09-27) är fyra rader
-öppna: operatörshandlingen att aktivera övergång 18 (förfaller inte), namnfrågan om det gamla webbförvaltningsrepot,
-Digitalas stående mandats två saknade gränser, och Digitalas nästa fiktiva fall med ägarens ändringar; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter RUNTIME-OVERGANG-18-AKTIV-20260927 (2026-09-27) är tre rader
+öppna: namnfrågan om det gamla webbförvaltningsrepot, Digitalas stående mandats två saknade gränser, och Digitalas
+nästa fiktiva fall med ägarens ändringar; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
 ÄGARENS TUR
-- [operatörshandling] Runtime: aktivera övergång 18 (D037, mätprofilens parametrar) med kommandot i den privata filen AKTIVERINGSKOMMANDO-OVERGANG-18.md, utanför AP-10:s fönster, huvudgrenen exakt 3bea86e (OMBYGGNAD-RESULTAT-20260927) — sedan 2026-09-27
 - [beslut] Namnbyte av nortropic-webbforvaltning: ditt förslag nortropic-digtala ligger ett tecken från det nya repots namn nortropic-digitala; välj ett annat namn, till exempel nortropic-webbforvaltning-arkiv, eller låt det vara; DIGITALA-1-KORRIGERING-20260926 gäller oavsett, inget namnbyte gör den till körväg (OMBYGGNAD-RESULTAT-20260927) — sedan 2026-09-27
 - [beslut] Digitalas stående mandat, de två gränser MANDAT.md §3 namnger som saknade: får en levererad sajt underhållas mellan beställningar inom stående mandat, och vilket tak gäller för stående arbete (OMBYGGNAD-RESULTAT-20260927) — sedan 2026-09-27
 - [beslut] Digitala: nästa fiktiva fall — välj och beställ det med dina ändringar från Norrglänta (DIGITALA-1-AGARBEDOMNING-20260927) — sedan 2026-09-27
@@ -728,7 +727,7 @@ FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
 RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
 RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927,
-RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927, KONTORET-FORVALTNINGSFALT-20260927, OMBYGGNAD-RESULTAT-20260927 och Runtime-planens ingång.
+RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927, KONTORET-FORVALTNINGSFALT-20260927, OMBYGGNAD-RESULTAT-20260927, RUNTIME-OVERGANG-18-AKTIV-20260927 och Runtime-planens ingång.
 
 ---
 

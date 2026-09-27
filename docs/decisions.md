@@ -5832,3 +5832,35 @@ fall, och stycket ovanför rubriken säger detsamma; tre förslagsrader; kunskap
 inledning och i stegen 16–17, lärdomsfilens plats i rytmstycket; postens namn i återupptagningspunkten.
 
 **Ersätter:** ingen post. OMBYGGNAD-20260927 står som registrering.
+
+## RUNTIME-OVERGANG-18-AKTIV-20260927 — ägaren aktiverade övergång 18 (D037, mätprofilens parametrar); läst tillbaka och mätt genom den aktiva releasen med parametrar; ombyggnaden är därmed avslutad
+
+**Ägarens handling.** Ägaren körde aktiveringskommandot i sin egen Terminal 2026-09-27 kl. 10:44Z, utanför AP-10:s
+fönster, och klistrade in utskriften i kedjedrivarens session; den är sparad ordagrant privat
+(`evidence/nasta-uppdrag/local/ombyggnad-20260927/agarens-aktivering-overgang-18.txt`). Skriptets sista ord:
+`completed: true`, `problems: []`, konfiguration `eb102e4e` ersatte `03e776bd`, modellvalet oförändrat.
+
+**Läst tillbaka av kedjedrivaren (10:47Z).** Runtimes aktiva konfiguration är `eb102e4e` (runtime `3bea86ef`, kontoret
+`df5ed5dc`); tjänstens tre processer (daemon, motor, arbetare) startade 10:44:37–40Z ur den nya releasens katalog;
+AP-10:s schema är ombundet till den nya konfigurationen (skriptets rebind-rekord: `rebound: true`), opausat, med nästa
+ordinarie körning 2026-09-28 07:00Z; AP-10:s kommando mättes oförändrat och det avslutade AP-11 rördes inte. Därefter
+kördes mätprofilen genom den aktiva releasens egen kopia mot Norrgläntas produktion med Digitalas två vyer och sex
+axe-taggar skickade som parametrar: utfall klar, kvittot namnger den aktiva releasen som kodrot, `standardvarden`
+falskt för båda, undantagsnyckeln använd utan att förekomma i något utdata. Det var den sista punkten under "ännu inte
+verifierat" för Runtime i OMBYGGNAD-RESULTAT-20260927.
+
+**Runtime.** D037 har fått sitt tillägg om vad som visades efter integrationen, och planens ingång säger aktiv sedan
+övergång 18 med ordningens tre steg genomförda (Runtime PR 69, efter separat granskning och värdkontroller).
+
+**Läge enligt ägarens §5.** *Aktiverat:* övergång 18. *Körprovat:* mätning med parametrar genom den aktiva releasen.
+*Ännu inte verifierat:* AP-06-fältet i en skarp beredning; provarprofilen i ett skarpt Digitala-steg; täckning "visad" i
+mätkonsolideringen; professionell effekt hos verkliga användare.
+
+**Plan.** Operatörsraden för övergång 18 tas bort ur ägarens tur (tre rader kvar: namnfrågan, mandatgränserna, nästa
+fall); blocket OMBYGGNAD TILL MÅLBILDEN och planens inledning märks avslutade utan förbehåll; punkt 4 säger aktiverad.
+
+**Granskning.** Separat läsning genom Runtimes läsarprofil (samma modellfamilj som författaren: en separat läsning,
+inte ett oberoende omdöme) mot övergångsskriptets rekord, ägarens utskrift och mätningens kvitto; kvittot i
+publiceringen.
+
+**Ersätter:** ingen post. Kompletterar OMBYGGNAD-RESULTAT-20260927.
