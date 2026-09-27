@@ -5192,3 +5192,123 @@ följer K11 och inte ändrar något annat.
 **Granskning:** en separat läsning genom Runtimes skrivskyddade läsare, redovisad i publiceringens kvitto.
 
 **Ersätter:** ingen post. RUNTIME-PROFILER-KANDIDAT-20260926 står kvar, och dess ord om en rad i ägarens tur gäller.
+
+## RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927 — övergången till webbprofilerna är förberedd på ägarens beslut: städrättningen D036 integrerad (Runtimes PR 66), release 17 stegad och kontrollerad, isolerad startövning genomförd med spärrprov A och en provarsession per utförare mot ett mål som heter localhost; aktiveringen väntar på ägaren
+
+**Status:** registrerat 2026-09-27 av den session som fick beställningen av Runtime-profilerna (Claude Code). Ägaren
+beslutade samma morgon att övergången förbereds nu, med beskedet "Ja, förbered nu (Rekommenderas)" på kedjedrivarens
+fråga. Frågan och svaret står ordagrant privat i `evidence/runtime-profiler/local/`. Aktiveringen är ägarens, och
+ingenting är aktiverat: aktiv konfiguration är fortfarande `e814c757`, och daemon, AP-10 och modellvalet är orörda.
+
+**D036, städrättningen.** D036 handlar om de fem anmärkningar från D035:s andra granskningsrunda som gällde städningen:
+- ett fel eller avbrott medan hållaren startar avslutar genast hållaren, dess Chrome och dess profil;
+- visitörens och mätningens slutstädning kan inte avbrytas av en stoppsignal;
+- körningens Chrome-profil tas bort också efter avbrott och hårt dödade kommandon. Efter förberedelsen innehåller den
+  den skyddade värdens kaka;
+- Chrome-sopningen kastar aldrig ett undantag över det fel som städningen körs under;
+- två kodkommentarer säger nu vad koden gör.
+
+Svit, värdprov och granskning:
+- Runtimes svit gick med 597 prov, varav fyra nya, och alla var gröna. Webbvärdproven var 13 och de stående värdproven 28,
+  alla gröna på exakt kandidaten.
+- Nio mutationsprov kördes, på koden i `5997c5a`, som bara skiljer sig från den integrerade commiten i beslutstexten.
+  Åtta fälls av rätt skäl. Det nionde visar att mätningens nya utgångshanterare inte är det som tar bort profilen i någon
+  uppmätt väg, eftersom mätningens eget slutblock redan gör det. D036 säger det uttryckligen.
+  Efter omgången låg den stand-in-hållare kvar som en av mutationerna med avsikt lämnar utan städning. Den avslutades för
+  hand, och drivaren städar sedan dess allt som startats under en mutation.
+- En separat granskningsrunda godkände utan blockerande fynd, med kvarstående smala kantfall. Två av dem: ett ögonblick
+  mellan Chromes start och hållarens utgångshanterare, och en normal körnings stopp efter sessionen, som inte är skyddat.
+- Integrerad som Runtimes PR 66, main `3fdf7f2`, med samma träd som den granskade commiten.
+
+**Övergångsskriptet.** Övergång 17 är härledd ur övergång 16, som ägaren körde 2026-09-25. Skillnaderna:
+- den nya revisionen nås från den aktiva genom exakt fyra skyddade publiceringar: D033:s planpost, D034, D035 och D036;
+- releasen får ändra exakt 16 Runtime-filer, alla nya: webbprofilerna, deras verktygslås och installerare, värdproven och
+  proven;
+- kontrollen och återläsningen kräver att webbprofilernas pinnade verktyg stämmer mot den nya kodens lås. Ingenting
+  installeras eller hämtas.
+
+Allt annat är övergång 16:s: kontorets revision, modellvalet, kontexten, arkiven och vakterna förs över bytevis. AP-10:s
+kommando mäts under båda koderna, och den aktiva releasens egen startkontroll utgör vägen tillbaka. Skriptet granskades
+separat före stegningen och godkändes utan blockerande fynd. Två av granskningens kvarstående anmärkningar, som inte
+hindrar: verktygskontrollen är enkelriktad, så en extra paketkatalog i verktygskopian skulle passera obemärkt, och
+verktygskopian ligger utanför releasens filkarta, så ingenting i releasen binder den efter aktiveringen.
+
+**Releasen och kontrollen.** Releasen stegades 05:53Z:
+- runtime `a9a5eca1` → `3fdf7f21`, kontoret oförändrat `df5ed5dc`, konfiguration `03e776bd`;
+- exakt de 16 filerna, alla nya enligt Git (status A för var och en mellan de två revisionerna);
+- samma modellval.
+
+Kontrollen, som bara läser, fann att varje förutsättning håller. Den vägrar annars, bland annat om AP-11 inte är stängt
+och orört eller om arbete körs i motorn. Dess utskrift anger dessutom:
+- AP-10:s kommando är uppmätt oförändrat;
+- den nya daemonens startkrav uppfylls av de arkiv releasen binder;
+- webbverktygen stämmer under den stegade releasen;
+- den nuvarande releasen kan starta igen, så vägen tillbaka finns.
+
+**Startövningen,** isolerad i en port- och rotförskjuten kopia av den stegade releasen på en databaskopia. Ingenting
+levande valdes, stoppades, bands om eller aktiverades.
+- *Fas A:* motorn ensam. Den nya kodens ombindning av AP-10:s schema fungerade och var idempotent, och ett oväntat gammalt
+  argument vägrades. Schemana pausades sedan i kopian.
+- *Fas B och C:* den nya daemonen startade och bekräftades igång på 1,04 och 1,03 sekunder. Den levererade de tre
+  historikerna ur de arkiv releasen binder. De elva vilande utvecklingsuppgifterna svarade genom den nya arbetaren utan
+  att någon händelse lades till. Vilopauserna var händelsefria, SIGTERM gav exit 0 på cirka 1,2 sekunder, inget blev
+  kvar, och AP-11:s scope-kopia var bytevis oförändrad.
+- *Fas W, webbprofilerna från releasens egen kopia* (den aktiva releasen i övningsroten):
+  - spärrprov A och C utan modell, med releasens egen procedur och provmålet under namnet `localhost`: alla kontroller
+    gröna för Claude-vägen (13) och Codex-vägen (15). Det främmande provmålet fick noll förfrågningar, provmålet såg bara
+    namnet `localhost`, och den falska hemligheten fanns i ingen fil;
+  - en provarsession per utförare mot samma slags mål, bakom ett falskt skydd. Claude (claude-opus-5, bekräftat i
+    strömmen) och Codex (gpt-6-astra enligt modellvalet; Codex-strömmen redovisar inte modellnamnet) slutade båda
+    `klar`. Formuläret skickades med exakt de givna uppgifterna, och bekräftelsekoden som bara fanns i bilden
+    återgavs. Det främmande provmålet fick noll förfrågningar, och ingen hemlighet fanns i utdata. Kvittona anger
+    körningen som den aktiva releasens egen kopia.
+
+**Uppmätt, bedömt, ej prövat och okänt.**
+- *Uppmätt:* proven, kontrollen och övningen ovan. Att skriptet i övrigt är övergång 16:s är läst och granskat, inte
+  mätt.
+- *Bedömt:* att aktiveringen går som i övningen. Bytessekvensen är densamma som i övergång 16, som ägaren körde
+  2026-09-25.
+- *Ej prövat:*
+  - launchd självt och ägarens skal;
+  - ombindningen av det levande schemat, som bara sker vid aktiveringen;
+  - en verklig skyddad sajt (övningen använde lokala provmål med falskt skydd).
+- *Okänt:* inget nytt.
+
+**Resurser.**
+- Två modellsessioner, fas W: Claude 44 sekunder och Codex 38 sekunder.
+- Tre läsande granskningar: D036 (357 sekunder), övergångsskriptet (277 sekunder) och denna post.
+- Allt inom abonnemangen. Inga nya verktyg, konton, kostnader eller behörigheter.
+
+**Rytmen (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926).**
+- *Lärdomar:* inga nya poster. R16 och R14 har fått tillämpningsrader i Runtimes lärdomsfil:
+  - D036:s mutationsomgång, där en mutation som inte fälldes förklarades i beslutstexten före granskningen;
+  - drivaren som nu städar allt som mutationen startat;
+  - fas W:s modellsessioner, som kördes på releasens slutliga byte.
+- *Användningsnoter:*
+  - planens förslag för Runtime, R16 (en mutation per nytt värdprov och felorsaken läst före granskningen), är prövat i
+    D036;
+  - R15 styrde valet av `localhost` i startövningen;
+  - R10 nådde arbetet: startövningen gjordes före ägarens aktivering.
+- *Förslagsrad för nästa Runtime-fall:* mutationsdrivaren städar varje process som startats under en mutation, genom att
+  jämföra processlistan före och efter. En mutation som inte fälls förklaras i beslutstexten före granskningen. Belägg:
+  R16. Förslaget ryms i ett vanligt mandat.
+
+**Kvar:** ägarens aktivering. Ägaren har fått ett komplett kommando, som står privat i
+`evidence/runtime-profiler/local/AKTIVERINGSKOMMANDO-OVERGANG-17.md`:
+- `LC_ALL=C`, först en färsk kontroll och sedan aktiveringen, i ägarens egen Terminal;
+- inte inom 20 minuter före AP-10:s dagliga körning, och ingenting nytt på Runtimes main dessförinnan;
+- vad som binds och vad driften påverkas av;
+- återhämtningsvägarna: automatisk återställning om den nya versionen inte startar, `forward` efter ett avbrutet byte och
+  `rebind` om bara schemats ombindning föll.
+
+Efter aktiveringen läser kedjedrivaren tillbaka och registrerar övergången här och i Runtime.
+
+**Plan:**
+- blocket RUNTIME-PROFILER FÖR DIGITALA: steg 6 är nu förberett och väntar på aktiveringen;
+- raden i ägarens tur blir en operatörshandling och behåller sitt datum i läsarens form, "— sedan 2026-09-27";
+- Runtimes förslagsrad är ersatt;
+- postens namn står i återupptagningspunkten.
+
+**Granskning:** en separat läsning genom Runtimes skrivskyddade läsare, redovisad i publiceringens kvitto.
+
+**Ersätter:** ingen post.
