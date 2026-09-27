@@ -5376,3 +5376,83 @@ förberedelsen och ägarens aktivering. Nästa bygge behöver ett eget acceptera
 **Granskning:** en separat läsning genom Runtimes skrivskyddade läsare, redovisad i publiceringens kvitto.
 
 **Ersätter:** ingen post.
+
+## DIGITALA-1-ETAPP4-RESULTAT-20260927 — etapp 4 är levererad: "Ljuset med Planen" är inbyggd i Norrglänta och driftsatt bakom åtkomstskyddet med gröna prov, tre renderingsläsningar, en kritikröst och två skyddade scenarier; sajten väntar på ägarens bedömning
+
+**Status:** registrerat 2026-09-27 av kedjedrivaren (Claude Code). Planens steg 15 (DIGITALA-1-AGARBESLUT-20260926,
+"Bygg in den nu"), påbörjat efter ägarens ord "continue, usage back" och fortsatt efter "continue" (sparade ordagrant
+privat). Allt står privat under `evidence/digitala/local/genomforande-20260926/etapp4/` och i läget `LAGE.md`
+(avsnittet etapp 4): utfallet (`UTFALL-ETAPP4.md`), riktningsfilen (`DESIGN.md`), åtgärdslistan efter läsningarna
+(`ATGARDER-VARV5.md`), mätmapparna per driftsättning, läsytorna och scenariernas körkataloger. Kundrepot bär bygget
+på en egen gren i tolv commits; ingen lansering, ingen domän, ingen delbar länk, ingen indexering.
+
+**Bygget.** Första vyn är en ljus, fotofri rubrikvy med Säsongsplanen som bärande objekt: på dator sida vid sida och
+toppjusterade, på mobil rubrik följd av plan. Huvudrubriken är den kortare med stödtext (A1): rubrikraden är sidans enda
+h1 och står på två rader i båda bredderna, stödraden är en egen rad. Säsongsplanen har inget förvalt tillval, valen
+lever i adressen så att bakåt och en delad länk ger samma plan, alla fyra tjänsterader visas alltid med en synlig
+teckenförklaring, takten ritas som staplar ("takten, inte antalet besök") och engångsjobb som en ram över perioden, och
+"Ta med i förfrågan" är en konturknapp. Solgult står bara på sidans egen "Skicka förfrågan", en gång per vy; headerns
+beständiga knapp är kontur, och den flytande knappen på mobil håller sig undan planen och CTA-bandet. Kontaktfältets
+felmeddelande säger regeln (A2), rättelseanteckningen står i briefen (A3), och scenariernas tre fel är rättade
+(förkryssat tillval, nollställda val vid bakåt, klistrad knapp över tabellen). Herobilden och dess bildpost är borta;
+miljöbilderna har synlig bildtext. Riktningsfilen DESIGN.md (P-A, formatverktyget hämtat pinnat och installerat
+isolerat) beskriver det byggda, är lintad utan fel och varningar och redovisar varje avvikelse från briefen med skäl.
+Funktionsregionen är Stockholm (C7), och åtkomstskyddets automationsnyckel är roterad med en nyckel per verktyg och den
+gamla återkallad (C9); ett läsprov visade att en ny nyckel gäller direkt, utan ny driftsättning.
+
+**Proven.** Modellfria prov i kundrepot, ett batteri som växte under etappen, kördes lokalt i varje varv, mot tre av
+fyra förhandsvisningar (den fjärde, med bara hover-rättelsen, fick skydds- och uppladdningskontrollen och
+nyckelsökningen) och mot båda produktionsdriftsättningarnas oföränderliga adresser. I sin slutliga form: acceptans och formulär, tidsfälla, erbjudandets kedja, bakåt, flytknapp, tangentbord i planen, första vyn,
+axe (0 överträdelser i 19 lägen), kontrast per pixel med opacitet och grafiska markeringar, tappytor, nätverk (bara
+sajten själv), reducerad rörelse, horisontellt spill från 320 till 1440 px, text, lägen, skärmbilder och Lighthouse
+(alla sidor över kraven; SEO under kravet enbart för att sajten är noindex). Fem nya prov kom till i etappen och kontrastprovet skrevs om; ett av
+de nya fann att fyra rader i remsan vidgade mobilens layoutvy, vilket skärmbilderna dolde. Detektorn gav tolv varningar, samma
+som golvet, inga nya. Skyddet är prövat på varje driftsättning: utan inloggning omdirigeras alla sidor och båda aliasen,
+med automationsnyckeln svarar sidorna med noindex, och inga källfiler serveras. Ingen nyckel finns i någon sparad
+utdata.
+
+**Läsningar och granskning.** Ett femsekunderstest av första vyn (vad, var, hur uppfattades rätt; rubriken lästes som
+en rubrik i två delar). En separat granskning av bygget (godkänd). Tre renderingsläsningar av förhandsvisningen: den första
+och den tredje godkände; den andra, med kodläsning, underkände för ett riktigt kodfel (flytknappen fastnade dold efter
+klientnavigering till en sida utan plan) och för att kedjedrivarens läsyta gav den kod från en äldre commit än den
+driftsatta, och godkände i andra rundan på en ny förhandsvisning där all kod togs ur den driftsatta commiten. Hallmark
+som kritikröst (P-C) gav en rankad punchlista med flera fynd som ingen annan läsning såg, bland dem att räknebara
+rutor påstod ett exakt antal besök, att remsans märken liknade kryssrutorna och att demonotisen föll utanför vikningen
+på dator; de är åtgärdade. canvas-design (P-D) behövdes inte: riktningen är ren typografi. Varje fynd är antingen
+åtgärdat eller lämnat med skäl i åtgärdslistan.
+
+**Scenarierna.** Två skyddade scenarier med den egna webbläsarvägen mot produktionens oföränderliga adress, med
+tvingande bindning till driftsättningen och ett modellfritt driftsättningsprov med scenariohållarens nyckel före: en
+villaägare i Luleå på mobil lade upp säsongen i planen med häckklippning, gick bakåt och fram igen utan att valen
+tappades och skickade förfrågan (17 handlingar); en styrelseledamot i en bostadsrättsförening i Boden på dator hittade
+föreningstexterna, vår- och höststädningens innehåll och orterna och skickade förfrågan (21 handlingar). Båda lyckades,
+kvittot återgav valen och gränsen höll. Etapp 3:s "för tidiga felsammanfattning" syns inte längre: den var
+provverktygets Enter i en rullgardin, som skickar formuläret, och hållaren väljer nu med Tab (reproducerat modellfritt
+före ändringen). Kontrollanten såg på en av scenariets skärmbilder att konturknappen blev solgul där pekaren stod kvar
+efter ett tryck — primärknappens hover slog igenom; felet rättades, fick ett eget provfall som fäller den
+tidigare byggnaden, och produktionen driftsattes om med hela provbatteriet grönt. Scenariernas övriga iakttagelser (tillval
+bara via planen, ingen fritext, "mindre" förening odefinierad, inget pris, kontaktvägen återges inte i kvittot)
+noteras; de två sista är avsiktliga.
+
+**Förslag som väntar på ägaren.** Texten "fem korta frågor" räknar nu också kontaktvägen (på fyra ställen), eftersom
+formuläret har fem frågor men texterna räknade upp fyra. Det ändrar godkänt innehåll och ligger därför som ett
+obeslutat förslag i två egna commits som kan återställas tillsammans.
+
+**Rytmerna (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926, per fall).** Lärdomsposter L21 (mät layoutvyns bredd;
+en skärmbild som bara blir bredare döljer felet), L22 (ett "produktfel" i ett scenario var provarens tangent: Enter i
+en rullgardin skickar formuläret; reproducera modellfritt före varje ändring) och L23 (automationsnyckelns rotation
+har en fast ordning, och en ny nyckel gäller direkt) i kunskapsregistrets lärdomsfil. Användningsnoter per underlag i
+utfallet: frontend-design, mobile-native, det redaktionella passet, DESIGN.md-formatet och Hallmark påverkade konkreta
+val; WIG, web-quality-audit, accessibility och formulärsäkerheten användes som kontroller; emil-design-eng och canvas-design
+var inte tillämpliga; prototype och Taste nådde inte arbetet. Registret har fått en del G för proven P-A, P-C och P-D.
+Förslagsraden för Digitala är satt i planen.
+
+**Resurser.** Elva modellsessioner, en över kedjedrivarens ram 6–10 (ägaren angav ingen): femsekunderstestet,
+granskningen av bygget, tre renderingsläsningar (den andra i två rundor), kritikrösten, två scenarier och två rundor
+av denna posts granskning — den första rundan fann ett felaktigt ordningstal i posten. Därutöver, utanför ramen: ett kartläggningsarbetsflöde före bygget (sex läsare och en
+syntes). Inga kostnader utöver den inkluderade krediten; ingenting köpt, inga tillägg.
+
+**Kvar:** ägarens bedömning av den färdiga sajten, med ställningstagande till förslaget om "fem korta frågor"; steg
+16–18 väntar som planen säger.
+
+**Ersätter:** ingen post.
