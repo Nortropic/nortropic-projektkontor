@@ -1,4 +1,21 @@
-# GÄLLANDE: bygg Aquarium v0 (accepterat byggbeslut)
+# Gällande uppdrag: samlade åtgärder efter fiktivt kundprov
+
+Ägarens genomförandemandat DIGITALA-SAMLAT-ATGARDSMANDAT-20260927 gäller kontoret, Digitala,
+Kundstart, Runtime och kundprodukten. Rätta informationskedja, bevis, kontinuitet, integrationer
+ och skyddad drift, och omarbeta den underkända visuella leveransen till en varm, redaktionell helhet.
+Tidigare provmandats förbud mot berörda systemändringar är ersatt. Tidigare modellgodkännande
+är historik och innebär inte ägaraccept. Samtliga 36 frysta krav och 43 gapobjekt bevaras.
+
+Arbeta inom befintliga förvaltningar och Runtime, utan ny kontrollplattform. Genomför implementation,
+omprov, separat granskning och skyddat införande inom accepterad omfattning. Inga abonnemang,
+köpta krediter, skarpa utskick, verkliga debiteringar, publika kundlanseringar eller bredare
+kontoåtkomster. Om befintlig skyddsmodell kräver operatörsaktivering ska den beredas exakt.
+Kriterieändring granskas separat före kandidatbedömning. Planen ensam äger nästa handling,
+skrivansvar, aktuellt driftläge och återupptagning. Beslutet länkar det privata originalmandatet.
+
+---
+
+# Historiskt uppdrag: bygg Aquarium v0 (levererat enligt planen)
 
 Ägarbeslut 2026-09-24, se AQUARIUM-V0-ACCEPT-20260924 i beslutsloggen; orden bevaras ordagrant privat. Ägaren
 accepterade byggbeslutet AQUARIUM-V0-BEREDNING-20260924 (PR 36) med preciseringar. Bygg den första privata, lokala

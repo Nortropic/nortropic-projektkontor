@@ -8,6 +8,43 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
+# Gällande arbete — samlade åtgärder efter fiktivt kundprov
+
+DIGITALA-SAMLAT-ATGARDSMANDAT-20260927 är det aktuella genomförandeuppdraget. Ägaren har underkänt
+kundproduktens tidigare visuella kvalitet; tidigare privata modellgodkännanden är historiska och
+innebär inte ägaraccept. Formgivning och tekniska rättningar drivs parallellt från början.
+
+Etapp 1 är säkrad: originalmandat, nuläge och historik är bevarade. Alla 36 frysta krav och 43 gapobjekt
+står kvar. Åtgärdskartan är en dispositionsbilaga, inte en ny plan. Etapp 2 har påbörjats med faktisk
+visuell diagnos och nya riktningar; intagsspåret implementerar robusta modellsvar och beständig
+signal-/returfrågeväg. Etapp 3–5 återstår till verifierat resultat.
+
+Skrivansvar: kedjedrivaren äger kontoret, Runtime, drift och produktens backend. En separat utförare
+äger produktens form, UI och tillgångar; en annan Kundstart; en annan Digitalas gemensamma verktyg
+ och kvalitetsregler. Alla arbetar i isolerade grenar/arbetskopior. Ingen skriver i den frysta
+kundprovskopian. Gemensamma filer och publicering samordnas av kedjedrivaren.
+
+Nästa handling: färdigställ och separat granska kvalitetskriterier före kandidatbedömning; bygg
+informationskedjans och leveransbevisens rättningar; fortsätt de kreativa riktningarna samt undersök
+befintlig hostad lagring och tillåtna integrationskonton. Registreringsvägens fasta namntabell
+rättas med bibehållna mål-, mandat- och granskningsgrindar före skyddad publicering av detta uppdrag.
+
+Senaste arbetsläge 2026-09-27T22:12:30.895375+00:00: hostad privat produktlagring skapad och faktiskt CAS-prov passerat; backend ba2f825 och tillägg 0c0fa83 tas in i den kreativa kandidaten. Första integrerade UI-prov ger 18 pass inom angiven räckvidd; kreativ kandidatkritik återstår. Kundstart 07c874e är ren kandidat med slutbyggning och riktat verkligt AI-prov; separat review täcker också äldre ogranskade main-ändringar. Kvalitetsregler r1 underkända; korrigerad r2 granskas före produktdom. Digitalas 136 regressioner passerar före fortsatt Ads-adapterarbete. Runtime/Office har avgränsad schemakod och ett faktiskt isolerat trestartsprov, ännu ingen aktiv driftändring. Native Codex-konfiguration har en kvarvarande avvikelse (aktuellt hash har ändrats även under arbetet); gräns-/verktygsprov passerar på aktuell konfiguration men ersätter inte skyddad ombindning. Kontorets och Runtimes nya kod är ännu ogranskad/opublicerad.
+
+ÅTERUPPTAGNING: denna planpost och privat
+`evidence/nasta-uppdrag/local/atgarder-vikskar-20260927/BASLINJE.json` samt `ATGARDSKARTA.json`.
+Aktiva arbetsgrenar: `atgarder/vikskar-20260927` i kontor/Runtime, `atgarder/intag-20260927` i
+Kundstart och produktens `omarbetning/visuell-20260927`; Digitalas aktuella gren redovisas i nästa
+uppdatering. Digitala arbetar på `atgarder-kvalitet-bevis-20260927`. De är pågående kandidater, inte godkända integrationer. Den äldre lokala grenen
+`test/fiktivt-e2e-20260927` är arkiverad som bevarat provunderlag; dess registrering blockerades av
+den dåvarande publiceringsvägens fasta namnlista och får inte beskrivas som publicerad.
+
+Den äldre HELHET-noten om R39:s saknade merge är inaktuell: faktisk PR12-merge verifierades i
+kundprovets källspår. Merge och avgränsad sakläsning är olika uppgifter; inget automatiskt införande
+av hela den senare källan följer av detta.
+
+---
+
 # Levande plan — Digitala 1: fiktiv kvalitetsdemo och avgränsad Runtime-diagnos. Aquarium v0 och granskningstiden klara
 
 TVÅ SPÅR (ARBETA-VIDARE-20260925). Spår A, Aquarium: levererat 2026-09-25 (AQUARIUM-V0-LEVERANS-20260925,
