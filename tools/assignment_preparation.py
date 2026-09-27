@@ -24,6 +24,15 @@ _KINDS = ("fact", "judgment", "decision", "authority")
 # travel with the assignment. Optional: an absent object keeps every earlier spec valid and adds no gap.
 _SPEC_FIELDS = "schema action references reference_checks requirements tests export task"
 _FORVALTNING_FIELDS = "namn steg proportion metod underlag kriterier bedomning"
+# HELHET-20260927, etapp 3: the problem formulation travels with the förvaltning. Optional `problem`: what the
+# business wants, for whom, which user tasks matter, the offer and position, what material exists, what is
+# uncertain, which channels the need motivates, how success is judged, where the user insight comes from and the
+# intervention decision (a site is not always the answer). Absent for liten: no gap; absent otherwise: one gap.
+_PROBLEM_LISTS = "verksamhetsmal malgrupper uppgifter erbjudande positionering befintligt_underlag osakerheter kanalbehov framgangskriterier"
+_PROBLEM_FIELDS = _PROBLEM_LISTS + " anvandarinsikt interventionsbeslut"
+_LITEN_PROBLEM = ("verksamhetsmal", "uppgifter", "framgangskriterier")
+_ANVANDARINSIKT = ("intervjuer", "observationer", "data", "antaganden", "saknas")
+_INTERVENTIONER = ("ny-sajt", "forbattra-befintlig", "annan-kanal", "ingen-atgard", "oavgjort")
 _PROPORTIONER = ("liten", "mellan", "stor")
 _NAMN = r"[a-z][a-z0-9-]{1,39}"
 _LIMITATIONS = (
@@ -149,9 +158,30 @@ def _validate_task(task, gap):
             _path(value, "acceptance" if field == "acceptance" else "tasks", "task " + field)
 
 
+def _validate_problem(value, liten, gap):
+    """The problem formulation: exact shape, enumerated sources and decisions, missing substance as gaps by proportion."""
+    _object(value, _PROBLEM_FIELDS, "forvaltning problem")
+    for field in _PROBLEM_LISTS.split():
+        _list(value[field], "forvaltning problem " + field)
+        for entry in value[field]:
+            _text(entry, "forvaltning problem " + field + " entry")
+        if not value[field] and (not liten or field in _LITEN_PROBLEM):
+            gap("forvaltning_problem_" + field + "_empty", "forvaltning")
+    if value["anvandarinsikt"] not in _ANVANDARINSIKT:
+        raise ValueError("forvaltning problem anvandarinsikt must be one of " + ", ".join(_ANVANDARINSIKT))
+    _object(value["interventionsbeslut"], "val skal", "forvaltning problem interventionsbeslut")
+    if value["interventionsbeslut"]["val"] not in _INTERVENTIONER:
+        raise ValueError("forvaltning problem interventionsbeslut val must be one of " + ", ".join(_INTERVENTIONER))
+    _text(value["interventionsbeslut"]["skal"], "forvaltning problem interventionsbeslut skal", empty=True)
+    if not value["interventionsbeslut"]["skal"].strip():
+        gap("forvaltning_problem_interventionsbeslut_skal_empty", "forvaltning")
+
+
 def _validate_forvaltning(value, gap):
     """Exact schema, contradictions as errors, missing substance as gaps; proportion decides which gaps apply."""
-    _object(value, _FORVALTNING_FIELDS, "forvaltning")
+    if not isinstance(value, dict) or set(value) - set(_FORVALTNING_FIELDS.split()) - {"problem"} \
+            or set(_FORVALTNING_FIELDS.split()) - set(value):
+        raise ValueError("forvaltning must have exactly these fields: " + _FORVALTNING_FIELDS + ", optionally problem")
     for field in ("namn", "steg"):
         _text(value[field], "forvaltning " + field)
         if re.fullmatch(_NAMN, value[field]) is None:
@@ -190,6 +220,10 @@ def _validate_forvaltning(value, gap):
             _text(entry, "forvaltning bedomning " + field + " entry")
         if not value["bedomning"][field] and not (liten and field == "professionellt"):
             gap("forvaltning_bedomning_" + field + "_empty", "forvaltning")
+    if "problem" in value:
+        _validate_problem(value["problem"], liten, gap)
+    elif not liten:
+        gap("forvaltning_problem_missing", "forvaltning")
 
 
 def _validate_spec(spec, case, gap):
@@ -274,12 +308,31 @@ def _brief(export, requirements, tests, gaps, limitations, forvaltning=None):
         underlag = forvaltning["underlag"]
         lines.extend(["", "## Förvaltning", "",
                       "- Förvaltning: " + forvaltning["namn"] + "; steg: " + forvaltning["steg"]
-                      + "; proportion: " + forvaltning["proportion"],
-                      "- Metod: " + (forvaltning["metod"]["val"].strip() or "(inte angiven)")
-                      + " — skäl: " + (forvaltning["metod"]["skal"].strip() or "(inte angivet)"),
-                      "- Underlag: laddningskvitto " + (underlag["laddningskvitto_sha256"].strip() or "(saknas)")
+                      + "; proportion: " + forvaltning["proportion"]])
+        problem = forvaltning.get("problem")
+        if problem is not None:
+            lines.extend(["- Problem (verksamhetsmål): " + ("; ".join(problem["verksamhetsmal"]) or "(inga angivna)"),
+                          "- Målgrupper: " + ("; ".join(problem["malgrupper"]) or "(inga angivna)"),
+                          "- Viktigaste användaruppgifter: " + ("; ".join(problem["uppgifter"]) or "(inga angivna)"),
+                          "- Erbjudande: " + ("; ".join(problem["erbjudande"]) or "(inget angivet)"),
+                          "- Positionering: " + ("; ".join(problem["positionering"]) or "(ingen angiven)"),
+                          "- Befintligt underlag: " + ("; ".join(problem["befintligt_underlag"]) or "(inget angivet)"),
+                          "- Osäkerheter: " + ("; ".join(problem["osakerheter"]) or "(inga angivna)"),
+                          "- Kanalbehov: " + ("; ".join(problem["kanalbehov"]) or "(inga angivna)"),
+                          "- Framgångskriterier: " + ("; ".join(problem["framgangskriterier"]) or "(inga angivna)"),
+                          "- Användarinsiktens källa: " + problem["anvandarinsikt"]
+                          + (" — inga användarintervjuer eller observationer; insikterna är antaganden och redovisas så"
+                             if problem["anvandarinsikt"] in ("antaganden", "saknas") else "")])
+        elif forvaltning["proportion"] != "liten":
+            lines.append("- Problem: (problemformuleringen saknas)")
+        lines.extend(["- Underlag: laddningskvitto " + (underlag["laddningskvitto_sha256"].strip() or "(saknas)")
                       + "; underlagets hash " + (underlag["sha256_over_underlag"].strip() or "(saknas)"),
-                      "- Kriterier: " + (", ".join(forvaltning["kriterier"]) or "(inga)"),
+                      "- Metod: " + (forvaltning["metod"]["val"].strip() or "(inte angiven)")
+                      + " — skäl: " + (forvaltning["metod"]["skal"].strip() or "(inte angivet)")])
+        if problem is not None:
+            lines.append("- Interventionsbeslut: " + problem["interventionsbeslut"]["val"] + " — skäl: "
+                         + (problem["interventionsbeslut"]["skal"].strip() or "(inte angivet)"))
+        lines.extend(["- Kriterier: " + (", ".join(forvaltning["kriterier"]) or "(inga)"),
                       "- Bedömning, tekniskt prövat: " + ("; ".join(forvaltning["bedomning"]["tekniskt"]) or "(inget)"),
                       "- Bedömning, professionellt bedömt: " + ("; ".join(forvaltning["bedomning"]["professionellt"]) or "(inget)"),
                       "- Ej observerat hos verkliga användare: " + ("; ".join(forvaltning["bedomning"]["ej_observerat"]) or "(inget angivet)")])

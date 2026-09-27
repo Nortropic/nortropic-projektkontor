@@ -70,22 +70,28 @@ FÖRSLAG ATT PRÖVA I NÄSTA FALL
 HELHET (HELHET-20260927) — genomförandeuppdrag i sex etapper, utfört av sessionen nortropic-repos-f0. Etapperna är
 arbetsordning, inte ägarstopp; läge och nästa kommando privat i `evidence/nasta-uppdrag/local/helhet-20260927/LAGE.md`.
  1. PÅBÖRJAD 2026-09-27: käll- och ändringsbild — revisioner lästa, skrivansvar samordnat; grenskydd på Digitala-repot
-    genom rulesetet `main-skydd` (deletion, non_fast_forward, pull_request med noll godkännanden, merge/squash/rebase,
-    inga bypass-aktörer, GitHubs extra godkännande för oattribuerade ändringar), verifierat genom API-läsning och en
-    attribuerad PR sammanslagen utan godkännande (Digitala PR 1); ÖPPET: ett levande vägransprov med direkt push
-    (kedjedrivarens verktyg nekade försöket; ägaren kan köra det). Gamla repot klonat till läsyta, genomgång pågår;
-    konton kartlagda (ingen Google- eller Meta-behörighet på kända platser); beviskedjans tre fynd bekräftade och
-    rättade i kandidat. Kvar: täckningskarta (förmåga, källa, tidigare innehåll, dagens motsvarighet, lucka,
-    disposition, anropsväg), resultatpost.
- 2. PÅBÖRJAD 2026-09-27: korrigerade mandat och kunskapsgränser — Digitala-kandidat (gren helhet/etapp2-mandat) i sin
-    andra granskningsrunda efter en första underkänd (en beställning bär hela uppdraget, inga ägarstopp, Norrglänta inte
-    referens, klassning i stället för praxis av antal, uppgiftsmotiverade kriterier och mallar; samma kandidat bär
-    beviskedjans rättelser A, B och C med prov); kontorets privata rytm- och lärdomsfiler bär klassningsregeln.
- 3. VÄNTAR: professionellt flöde och specialistintegrationer (strategi, upplevelse, innehåll, produktion, SEO, sökkonsol,
-    lokal synlighet, annonsberedning, mätning och uppföljning, leverans och drift) med kontrakt mot officiella API:er.
- 4. VÄNTAR: Playwright-baserad webbläsarväg med tre användningar; beviskedjans fynd A, B och C rättade med negativa prov.
+    genom rulesetet `main-skydd` (id 24072759: deletion, non_fast_forward, pull_request med noll godkännanden,
+    merge/squash/rebase, inga bypass-aktörer, GitHubs extra godkännande för oattribuerade ändringar), verifierat genom
+    API-läsning och attribuerade PR:ar sammanslagna maskinellt utan godkännande (Digitala PR 1 och PR 2); ÖPPET: ett
+    levande vägransprov med direkt push (kedjedrivarens verktyg nekade försöket; ägaren kan köra det). Gamla repot
+    läst i klonad läsyta (ingen kod körd); täckningskartan skriven privat (24 förmågerader: källa, tidigare innehåll,
+    dagens motsvarighet, lucka, disposition, anropsväg; läsgrad och källuckor redovisade); konton kartlagda (ingen
+    Google- eller Meta-behörighet på kända platser). Kvar: resultatposten (bär täckningskartans sammanfattning).
+ 2. KLAR 2026-09-27: korrigerade mandat och kunskapsgränser — Digitala PR 2 (main bb4a602) efter tre granskningsrundor
+    (två underkända): en beställning bär hela uppdraget, inga ägarstopp, Norrglänta underkänt som kvalitetsresultat och
+    inte referens, klassning i stället för praxis av antal, uppgiftsmotiverade kriterier och mallar, intern
+    gransknings- och rättningsloop; samma PR bär beviskedjans rättelser A, B och C med negativa prov (avsnitt 7);
+    kontorets privata rytm- och lärdomsfiler bär klassningsregeln. Restnoter privat.
+ 3. PÅBÖRJAD 2026-09-27: professionellt flöde och specialistintegrationer — kontorets beredning bär
+    problemformuleringen (KONTORET-PROBLEMFORMULERING-20260927: `forvaltning.problem` med insiktskälla och
+    interventionsbeslut, kedjan problem → underlag → metod → beslut → bedömning i briefen); Digitala-kandidat (gren
+    helhet/etapp3-flode) med steget beredning, research-, brief-, juridik-, bild- och copyunderlag, sedan SEO, sökkonsol,
+    lokal synlighet, annonsberedning, mätning och uppföljning, prelaunch, lansering och drift med kontrakt mot officiella
+    API:er och namngivna externa beroenden.
+ 4. PÅBÖRJAD 2026-09-27: beviskedjans fynd A, B och C rättade med negativa prov (Digitala PR 2); kvar: Playwright-baserad
+    webbläsarväg med tre användningar (utvecklarinspektion med kontext, utforskande QA, avskärmad förstagångsbesökare).
  5. VÄNTAR: självständig genomföring — ordinarie start- och fortsättningsväg, utförarbyte på ett representativt steg,
-    maskinell publiceringsväg för Digitala-repot, kontorets beredning verksam.
+    maskinell publiceringsväg för Digitala-repot.
  6. VÄNTAR: sammanhängande slutverifiering med ett beställt fall eller neutrala märkta testunderlag; slutrapport.
 
 OMBYGGNAD TILL MÅLBILDEN (OMBYGGNAD-20260927) — AVSLUTAT 2026-09-27 (OMBYGGNAD-RESULTAT-20260927; övergång 18 aktiverad
