@@ -5162,3 +5162,33 @@ main vore i så fall en ny publicering.
 för Runtime i FÖRSLAG ATT PRÖVA I NÄSTA FALL och postens namn i återupptagningspunkten.
 
 **Ersätter:** ingen post.
+
+## RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927 — raden om Runtime-profilernas övergång syns nu för Aquarium: prosameningen under rubriken ÄGARENS TUR står i stycket ovanför, och radens datum står i läsarens form
+
+**Status:** registrerat 2026-09-27 av den session som fick beställningen av Runtime-profilerna (Claude Code), efter ett
+fynd av sessionen som driver kontorets utvecklingsrytm. Ändringen gäller bara planen.
+
+**Felet.** På main `336bd2c` stod en prosamening direkt under rubriken ÄGARENS TUR. Den infördes med
+DIGITALA-1-AGARBESLUT-20260926, och RUNTIME-PROFILER-KANDIDAT-20260926 gav den tillägget "utom raden nedan" och lade
+beslutsraden om Runtime-profilernas övergång under den. Aquarium läser blocket från main och slutar vid första rad som
+varken börjar med `- [beslut]` eller `- [operatörshandling]` (`tools/aquarium.py`, `office_reader`). Uppmätt med
+läsarens egen funktion på `336bd2c`: noll rader, fast en fanns. Radens datum stod dessutom efter postnamnet ("—
+RUNTIME-PROFILER-KANDIDAT-20260926, sedan 2026-09-27"), medan läsarens datummönster kräver "— sedan ÅÅÅÅ-MM-DD" sist.
+Datumet hade därför inte lästs heller.
+
+**Rättelsen.**
+- Prosameningens innehåll står nu i stycket "Ägarens tur:" ovanför rubriken, tillsammans med regeln att förklarande
+  text aldrig står under rubriken.
+- Raden står direkt under rubriken, med postnamnet inom parentesen och datumet sist, "— sedan 2026-09-27".
+- Blocket RUNTIME-PROFILER FÖR DIGITALA och återupptagningspunkten nämner denna post.
+
+**Uppmätt efter rättelsen:** läsarens egen funktion på kandidaten ger en rad, av sorten beslut, med datumet
+2026-09-27. Kontorets svit är grön.
+
+**Rytmen.** Lärdomen står redan som K11 i kontorets lärdomsfil, skriven av rytmsessionen samma natt: varje ändring i
+ägarens tur prövas mot läsarens faktiska tolkning. Den tillämpades här. Inga fler nya lärdomar, eftersom rättelsen
+följer K11 och inte ändrar något annat.
+
+**Granskning:** en separat läsning genom Runtimes skrivskyddade läsare, redovisad i publiceringens kvitto.
+
+**Ersätter:** ingen post. RUNTIME-PROFILER-KANDIDAT-20260926 står kvar, och dess ord om en rad i ägarens tur gäller.
