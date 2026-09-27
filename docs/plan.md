@@ -80,29 +80,29 @@ nortropic-repos-f0. Etapperna är arbetsordning, inte ägarstopp; läge och näs
     inte referens, klassning i stället för praxis av antal, uppgiftsmotiverade kriterier och mallar, intern
     gransknings- och rättningsloop; samma PR bär beviskedjans rättelser A, B och C med negativa prov (avsnitt 7);
     kontorets privata rytm- och lärdomsfiler bär klassningsregeln. Restnoter privat.
- 3. PÅBÖRJAD 2026-09-27: professionellt flöde och specialistintegrationer — kontorets beredning bär
-    problemformuleringen (KONTORET-PROBLEMFORMULERING-20260927); Digitala PR 3 (main 4bd1206) efter tre granskningsrundor
-    (två underkända): steget beredning; research-, brief-, juridik-, bild-, bygge- och
-    copyunderlag; stegen seo, sokkonsol, lokal-synlighet, annonsberedning, uppfoljning, prelaunch, lansering och drift
-    med verktyg prövade mot fixturer och inspelade svar (ingen live-integration: extern åtkomst saknas och är namngiven);
-    Hallmark-linsen och design.md-formatet kopplade till steg. Kvar (tillägg 2): kundintervju och egen research — adaptiv,
-    återupptagbar intervjuväg med följdfrågor som beror på svaren, status per nyckeluppgift, research.md som kundspecifik
-    ingång, integrationskedjor (formulär/leads, bokning, CRM) och redaktörsupplevelse — kandidat (gren helhet/intervju) i
-    första granskningsrundan.
- 4. PÅBÖRJAD 2026-09-27: beviskedjans fynd A, B och C rättade med negativa prov (Digitala PR 2); kvar: Playwright-baserad
-    webbläsarväg med tre användningar (utvecklarinspektion med kontext, utforskande QA, avskärmad förstagångsbesökare).
- 5. VÄNTAR: självständig genomföring — ordinarie start- och fortsättningsväg, utförarbyte på ett representativt steg,
-    maskinell publiceringsväg för Digitala-repot, schemalagd driftkontroll genom Runtime.
- 6. VÄNTAR: sammanhängande slutverifiering med ett beställt fall eller neutrala märkta testunderlag (testdialoger märkta
-    som sådana); proven i tillägg 2 avsnitt 8; översikten "Så fungerar Digitala i praktiken" (tillägg 1 avsnitt 5,
-    tillägg 2 avsnitt 9: vy A ordinarie arbetsväg, vy B en faktiskt genomförd körning, kort förklaring och stegkarta
-    först, teknik intill eller i bilaga) i Digitalas dokumentation och slutrapporten; separat slutgranskning åt båda
-    hållen (tidigare underlag och beslut → disposition och användningsplats; påståenden → implementation och körbevis;
-    kundbehov och uppdrag → leverans) med kontrollerna: bortvald körkedja är inte förbud mot specialistkompetens,
-    installerat är inte använt, använt är inte bevisat bättre, ett lyckat testfall är inte praxis; researchen har inte
-    krympt till referensjakt, intervjun har inte blivit en kedja av ägarstopp, integrationer har inte reducerats till
-    länkar där mer beställts, frånvaro av data har inte blivit påstådd förståelse; sambandet visas genom bärande exempel
-    ur det verkliga underlaget, inte påhittade berättelser.
+ 3. KLAR 2026-09-27 (HELHET-RESULTAT-20260927): professionellt flöde och specialistintegrationer — kontorets beredning
+    bär problemformuleringen (KONTORET-PROBLEMFORMULERING-20260927); Digitala PR 3 (main 4bd1206) och PR 4 (main df6cf8c):
+    steget beredning; research-, brief-, juridik-, bild-, bygge- och copyunderlag; stegen seo, sokkonsol, lokal-synlighet,
+    annonsberedning, uppfoljning, prelaunch, lansering och drift med verktyg prövade mot fixturer och inspelade svar (ingen
+    live-integration: extern åtkomst saknas och är namngiven i ÄGARENS TUR); kundintervjun (adaptiv, återupptagbar,
+    följdfrågor ur namngivna regler, status per uppgift, research.md som kundspecifik ingång, integrationskedjor,
+    redaktörsupplevelse); Hallmark-linsen och design.md-formatet kopplade till steg.
+ 4. KLAR 2026-09-27 (HELHET-RESULTAT-20260927): beviskedjans fynd A, B och C (PR 2) och webbläsarvägen med tre
+    användningar (Digitala PR 5, main 40b75b0; Playwright 1.63.0 och Playwright MCP 0.0.82 pinnade; utvecklarinspektion
+    med kontext, utforskande QA med regressionsprov, avskärmad förstagångsbesökare i egen modellsession genom verklig MCP
+    med ursprungsgräns i besökarens webbläsare; två livekörningar); direkt push till main nekad av rulesetet (etapp 1:s
+    öppna prov stängt).
+ 5. KLAR 2026-09-27 (HELHET-RESULTAT-20260927) utom schemalagd driftkontroll: start- och fortsättningsvägen
+    `verktyg/fortsatt.py` (bunden beställning, tillstånd per fall, omprov, väntande beroenden) och publiceringsvägen
+    `verktyg/publicera.py` (PR-vägen utan manuellt godkännande; från klon eller worktree) — Digitala PR 6 (main e7c3bdf)
+    och PR 7 (main 3c9e448); utförarbytet verifierat på ett representativt steg i slutprovet (Codex genom Runtimes
+    pinnade binär). Schemalagd driftkontroll genom Runtime kräver eget Runtime-mandat, release och övergång (ÄGARENS TUR).
+ 6. KLAR 2026-09-27 (HELHET-RESULTAT-20260927): slutprovet på det märkta testfallet Provfirma Trädgård (privat
+    `evidence/digitala/local/testfall-helhet-20260927/`): hela vägen från uppstart till färdig privat leverans i 38
+    körhändelser (plus en rättelsehändelse), tilläggens prov (avsnitt 8), tre verktygsfynd rättade (Digitala PR 8, main 94dcb0e), lärdomar
+    L24–L27, översikten "Så fungerar Digitala i praktiken" med vy A och vy B i `OVERSIKT.md`; slutgranskningen åt båda
+    hållen med de åtta kontrollerna gjordes som denna posts läsargranskning (rundorna bokförda privat, underkända
+    versioner ersatta före publiceringen). Uppdraget avslutat; nästa bygge behöver eget uppdrag.
 
 KUNDSTART (KUNDSTART-20260927) — ägarens separata genomförandespår för kundupplevelsen, utfört av sessionen
 nortropic-repos-0a parallellt med HELHET; en kanal i huvudspårets intervjumodell, inte en egen intervjumotor. Etapperna
@@ -605,9 +605,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27) är tre rader
-öppna: taket för Digitalas stående arbete, underhållsformen som ägaren arbetar fram, och Digitalas nästa fiktiva fall
-med ägarens ändringar; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27) är nio rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
@@ -618,6 +616,9 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [beslut] Digitala Kundstart: kundredo kräver att förhandsvisningens inloggningsskydd lyfts för kundlänkar, en delbar länk till utomstående enligt MANDAT §2; beställ när ett kunduppdrag finns (KUNDSTART-20260927) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: modell på servern är OpenAI-familjen på AI Gateways fria nivå; Claude på servern kräver köpta AI Gateway-krediter, en betalväg (KUNDSTART-20260927) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: bevarandetid och radering för kundmaterial i Blob-lagret är inte beslutade (KUNDSTART-20260927) — sedan 2026-09-27
+- [beslut] Digitala: schemalagd driftkontroll (drift_kontroll.py) genom Runtime kräver ett eget Runtime-mandat med release och övergång (AP-10:s schema är hårdkodat till bedömningen; inga generella schemalagda kommandon) — beställ eller avstå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
+- [beslut] Digitala: externa aktiveringar bara vid verklig kund — Google Cloud-projekt med OAuth eller tjänstekonto för Search Console, Google Ads-utvecklartoken, Meta-token, företagsprofil genom behörig människa; inget av det ingår i uppdraget (HELHET-RESULTAT-20260927) — sedan 2026-09-27
+- [operatörshandling] Codex-CLI:n i PATH (0.147.0) vägrar Runtimes modell gpt-6-astra; Runtimes pinnade codex-0.155.1 fungerar — uppdatera CLI:n eller låt det stå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
