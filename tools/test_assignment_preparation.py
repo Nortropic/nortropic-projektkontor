@@ -98,6 +98,7 @@ class PreparationTests(unittest.TestCase):
         self.assertEqual(result["gaps"], [])
         package = result["package"]
         self.assertEqual(set(package), {"brief", "task_draft", "requirements", "tests", "gaps", "limitations"})
+        self.assertNotIn("forvaltning", package)
         self.assertEqual(package["task_draft"], self.spec["task"])
         self.assertEqual(package["tests"], self.spec["tests"])
         self.assertEqual(set(package["requirements"][0]), {"id", "text", "reason", "tests"})
@@ -397,6 +398,84 @@ class PreparationTests(unittest.TestCase):
         result = self.prepare()
         result["package"]["gaps"][0]["subject"] = "changed"
         self.assertNotEqual(result["package"]["gaps"], result["gaps"])
+
+
+def forvaltning(**overrides):
+    value = {
+        "namn": "digitala", "steg": "kritik", "proportion": "mellan",
+        "metod": {"val": "renderingsläsning genom kritikprofilen", "skal": "riktningen är beslutad; osäkerheten gäller det renderade resultatet"},
+        "underlag": {"laddningskvitto_sha256": "d" * 64, "steg": "kritik", "sha256_over_underlag": "e" * 64},
+        "kriterier": ["KVALITET.md", "matning/PROFIL.json"],
+        "bedomning": {"tekniskt": ["axe utan violations i båda vyerna"], "professionellt": ["en renderingsläsning"],
+                      "ej_observerat": ["verkliga besökare"]},
+    }
+    value.update(overrides)
+    return value
+
+
+class ForvaltningTests(unittest.TestCase):
+    """OMBYGGNAD-20260927 etapp 3: the office's method competence travels with the assignment, proportionately."""
+
+    def test_a_complete_forvaltning_is_carried_without_gaps_and_rendered_in_the_brief(self):
+        case, check, spec = fixture()
+        spec["forvaltning"] = forvaltning()
+        result = preparation.prepare(case, check, spec)
+        self.assertEqual(result["gaps"], [])
+        self.assertTrue(result["mechanical_complete"])
+        self.assertEqual(result["package"]["forvaltning"], forvaltning())
+        self.assertIsNot(result["package"]["forvaltning"], spec["forvaltning"])
+        brief = result["package"]["brief"]
+        self.assertIn("## Förvaltning", brief)
+        self.assertIn("Förvaltning: digitala; steg: kritik; proportion: mellan", brief)
+        self.assertIn("laddningskvitto " + "d" * 64, brief)
+        self.assertIn("Ej observerat hos verkliga användare: verkliga besökare", brief)
+
+    def test_an_absent_forvaltning_keeps_every_earlier_spec_valid(self):
+        case, check, spec = fixture()
+        result = preparation.prepare(case, check, spec)
+        self.assertEqual(result["gaps"], [])
+        self.assertNotIn("## Förvaltning", result["package"]["brief"])
+        self.assertNotIn("forvaltning", result["package"])
+        self.assertEqual(result["package"], preparation.prepare(case, check, spec)["package"])
+
+    def test_missing_substance_is_a_gap_and_proportion_decides_which(self):
+        case, check, spec = fixture()
+        spec["forvaltning"] = forvaltning(metod={"val": "", "skal": " "},
+                                          underlag={"laddningskvitto_sha256": "", "steg": "kritik", "sha256_over_underlag": ""},
+                                          kriterier=[], bedomning={"tekniskt": [], "professionellt": [], "ej_observerat": []})
+        codes = [g["code"] for g in preparation.prepare(case, check, spec)["gaps"]]
+        self.assertEqual(codes, ["forvaltning_metod_val_empty", "forvaltning_metod_skal_empty", "forvaltning_underlag_missing",
+                                 "forvaltning_underlag_unbound", "forvaltning_kriterier_empty", "forvaltning_bedomning_tekniskt_empty",
+                                 "forvaltning_bedomning_professionellt_empty", "forvaltning_bedomning_ej_observerat_empty"])
+        self.assertTrue(all(g["subject"] == "forvaltning" for g in preparation.prepare(case, check, spec)["gaps"]))
+        spec["forvaltning"]["proportion"] = "liten"
+        codes = [g["code"] for g in preparation.prepare(case, check, spec)["gaps"]]
+        self.assertNotIn("forvaltning_metod_skal_empty", codes)
+        self.assertNotIn("forvaltning_bedomning_professionellt_empty", codes)
+        self.assertIn("forvaltning_underlag_missing", codes)
+
+    def test_forvaltning_gaps_come_after_export_gaps_and_before_task_gaps(self):
+        case, check, spec = fixture()
+        spec["export"]["scope"] = []
+        spec["forvaltning"] = forvaltning(kriterier=[])
+        del spec["task"]["brief"]
+        codes = [g["code"] for g in preparation.prepare(case, check, spec)["gaps"]]
+        self.assertEqual(codes, ["export_scope_empty", "forvaltning_kriterier_empty", "task_field_missing"])
+
+    def test_contradictions_and_bad_shapes_are_errors_not_gaps(self):
+        case, check, spec = fixture()
+        for bad in (forvaltning(underlag={"laddningskvitto_sha256": "d" * 64, "steg": "bygge", "sha256_over_underlag": "e" * 64}),
+                    forvaltning(proportion="enorm"), forvaltning(namn="Digitala"), forvaltning(steg="x"),
+                    forvaltning(extra="x"), forvaltning(metod={"val": "x"}), forvaltning(kriterier=[""]),
+                    forvaltning(underlag={"laddningskvitto_sha256": "kort", "steg": "kritik", "sha256_over_underlag": "e" * 64}),
+                    forvaltning(bedomning={"tekniskt": [1], "professionellt": [], "ej_observerat": []}), "text", None):
+            spec["forvaltning"] = bad
+            with self.assertRaises(ValueError, msg=repr(bad)[:80]):
+                preparation.prepare(case, check, spec)
+        del spec["forvaltning"]
+        spec["forvaltningen"] = forvaltning()
+        with self.assertRaises(ValueError):
+            preparation.prepare(case, check, spec)
 
 
 if __name__ == "__main__":

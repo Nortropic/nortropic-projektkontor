@@ -19,6 +19,13 @@ _TASK_FIELDS = (
 _OPTIONAL_TASK_FIELDS = ("review_provider",)
 _EXECUTORS = ("codex", "claude")
 _KINDS = ("fact", "judgment", "decision", "authority")
+# OMBYGGNAD-20260927, etapp 3: the office's method competence in the preparation. A förvaltning's step, proportion,
+# method with reason, the loading receipt that binds the professional underlag, the criteria and the assessment plan
+# travel with the assignment. Optional: an absent object keeps every earlier spec valid and adds no gap.
+_SPEC_FIELDS = "schema action references reference_checks requirements tests export task"
+_FORVALTNING_FIELDS = "namn steg proportion metod underlag kriterier bedomning"
+_PROPORTIONER = ("liten", "mellan", "stor")
+_NAMN = r"[a-z][a-z0-9-]{1,39}"
 _LIMITATIONS = (
     "DRAFT only. Mechanical completeness is neither acceptance nor authority; "
     "this tool grants no permission and does not authenticate AP06-ACCEPT.",
@@ -142,8 +149,53 @@ def _validate_task(task, gap):
             _path(value, "acceptance" if field == "acceptance" else "tasks", "task " + field)
 
 
+def _validate_forvaltning(value, gap):
+    """Exact schema, contradictions as errors, missing substance as gaps; proportion decides which gaps apply."""
+    _object(value, _FORVALTNING_FIELDS, "forvaltning")
+    for field in ("namn", "steg"):
+        _text(value[field], "forvaltning " + field)
+        if re.fullmatch(_NAMN, value[field]) is None:
+            raise ValueError("forvaltning " + field + " must match " + _NAMN)
+    if value["proportion"] not in _PROPORTIONER:
+        raise ValueError("forvaltning proportion must be liten, mellan or stor")
+    liten = value["proportion"] == "liten"
+    _object(value["metod"], "val skal", "forvaltning metod")
+    for field in ("val", "skal"):
+        _text(value["metod"][field], "forvaltning metod " + field, empty=True)
+    if not value["metod"]["val"].strip():
+        gap("forvaltning_metod_val_empty", "forvaltning")
+    if not liten and not value["metod"]["skal"].strip():
+        gap("forvaltning_metod_skal_empty", "forvaltning")
+    _object(value["underlag"], "laddningskvitto_sha256 steg sha256_over_underlag", "forvaltning underlag")
+    underlag = value["underlag"]
+    _text(underlag["steg"], "forvaltning underlag steg")
+    if underlag["steg"] != value["steg"]:
+        raise ValueError("forvaltning underlag steg must equal the forvaltning step")
+    for field, code in (("laddningskvitto_sha256", "forvaltning_underlag_missing"),
+                        ("sha256_over_underlag", "forvaltning_underlag_unbound")):
+        _text(underlag[field], "forvaltning underlag " + field, empty=True)
+        if not underlag[field].strip():
+            gap(code, "forvaltning")
+        else:
+            _hex(underlag[field], 64, "forvaltning underlag " + field)
+    _list(value["kriterier"], "forvaltning kriterier")
+    for entry in value["kriterier"]:
+        _text(entry, "forvaltning kriterier entry")
+    if not value["kriterier"]:
+        gap("forvaltning_kriterier_empty", "forvaltning")
+    _object(value["bedomning"], "tekniskt professionellt ej_observerat", "forvaltning bedomning")
+    for field in ("tekniskt", "professionellt", "ej_observerat"):
+        _list(value["bedomning"][field], "forvaltning bedomning " + field)
+        for entry in value["bedomning"][field]:
+            _text(entry, "forvaltning bedomning " + field + " entry")
+        if not value["bedomning"][field] and not (liten and field == "professionellt"):
+            gap("forvaltning_bedomning_" + field + "_empty", "forvaltning")
+
+
 def _validate_spec(spec, case, gap):
-    _object(spec, "schema action references reference_checks requirements tests export task", "spec")
+    if not isinstance(spec, dict) or set(spec) - set(_SPEC_FIELDS.split()) - {"forvaltning"} \
+            or set(_SPEC_FIELDS.split()) - set(spec):
+        raise ValueError("spec must have exactly these fields: " + _SPEC_FIELDS + ", optionally forvaltning")
     if type(spec["schema"]) is not int or spec["schema"] != 1:
         raise ValueError("spec schema must be integer 1")
     _text(spec["action"], "spec action")
@@ -205,17 +257,32 @@ def _validate_spec(spec, case, gap):
                 _text(entry["text"], "export context text")
             else:
                 _text(entry, "export " + field + " entry")
+    if "forvaltning" in spec:
+        _validate_forvaltning(spec["forvaltning"], gap)
     _validate_task(spec["task"], gap)
     return references, checks, requirements, tests
 
 
-def _brief(export, requirements, tests, gaps, limitations):
+def _brief(export, requirements, tests, gaps, limitations, forvaltning=None):
     lines = ["# DRAFT — " + export["title"], "", _LIMITATIONS[0], "", "## Context"]
     for kind in _KINDS:
         lines.extend(["", "### " + kind.capitalize(), ""])
         lines.extend("- " + entry["text"] for entry in export["context"] if entry["kind"] == kind)
     lines.extend(["", "## Scope", ""])
     lines.extend("- " + text for text in export["scope"])
+    if forvaltning is not None:
+        underlag = forvaltning["underlag"]
+        lines.extend(["", "## Förvaltning", "",
+                      "- Förvaltning: " + forvaltning["namn"] + "; steg: " + forvaltning["steg"]
+                      + "; proportion: " + forvaltning["proportion"],
+                      "- Metod: " + (forvaltning["metod"]["val"].strip() or "(inte angiven)")
+                      + " — skäl: " + (forvaltning["metod"]["skal"].strip() or "(inte angivet)"),
+                      "- Underlag: laddningskvitto " + (underlag["laddningskvitto_sha256"].strip() or "(saknas)")
+                      + "; underlagets hash " + (underlag["sha256_over_underlag"].strip() or "(saknas)"),
+                      "- Kriterier: " + (", ".join(forvaltning["kriterier"]) or "(inga)"),
+                      "- Bedömning, tekniskt prövat: " + ("; ".join(forvaltning["bedomning"]["tekniskt"]) or "(inget)"),
+                      "- Bedömning, professionellt bedömt: " + ("; ".join(forvaltning["bedomning"]["professionellt"]) or "(inget)"),
+                      "- Ej observerat hos verkliga användare: " + ("; ".join(forvaltning["bedomning"]["ej_observerat"]) or "(inget angivet)")])
     lines.extend(["", "## Derived requirements", ""])
     for req in requirements:
         lines.extend(["### " + req["id"], "", req["text"], "",
@@ -298,6 +365,7 @@ def prepare(case, check, spec):
                            for req in requirements.values()]
     public_tests = copy.deepcopy(spec["tests"])
     limitations = list(_LIMITATIONS) + copy.deepcopy(spec["export"]["limitations"])
+    forvaltning = copy.deepcopy(spec.get("forvaltning"))
     return {
         "status": "draft", "mechanical_complete": not gaps, "gaps": gaps,
         "private": {
@@ -305,8 +373,9 @@ def prepare(case, check, spec):
             "spec": copy.deepcopy(spec), "references": reference_trace, "requirements": requirement_trace,
         },
         "package": {
-            "brief": _brief(spec["export"], public_requirements, public_tests, gaps, limitations),
+            "brief": _brief(spec["export"], public_requirements, public_tests, gaps, limitations, forvaltning),
             "task_draft": copy.deepcopy(spec["task"]), "requirements": public_requirements,
             "tests": public_tests, "gaps": copy.deepcopy(gaps), "limitations": limitations,
+            **({"forvaltning": copy.deepcopy(forvaltning)} if forvaltning is not None else {}),
         },
     }

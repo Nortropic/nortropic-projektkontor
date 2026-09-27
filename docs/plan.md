@@ -70,9 +70,10 @@ etappmappar rörs inte. Läge och nästa kommando privat i `evidence/nasta-uppdr
     körverktyg mot Runtimes profiler, täckningskarta, `KEDJA.md`, adaptrar för Claude Code och Codex, 32 prov;
     mottagarprov godkända med Claude och med Codex som session; kontorets kopia av `kunskap/` är märkt flyttad
     (`FLYTTAD.md`, inte raderad; notis före till kontorets andra session). Kvar: resultatpost.
- 3. VÄNTAR: kontorets metodkompetens i AP-06:s beredning (fält för förvaltning, steg, proportion, metod, laddningskvitto,
-    kriterier, bedömningssätt; egna gap-koder; egen publicering); stående mandat (Digitala-repots `MANDAT.md`, skrivet)
-    och kvalitetsbilden (skrivet, verktyg finns) prövas i etapp 5.
+ 3. KLART 2026-09-27 (KONTORET-FORVALTNINGSFALT-20260927): kontorets metodkompetens i AP-06:s beredning som en valfri
+    del `forvaltning` (namn, steg, proportion, metod med skäl, laddningskvitto, kriterier, bedömning i tre kolumner) med
+    egna gap-koder och en brief-sektion; utan delen är paketet byte för byte som förut. Det stående mandatet står i
+    Digitala-repots `MANDAT.md`; kvalitetsbilden byggs av Digitala-repots verktyg och redovisas i etapp 5.
  4. PÅBÖRJAD 2026-09-27: Runtime D037 — mätprofilens vyer och axe-taggar som förvaltningens parametrar med D034:s
     värden som standard; kandidat `28e8b74` på `b603d91` (svit 599, värdkontroller 28 + 13, verklig mätning med tre
     vyer) separat granskad (godkänd) och integrerad genom Runtimes publicerare (PR 68, Runtimes main `3bea86e`);
@@ -717,7 +718,7 @@ FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
 RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
 RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927,
-RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927 och Runtime-planens ingång.
+RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927, KONTORET-FORVALTNINGSFALT-20260927 och Runtime-planens ingång.
 
 ---
 
