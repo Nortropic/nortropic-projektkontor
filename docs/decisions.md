@@ -6580,3 +6580,20 @@ Runtimes pinnade); blocket har nu nio rader: de tre äldre (taket, underhållsfo
 tre och dessa tre. Kundstart-uppdraget (egen session, egen post KUNDSTART-20260927) publicerades samma kväll före denna post, efter
 ägarens klartecken för en rad i publicerarens tabell; dess beställning ingår inte i detta uppdrag. Nästa bygge behöver
 eget accepterat uppdrag. Privat läge: `LAGE.md` i uppdragets evidence-mapp.
+
+## HELHET-RESULTAT-TILLAGG-20260927 — förslagsraden ur slutprovet i planen och Digitala PR 10 med restnoterna som låg kvar i main
+
+**Vad.** Två luckor efter HELHET-RESULTAT-20260927 stängs. (1) Leveranssteget ska lämna en förslagsrad i planblocket
+"Förslag att pröva i nästa fall"; den saknades och läggs nu in (tre förslag: ur processfyndet om användningsnoterna, ur L25 om QA-verktyget
+som fyller allt, och ur den återstående kopplingen till en verkligt skyddad förhandsvisning — L18 är närmaste lärdom;
+alla som hypoteser eller billiga prov inom vanligt mandat). (2) Fem textställen och två
+verktygsluckor som slutgranskningarna noterade i Digitala main är rättade i Digitala PR 10 (main `673d47f`, efter
+separat läsargranskning genom publiceringsvägen): översiktens uppgifter om publiceringsvägen (PR 5–8, inte PR 4) och
+fallets händelseantal, registrets läge (§E) efter testfallets användningsnoter, prelaunch-textens grind 2–3 som verktyget
+faktiskt prövar, kundintervju-textens mening om var länken skrivs, intervjuverktygets spärr mot en kundmapp i
+repot för alla kommandon, och obesvarade följdfrågor som luckor i intervjuverktyget (status, nästa omgång, research).
+Planens punkt 1 i HELHET-blocket, som fortfarande sade "ÖPPET: ägarens levande vägransprov med direkt push", rättas
+samtidigt: provet stängdes i etapp 4 (direkt push nekad).
+
+**Läge 18:35Z.** Inget mer öppet i HELHET-20260927 (planens punkt 1–6 utan ÖPPET-markering); ägarens tur oförändrad (nio rader). Privat läge: `LAGE.md` i
+uppdragets evidence-mapp.
