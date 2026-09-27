@@ -66,13 +66,20 @@ FÖRSLAG ATT PRÖVA I NÄSTA FALL
 - Runtime: startövningens harnesskontroller jämför mängder och antal mot parametersträngen, aldrig kvittots
   nyckelordning (lärdom R18, belägg REHEARSAL.md för övergång 18; billigt prov: nästa startövning; ersätter
   ordningskänsliga jämförelser i harness-17/18; ryms i ett vanligt mandat).
+- Digitala (ur slutprovet HELHET-20260927, 2026-09-27; hypoteser, inte praxis): (a) användningsnoterna fylls per steg
+  före `klart` — pröva om `fortsatt.py` ska vägra `klart` utan ifyllda noter eller bara bokföra att de saknas (processfynd
+  i slutprovet: noterna skrevs i efterhand); (b) kör Runtimes provarprofil och Playwright-vägen på samma uppgift i nästa
+  fall och jämför kontrollantens utfall (L25: verktyget som fyller allt provar som en robot); (c) kör webbläsarvägen mot
+  en verkligt skyddad förhandsvisning — etapp 4 och slutprovet körde bara lokala provsajter, och kopplingen står som
+  återstående i översikten (närmaste lärdom L18: pröva målklassen modellfritt först); ingen ägarpunkt kräver det, och
+  Kundstart körde skyddad förhandsvisning inom sitt mandat. Alla tre ryms i ett vanligt mandat.
 
 HELHET (HELHET-20260927; tilläggen HELHET-TILLAGG-20260927) — genomförandeuppdrag i sex etapper, utfört av sessionen
 nortropic-repos-f0. Etapperna är arbetsordning, inte ägarstopp; läge och nästa kommando privat i
 `evidence/nasta-uppdrag/local/helhet-20260927/LAGE.md`.
  1. KLAR 2026-09-27 (HELHET-ETAPP1-RESULTAT-20260927): käll- och ändringsbild — revisioner lästa; grenskydd på
     Digitala-repot genom rulesetet `main-skydd` (id 24072759), verifierat genom API-läsning och maskinellt sammanslagna
-    PR 1 och PR 2; ÖPPET: ägarens levande vägransprov med direkt push; täckningskartan (25 förmågerader med disposition)
+    PR 1 och PR 2; vägransprovet med direkt push gjordes i etapp 4 (nekad, HELHET-RESULTAT-20260927); täckningskartan (25 förmågerader med disposition)
     och resursspårningen (36 rader, 25 saknas-rader klassade, korpusens slutpunkt r38; R39 oläst) privata; konton
     kartlagda (ingen Google- eller Meta-behörighet).
  2. KLAR 2026-09-27: korrigerade mandat och kunskapsgränser — Digitala PR 2 (main bb4a602) efter tre granskningsrundor
