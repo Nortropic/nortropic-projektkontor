@@ -548,15 +548,15 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter RUNTIME-OVERGANG-18-AKTIV-20260927 (2026-09-27) är tre rader
-öppna: namnfrågan om det gamla webbförvaltningsrepot, Digitalas stående mandats två saknade gränser, och Digitalas
-nästa fiktiva fall med ägarens ändringar; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27) är tre rader
+öppna: taket för Digitalas stående arbete, underhållsformen som ägaren arbetar fram, och Digitalas nästa fiktiva fall
+med ägarens ändringar; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
 ÄGARENS TUR
-- [beslut] Namnbyte av nortropic-webbforvaltning: ditt förslag nortropic-digtala ligger ett tecken från det nya repots namn nortropic-digitala; välj ett annat namn, till exempel nortropic-webbforvaltning-arkiv, eller låt det vara; DIGITALA-1-KORRIGERING-20260926 gäller oavsett, inget namnbyte gör den till körväg (OMBYGGNAD-RESULTAT-20260927) — sedan 2026-09-27
-- [beslut] Digitalas stående mandat, de två gränser MANDAT.md §3 namnger som saknade: får en levererad sajt underhållas mellan beställningar inom stående mandat, och vilket tak gäller för stående arbete (OMBYGGNAD-RESULTAT-20260927) — sedan 2026-09-27
+- [beslut] Digitala: tak för stående arbete per månad, i antal läsande modellsessioner; kedjedrivarens förslag är 20, redovisade i månadsomgången (OMBYGGNAD-AGARSVAR-20260927) — sedan 2026-09-27
+- [beslut] Digitala: underhållsform för levererade sajter; du skrev "vi ska arbete fram åt slags underhåll tänker jag, ja", och tills den är beslutad är varje ändring en beställning (OMBYGGNAD-AGARSVAR-20260927) — sedan 2026-09-27
 - [beslut] Digitala: nästa fiktiva fall — välj och beställ det med dina ändringar från Norrglänta (DIGITALA-1-AGARBEDOMNING-20260927) — sedan 2026-09-27
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
@@ -727,7 +727,7 @@ FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
 RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
 RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927,
-RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927, KONTORET-FORVALTNINGSFALT-20260927, OMBYGGNAD-RESULTAT-20260927, RUNTIME-OVERGANG-18-AKTIV-20260927 och Runtime-planens ingång.
+RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927, KONTORET-FORVALTNINGSFALT-20260927, OMBYGGNAD-RESULTAT-20260927, RUNTIME-OVERGANG-18-AKTIV-20260927, OMBYGGNAD-AGARSVAR-20260927 och Runtime-planens ingång.
 
 ---
 

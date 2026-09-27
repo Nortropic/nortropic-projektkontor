@@ -5864,3 +5864,30 @@ inte ett oberoende omdöme) mot övergångsskriptets rekord, ägarens utskrift o
 publiceringen.
 
 **Ersätter:** ingen post. Kompletterar OMBYGGNAD-RESULTAT-20260927.
+
+## OMBYGGNAD-AGARSVAR-20260927 — ägarens svar på de tre raderna: det gamla webbförvaltningsrepot är arkiverat med namnet kvar; ägaren arbetar fram en underhållsform; taket för stående arbete är obesvarat; ägaren tar fram nästa fiktiva fall
+
+**Ägarens ord.** Som svar på kedjedrivarens rekommendationer per rad (namnbytet, mandatgränserna, nästa fall) skrev
+ägaren i sessionen 2026-09-27: "arkivera, vi ska arbete fram åt slags underhåll tänker jag, ja, jag ska ta fram ett
+fiktivt fall". Orden är sparade ordagrant privat (`evidence/nasta-uppdrag/local/ombyggnad-20260927/`
+`owner-words-svar-tre-fragor-20260927.md`), tillsammans med rekommendationerna de svarar på.
+
+**Genomfört.** Kedjedrivaren arkiverade repot `Nortropic/nortropic-webbforvaltning` på GitHub 2026-09-27 kl. 11:15Z på
+ägarens ord: skrivskyddat, namn och synlighet oförändrade (publikt, `nortropic-webbforvaltning` före och efter), läst
+tillbaka som arkiverat. Den lokala kopian är orörd. Återgång: avarkivering är ett
+kommando. DIGITALA-1-KORRIGERING-20260926 gäller oförändrat: den gamla webbförvaltningen är inspiration, inte körväg,
+och inget namnbyte är gjort. Ägarens ursprungliga förslag `nortropic-digtala` föll bort eftersom det ligger ett tecken
+från Digitala-repots namn.
+
+**Kedjedrivarens läsning av svaret** (inte ägarens ord). Underhåll mellan beställningar: ingen stående rätt är beslutad;
+ägaren avser att arbeta fram en underhållsform, och tills den är beslutad är varje ändring av en levererad sajt en
+beställning, som förut. Tak för stående arbete: obesvarat; kedjedrivarens förslag är 20 läsande modellsessioner per
+månad, redovisade i månadsomgången, och raden står kvar. Nästa fiktiva fall: ägaren tar fram det; raden står kvar tills
+fallet är beställt. Digitala-repots `MANDAT.md` §3, som namnger just dessa tre saknade gränser (underhåll mellan beställningar, tak
+för stående arbete, nästa kund), får samma tre lägen i en egen granskad commit inom det stående mandatets registrering.
+
+**Plan.** Ägarens tur: raden om namnbytet tas bort (avgjord); raden om mandatgränserna delas i två, taket (obesvarat)
+och underhållsformen (ägaren arbetar fram den); raden om nästa fall står kvar. Tre rader öppna. Stycket ovanför rubriken
+säger detsamma.
+
+**Ersätter:** ingen post. Kompletterar OMBYGGNAD-RESULTAT-20260927 och RUNTIME-OVERGANG-18-AKTIV-20260927.
