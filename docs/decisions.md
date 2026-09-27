@@ -6085,3 +6085,186 @@ Digitalas motsvarande steg `beredning` och `kunskap/beredning.md` byggs i Digita
 **Granskning.** Separat, skrivskyddad läsning genom Runtimes läsarprofil (samma modellfamilj som författaren: en
 separat läsning, inte ett oberoende omdöme) av kandidatens diff, dokumentation, prov och denna post mot orderns
 avsnitt 3; kvittot i publiceringen.
+
+## HELHET-ETAPP1-RESULTAT-20260927 — etapp 1 levererad: käll- och ändringsbild, grenskydd, konton, täckningskarta över det arkiverade repot och resursspårning från ursprung till dagens arbetsväg
+
+**Vad.** Etapp 1 i HELHET-20260927 är genomförd. Revisioner lästa vid start: kontoret `befb45f`, Runtime main `3d74733`
+(aktiv konfiguration `eb102e4e` sedan övergång 18), Digitala main `74a9951` (nu `bb4a602` efter PR 2), det arkiverade
+repot `Nortropic/nortropic-webbforvaltning` @ `e4c8c52` i en klonad läsyta (ingen kod körd ur klonen). Grenskyddet på
+Digitala-repot är rulesetet `main-skydd` (id 24072759: deletion, non_fast_forward, pull_request med noll godkännanden,
+merge/squash/rebase, inga bypass-aktörer), verifierat genom API-läsning av de verkställda reglerna och genom att PR 1
+och PR 2 slogs samman maskinellt utan manuellt godkännande; ÖPPET: ett levande vägransprov med direkt push, som
+kedjedrivarens verktygsbehörighet nekade att försöka (ägaren kan köra det). Konton: ingen Google- eller Meta-behörighet
+hittades på kända platser (inga gcloud-, Google Ads- eller Meta-verktyg; `gh` och `vercel` inloggade); allt som kräver
+dem är namngivna externa beroenden.
+
+**Täckningskartan** (privat `TACKNINGSKARTA-GAMLA-WEBBFORVALTNING.md`, 25 förmågerader: källa, tidigare innehåll och
+form, dagens motsvarighet, lucka, disposition, anropsväg efter införande). Dispositionerna är kedjedrivarens förslag
+inom arbetsordern, inte ägarbeslut: TA IN som
+professionsunderlag eller verktyg — research-kontraktet, interventionsbeslutet, juridikflaggorna, inspirationsprotokollet,
+briefstrukturen, stackens krav (utan fast stack), copyreglerna (som rapport), bildkedjans behandlings- och varumärkesskript,
+premiumreferenserna (som jämförelse), lokal SEO, företagsprofilen, prelaunch-grindarna, lanseringsproceduren, granskningens
+"verifiera varje fynd" (till KVALITET:s loop), paketets skärpningar (utan paketmaskineri); BYGG OM — sökkonsolen som
+verktyg mot API:et; BYGG NYTT — annonsberedning, uppföljning; AVSTÅ som form — anti-slop-poängen, eval-siffran (men faktatrohet som grind och kriterielistan som kontrollpunkter i
+KVALITET tas in), paketmaskineriet, autobygg-workflowet (men utfallsformen tas in i etapp 5:s fortsättningsväg), stewarden
+och nattskiftet (men punktlistan tas in i leveransmallen), review-, launch- och cutover-workflowens form (innehållet tas
+in som loop, grindar och procedur), bildanskaffning via betaltjänst, gallringspoängen; PRÖVA — vendorerade
+skills först efter ursprungs- och licenskontroll; KANDIDAT för etapp 6 — backtesterna som neutralt testfall; REDAN TÄCKT —
+de pinnade mätverktygen (Runtime D034–D037). Läsgrad och källuckor står i kartan.
+
+**Resursspårningen** (ägarens tillägg 2026-09-27 avsnitt 2–4; privat `RESURSSPAR-20260927.md` med läsunderlaget
+`RESURSSPAR-UNDERLAG-20260927.md`). Kedjan av kontorsposter från DIGITALA-1-BEREDNING-20260925 till HELHET-20260927 (27 rader i läsunderlagets
+kedjetabell, 33 namngivna poster) är klassad ÄB/AF (ägarbeslut med citat respektive assistentförslag). 36 rader (33 resurser i läsunderlagets A1–A33,
+några delade) är följda genom ursprung och behov →
+bedömning/beslut → form → införande → arbetsväg → faktisk användning → observerat resultat, med belägg per cell och
+"okänt" där belägg saknas. Verifierat använt (körspår, kvitton eller användningsnoter): frontend-design, mobile-native,
+Web Interface Guidelines, web-quality-audit och accessibility, Impeccable-detektorn, Hallmark, design.md-linten,
+redaktionellt-pass.md, referensjakten, Runtime-profilerna, Puppeteer-provaren, KVALITET med kvalitetsbilden; om de gav
+bättre kundresultat än utan dem är okänt (inget jämförande prov). Finns men används inte än: emil-design-eng,
+prototype, Taste efter etapp 2, canvas-design, copykontrollen, referensfilen, bildverktygen (bara läsyta), alla
+etapp 3-verktyg (bara prov). 25 rader "saknas eller förefaller saknas" (läsunderlaget: 28) är klassade med belägg och
+var bortfallet uppstod: Hallmark och design.md fanns men var inte kopplade till rätt steg (klass 4; kopplade i etapp
+3-kandidaten, i granskning), canvas-design (4/1) och emil-design-eng (5/4) finns utan belagd användning; täckningskartans
+rad om vendorerade skills ("ursprung/licens inte fastställda") är fel — VENDORED.md bevisar proveniens för 9/9 och
+licens för de flesta (content-humanizer MIT) — och rättas; find-animation-opportunities har ingen sakbedömning återfunnen
+(disposition: avstå tills en brief har motion-nivå över subtil) och gsap-build ingen disposition efter den ersatta
+planen (disposition: avstå som stackbunden; rörelse via emil-design-eng); de beställda men inte körda stegen
+16–18 (designlang, Claude Design) ligger utanför HELHET; kanalförmågorna som tappades mellan den ersatta arbetskedjan
+och registret återförs i etapp 3-kandidaten (i granskning). Korpusens slutpunkt: Improvements r38 (30 källor, 2026-09-01);
+R39 (55 källor, 2026-09-11) ligger ogranskat i PR #12 och är inte läst av någon Digitala-post. Luckor: ägarens
+underliggande ord bakom HELHET-ordern finns inte i sessionen; om metodlitteraturens J1–J5 omfattas av "kör enligt
+rekommendationer" avgörs av en tolkningsfil som inte lästs här; CONV-010-filerna finns inte lokalt.
+
+**Klart-när mot ordern.** Avsnitt 1 (korrigera nuläget utan blind återställning): revisionerna lästa, skyddet
+konfigurerat och verifierat så långt behörigheten når, fungerande kod bevarad. Avsnitt 2 (återvinn tidigare omfattning):
+täckningskartan med disposition per förmåga; resursspårningen enligt tillägget. Kvar i etapp 1: inget, utom ägarens
+vägransprov; resursspårningen förs in i Digitalas dokumentation med nästa kandidat (kunskap/) och utökas i etapp 6
+med slutprovets faktiska användning. Återstående inkopplingar (tillägg 1 avsnitt 6): Playwright-vägen (etapp 4), start-
+och fortsättningsvägen med utförarbyte och schemalagd drift (etapp 5), slutprovet med de nya stegen (etapp 6); externa
+aktiveringar som inte finns: Google Cloud-projekt med OAuth eller tjänstekonto (sökkonsol), Google Ads-utvecklartoken,
+Meta-token, företagsprofil av behörig människa.
+
+**Läge 14:31Z.** Digitala etapp 3 är integrerad (PR 3, main `4bd1206`) efter tre granskningsrundor; intervju- och
+researchkandidaten (gren helhet/intervju, `4874366`) är i sin första granskningsrunda; webbläsarvägen (etapp 4) byggs i en
+egen gren; kontorets beredning bär problemformuleringen sedan KONTORET-PROBLEMFORMULERING-20260927; etapp 5–6 inte
+påbörjade.
+
+**Granskning.** Separat, skrivskyddad läsning genom Runtimes läsarprofil (samma modellfamilj som författaren: en separat
+läsning, inte ett oberoende omdöme) av denna post, registreringsposten för tilläggen, planblocket och de privata
+underlagen (täckningskarta, resursspårning med läsunderlag, LAGE); kvittot i publiceringen.
+
+**Plan.** Blocket HELHET: punkt 1 KLAR med denna post; punkt 3, 5 och 6 uppdaterade med tilläggen (HELHET-TILLAGG-20260927).
+
+**Ersätter.** Inget.
+
+## HELHET-TILLAGG-20260927 — ägarens två tillägg till HELHET-20260927 registrerade: resursval och verkligt flöde; kundintervju, egen research och professionell helhetsleverans
+
+**Vad.** Två tillägg mottogs 2026-09-27 som meddelanden i sessionen nortropic-repos-f0 och sparades ordagrant först av
+allt i kontorets privata uppdragsmapp (`evidence/nasta-uppdrag/local/helhet-20260927/tillagg-resursval-och-flode-20260927.md`
+och `tillagg-kundintervju-och-research-20260927.md`). Tillägg 2 anger själv att bara ett citat är ordagrant ägaruttalande:
+"Detta låter bra och jag vill att digitala förstår detta genom att intervjua kunden samt egen research förstås för att
+förstå." — resten är assistentformulerad arbetsorder; tillägg 1 anger ingen sådan reservation och är sparat som ägarens
+ord. Båda säger
+att de inte ersätter huvuduppdraget, inte startar om arbetet och inte skapar nya rutinmässiga ägarstopp.
+
+**Tillägg 1 (resursval och verkligt flöde) kräver.** (avsnitt 1) Tidigare brainstorming och GitHub-research — hela
+skills och utvalda delar — ska följas fram till dagens arbetsväg, inte ersättas av en lista över vad som råkar vara
+installerat eller i registret; ägaren ska få en begriplig, verifierbar bild av vilka namngivna resurser som används,
+när, av vem, till vad och med vilket resultat ("vi använder specialistkompetens" räcker inte); som del av pågående bygge,
+utan separat granskningsplattform, ny fullständig Improvements-sweep eller obligatorisk ny kundpilot. (avsnitt 2) Följ varje resurs och tidigare avsedd förmåga från ursprung och
+behov → tidigare bedömning/beslut → vald form → införande → aktuell arbetsväg → faktisk användning → observerat resultat,
+via befintlig Intake-/korpusväg och de namngivna underlagen (ARBETSKEDJA-20260925, IDEBEDOMNING-20260926,
+JAMFORELSE-DIGITALA-20260926 med senare versioner, RIKTNING-underlaget, gamla och nuvarande register); sammanställningar
+är sökhjälp, inte ersättning för originalbesked; begränsa inte till installerade skills — ta med externa kandidater och
+delar som diskuterades men aldrig installerades eller registrerades; registret får inte definiera sin egen
+fullständighet; skilj ägarbeslut från assistentförslag, historisk avgränsning från permanent bortval och avvisad
+körkedja från avvisad specialistkompetens ("gamla flödet är historik" besvarar inte vad som hände med en bra resurs);
+klassa det som saknas i sju klasser med belägg och spåra var bortfallet uppstod; korrigera aktiva underlag utan att
+skriva om historien; påstå inte att varje kandidat blev felaktigt bortvald eller att allt var beslutat; återanvänd giltiga
+läsningar; redovisa korpusens slutpunkt, läst omfattning och luckor; utred det som behövs och fortsätt samtidigt.
+(avsnitt 3) Avgör hel skill eller utvalda delar per resurs med namn, ursprung, version, behov, form, skäl, vad som inte
+följer med och var instruktioner och verktyg finns; ingen generell regel om form; de tidigare nämnda namnen
+(frontend-design, Emil Kowalskis resurser, Impeccable, Taste, Web Interface Guidelines, web-quality-skills, Hallmark,
+design.md) är sökingångar, inte en uttömmande lista eller automatisk installationsorder; samma prövning gäller äldre
+egna skills inom SEO, innehåll, bild, lansering och förvaltning; anpassa gamla val när dagens uppdrag motiverar det och
+redovisa ändringen; återinstallera inte sådant som redan fungerar; tappa inte körbara funktioner genom att bara kopiera
+beskrivningen; återinför inte agenthierarkier, privilegier eller stilregler. (avsnitt 4) Visa användning, inte förekomst:
+per resurs beslut/disposition, faktisk integration och observerad användning med belägg; skilj rapporterad användning
+från körbevis och fungerande teknik från förbättrad kvalitet; ett förberett underlag är inte automatiskt tillfört
+modellens kontext, tillförd kontext är inte bevis för förståelse och ett lyckat anrop inte automatiskt ett bättre
+kundresultat — skriv uttryckligen när det sista är okänt; skilj användning i isolerade testfall, sammanhängande slutprov
+och ordinarie kundarbete — en mockad anslutning är inte live-användning; märk äldre körbevis med version och räckvidd; ange vad som är obligatoriskt per uppgift och varför något inte är tillämpligt; en förmåga på
+disk är inte levererad — koppla in och använd den; uppfinn inga bidrag. (avsnitt 5) Leverera "Så fungerar Digitala i praktiken"
+som daterad översikt i befintlig dokumentation och slutrapport, med vy A (ordinarie arbetsväg: steg, indata, ansvarig
+funktion och utförarväg, namngivna resurser i form och tid, produktion och kontroll, hur underkännande och återupptagning
+hanteras; normalväg och återkoppling; en kort uppgift och ett större webbuppdrag) och vy B (en faktiskt genomförd körning
+med belagt, rapporterat, inte kört och inte tillämpligt märkt; saknas ett verkligt exempel ska det stå, inget kundfall
+uppfinns); presentation: kort läsbar förklaring och kompakt stegkarta först, tekniska referenser intill eller i bilaga
+(filnamn, hashar eller installationstabell räcker inte); kanalförmågorna (SEO, sökkonsol, företagsprofil, Google Ads,
+Meta Ads) med integrationsläge, tillämplighet och beroenden separat från fallet; inga hemligheter, kunduppgifter eller
+känsliga råspår. (avsnitt 6) För in tillägget i planen och fortsätt från aktuellt läge utan att göra om avslutat arbete utan
+konkret anledning; ägaren väljer inte skill för skill och godkänner inte kartläggningen i förväg; i nästa lägesbesked:
+verifierat använt, finns men används inte, återstående inkopplingar — inga spekulativa besked, invänta inte svar;
+slutgranskning åt båda hållen med kontrollerna att bortvald körkedja inte blivit förbud mot specialistkompetens, att
+installerat inte blivit använt, att använt inte blivit bevisat bättre och att ett lyckat testfall inte blivit praxis;
+huvuduppdragets gränser består (ingen Norrglänta-standard, inga ägarstopp före färdig sida, inga nya ekonomiska
+åtaganden eller behörigheter); målet är att ägaren kan säga att han förstår hur Digitala arbetar, vilka resurser som
+faktiskt används, varför, vad systemet gör själv och vad som ännu inte är verifierat.
+
+**Tillägg 2 (kundintervju, egen research, helhetsleverans) kräver.** (1) Förstå innan lösningen bestäms: Digitala leder
+en adaptiv kundintervju och egen research som tillsammans styr research.md, brief, lösningsval, specialistresurser,
+implementation, integrationer och leveransprov; byråförmågans elva områden bedöms för varje uppdrag men byggs inte för
+varje kund; "världsklass" är ambition, inte verifierad status. (2) En sammanhängande arbetsväg med återkoppling
+(beställning → läsning och research → intervju ↔ riktad research → källbundet research.md → brief och leveranskrav →
+design, innehåll, bygge, integrationer → granskning, rättning, omprov → färdig privat sida och rapport → lansering och
+förvaltning enligt mandat); intervju är normalvägen för nytt eller väsentligt förändrat uppdrag, luckor kompletteras
+annars; Digitala leder kunddialogen, kontoret bidrar med problemformulering, metodstöd, mandat och proportion; ägaren
+ska inte behöva vara intervjuare. (3) Intervjuvägen ska fungera och kunna återupptas i lämplig befintlig kanal (ingen
+ny kundportal; en frågelista i Markdown räcker inte); läs tillgängliga svar före frågor; frågor i omgångar,
+följdfrågor beroende av svaren; kräv inte att kunden väljer ramverk, API, skill, typografisk skala eller arkitektur;
+områdena A–H
+(verksamhet och erbjudande; besökare och situationer; hela verksamhetsflödet; befintliga system och åtkomster — aldrig
+lösenord i svar; varumärke, innehåll, förtroende; synlighet och mätning; förvaltning och redaktörsarbete; ramar och
+osäkerheter); kundens faktiska svar bevaras skilda från sammanfattningen, bara nödvändiga uppgifter i rätt privat
+kundyta; sammanfatta tolkningar i dialogen så kunden kan rätta dem, utan obligatoriskt godkännande av en separat
+brief; en intervju är inte ett användartest. (4) Egen research prövar intervjun med primärkällor; referensjakt får inte
+ersätta förståelsen av verksamheten, ett högt betyg bevisar inte att en design fungerar och en konkurrentwebb avslöjar
+inte sin konverteringsgrad; status per
+nyckeluppgift (kunden uppger, observerat, externt belagt, tolkning, hypotes, preferens, okänt) med källa och datum där
+det påverkar lösningen; motsägelser bevaras och följs upp; ingen fabricerad data. (5) research.md som kundspecifik
+ingång: det tidigare research-kontraktets innehåll som täckningsunderlag utan gamla paketspärrar, kundantaganden,
+låsta stackval eller ägarstopp; befintliga kundunderlag förblir läsbara och migreras varsamt med proveniens; täcker A–H,
+visar utrett/inte tillämpligt/motsägelsefullt/okänt, räckvidd och kontaktkanaler för aktuell kund, skilt från briefen; användbarhet prövas (viktigaste uppgift, vad formuläret ska åstadkomma, mottagande system, vad vi
+inte vet); nya svar slår igenom spårbart; ingen ändring av en pågående kandidats frusna acceptans. (6) Behoven styr
+förmågorna: kundsvar → leveranskrav → metod/skill/integration → implementation → kontroll → bevis, in i täckningskartan
+och beredningen; formulär och leads som kedja (validering, mottagning, rätt system, sant besked, fel, dubbletter),
+bokning (etablerad tjänst, integrationsnivå, vad som faktiskt fungerar), CRM/betalning bara vid behov med prov,
+redaktörsupplevelse utan Git-krav, synlighet/mätning/drift kvar i förmågekartan; kundens funktioner ska fungera utan
+ägarens Mac. (7) Kunddialog är inget ägarstopp; följdfrågor samlas efter betydelse; uteblivna svar döljs inte; bara den
+kund och kanal uppdraget omfattar; inga nya abonnemang, annonsutgifter, publika lanseringar eller utökade befogenheter.
+(8) Verifiera i den ordinarie vägen med prov: kända svar återanvänds och en lucka ger relevant följdfråga; ett
+bokningsbehov leder till verksamhetsfrågor och leveranskrav, inte automatiskt till ett kontaktformulär; motsägande
+uppgifter hanteras spårbart; en färsk utförare fortsätter intervjun; kundmaterial hamnar inte i professionsfiler;
+integrationsvägar prövas i normalfall och felvägar med verklig räckvidd; färdig privat leverans utan brief- eller
+konceptstopp; testdialoger märks som sådana och är inte kundresearch; Norrglänta ingen praxis. (9) Översikten utökas
+med intervju, research, vad kunden bidrar med, vilka resurser som faktiskt används, vad som är klart för privat
+granskning respektive verifierat för drift, och återstående beroenden, genom bärande exempel ur det verkliga underlaget,
+inte påhittade berättelser; slutgranskning åt båda hållen som särskilt kontrollerar att researchen inte krympt till
+referensjakt, att intervjun inte blivit en ny kedja av ägarstopp, att integrationer inte reducerats till länkar där mer
+beställts och att frånvaro av data inte blivit påstådd förståelse.
+
+**Kedjedrivarens val (inget ägarbeslut).** Resursspårningen är levererad privat med etapp 1 (HELHET-ETAPP1-RESULTAT-20260927)
+och förs in i Digitalas dokumentation med nästa kandidat. Intervju- och researchförmågan byggs som egen Digitala-kandidat
+efter etapp 3: ett steg `intervju` med ett återupptagbart intervjuverktyg som läser kundmappens befintliga underlag,
+bygger frågeomgångar per område A–H, härleder följdfrågor ur svaren (regler per svar, inte fast enkät), lagrar kundens
+svar ordagrant i kundmappen och skriver research.md:s intervjuavsnitt med status per uppgift; kanalen är den kontaktväg
+beställningen anger (svaren tas emot som text och registreras — ingen ny portal); professionsunderlag för intervju,
+research med statusklasser och integrationskedjor (formulär/leads, bokning, CRM, redaktörsupplevelse). Proven i tillägg 2
+avsnitt 8 läggs i etapp 6:s slutverifiering med tydligt märkta testdialoger om inget kundfall finns.
+
+**Läge.** Denna registreringspost bär inget lägesstycke (lärdom K12): läget står i planens block HELHET och i det
+privata `evidence/nasta-uppdrag/local/helhet-20260927/LAGE.md`.
+
+**Plan.** Blocket HELHET: punkt 3, 5 och 6 utökade med tilläggen; punkt 1 KLAR.
+
+**Ersätter.** Inget; tilläggen kompletterar HELHET-20260927.

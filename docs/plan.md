@@ -67,32 +67,42 @@ FÖRSLAG ATT PRÖVA I NÄSTA FALL
   nyckelordning (lärdom R18, belägg REHEARSAL.md för övergång 18; billigt prov: nästa startövning; ersätter
   ordningskänsliga jämförelser i harness-17/18; ryms i ett vanligt mandat).
 
-HELHET (HELHET-20260927) — genomförandeuppdrag i sex etapper, utfört av sessionen nortropic-repos-f0. Etapperna är
-arbetsordning, inte ägarstopp; läge och nästa kommando privat i `evidence/nasta-uppdrag/local/helhet-20260927/LAGE.md`.
- 1. PÅBÖRJAD 2026-09-27: käll- och ändringsbild — revisioner lästa, skrivansvar samordnat; grenskydd på Digitala-repot
-    genom rulesetet `main-skydd` (id 24072759: deletion, non_fast_forward, pull_request med noll godkännanden,
-    merge/squash/rebase, inga bypass-aktörer, GitHubs extra godkännande för oattribuerade ändringar), verifierat genom
-    API-läsning och attribuerade PR:ar sammanslagna maskinellt utan godkännande (Digitala PR 1 och PR 2); ÖPPET: ett
-    levande vägransprov med direkt push (kedjedrivarens verktyg nekade försöket; ägaren kan köra det). Gamla repot
-    läst i klonad läsyta (ingen kod körd); täckningskartan skriven privat (24 förmågerader: källa, tidigare innehåll,
-    dagens motsvarighet, lucka, disposition, anropsväg; läsgrad och källuckor redovisade); konton kartlagda (ingen
-    Google- eller Meta-behörighet på kända platser). Kvar: resultatposten (bär täckningskartans sammanfattning).
+HELHET (HELHET-20260927; tilläggen HELHET-TILLAGG-20260927) — genomförandeuppdrag i sex etapper, utfört av sessionen
+nortropic-repos-f0. Etapperna är arbetsordning, inte ägarstopp; läge och nästa kommando privat i
+`evidence/nasta-uppdrag/local/helhet-20260927/LAGE.md`.
+ 1. KLAR 2026-09-27 (HELHET-ETAPP1-RESULTAT-20260927): käll- och ändringsbild — revisioner lästa; grenskydd på
+    Digitala-repot genom rulesetet `main-skydd` (id 24072759), verifierat genom API-läsning och maskinellt sammanslagna
+    PR 1 och PR 2; ÖPPET: ägarens levande vägransprov med direkt push; täckningskartan (25 förmågerader med disposition)
+    och resursspårningen (36 rader, 25 saknas-rader klassade, korpusens slutpunkt r38; R39 oläst) privata; konton
+    kartlagda (ingen Google- eller Meta-behörighet).
  2. KLAR 2026-09-27: korrigerade mandat och kunskapsgränser — Digitala PR 2 (main bb4a602) efter tre granskningsrundor
     (två underkända): en beställning bär hela uppdraget, inga ägarstopp, Norrglänta underkänt som kvalitetsresultat och
     inte referens, klassning i stället för praxis av antal, uppgiftsmotiverade kriterier och mallar, intern
     gransknings- och rättningsloop; samma PR bär beviskedjans rättelser A, B och C med negativa prov (avsnitt 7);
     kontorets privata rytm- och lärdomsfiler bär klassningsregeln. Restnoter privat.
  3. PÅBÖRJAD 2026-09-27: professionellt flöde och specialistintegrationer — kontorets beredning bär
-    problemformuleringen (KONTORET-PROBLEMFORMULERING-20260927: `forvaltning.problem` med insiktskälla och
-    interventionsbeslut, kedjan problem → underlag → metod → beslut → bedömning i briefen); Digitala-kandidat (gren
-    helhet/etapp3-flode) med steget beredning, research-, brief-, juridik-, bild- och copyunderlag, sedan SEO, sökkonsol,
-    lokal synlighet, annonsberedning, mätning och uppföljning, prelaunch, lansering och drift med kontrakt mot officiella
-    API:er och namngivna externa beroenden.
+    problemformuleringen (KONTORET-PROBLEMFORMULERING-20260927); Digitala PR 3 (main 4bd1206) efter tre granskningsrundor
+    (två underkända): steget beredning; research-, brief-, juridik-, bild-, bygge- och
+    copyunderlag; stegen seo, sokkonsol, lokal-synlighet, annonsberedning, uppfoljning, prelaunch, lansering och drift
+    med verktyg prövade mot fixturer och inspelade svar (ingen live-integration: extern åtkomst saknas och är namngiven);
+    Hallmark-linsen och design.md-formatet kopplade till steg. Kvar (tillägg 2): kundintervju och egen research — adaptiv,
+    återupptagbar intervjuväg med följdfrågor som beror på svaren, status per nyckeluppgift, research.md som kundspecifik
+    ingång, integrationskedjor (formulär/leads, bokning, CRM) och redaktörsupplevelse — kandidat (gren helhet/intervju) i
+    första granskningsrundan.
  4. PÅBÖRJAD 2026-09-27: beviskedjans fynd A, B och C rättade med negativa prov (Digitala PR 2); kvar: Playwright-baserad
     webbläsarväg med tre användningar (utvecklarinspektion med kontext, utforskande QA, avskärmad förstagångsbesökare).
  5. VÄNTAR: självständig genomföring — ordinarie start- och fortsättningsväg, utförarbyte på ett representativt steg,
-    maskinell publiceringsväg för Digitala-repot.
- 6. VÄNTAR: sammanhängande slutverifiering med ett beställt fall eller neutrala märkta testunderlag; slutrapport.
+    maskinell publiceringsväg för Digitala-repot, schemalagd driftkontroll genom Runtime.
+ 6. VÄNTAR: sammanhängande slutverifiering med ett beställt fall eller neutrala märkta testunderlag (testdialoger märkta
+    som sådana); proven i tillägg 2 avsnitt 8; översikten "Så fungerar Digitala i praktiken" (tillägg 1 avsnitt 5,
+    tillägg 2 avsnitt 9: vy A ordinarie arbetsväg, vy B en faktiskt genomförd körning, kort förklaring och stegkarta
+    först, teknik intill eller i bilaga) i Digitalas dokumentation och slutrapporten; separat slutgranskning åt båda
+    hållen (tidigare underlag och beslut → disposition och användningsplats; påståenden → implementation och körbevis;
+    kundbehov och uppdrag → leverans) med kontrollerna: bortvald körkedja är inte förbud mot specialistkompetens,
+    installerat är inte använt, använt är inte bevisat bättre, ett lyckat testfall är inte praxis; researchen har inte
+    krympt till referensjakt, intervjun har inte blivit en kedja av ägarstopp, integrationer har inte reducerats till
+    länkar där mer beställts, frånvaro av data har inte blivit påstådd förståelse; sambandet visas genom bärande exempel
+    ur det verkliga underlaget, inte påhittade berättelser.
 
 OMBYGGNAD TILL MÅLBILDEN (OMBYGGNAD-20260927) — AVSLUTAT 2026-09-27 (OMBYGGNAD-RESULTAT-20260927; övergång 18 aktiverad
 av ägaren 10:44Z, RUNTIME-OVERGANG-18-AKTIV-20260927). Ett genomförandeuppdrag utfört av en separat session (peer-namn
