@@ -65,7 +65,8 @@ ordagrant privat i `evidence/runtime-profiler/local/`, och återupptagningspunkt
  5. KLART 2026-09-27: separat granskning genom läsarprofilen, av D034 och D035 i två rundor var och av varje
     kontorspost.
  6. STANNAR före övergången: release, isolerad startövning och aktivering väntar på ägarens beslut (ägarens tur).
-Aktiv release, konfiguration, daemon, AP-10, modellvalet och Digitalas filer är orörda.
+Aktiv release, konfiguration, daemon, AP-10, modellvalet och Digitalas filer är orörda. Raden i ägarens tur står sedan
+RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927 direkt under rubriken, så att Aquarium läser den.
 
 DIGITALA 1 — FIKTIV KVALITETSDEMO OCH RUNTIME-DIAGNOS (DIGITALA-1-ACCEPT-20260925, ägarens besked privat i
 `evidence/digitala/local/`; gränserna står avsnitt för avsnitt i beslutsposten). Två spår, med en skrivare åt gången.
@@ -499,12 +500,13 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926).
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter DIGITALA-1-AGARBESLUT-20260926 (2026-09-26) är bara raden om
+Runtime-profilernas övergång öppen; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
+i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
+`- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
 ÄGARENS TUR
-Inga öppna rader efter DIGITALA-1-AGARBESLUT-20260926 (2026-09-26) utom raden nedan (RUNTIME-PROFILER-KANDIDAT-20260926,
-sedan 2026-09-27); nästa kvartalsgenomgång enligt förfallsregeln i januari 2027.
-- [beslut] Runtime-profilerna: övergången till aktiv release (release med de nya filerna, egen isolerad startövning, aktivering med ett komplett kommando) — RUNTIME-PROFILER-KANDIDAT-20260926, sedan 2026-09-27
+- [beslut] Runtime-profilerna: övergången till aktiv release (release med de nya filerna, egen isolerad startövning, aktivering med ett komplett kommando; RUNTIME-PROFILER-KANDIDAT-20260926) — sedan 2026-09-27
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
@@ -669,8 +671,8 @@ DIGITALA-1-INVENTERING-TILLAGG-20260926, DIGITALA-1-INVENTERING-RESULTAT-2026092
 FORVALTNINGAR-LOPANDE-UTVECKLING-20260926, DIGITALA-1-INVENTERING-TILLAGG-RESULTAT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
-RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926 och
-Runtime-planens ingång.
+RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
+RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927 och Runtime-planens ingång.
 
 ---
 
