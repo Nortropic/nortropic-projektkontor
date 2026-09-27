@@ -5481,3 +5481,202 @@ pull request för spårbarhet. Ingen driftsättning, ingen inställning ändrad,
 
 **Ersätter:** ingen post; uppgiften i DIGITALA-1-ETAPP4-RESULTAT-20260927 att förslaget om "fem korta frågor" väntar på
 ägaren är avgjord här.
+
+## OMBYGGNAD-20260927 — ägaren beställer den sammanhängande ombyggnaden till målbilden: Runtime som gemensam mekanik, kontoret som organisationens förvaltning och Digitala som bestående professionell förmåga; etapp 1 registrerad, etapp 2 klar, etapp 4 och 5 påbörjade (läge 10:03Z)
+
+**Status:** registrerat 2026-09-27 av kedjedrivaren (Claude Code, session 933ded0d, peer-namn nortropic-repos-f0), skild
+från Digitala-sessionen. Ägarens besked står ordagrant privat i
+`evidence/nasta-uppdrag/local/ombyggnad-20260927/owner-words-ombyggnad-20260927.md`; ingen exakt klocktid tillskrivs
+ägaren. Beskedet kom efter leveransen av ansvarsfördelningsanalysen (privat, `evidence/nasta-uppdrag/local/ansvarsfordelning-20260927/`),
+som är underlag och historik: dess rekommendationer är inte ägarbeslut, och varken det tidigare analysuppdraget,
+kedjedrivarens slutsatser i det eller assistentens tidigare formuleringar behandlas som ordagranna ägaruttalanden. Genomförandeplanen och
+återupptagningsläget står privat i samma mapp (`PLAN-OMBYGGNAD.md`, `LAGE.md`).
+
+**Beställningen, avsnitt för avsnitt.**
+- *§1 Nytt genomförandeuppdrag:* ägarens besked "Vi bygger om systemet du föreslår, inge små experimenterande". Det är
+  ett genomförandeuppdrag, inte ett analysuppdrag: bygg om Nortropic till målbilden, genomför nödvändiga
+  förändringar, migrera befintligt material, koppla ihop arbetsvägarna, verifiera och integrera genom befintliga
+  skyddade vägar. Inget andra webbfall, ingen andra profession och inget framtida skarpt fall ska inväntas för att
+  börja. Tester, separat granskning och kontrollerat införande ingår som kvalitetssäkring, inte som ett
+  experimentprogram som skjuter leveransen framför sig. Analysen bevaras som underlag och historik.
+- *§2 Målbilden. Runtime:* bär den gemensamma mekaniken för tillåtet genomförande (uppgifter, försök, kontinuitet,
+  verktygsanvändning, verifiering, bevis, publicering inom kvalificerat scope); modeller och utförare är utbytbara
+  resurser inom gällande mandat; fungerande och verifierad mekanik bevaras; ingen ny motor, ingen separat Trust
+  Kernel, ingen parallell orkestrerare; Runtime ska verkställa verksamhetens kriterier utan att äga den professionella
+  definitionen av vad som är bra. *Kontoret:* organisatoriskt en förvaltning med Nortropic självt som domän och med
+  organisationsövergripande ansvar; håller ihop ägarens beslutsspår, planen, uppdragsberedning, proportionerligt
+  metodval, bevisstandard och tvärgående lärande; ska faktiskt hjälpa arbetet framåt (förstå behov, identifiera
+  osäkerheter, välja metoder, samverka med fackkompetensen, omsätta i genomförbara uppdrag); får varken reduceras till
+  ett register eller bli en obligatorisk passage för varje rutinåtgärd; får inte ensamt bestämma alla domänkriterier
+  eller överta ägarens befogenheter; använder självt Runtime där arbetsvägen stödjer det. *Digitala:* en
+  sammanhängande, återanvändbar webbprofessionell förmåga, inte bara ett kundprojekt, personliga skills eller ett skal
+  av Runtime-profiler; håller ihop mandat, professionskunskap, metoder, kvalitetskriterier, prov, verktyg, lärdomar och
+  uppgiftsanpassad tillgång till kundkontext; professionsgemensamt skiljs från kundspecifik sanning; en ny behörig
+  utförarsession ska hitta och använda förmågan från ordinarie ingång utan muntlig överlämning, dolt användarminne eller
+  specialinstruktioner från ägaren; arbetsformen anpassas till uppgiften; detta är en ansvarsmodell, inte ett krav på ett visst
+  antal tjänster, agentsystem eller lager.
+- *§3 Arbetssätt och mandat:* etapperna är arbetsordning, inte godkännandestopp; tekniska val inom uppdraget görs av
+  kedjedrivaren (filstruktur, kodorganisation, testupplägg, reversibla detaljer) utan att återkomma till ägaren;
+  befintliga krav på granskning, integration och aktivering följs; nya ekonomiska åtaganden, utökad åtkomst, nya
+  kundförpliktelser eller
+  ändrad säkerhetsauktoritet ingår inte automatiskt (en sådan fråga avgränsas konkret och övrigt arbete fortsätter);
+  ingen ny generell kontroll- eller kunskapsplattform.
+- *§4 Etapp 1:* utgå från analysen och aktuella beslut, planer, kontrakt och implementationer; kontrollera nuläget på
+  nytt för det som ändras; skilj ägarens beslut, vad som finns, vad analysen föreslår och kedjedrivarens tekniska val;
+  repoverkligheten bestämmer inte vad ägaren får vilja; identifiera sessioner, arbetskopior och ocommittat arbete,
+  samordna skrivansvaret, skriv inte över andras arbete, återställ inte fungerande delar; plan och återupptagningsläge i
+  befintliga underlag; ingen ny Improvements-sweep; markera i berörda planer att ombyggnadens delar inte längre väntar
+  på ett andra kundfall; bevara tidigare beslut och analys som historik; fortsätt till implementation.
+- *§4 Etapp 2:* Digitalas gemensamma kompetens får en tydlig, versionshanterad hemvist skild från körningars evidens,
+  kundkod och personliga CLI-inställningar; minsta ändamålsenliga repo- eller paketlösning inom befintliga
+  behörigheter, motiverad med ansvar, återanvändning, åtkomst och uppdatering; migrering med bevarad källhänvisning,
+  version, status och historik; inga kundhemligheter eller privata ägaruppgifter till en vidare åtkomstyta; kriterier,
+  kritikfrågor, scheman, provaruppgifter och metodunderlag samlas där de hör hemma, kundspecifika avvikelser hos kunden;
+  uppgiftsanpassad underlagsladdning i den ordinarie arbetsvägen ("läs registret" räcker inte); det ska gå att se vilka
+  obligatoriska underlag och versioner en körning fick, och saknat obligatoriskt underlag ska upptäckas, inte tyst
+  ersättas; samma institutionella innehåll för stödda utförare; CLI-specifika skills och adaptrar får finnas som
+  leveransformer men inte som enda bärare.
+- *§4 Etapp 3:* kontorets metodkompetens integreras i den befintliga uppdragsberedningen; ett uppdrag får,
+  proportionerligt, mål, kunskapsunderlag, motiverat arbetssätt, kvalitetskriterier, mandat och bedömningssätt;
+  domänkompetensen får påverka problemformulering och metodval, gränsen är inget samarbetsförbud; metod- och
+  kunskapsunderlag knyts till faktisk körning och uppföljning (ett register är inte bevis för kompetens); Digitalas
+  kvalitetsbedömning samlas i tekniskt prövat, professionellt bedömt och ännu inte observerat hos verkliga användare;
+  stående mandat formaliseras för återkommande arbete inom gällande befogenheter, skilt från nya beställningar; inga
+  uppfunna budgettak, lanseringsrättigheter eller nytt underhållsåtagande för Norrglänta — en saknad mandatgräns namnges
+  som avgränsad behörighetsfråga, inte som skäl att stoppa; löpande arbete inom mandat behöver ingen ny beställning
+  bara för att det är en ny operation.
+- *§4 Etapp 4:* den sammanhängande förmågan kopplas till Runtimes befintliga kvalificerade körvägar; generisk
+  mätmekanik skiljs från Digitalas val av kriterier, mätprofiler och standardvärden; nödvändiga standardvärden görs
+  konfigurerbara där det behövs för målbilden, med bevarade pinnade verktygsidentiteter, reproducerbarhet och bindning
+  till en bestämd körning; förvaltningens möjlighet att konfigurera framtida uppdrag får inte bli en möjlighet för
+  kandidaten att ändra eller försvaga den frusna acceptansen för sin egen pågående körning; överlappande
+  generisk mätning konsolideras där det är motiverat, sajtspecifika produktprov stannar hos kunden, inga gamla prov
+  tas bort förrän täckning visats (liknande verktygsnamn är inte bevis); modell- och utförarval bevaras, ingen
+  automatisk växling, inga reservmodeller eller nya abonnemang; kundrepot blir inte automatiskt publiceringsmål i
+  Runtime, den befintliga kundbyggvägen får vara kvar där mandatet kräver det men ska ingå i kontext-, mandat- och
+  beviskedjan; det redovisas
+  exakt vad Runtime verkställer mekaniskt och vad som bärs av en session och dokumenterade regler, utan att kalla det
+  senare mekaniskt skyddat.
+- *§4 Etapp 5:* helheten verifieras på ett befintligt relevant uppdrag (slutprov, inte experiment); en färsk session
+  från ordinarie ingång ska hitta mandat, läge, kundkontext, professionsunderlag och nästa handling och utföra ett
+  representativt steg med rätt kontroller och bevis; byte mellan stödda utförare prövas nu inom gällande behörighet,
+  inte som senare förslagsrad, och mottagande utförare ska kunna fortsätta med rätt underlag, verktyg och verifieringsväg (lyckad
+  filläsning räcker inte); negativa fall: saknat obligatoriskt underlag, fel version, försök att ändra frusen
+  acceptans, arbete utanför mandat, sammanblandning av kunddata och professionskunskap; befintlig separat granskning
+  används och det redovisas vad den är oberoende av; integration genom befintliga skyddade vägar; aktivering som
+  kräver ägarens hand bereds exakt och redovisas som återstående steg, ingen självaktivering; fungerande återgångsväg,
+  ingen blind återställning, ingen radering av källhistorik.
+- *§5 Klart:* inte vid plan, katalogstruktur eller nya AGENTS-instruktioner, utan när målbilden är implementerad och
+  sammanhängande i den ordinarie arbetsvägen, materialet migrerat, integrationerna fungerar och slutproven visar det;
+  implementerat, integrerat, aktiverat, körprovat och ännu inte verifierat hålls isär; systemets funktionsbevis skiljs
+  från professionell effekt (inga påståenden om bättre kundresultat för att metoder laddas eller prov är gröna); ett
+  hinder beskrivs med orsak, omfattning och vad som återstår; en ofärdig helhet märks inte färdig.
+- *§6 Slutleverans:* en sammanhållen slutrapport med före och efter, den ordinarie ingången och hur arbetet nu
+  genomförs, revisioner, aktiv version, slutprov och bevis, bevarade begränsningar, införandehinder och återgångsväg,
+  samt en jämförelse mot beställningen där varje materiell avvikelse redovisas skilt från nya rekommendationer.
+  "Genomför nu. Stanna inte efter planeringen och omvandla inte uppdraget tillbaka till en serie framtida små
+  experiment."
+- *Ägarens fristående mening:* "nortropic-webbforvaltning kanske borde heta nortropic-digtala för att undvika
+  missförstånd" — läst som ett förslag om det gamla repots namn, inte som ett beslut; se de tekniska valen nedan.
+
+**Ändringsbilden (etapp 1), omkontrollerad 2026-09-27.** Runtime main `b603d91`, aktiv konfiguration `03e776bd`
+(runtime `3fdf7f21`); vyerna och axe-taggarna var konstanter i mätprofilen. Kontoret main `4798ed2` vid läsningen,
+`8c36bdd` efter DIGITALA-1-ETAPP4-RESULTAT-20260927 och `4fb7269` efter DIGITALA-1-AGARBEDOMNING-20260927, som denna post
+bygger på; AP-06:s kärna oförändrad. Digitala privat i kontoret: registret
+(del A–G), lärdomarna L1–L23, sjutton externa texter med kontroll, tre härledda texter, kritikfrågor per etapp,
+scenariouppgifter och provvägen; kundmappen är kundspecifik. Kundrepot: etapp 4 levererad av Digitala-sessionen
+(produktion bakom inloggning), ocommittat arbete fanns under dagen — rörs inte av ombyggnaden. Sessioner: Digitala
+(a0, etapp 4, publicerade PR 98 först enligt överenskommelse), Runtime-profilerna (74, avslutad, skrivplatser fria,
+förlagor för nästa övergång namngivna), AP-11:s kompletteringsskrivare (dd, avslutad, inget hålls). Det gamla repot
+`nortropic-webbforvaltning` (`e4c8c52`) är källmaterial och rörs inte.
+
+**Kedjedrivarens tekniska val (reversibla, inom §3).**
+1. *Hemvist:* ett nytt privat repo `Nortropic/nortropic-digitala` (lokal klon som syskonkatalog). Skäl: ansvar (en
+   förvaltning, ett repo, som Runtime och kontoret), återanvändning (nästa kund pekar dit, inget kopieras per kundrepo),
+   åtkomst (privat: materialet är härlett ur privata fall och ska inte ligga i det publika kontorsrepot; kundmappar,
+   nycklar och adresser flyttas inte), uppdatering (git-versioner, sha256-pinnar per fil). Inte det gamla repot:
+   ägaren har sagt att det inte ska döpas om eller bli körväg (DIGITALA-1-KORRIGERING-20260926), och dess historik
+   skulle ligga i vägen. Ett namnbyte av det gamla repot är en ägarfråga och görs inte här.
+2. *Underlagsladdning:* ett verktyg i Digitala-repot laddar stegets obligatoriska och valfria underlag (profession och
+   kund i skilda klasser) med versionspinnar till en arbetsyta utanför repot och skriver kvitto, lista och skelett för
+   användningsnoter; det vägrar saknat obligatoriskt underlag, fel version, kundfil i fel klass och beställningssteg
+   utan beslutspost. Filform först; Claude Code-skill i repot och Codex-utdrag som leveransformer.
+3. *Kontorets beredning:* AP-06:s spec får ett valfritt fält för förvaltning, steg, proportion, metod med skäl,
+   laddningskvitto, kriterier och bedömningssätt, med egna gap-koder; befintliga fält och koder oförändrade (etapp 3,
+   egen publicering).
+4. *Runtime D037:* mätprofilens vyer och axe-taggar som parametrar med D034:s värden som standard, bokförda i kvittot;
+   ingen annan mekanik ändras; release, isolerad startövning och ägaraktiverad övergång 18 (etapp 4).
+5. *Mätkonsolidering:* täckningskarta i Digitala-repot; inget prov tas bort i denna ombyggnad, eftersom täckning ska
+   visas på samma driftsättning först och kundrepot drivs av Digitala-sessionen.
+6. *Stående mandat:* härlett ur registrerade ägarbeslut med källor i Digitala-repots `MANDAT.md`; saknade gränser
+   namngivna som behörighetsfrågor (underhåll av en levererad sajt mellan beställningar, tak för stående arbete).
+
+**Väntar inte längre på ett andra kundfall** (markering enligt etapp 1): hemvisten för Digitalas gemensamma verktyg och
+skills (den namngivna öppna frågan i DIGITALA-1-RIKTNING-BESKED-20260926 §2 och planens steg 11), provet av utförarbyte
+i Digitala, mätkonsolideringens riktning och kritik-/scenariomallarna avgörs inom ombyggnaden. Etapp 3:s förslag om
+agent-browser som observationslager står kvar som förslagsrad; konceptsteget och bygget stannar i dagens flöde
+(ägarens ord 2026-09-26 och §4 etapp 4: kundbyggvägen får vara kvar där mandatet kräver det).
+
+**Läge 09:24Z (2026-09-27).** Etapp 1: ägarens ord sparade först, sessionerna samordnade,
+ändringsbild och plan skrivna. Etapp 2 påbörjad: repot skapat och pushat med migrerat material byte för byte (26 filer
+med proveniens), stegdefinition med pinnar, mallar, verktyg och 31 gröna prov (initial commit `a5e0488`); det fortsatta
+arbetet (körverktyget mot Runtimes profiler, täckningskartan, redovisningen mekaniskt kontra sessionsburet och
+mottagarprovets rättelser av ingången) ligger på en gren som väntar på separat granskning före sammanslagning;
+kontorets kopia av `kunskap/` märks "flyttad" i en senare post, med kopians commit, efter notis till Digitala-sessionen.
+Etapp 3 väntar: AP-06-utbyggnaden är prövad på en kopia, inte införd. Etapp 4: Runtime-kandidaten för D037
+(`28e8b74` på `b603d91`; svit 599, värdkontroller 28 + 13, verklig mätning med tre vyer och tre taggar) är separat
+granskad (godkänd utan blockerande fynd, tio restnoter bokförda privat) och integrerad genom Runtimes publicerare
+(PR 68, Runtimes main `3bea86e`); release 18 är stegad och kontrollerad, övergångsskriptet är separat granskat, och en
+isolerad startövning är genomförd på en port- och rotförskjuten kopia (motorn ensam, två daemonstarter med stopp,
+spärrproven A och C utan modell, en mätning med tre vyer ur releasens egen kopia mot en lokal fil med kvittot läst).
+Ingenting är aktiverat: aktiveringen är ägarens, kommandot är berett privat, och den blir en operatörsrad i ägarens tur
+i resultatposten. Etapp 5 påbörjad parallellt: Norrgläntas produktionsdriftsättning (den som är i drift; vilken, står
+privat) är mätt genom den nya vägen (laddning → Runtimes mätprofil som aktiv release, utfall klar, nyckeln i inget
+utdata); en renderingsläsning (Claude) och ett femsekunderstest (Codex) genom kritikprofilen på samma laddade underlag
+gav giltiga svar; kvalitetsbilden är byggd i tre kolumner; sex negativa fall (saknat obligatoriskt underlag, fel
+version, steg utanför stående mandat, kundmapp i repot, kundfil som länk ut ur kundmappen, ändrad frusen acceptans i
+Runtimes uppgiftsväg) vägrades som avsett; ett mottagarprov från ordinarie ingång (en läsande session utan
+överlämning, med repots egen `AGENTS.md`) hittade steg, mandat och kommando och godkändes med fem anmärkningar om vad
+ingången inte namngav, rättade på grenen. Grenskydd på det nya repot vägrades av GitHub (privat repo på
+organisationens gratisplan); ändringar går ändå via gren, prov och separat granskning enligt repots `AGENTS.md`,
+och det redovisas som sessionsburet, inte mekaniskt.
+
+**Gränser som står kvar.** Inga nya kostnader, åtkomster, kundförpliktelser eller ändrad säkerhetsauktoritet; ingen ny
+kontroll- eller kunskapsplattform; inga nya modellval, reservmodeller eller abonnemang; kundrepot inte Runtime-mål;
+aktivering av en Runtime-release är ägarens; kundrepot och Digitala-sessionens etappmappar rörs inte; privat material
+stannar privat; demoreglerna, krediten i Pro och "ägaren deltar inte i prov" gäller.
+
+**Klart-när.** Ägarens §5. Klart-när innefattar också lärdomsposten (eller "inga nya lärdomar" med skäl),
+användningsnoterna för kopplade underlag och för planens förslag, och förslagsraden för nästa fall.
+
+**Granskning.** Denna post och planändringen granskas separat genom Runtimes skrivskyddade läsare (samma modellfamilj
+som författaren: en separat läsning, inte ett oberoende omdöme) med ägarens ordagranna besked, det privata
+planunderlaget och Digitala-repots ingångsfiler i arbetsytan, med frågan "tappad gräns eller tillagd befogenhet?".
+Första rundan godkände med elva precisionsanmärkningar om ägarens ordalydelse, införda i den andra versionen. Andra
+rundan underkände den andra versionen på ett fynd: lägesstycket, planraden och resursraden beskrev D037:s granskning i
+tre olika lägen, och godkännandet saknade stöd i arbetsytan. Den tredje versionen daterade lägesstycket och lade
+granskningssvaren, publicerarens kvitton, övergångens stegning och kontroll samt startövningens och slutprovets
+protokoll i arbetsytan; tredje rundan godkände med nio anmärkningar, varav två fördes in i den fjärde versionen
+(planens punkt 5 skiljer mätningens laddning från kritikens; "från ägaren" i §2) och två besvarades med bevis. Fjärde
+rundan godkände med åtta; den femte versionen uppdaterade rundhistoriken, resursraden och planens punkter 2 och 5.
+Femte rundan godkände med tio. Den sjätte versionen band om tidsbindningarna, lägesstycket från en uppskattad 09:40Z
+till 09:24Z och de övriga raderna från 10:50Z till 09:41Z, sedan kedjedrivaren upptäckt att de tidigare tiderna var
+uppskattade och låg före klockan; de nya tiderna togs ur commit-tider och granskningssvarens filtider. Sjätte rundan
+underkände den sjätte versionen på ett fynd: detta stycke hade inte följt med utan beskrev fortfarande den femte. Den
+sjunde versionen rättade stycket och band resursraden och planens punkter 2 och 5 till 09:58Z; sjunde rundan underkände
+den på ett fynd: rubriken sade fortfarande att etapp 2 var påbörjad när planens punkt 2 sade klar. Denna åttonde
+version ger rubriken samma läge som planblocket, tidsbundet till 10:03Z, och granskas en åttonde gång; läsningen
+redovisas i publiceringens kvitto.
+
+**Resurser till 10:03Z.** Arton påbörjade läsande modellsessioner i ombyggnaden (D037:s granskning, övergångsskriptets
+granskning, denna posts sju rundor, Digitala-grenens fyra rundor samt en avbruten start utan svar, en renderingsläsning
+och ett femsekunderstest genom kritikprofilen, mottagarprov med Claude och med Codex), alla gav svar utom den avbrutna;
+den åttonde rundan av denna post startar efter denna version. Allt utöver analysuppdragets. Startövningen använde ingen
+modell. Inga nya verktyg, konton, kostnader eller behörigheter; ett nytt privat repo inom befintlig organisationsbehörighet.
+
+**Plan:** ett block OMBYGGNAD TILL MÅLBILDEN med de fem etapperna och deras läge, en mening i planens inledning,
+postens namn i återupptagningspunkten och en bisats i Digitala-planens steg 11 om att hemvistfrågan är avgjord.
+Ägarens tur ändras inte av denna post.
+
+**Ersätter:** ingen post. Den öppna hemvistfrågan (DIGITALA-1-RIKTNING-BESKED-20260926 §2, planens steg 11) är avgjord
+genom ägarens beställning och kedjedrivarens val 1; posterna står kvar som historik.

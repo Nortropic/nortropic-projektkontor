@@ -32,6 +32,11 @@ att datumet passerat, annars noteras den som utebliven. Arbetssättet står priv
 och `evidence/forvaltningsutveckling/local/kontoret/LARDOMAR.md`; Digitalas lärdomsfil står i dess kunskapsmapp. Varje nytt
 uppdrag får i sitt klart-när en lärdomspost, användningsnoter och förslagsraden för nästa fall.
 
+OMBYGGNAD TILL MÅLBILDEN, BESTÄLLD 2026-09-27 (OMBYGGNAD-20260927): ägaren har beställt en sammanhängande ombyggnad i
+fem etapper — Runtime som gemensam mekanik, kontoret som organisationens förvaltning, Digitala som bestående professionell
+förmåga med en tydlig, versionshanterad hemvist — utan att invänta ett andra kundfall; blocket OMBYGGNAD TILL MÅLBILDEN nedan
+bär etapperna och deras läge, och det privata läget står i `evidence/nasta-uppdrag/local/ombyggnad-20260927/`.
+
 RYTMER
 - Nästa månadsomgång: 2026-10-01 eller första session därefter. Runtime och kontoret enligt arbetssättet; Digitala enligt
   inventeringens del b från oktober 2026 (beslutet D5/C5 taget 2026-09-26, DIGITALA-1-AGARBESLUT-20260926, steg 18).
@@ -50,6 +55,37 @@ FÖRSLAG ATT PRÖVA I NÄSTA FALL
   förslag, en mutation per nytt värdprov, är prövat i RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927.
 - Kontoret: före varje granskning av en kontorspost söks modellfritt efter det ersatta lägets formuleringar i posten och i
   hela planen, och varje träff läses (lärdom K1; ryms i ett vanligt mandat).
+
+OMBYGGNAD TILL MÅLBILDEN (OMBYGGNAD-20260927), ett genomförandeuppdrag utfört av en separat session (peer-namn
+nortropic-repos-f0), parallellt med Digitala. Etapperna är arbetsordning, inte godkännandestopp; tekniska val är
+kedjedrivarens; granskning, integration och aktivering följer befintliga vägar. Kundrepot rörs inte; Digitalas
+etappmappar rörs inte. Läge och nästa kommando privat i `evidence/nasta-uppdrag/local/ombyggnad-20260927/LAGE.md`.
+ 1. KLART 2026-09-27: ändringsbild, samordning (Digitala-, Runtime-profil- och AP-11-sessionerna), genomförandeplan och
+    registrering (denna post). Följande avgörs i ombyggnaden och väntar inte på ett andra kundfall: hemvisten för
+    Digitalas gemensamma verktyg och skills (tidigare öppen fråga i steg 11 nedan), provet av utförarbyte i Digitala,
+    mätkonsolideringens riktning och kritik-/scenariomallarna.
+ 2. KLART 2026-09-27 (10:03Z): Digitalas gemensamma hem — det privata repot `Nortropic/nortropic-digitala` (main `6692877`
+    efter fyra godkända granskningsrundor på grenarna): mandat, arbetssätt, kvalitet, stegdefinition med versionspinnar,
+    migrerad kunskap med proveniens, kritik- och scenariomallar, mätprofilval, underlagsladdning med kvitto och vägran,
+    körverktyg mot Runtimes profiler, täckningskarta, `KEDJA.md`, adaptrar för Claude Code och Codex, 32 prov;
+    mottagarprov godkända med Claude och med Codex som session; kontorets kopia av `kunskap/` är märkt flyttad
+    (`FLYTTAD.md`, inte raderad; notis före till kontorets andra session). Kvar: resultatpost.
+ 3. VÄNTAR: kontorets metodkompetens i AP-06:s beredning (fält för förvaltning, steg, proportion, metod, laddningskvitto,
+    kriterier, bedömningssätt; egna gap-koder; egen publicering); stående mandat (Digitala-repots `MANDAT.md`, skrivet)
+    och kvalitetsbilden (skrivet, verktyg finns) prövas i etapp 5.
+ 4. PÅBÖRJAD 2026-09-27: Runtime D037 — mätprofilens vyer och axe-taggar som förvaltningens parametrar med D034:s
+    värden som standard; kandidat `28e8b74` på `b603d91` (svit 599, värdkontroller 28 + 13, verklig mätning med tre
+    vyer) separat granskad (godkänd) och integrerad genom Runtimes publicerare (PR 68, Runtimes main `3bea86e`);
+    release 18 stegad och kontrollerad, övergångsskriptet separat granskat, isolerad startövning genomförd på en port-
+    och rotförskjuten kopia (motorn ensam, två daemonstarter, spärrprov, mätning med tre vyer ur releasens egen kopia).
+    Kvar: ägarens aktivering av övergång 18 (kommandot berett privat; blir en operatörsrad i ägarens tur i
+    resultatposten), därefter en mätning genom den aktiva releasen med parametrar; täckningskartan och redovisningen
+    mekaniskt kontra sessionsburet följer Digitala-grenen (punkt 2).
+ 5. PÅBÖRJAD 2026-09-27: slutprov på Norrglänta genom den nya vägen (laddning → mätning → kritik → kvalitetsbild):
+    mätningen gjord mot produktionen; en renderingsläsning (Claude) och ett femsekunderstest (Codex) genom kritikprofilen
+    på samma laddade underlag; kvalitetsbilden byggd, sex negativa fall vägrade, mottagarprov från ordinarie ingång
+    godkänt både med Claude och med Codex som session (läge 10:03Z). Kvar: separat granskning av resultatposten,
+    integration genom skyddade vägar, slutrapport med jämförelse mot beställningen.
 
 RUNTIME-PROFILER FÖR DIGITALA — AVSLUTAT (RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926,
 RUNTIME-PROFILER-KANDIDAT-20260926, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927 och
@@ -186,7 +222,7 @@ inte krav.
     av, `/impeccable init` körd och `PRODUCT.md` skriven; Taste §0–§1 och §4 i registret; kontrollerna: byggsessionen
     anropade frontend-design själv men inte Emils skills (delvis; L14), detektorn gav tolv varningar som golv.
     Två modellsessioner. Utfall privat i `evidence/digitala/local/genomforande-20260926/etapp1/UTFALL-ETAPP1.md`;
-    registret del F.
+    registret del F. Hemvistfrågan är avgjord genom OMBYGGNAD-20260927 (ett eget repo för Digitala).
 12. KLART 2026-09-26: etapp 2, kvalitetsprovet (DIGITALA-1-ETAPP2-RESULTAT-20260926); ägaren valde rekommendationen "Ljuset
     med Planen" och godtog den färdiga sajten efter etapp 4 som ett första bygge (DIGITALA-1-AGARBEDOMNING-20260927).
     Konceptsteg med Design Read och tvåpass-kontroll; tre komps — A "Ljuset", C "Planen" och B′ "Arbetet" (B i sin
@@ -681,7 +717,7 @@ FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926,
 FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926, DIGITALA-1-ETAPP3-RESULTAT-20260926, DIGITALA-1-AGARBESLUT-20260926,
 RUNTIME-PROFILER-BEREDNING-20260926, RUNTIME-PROFILER-KONTRAKT-20260926, RUNTIME-PROFILER-KANDIDAT-20260926,
 RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927, RUNTIME-PROFILER-OVERGANG-FORBEREDD-20260927,
-RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927 och Runtime-planens ingång.
+RUNTIME-PROFILER-OVERGANG-AKTIV-20260927, DIGITALA-1-ETAPP4-RESULTAT-20260927, DIGITALA-1-AGARBEDOMNING-20260927, OMBYGGNAD-20260927 och Runtime-planens ingång.
 
 ---
 
