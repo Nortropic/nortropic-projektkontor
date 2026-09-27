@@ -29,13 +29,24 @@ informationskedjans och leveransbevisens rättningar; fortsätt de kreativa rikt
 befintlig hostad lagring och tillåtna integrationskonton. Registreringsvägens fasta namntabell
 rättas med bibehållna mål-, mandat- och granskningsgrindar före skyddad publicering av detta uppdrag.
 
-Senaste arbetsläge 2026-09-27T22:12:30.895375+00:00: hostad privat produktlagring skapad och faktiskt CAS-prov passerat; backend ba2f825 och tillägg 0c0fa83 tas in i den kreativa kandidaten. Första integrerade UI-prov ger 18 pass inom angiven räckvidd; kreativ kandidatkritik återstår. Kundstart 07c874e är ren kandidat med slutbyggning och riktat verkligt AI-prov; separat review täcker också äldre ogranskade main-ändringar. Kvalitetsregler r1 underkända; korrigerad r2 granskas före produktdom. Digitalas 136 regressioner passerar före fortsatt Ads-adapterarbete. Runtime/Office har avgränsad schemakod och ett faktiskt isolerat trestartsprov, ännu ingen aktiv driftändring. Native Codex-konfiguration har en kvarvarande avvikelse (aktuellt hash har ändrats även under arbetet); gräns-/verktygsprov passerar på aktuell konfiguration men ersätter inte skyddad ombindning. Kontorets och Runtimes nya kod är ännu ogranskad/opublicerad.
+Senaste arbetsläge 2026-09-27T22:45Z: nya skyddade produktpreviewn har privat Blob-lagring och
+38 faktiska hostade kontroller passerar, inklusive beständig förfrågan, roller, innehållsåtergång,
+Resend-testefterled och mediapolicy. Färsk mobilbesökare har lämnat en syntetisk fråga genom den
+faktiska sidan. Previewns manuellt felaktiga tree-metadata gör att slutpreview måste byggas om
+med maskinberäknad bindning. Kvalitetskriterier r4 granskas separat före produktdom; generell
+Digitala-granskning delas i bevis/fortsättning, intag och kanaler. Kundstart r2 och adapter r2 är
+frysta och granskas. Kundrollens nya syntetiska regler är bevarade separat men ännu inte införda
+genom Kundstarts kedja. Runtime/Office r1 fick fyra blockerare; r2 har nu egen kö, separat intagslarm,
+validerad outbox och bunden Python. Isolerat trestartsprov med upptagen parallell kö passerar.
+Guard-only övergång för samma 203 redan integrerade kodfiler har klarat verklig isolerad start-
+och databasåterställningsövning; exakt operatörsskript granskas separat. Ingen aktiv release,
+kunddrift eller skyddad main-integration har ändrats i detta arbete.
+
 
 ÅTERUPPTAGNING: denna planpost och privat
 `evidence/nasta-uppdrag/local/atgarder-vikskar-20260927/BASLINJE.json` samt `ATGARDSKARTA.json`.
 Aktiva arbetsgrenar: `atgarder/vikskar-20260927` i kontor/Runtime, `atgarder/intag-20260927` i
-Kundstart och produktens `omarbetning/visuell-20260927`; Digitalas aktuella gren redovisas i nästa
-uppdatering. Digitala arbetar på `atgarder-kvalitet-bevis-20260927`. De är pågående kandidater, inte godkända integrationer. Den äldre lokala grenen
+Kundstart och produktens `omarbetning/visuell-20260927` och Digitalas `atgarder-kvalitet-bevis-20260927`. De är pågående kandidater, inte godkända integrationer. Den äldre lokala grenen
 `test/fiktivt-e2e-20260927` är arkiverad som bevarat provunderlag; dess registrering blockerades av
 den dåvarande publiceringsvägens fasta namnlista och får inte beskrivas som publicerad.
 

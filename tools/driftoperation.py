@@ -13,8 +13,8 @@ from pathlib import Path
 import re
 import stat
 import subprocess
-import sys
 import time
+import uuid
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -102,6 +102,11 @@ def monitor(config):
 
 
 def consume(config, output):
+    interpreter = regular(config['python_path'])
+    if (not Path(config['python_path']).is_absolute() or not interpreter.is_file()
+            or not os.access(interpreter, os.X_OK)
+            or digest(interpreter.read_bytes()) != config['python_sha256']):
+        raise ValueError('Consumer interpreter differs from reviewed binding')
     root = regular(config['digitala_root'])
     files = config['digitala_files']
     if not files or 'verktyg/kundstart.py' not in files:
@@ -120,7 +125,7 @@ def consume(config, output):
                        KUNDSTART_NYCKEL_FIL=str(regular(config['key_file'])))
     if config.get('bypass_file'):
         environment['KUNDSTART_BYPASS_FIL'] = str(regular(config['bypass_file']))
-    argv = [sys.executable, '-B', str(root / 'verktyg/kundstart.py'), 'konsumera',
+    argv = [str(interpreter), '-I', '-B', str(root / 'verktyg/kundstart.py'), 'konsumera',
             '--kund', str(regular(config['customer'])), '--utforare', config['executor']]
     with (output / 'intake.stdout').open('xb') as out, (output / 'intake.stderr').open('xb') as err:
         process = subprocess.Popen(argv, cwd=root, env=environment, stdout=out, stderr=err,
@@ -136,25 +141,136 @@ def consume(config, output):
                 os.killpg(process.pid, signal.SIGKILL); process.wait(timeout=3)
             return {'completed': False, 'reason': 'consumer_timeout'}
     return {'completed': status == 0, 'returncode': status,
+            'python_sha256': config['python_sha256'],
             'stdout_sha256': digest((output / 'intake.stdout').read_bytes()),
             'stderr_sha256': digest((output / 'intake.stderr').read_bytes())}
 
 
+class StateError(ValueError):
+    """Named malformed durable-state error; raw state is never used as a path."""
+
+
+def timestamp(value):
+    if not isinstance(value, str):
+        raise StateError('invalid_timestamp')
+    try:
+        parsed = datetime.fromisoformat(value)
+        if parsed.tzinfo is None:
+            raise ValueError()
+    except ValueError as error:
+        raise StateError('invalid_timestamp') from error
+
+
+def validate_state(value):
+    if (not isinstance(value, dict) or set(value) != {'healthy', 'sequence', 'observed_at'}
+            or type(value['healthy']) is not bool or type(value['sequence']) is not int
+            or value['sequence'] < 0):
+        raise StateError('invalid_state')
+    timestamp(value['observed_at'])
+
+
+def validate_event(event, channel=None):
+    if (not isinstance(event, dict) or set(event) != {'id', 'channel', 'kind', 'state', 'observation'}
+            or event['channel'] not in ('monitor', 'intake')
+            or (channel is not None and event['channel'] != channel)
+            or not isinstance(event['id'], str)
+            or not re.fullmatch(event['channel'] + '-[0-9a-f]{32}', event['id'])):
+        raise StateError('invalid_event_identity')
+    validate_state(event['state'])
+    if event['kind'] != ('recovered' if event['state']['healthy'] else 'incident'):
+        raise StateError('invalid_event_kind')
+    observation = event['observation']
+    if (not isinstance(observation, dict)
+            or set(observation) != {'healthy', 'reason', 'observed_at', 'detail_sha256'}
+            or type(observation['healthy']) is not bool
+            or observation['healthy'] != event['state']['healthy']
+            or observation['observed_at'] != event['state']['observed_at']
+            or not isinstance(observation['reason'], str)
+            or not re.fullmatch('[a-z_]{1,80}', observation['reason'])
+            or not isinstance(observation['detail_sha256'], str)
+            or not re.fullmatch('[0-9a-f]{64}', observation['detail_sha256'])):
+        raise StateError('invalid_event_observation')
+    return event
+
+
+def load_state(path):
+    try:
+        return json.loads(regular(path).read_text())
+    except (ValueError, OSError) as error:
+        raise StateError('unreadable_state') from error
+
+
 def deliver(home, event):
     """The private Office inbox consumes each stable event once, including retries."""
-    inbox = home / 'inbox'; inbox.mkdir(mode=0o700, exist_ok=True)
+    validate_event(event)
+    inbox = regular(home / 'inbox'); inbox.mkdir(mode=0o700, exist_ok=True)
     target = regular(inbox / (event['id'] + '.json'))
+    if target.parent != inbox:
+        raise StateError('recipient_path_escape')
     if target.exists():
-        existing = json.loads(target.read_text())
-        if existing['event'] != event:
-            raise ValueError('Incident id collision')
-        return existing['receipt']
+        existing = load_state(target)
+        if (not isinstance(existing, dict) or set(existing) != {'event', 'receipt'}
+                or existing['event'] != event):
+            raise StateError('recipient_event_collision')
+        receipt = existing['receipt']
+        if (not isinstance(receipt, dict) or set(receipt) != {'recipient', 'received_at', 'event_id'}
+                or receipt['recipient'] != 'kontorets-privata-driftyta'
+                or receipt['event_id'] != event['id']):
+            raise StateError('invalid_recipient_receipt')
+        timestamp(receipt['received_at'])
+        return receipt
     receipt = {'recipient': 'kontorets-privata-driftyta', 'received_at': now(), 'event_id': event['id']}
     write(target, {'event': event, 'receipt': receipt})
-    # Read back the recipient's durable record before acknowledging delivery.
-    if json.loads(target.read_text())['event'] != event:
-        raise ValueError('Incident recipient readback failed')
+    if load_state(target) != {'event': event, 'receipt': receipt}:
+        raise StateError('recipient_readback_failed')
     return receipt
+
+
+def transition(home, channel, current):
+    """Independent channels, durable outbox before actual inbox acknowledgement."""
+    state_file = regular(home / (channel + '.json'))
+    pending = regular(home / ('pending.json' if channel == 'monitor' else 'intake-pending.json'))
+    receipts = []
+    previous = {'healthy': True, 'sequence': 0, 'observed_at': now()}
+    try:
+        if state_file.exists():
+            previous = load_state(state_file); validate_state(previous)
+        if pending.exists():
+            event = validate_event(load_state(pending), channel)
+            receipts.append({'resumed': True, **deliver(home, event)})
+            write(state_file, event['state']); pending.unlink()
+            previous = event['state']
+    except StateError as error:
+        # Preserve malformed inputs for diagnosis, never silently treat them as
+        # healthy. The next ordinary run can recover from the explicit incident.
+        for path in (state_file, pending):
+            if path.exists():
+                path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
+        observed = now()
+        detail = {'error_code': str(error), 'channel': channel}
+        current = {'healthy': False, 'reason': 'invalid_persisted_state',
+                   'observed_at': observed,
+                   'detail_sha256': digest(json.dumps(detail, sort_keys=True).encode())}
+        previous = {'healthy': True, 'sequence': 0, 'observed_at': observed}
+        state_error = str(error)
+    else:
+        state_error = None
+    if current['healthy'] != previous['healthy']:
+        state = {'healthy': current['healthy'], 'sequence': previous['sequence'] + 1,
+                 'observed_at': current['observed_at']}
+        event = {'id': channel + '-' + uuid.uuid4().hex, 'channel': channel,
+                 'kind': 'recovered' if current['healthy'] else 'incident',
+                 'state': state, 'observation': current}
+        validate_event(event, channel)
+        write(pending, event)
+        receipts.append({'resumed': False, **deliver(home, event)})
+        write(state_file, state); pending.unlink()
+    return {'receipts': receipts, 'state_error': state_error}
+
+
+def observation(healthy, reason, detail):
+    return {'healthy': healthy, 'reason': reason, 'observed_at': now(),
+            'detail_sha256': digest(json.dumps(detail, sort_keys=True).encode())}
 
 
 def run(config, run_id):
@@ -192,25 +308,19 @@ def run(config, run_id):
                 result['intake'] = {'completed': False, 'reason': 'consumer_failed',
                                     'error_type': type(error).__name__}
             result['completed'] = result['intake']['completed']
+        result['deliveries'] = {}
+        if 'intake' in result:
+            intake = result['intake']
+            result['deliveries']['intake'] = transition(home, 'intake', observation(
+                intake['completed'], 'verified' if intake['completed'] else 'consumer_failed', intake))
         if config.get('monitor'):
             current = monitor(config['monitor']); result['monitor'] = current
-            state_file = regular(home / 'monitor.json')
-            previous = json.loads(state_file.read_text()) if state_file.exists() else {'healthy': True, 'sequence': 0}
-            # Persist an outbox item BEFORE delivery. A crash resumes the same event.
-            pending = home / 'pending.json'
-            if pending.exists():
-                event = json.loads(pending.read_text())
-                deliver(home, event)
-                write(state_file, event['state']); pending.unlink()
-                previous = event['state']
-            if current['healthy'] != previous['healthy']:
-                state = {'healthy': current['healthy'], 'sequence': previous['sequence'] + 1,
-                         'observed_at': current['observed_at']}
-                event = {'id': 'incident-%06d' % state['sequence'], 'kind': 'recovered' if current['healthy'] else 'incident',
-                         'state': state, 'observation': current}
-                write(pending, event)
-                result['delivery'] = deliver(home, event)
-                write(state_file, state); pending.unlink()
+            current['access_scope'] = ('internal_protection_bypass' if config['monitor'].get('bypass_file')
+                                       else 'ordinary_endpoint')
+            result['deliveries']['monitor'] = transition(home, 'monitor', observation(
+                current['healthy'], current['reason'], current))
             result['completed'] = result['completed'] and current['healthy']
+        result['completed'] = result['completed'] and not any(
+            item['state_error'] for item in result['deliveries'].values())
         result['finished_at'] = now(); write(result_file, result)
         return result

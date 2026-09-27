@@ -4,6 +4,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 import tempfile
+import sys
 import threading
 import unittest
 from unittest.mock import patch
@@ -37,14 +38,14 @@ class OperationTests(unittest.TestCase):
         self.http_status = 503
         failed = operation.run(self.config, 'second')
         self.assertFalse(failed['completed']); self.assertEqual(len(failed['monitor']['attempts']), 2)
-        self.assertEqual(failed['delivery']['recipient'], 'kontorets-privata-driftyta')
+        self.assertEqual(failed['deliveries']['monitor']['receipts'][0]['recipient'], 'kontorets-privata-driftyta')
         calls = self.calls
         self.assertEqual(operation.run(self.config, 'second'), failed); self.assertEqual(self.calls, calls)
         self.http_status = 200
         self.assertTrue(operation.run(self.config, 'third')['completed'])
         inbox = self.home / 'state/inbox'
         events = [json.loads(p.read_text())['event']['kind'] for p in sorted(inbox.glob('*.json'))]
-        self.assertEqual(events, ['incident', 'recovered'])
+        self.assertCountEqual(events, ['incident', 'recovered'])
 
     def test_wrong_candidate_and_permanent_error_are_not_green(self):
         self.candidate = 'b' * 40
@@ -66,6 +67,7 @@ class OperationTests(unittest.TestCase):
         self.assertFalse(result['completed'])
         self.assertFalse((self.home / 'state/pending.json').exists())
         self.assertEqual(len(list((self.home / 'state/inbox').glob('*.json'))), 1)
+        self.assertTrue(result['deliveries']['monitor']['receipts'][0]['resumed'])
 
     def test_http_and_symlink_refused(self):
         altered = copy.deepcopy(self.config); altered['monitor'].pop('isolated_test')
@@ -86,8 +88,71 @@ class OperationTests(unittest.TestCase):
         result = operation.run(self.config, 'intake-failure')
         self.assertFalse(result['completed'])
         self.assertEqual(result['intake']['reason'], 'consumer_failed')
-        self.assertEqual(result['delivery']['recipient'], 'kontorets-privata-driftyta')
+        self.assertEqual(result['deliveries']['monitor']['receipts'][0]['recipient'], 'kontorets-privata-driftyta')
         self.assertEqual(len(result['monitor']['attempts']), 2)
+
+    def intake_fixture(self):
+        root = self.home / 'digitala'; (root / 'verktyg').mkdir(parents=True)
+        script = root / 'verktyg/kundstart.py'
+        script.write_text("import sys, pathlib\n"
+                          "p=pathlib.Path(sys.argv[sys.argv.index('--kund')+1])/'consumed'\n"
+                          "p.write_text('one') if not p.exists() else None\n"
+                          "print('fixture consumer completed')\n")
+        customer = self.home / 'customer'; customer.mkdir()
+        interpreter = Path(sys.executable).resolve()
+        self.config['intake'] = {'digitala_root': str(root),
+            'digitala_files': {'verktyg/kundstart.py': operation.digest(script.read_bytes())},
+            'python_path': str(interpreter), 'python_sha256': operation.digest(interpreter.read_bytes()),
+            'base_url': self.config['monitor']['url'], 'key_file': str(self.home / 'private-key'),
+            'customer': str(customer), 'executor': 'isolated-fixture'}
+        return customer
+
+    def test_actual_subprocess_positive_replay_and_interpreter_tamper(self):
+        customer = self.intake_fixture()
+        result = operation.run(self.config, 'consumer')
+        self.assertTrue(result['completed'])
+        self.assertEqual((customer / 'consumed').read_text(), 'one')
+        stamp = (customer / 'consumed').stat().st_mtime_ns
+        self.assertEqual(operation.run(self.config, 'consumer'), result)
+        self.assertEqual((customer / 'consumed').stat().st_mtime_ns, stamp)
+        self.config['intake']['python_sha256'] = '0' * 64
+        failed = operation.run(self.config, 'tampered-interpreter')
+        self.assertFalse(failed['intake']['completed'])
+        self.assertEqual(len(failed['deliveries']['intake']['receipts']), 1)
+        self.assertTrue(failed['monitor']['healthy'])
+
+    def test_intake_failure_and_recovery_have_independent_real_receipts(self):
+        self.config['intake'] = {'invalid': 'fixture'}
+        failed = operation.run(self.config, 'failed-intake')
+        self.assertEqual(len(failed['deliveries']['intake']['receipts']), 1)
+        self.assertEqual(failed['deliveries']['monitor']['receipts'], [])
+        self.intake_fixture()
+        recovered = operation.run(self.config, 'recovered-intake')
+        self.assertTrue(recovered['completed'])
+        events = [json.loads(p.read_text())['event'] for p in (self.home / 'state/inbox').glob('*.json')]
+        self.assertEqual({e['channel'] for e in events}, {'intake'})
+        self.assertCountEqual([e['kind'] for e in events], ['incident', 'recovered'])
+
+    def test_corrupt_outbox_cannot_escape_and_next_run_recovers(self):
+        operation.run(self.config, 'setup')
+        (self.home / 'state/pending.json').write_text(json.dumps({'id': '../escape'}))
+        failed = operation.run(self.config, 'corrupt')
+        self.assertFalse(failed['completed'])
+        self.assertEqual(failed['deliveries']['monitor']['state_error'], 'invalid_event_identity')
+        self.assertFalse((self.home / 'state/escape.json').exists())
+        self.assertEqual(len(list((self.home / 'state').glob('pending.json.invalid-*'))), 1)
+        self.assertTrue(operation.run(self.config, 'after-corrupt')['completed'])
+
+    def test_closed_state_shape_and_deleted_state_do_not_collide(self):
+        for value in ({'healthy': 'false', 'sequence': 1, 'observed_at': operation.now()},
+                      {'healthy': False, 'sequence': True, 'observed_at': operation.now()},
+                      {'healthy': False, 'sequence': 1, 'observed_at': operation.now(), 'extra': 1}):
+            with self.assertRaises(operation.StateError): operation.validate_state(value)
+        self.http_status = 403
+        operation.run(self.config, 'incident-before-loss')
+        (self.home / 'state/monitor.json').unlink()
+        operation.run(self.config, 'incident-after-loss')
+        self.assertEqual(len(list((self.home / 'state/inbox').glob('*.json'))), 2)
 
 
 if __name__ == '__main__': unittest.main()
