@@ -4732,3 +4732,433 @@ webbgrunden är inspiration, inte körväg; Runtime och AP-10 orörda; varje eta
 granskning.
 
 **Ersätter:** ingen post; de fyra Digitala-raderna i ägarens tur är besvarade och tas bort ur planen.
+
+## RUNTIME-PROFILER-BEREDNING-20260926 — ägaren beställer mät-, kritik- och provarprofiler för Digitala i Runtime; beredningen visar vilka steg som blir profiler och vilka Runtime-gränser som utformas bort
+
+**Status:** registrerat 2026-09-26 av den session som fick beställningen (Claude Code), skild från Digitala-sessionen
+och från sessionen för förvaltningarnas utvecklingsrytm. Ägarens besked står ordagrant privat i
+`evidence/runtime-profiler/local/owner-words-runtime-digitala-profiler-20260926.md`; ingen exakt klocktid tillskrivs
+ägaren. Beredningen är ett privat dokument, `evidence/runtime-profiler/local/BEREDNING-RUNTIME-PROFILER-20260926.md`,
+med ett daterat tillägg efter bygget. Den registreras här tillsammans med kontraktet (RUNTIME-PROFILER-KONTRAKT-20260926)
+efter separat granskning; se Granskning. Kandidaten får en egen post.
+
+**Beställningen, avsnitt för avsnitt.**
+- *Uppdraget och samordningen:* det är ett eget Runtime-uppdrag. Andra sessioner driver samtidigt Digitala (steg 12–14)
+  och kontorets utvecklingsrytm. Följande rörs inte: kundrepot, `evidence/digitala`, planens Digitala-steg och deras
+  poster. Varje kontorspublicering samordnas genom kontorets vanliga väg:
+  - notis före;
+  - PROFILES-raden sist, efter omläsning;
+  - ff-only;
+  - den som kommer tvåa bygger om på ny main.
+
+  Runtime stoppas aldrig.
+- *Målbilden:* Runtime är kvalitetsmotorn där alla modeller kan köras. En förvaltning är ett skal av profiler i
+  motorn, anpassat efter förvaltningsuppgiften. Kontoret, AP-10 och modellvalet lever redan så. Digitala har bara skal
+  för granskning och publicering. Bygge, mätning, kritik och AI-prov körs utanför motorn, med kedjedrivarens egna skript
+  och bara med Claude Code. Uppdraget ger Digitala de profiler som saknas, byggda en gång i motorn och utförarneutralt.
+- *Omfånget, tre profiltyper:*
+  1. Mätprofilen renderar en angiven adress eller lokal fil i 390 och 1440 och tar första vy och sektionsbilder. Den
+     mäter rubrikrader och handling i vyn, kör axe, Lighthouse och Impeccables detektor och lämnar ett kvitto med
+     hashar. Ingen modell är inblandad. Skyddade adresser nås med det befintliga undantaget, och hemligheten skrivs
+     aldrig ut.
+  2. Kritikprofilen är en läsare med fast underlag som svarar i ett angivet JSON-schema. Underlaget är FILES.md med
+     sha256, skärmbilder, HTML, briefens riktning och kalibreringslistor. Modellen är en parameter, inte en del av
+     profilen. Förlagan är Digitalas kritikbyggare från etapp 2.
+  3. Provarprofilen är en agent som använder en sajt som besökare i en riktig webbläsare, utan brief, kod eller facit.
+     Den har sluten argumentgrammatik per handling, värdregler och spårning av varje anrop. Förlagan är Digitalas
+     agentlägesskript och vakt. Spärrproven A, B och C ska gå igenom för både Claude- och Codex-vägen.
+
+  Konceptsteget och själva bygget ingår inte; de stannar i dagens flöde tills ett skarpt fall visar vad som är värt
+  att frysa.
+- *Gör så här 1–3:*
+  - Läs läget med `tools/ingang.py`: uppdraget, definitionen och planen, posterna om Runtime (direktivet 2026-09-19,
+    modellvalet, AP-11:s utförarneutrala körväg och granskningsbudgeten), PROFILES-tabellen och Digitalas förlagor i
+    `evidence/digitala/local` (bara läsning).
+  - Skriv en beredning: vilka av Digitalas steg som är mekaniska och upprepas, hur de mappar på profiltyperna och vilka
+    Runtime-gränser som måste utformas bort (indata högst 256 KiB, provkatalog utan uppgiftsbeskrivning, värdkontroller
+    och 1-dygnsretentionen).
+  - Skriv kontraktet per profil: indata, utdata, kvitto, hashar, vad som är fryst, vad som är parameter (modell, adress,
+    underlag) och vad profilen aldrig får göra.
+- *Gör så här 4–6:*
+  - Bygg kandidaten i egen worktree på Runtime, med acceptans, prov och grön svit.
+  - Visa utförarneutraliteten med samma spärrprov för Claude och Codex, inom befintlig åtkomst och kvot.
+  - Visa varje profil mot ett lokalt provmål, inte mot Norrglänta.
+  - Varje kontorspost granskas separat genom läsarprofilen innan den publiceras. Beredning, kontrakt och kandidat är tre
+    poster med planrader.
+  - Stanna före övergången: övergång till aktiv release är ägarens beslut och får en egen isolerad startövning först.
+- *Gränserna:*
+  - Aktiv release, aktiv config, daemon, AP-10 och modellvalet ändras inte, och kandidater ändrar aldrig sin egen
+    aktiva körväg.
+  - Inga nya verktyg, konton, kostnader eller behörigheter. Det som behövs utöver befintlig åtkomst är förslag för
+    ägarens beslut.
+  - Inget körs mot Norrgläntas sajt, och ingen driftsättning görs.
+  - Den gamla webbförvaltningens agenter, skills och workflows återinförs inte; de är källor.
+  - Privat material stannar privat: inga adresser, hemligheter, projekt- eller team-id i kontorsposter. Bypass-nycklar
+    skrivs aldrig ut.
+  - Uppmätt, bedömt och ej prövat hålls isär, och "okänt" skrivs där det inte går att avgöra.
+  - Fråga bara vid verkligt vägval, kostnad eller rättighet.
+  - Läge, diagnos och nästa kommando bevaras i planen före varje avbrott.
+- *Nästa besked:* beskedet ska innehålla
+  - beredningen, det vill säga mappningen steg till profil och de gränser som måste bort;
+  - kontraktet per profil;
+  - kandidatens läge: grön svit, spärrprov för båda modellfamiljerna och granskningsutfall;
+  - vad som återstår före övergången, och de beslut som behövs från ägaren.
+
+  Publicerar de två andra sessionerna tätt får den tredje vänta med sina kontorsposter. Runtime-bygget i egen worktree
+  påverkas inte av det.
+- *Klart-när, tillagt av kedjedrivaren enligt FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926, som infördes under
+  uppdraget:* Klart-när innefattar också lärdomsposten (eller "inga nya lärdomar" med skäl), användningsnoterna för
+  kopplade underlag och för planens förslag, och förslagsraden för nästa fall. Ägarens ord ändras inte.
+
+**Beredningen.**
+- *Utgångsläget,* uppmätt ur koden vid Runtime `d5a44064`. Runtime bär Codex-profilen, Claude-profilen (med Runtimes
+  egen pinnade CLI), läsaren (i granskarrollen med `--json-schema`), kontorsmålet, AP-10:s privata steg, modellvalets
+  verktyg och publiceraren. Digitala använder läsaren för separat granskning och publiceraren för kontorsposter. Allt
+  annat körs med kedjedrivarens egna skript, bara med Claude Code, och flera av skripten läser sina verktyg ur
+  kundrepots `node_modules`.
+- *Mappningen:*
+  - Mätprofilen: skärmbilder av komps, sajter och referenser, rubrikrader och handling i vyn, axe, Lighthouse och
+    detektorn.
+  - Kritikprofilen: kritiksessionerna, bildbedömningen, den blinda granskningen, seedfallet och mottagarproven, alla
+    med samma läsare men annat underlag och schema.
+  - Provarprofilen: AI-proven i webbläsaren.
+  - Ingen profil: research, brief, konceptsteg och bygge är omdöme och skapande och undantagna. De platsspecifika
+    produktproven stannar i kundrepot, enligt Runtimes mandat att verksamhetsspecifika funktioner hör till målrepot:
+    formulär, tidsfälla, kedja, målytor, nätverk, rörelse, kontrast, text, faktakontroll, HTTP-rubriker och exponering.
+    Driftsättningskontrollen kräver en Vercel-inloggning som motorn inte ska ha och stannar i kedjedrivarens flöde;
+    provarprofilen bokför bara bindningen.
+  - Separat granskning och publicering finns redan.
+- *Gränserna som utformas bort:*
+  - *Indata högst 256 KiB.* Uppmätt: Runtimes läsning av uppgiftsindata vägrar större filer, och Digitalas
+    kritikunderlag var 8,4–13 MB med bilder på upp till 2,1 MB. Profilerna tar därför inte sitt underlag som
+    uppgiftsindata. Värden kopierar och hashar det ur ett manifest, med egna tak: 16 MiB per fil, 128 MiB och 200 filer
+    per körning. Runtimes gräns ändras inte.
+  - *Provkatalog utan uppgiftsbeskrivning.* Varje körning bär hela sitt indata i sin egen körkatalog, bundet med sha256
+    i kvittot. Provarens arbetsyta innehåller genom konstruktion bara uppgiften, instruktionen och handlingskommandot.
+  - *Värdkontroller.* Uppmätt: sandlådan saknar uttag, också lokala, och läser inget i hemkatalogen utanför
+    arbetsytan. Därför gäller tre saker:
+    - värden kör webbläsaren och verktygen;
+    - modellen når webbläsaren bara genom en filkö;
+    - de verkliga värdproven får ett eget kvitto bundet till kandidatens commit och byte, i stället för prov i sviten som
+      tyst hoppas över.
+  - *1-dygnsretentionen.* Profilkörningarna är inte motorns arbetsflöden. Beviset är körkatalogen med kvittot, skapad
+    exklusivt och aldrig överskriven. Daemon, arbetare och AP-10 ändras inte.
+  - *Funnet vid mätningen.* Codex-sandlådans `/tmp` är alltid skrivbar och `/etc` läsbar, och tabellen kan inte smalna
+    av dem. Hemligheten och webbläsarprofilen ligger därför aldrig där. Kundrepots skript sätter skyddsundantaget som
+    rubrik på alla förfrågningar; profilerna sätter det bara mot målets origin.
+- *Formen:* tre värdkommandon i Runtime, med handlingarnas grammatik på ett enda ställe. Efter övergången körs de som den
+  aktiva releasens egen kopia, och utdata hamnar i Runtimes privata område.
+  - *Verktyg:* de redan installerade versionerna, kopierade byte för byte till Runtimes eget pinnade område enligt samma
+    mönster som för Runtimes Claude-kopia. Ingen ny version, inget nytt verktyg och inget nät. Chrome och Node bokförs
+    per körning.
+  - *Utförarneutralitet:* samma hållare, handlingskommando, grammatik, arbetsyta och kvitto för båda utförarna. Det som
+    skiljer är gränsen på modellsidan (vakt för Claude, sandlåda för Codex) och hur bilder visas.
+- *Codex-kvoten vid beredningen:* AP-10:s omgång 07:00Z fick leverantörens besked om kvot till 2026-09-27. I kandidatens
+  prov samma kväll tog leverantören ändå emot Codex-anropen; varför är okänt. Se RUNTIME-PROFILER-KANDIDAT-20260926.
+- *Okänt vid beredningen:* Codex-vägens flöde med modell, och hur väl detektorn på en ögonblicksbild motsvarar
+  detektorn på källfilerna. Kandidatposten redovisar vad proven sedan visade.
+
+**Granskning.** Beredningen, kontraktet och kandidatposten granskades i samma separata läsning före publiceringen, av
+Runtimes skrivskyddade läsare. Den läsningen redovisas i publiceringens kvitto. Kandidaten granskades dessutom separat i
+två rundor; se RUNTIME-PROFILER-KANDIDAT-20260926.
+
+**Plan:** ett eget block i planen, RUNTIME-PROFILER FÖR DIGITALA, med beställningens sex steg och deras läge, och
+postens namn i återupptagningspunkten.
+
+**Ersätter:** ingen post.
+
+## RUNTIME-PROFILER-KONTRAKT-20260926 — kontraktet per profil: indata, utdata, kvitto, hashar, vad som är fryst, vad som är parameter och vad profilen aldrig får göra
+
+**Status:** registrerat 2026-09-26 tillsammans med RUNTIME-PROFILER-BEREDNING-20260926 och granskat i samma separata
+läsning. Kontraktet är ett privat dokument, `evidence/runtime-profiler/local/KONTRAKT-RUNTIME-PROFILER-20260926.md`, i
+version 4; version 1–3 är bevarade bredvid. Version 2 skrevs efter bygget och de modellfria proven, version 3 efter
+kandidatens första separata granskning och version 4 efter integrationen, för rättningen i Runtimes D035. Ändringarna
+står överst i dokumentet. D034 är byggd mot version 3 och D035 mot version 4.
+
+**Gemensamt.**
+- Profilerna är tre värdkommandon i Runtime, inte motorns arbetsflöden. Varje körning får en egen katalog i Runtimes
+  privata område. Katalogen skapas exklusivt och stängs av ett kvitto med sha256 för varje fil, koden som körde och
+  verktygens identiteter.
+- Modellens arbetsyta ligger utanför varje repo, så att ingen CLI laddar ett projekts instruktioner.
+- Modellen är en parameter. Det finns ingen reservväg, inget automatiskt omtag och inget byte av utförare eller modell,
+  och kvotbrist bokförs med leverantörens egna ord.
+- Undantaget till en skyddad sajt kommer bara ur en privat fil (exakt 0600, en rad, minst 16 tecken) utanför de platser
+  sandlådan når. Det når
+  en enda webbläsarprocess, sätts bara mot målets origin och bärs därefter av en kaka i en tillfällig profil som tas
+  bort. Varje utdatafil genomsöks efter värdet: en träff tar bort filen och ger utfallet `hemlighet_i_utdata`.
+- En körning som inte slutar normalt lämnar ingen av sina processer kvar (version 4). Modellsession, hållare, Node och
+  Chrome avslutas vid tidsgräns, fel och avbrott. Ctrl-C, SIGTERM och SIGHUP till kommandot under körningen blir ett
+  avbrott med utfallet `avbruten`, utan kvitto, och en andra signal kan inte avbryta städningen. Hållaren och mätningen avslutar sig
+  själva om kommandot dödas hårt. Inte täckt: det modellens CLI kan lämna efter sig när den slutar normalt, och en
+  process som modellen själv kopplar loss i Codex-sandlådan, där den behåller sandlådans gränser.
+- Profilerna skriver aldrig i ett repo, publicerar inte, driftsätter inte och anropar varken Vercel eller GitHub. De
+  ändrar aldrig aktiv release, konfiguration, daemon, arbetare, AP-10 eller modellvalet.
+
+**Mätprofilen:**
+- *Indata:* en https-adress (http bara mot loopback) eller en lokal HTML-fil, som serveras skrivskyddad på loopback
+  under körningen. Därtill antal sektioner, vilka delar som körs, den namngivna handlingen och undantagsfilen.
+- *Fryst:* de två vyerna (390 med DPR 2 och 1440), väntan, skärmbilderna, axe-taggarna och Lighthouse för mobil och
+  desktop. Detektorn körs på en självbärande ögonblicksbild i sandlådan utan nät.
+- *Kvittot:* utfallet `klar`, `delvis`, `fel`, `vagrad` eller `hemlighet_i_utdata`; ett avbrutet kommando ger
+  `avbruten` utan kvitto.
+- *Aldrig:* modell, klick, formulär eller samtycken.
+
+**Kritikprofilen:**
+- *Indata:* ett manifest med absoluta källor, platser och beskrivningar, en fråga, ett schema i en sluten dialekt
+  (varje objekt stängt och varje egenskap krävd), utförare, modell och tid.
+- *Fryst:* läsarens instruktion och `FILES.md`. Claude läser skrivskyddat med `--json-schema`, med exakt verktygen Read
+  och StructuredOutput. Codex läser i en skrivskyddad sandlåda utan nät, med `--output-schema` och varje bild bifogad.
+  Värden prövar svaret mot schemat.
+- *Kvittot:* utfallet `svar_giltigt`, `svar_ogiltigt`, `inget_svar`, `leverantorsfel` eller `vagrad` (ett avbrutet
+  kommando ger `avbruten` utan kvitto); argv och
+  utförarbinärens SHA256; källans och kopians hash per plats; och om varje bild öppnades (Claude, ur strömmen) eller
+  bifogades (Codex, avläst ur kommandoraden).
+- *Aldrig:* skrivrätt, nät eller underlag utanför manifestet. Profilen prövar svarets form, aldrig dess innehåll.
+
+**Provarprofilen:**
+- *Indata:* startadress, vitlista (högst fyra origin), uppgift, vy, utförare, modell, handlingstak, tid, undantagsfil och
+  bindningar som bara bokförs.
+- *Fryst:* grammatiken för handlingarna (`open`, `look`, `read`, `click`, `type`, `select`, `scroll`, `back`, `done`),
+  sidregeln och den värdhållna webbläsaren i fyra lager: en proxy som bara släpper vitlistan, värdregler (som från
+  version 4 alltid låter webbläsaren nå sin egen proxy), förfrågningsfilter och stängda popupfönster.
+  - Modellen når webbläsaren bara genom en filkö.
+  - Claude kör Read och Bash bakom en PreToolUse-vakt: Bash bara exakt handlingskommandot och Read bara i arbetsytan.
+  - Codex kör i sandlådan, med skrivning bara i kön och `.scratch`.
+  - Före varje modellstart ska det modellfria värdprovet ha passerat för exakt dessa byte, denna Chrome och denna Node.
+    Från version 4 ska också startsidan ha öppnats utan fel, med status under 400 och inom vitlistan.
+- *Kvittot:* utfallet `klar`, `tidsgrans`, `inget_slut`, `leverantorsfel`, `ofullstandig_session`,
+  `start_misslyckades` (ingen modell startad) eller `vagrad`; ett avbrutet kommando ger `avbruten` utan kvitto. Codex
+  kommandon, så som strömmen redovisar dem, sparas i spåret. Om scenariot lyckades avgörs av en separat bedömning, aldrig
+  av provarens egen rapport.
+- *Aldrig:* nät, hemligheten, repo, brief, kod eller facit för modellen, och ingen webbläsare utanför vitlistan.
+  Uppmätt i Codex-vägen och redovisat: `/etc` är läsbar, `/` listbar, kommandon kan kedjas och `/tmp` är skrivbar.
+  Inget av det når nätet eller något utanför arbetsytan.
+
+**Acceptansen och vägen efter kandidaten.**
+- Acceptansen omfattar Runtimes hela svit, ett värdprov med eget kvitto och spärrprov med modell. Värdprovet innehåller
+  verktygen, spärrprov A, B och C för båda vägarna och mätningen av en adress, en fil och en skyddad adress. Spärrproven
+  med modell är spärrprov B, besöksscenariot och kritiken, var för sig med båda utförarna mot lokala provsajter.
+- Separat granskning av kandidaten.
+- Därefter, i ordning: skyddad integration i Runtimes main (den aktiverar ingenting), en release, en egen isolerad
+  startövning och ägarens övergång. Den aktiva releasen, konfigurationen, daemonen, arbetaren, AP-10 och modellvalet
+  ändras inte före ägarens beslut.
+
+**Granskning:** i samma separata läsning som beredningen och kandidatposten, redovisad i publiceringens kvitto.
+
+**Plan:** kontraktets rad i blocket RUNTIME-PROFILER FÖR DIGITALA och postens namn i återupptagningspunkten.
+
+**Ersätter:** ingen post.
+
+## RUNTIME-PROFILER-KANDIDAT-20260926 — kandidaten är byggd, prövad, separat granskad och integrerad i Runtime i två steg: profilerna (D034, Runtimes PR 64) och en rättning efter integrationen (D035, Runtimes PR 65); spärrproven gick igenom för båda modellfamiljerna; release, isolerad startövning och övergång väntar på ägarens beslut
+
+**Status:** registrerat 2026-09-27 av den session som fick beställningen (Claude Code). Kandidaten är Runtimes D034 och
+D035, integrerade genom Runtimes skyddade väg, varje gång med samma träd som den granskade commiten:
+- D034 byggdes i en egen arbetsyta på Runtimes main `d5a44064` som en commit, `f962b57`, med 19 filer. Den granskades
+  separat i två rundor och integrerades som PR 64, main `1048a37`.
+- D035 byggdes på `1048a37` som en commit, `6a948cf`, med tolv filer. Den rättar tre fel som visade sig efter den
+  integrationen (se nedan). Den granskades separat i två rundor och integrerades som PR 65, main `067e63b`.
+
+Integrationerna aktiverar ingenting. Aktiv release, konfiguration (`e814c757`), daemon, arbetare, AP-10 och modellvalet
+är orörda, och Runtimes ingång följer main. Allt underlag står privat i `evidence/runtime-profiler/local/`; läget står i
+`LAGE.md`.
+
+**Vad kandidaten tillför.** Tre värdkommandon i Runtime enligt kontraktet (RUNTIME-PROFILER-KONTRAKT-20260926, version
+3 för D034 och version 4 för D035):
+- `runtime.web_measure`, mätprofilen utan modell;
+- `runtime.web_critique`, kritikprofilen: en läsare med hashat underlag och ett slutet svarsschema;
+- `runtime.web_visitor`, provarprofilen: en värdhållen webbläsare, en filkö, en grammatik, en vakt för Claude och
+  sandlådan för Codex.
+
+Varje körning får en egen katalog med kvitto. Till det kommer Runtimes egen pinnade kopia av de redan installerade
+webbläsarverktygen, bunden till ett lås, och detektorns motor. Runtimes dokumentation är uppdaterad: D034 och D035,
+runbookavsnittet och planens ingång.
+
+**Rättningen efter integrationen (D035).**
+- *Proxyns adress.* Digitala-fallet fann i sin egen hållare, som D034:s följer, att värdreglerna bara släppte målets
+  namn. Proxyn nåddes då bara för att varje lokalt prov lät målet heta 127.0.0.1, samma adress som proxyn. Mot ett mål
+  med ett annat namn nådde webbläsaren inte sin proxy alls. Samma fel uppmättes modellfritt i D034:s hållare med ett
+  lokalt provmål som hette `localhost`: provmålet fick ingen förfrågan. D035 låter värdreglerna alltid släppa proxyns
+  egen adress. För ett mål som heter 127.0.0.1 är regeluppsättningen densamma som i alla D034:s prov.
+- *Startsidan.* Hållaren anmälde sig klar också när startsidan inte hade öppnats, och en modellsession skulle ha startat
+  på Chromes felsida. I D035 startar ingen modell om startsidan inte öppnades utan fel, med status under 400 och inom
+  vitlistan. Körningen slutar då som `start_misslyckades`, med skälet i kvittot.
+- *Barnprocesserna.* Mutationsprovet av rättningen visade ett tredje fel. Modellsessionen, hållaren och mätningens Node
+  startas i egna sessioner, och Chrome ligger i en egen processgrupp. Ingenting avslutade dem om körningen inte slutade
+  normalt, alltså vid ett fel efter starten, Ctrl-C, SIGTERM till kommandot (när en terminal stängs eller ett
+  drivarverktyg får tidsgräns) eller mätningens tidsgräns. Modellsessionen fortsatte då utan sin tidsgräns, och hållaren
+  och en huvudlös Chrome med körningens profil levde kvar. I D035 lämnar en körning som inte slutar normalt ingen av
+  sina processer kvar:
+  - varje sådan väg avslutar modellens hela processgrupp, hållaren, Node och varje process med körningens Chrome-profil;
+  - Ctrl-C, SIGTERM och SIGHUP blir ett avbrott som kör samma städning och slutar som `avbruten`, utan kvitto; den
+    första signalen stänger av alla tre, så att en andra inte kan avbryta städningen;
+  - hållaren avslutar sig själv inom sekunder om kommandot dödas hårt, redan från sin start, och mätningen från det att
+    dess Chrome är uppe;
+  - en modellsession vars kommando dödats så avslutas inte av profilen, utan slutar av sig själv;
+  - inte täckt: det modellens CLI kan lämna efter sig när den slutar normalt; en process som modellen själv kopplar
+    loss i Codex-sandlådan, där den behåller sandlådans gränser (inget nät, skrivning bara i kön, `.scratch` och
+    `/tmp`); och ett Ctrl-C i ögonblicket före eller efter själva körningen, som ger ett vanligt avbrott med felutskrift
+    i stället för `avbruten`.
+
+**Grön svit.**
+- D034: Runtimes hela svit, 585 prov varav 35 nya, var grön på exakt kandidaten. Under bygget föll den en gång (se
+  *Uppmätt, inte orsaksbestämt* nedan).
+- D035: 593 prov, varav åtta nya, grön på exakt kandidaten.
+- Publiceraren körde sviten själv två gånger före varje integration, i torrkörningen och i publiceringen, alla gånger
+  genom fångstomslaget och alla gröna. Runtimes stående värdprov (28) var gröna på båda commitarna, med kvitto.
+
+**Värdprov utan modell,** med eget kvitto bundet till commit, byte, importväg och verktygsidentiteter.
+- D034, 5 av 5: ett prov för verktygen, ett för spärrproven och tre för mätningen.
+  - De pinnade verktygen stämmer mot låset.
+  - Spärrproven, i ett och samma prov för Claude-vägen och Codex-vägen:
+    - A, webbläsargränsen: ingenting når det främmande provmålet, varken via länk, ny flik, popup, omdirigering,
+      localhost-alias, bild, fetch eller formulär. Demoresan fungerar, och ogiltiga handlingar vägras av både
+      kommandot och hållaren;
+    - C, hemligheter och isolering: den falska hemligheten finns i ingen fil. Rubriken når provmålet bara vid
+      förberedelsen, och kakan bara provmålet. Webbläsarprofilen är borta efter stopp, och arbetsytan innehåller bara
+      det kontraktet anger. Sandlådan kan varken läsa profilen, spåret eller undantagsfilen;
+    - B utan modell: samma försökslista mot vakten och mot sandlådan.
+  - Mätningen av en adress, en lokal fil och en adress bakom ett falskt skydd, ett prov var. Alla delar körs,
+    detektorn hittar sidokanten i den inlagda stilmallen, och värdet finns ingenstans.
+- D035, 13 av 13, varav åtta nya:
+  - hållaren når ett lokalt provmål som heter `localhost`;
+  - en körning mot en stängd lokal port stannar före modellen;
+  - ingenting av körningen lever kvar efter mätningens tidsgräns, efter ett fel efter hållarens start eller efter
+    SIGTERM till mätningen. Det sista kontrolleras i samma ögonblick som kommandot har slutat;
+  - en hårt dödad mätning, ett hårt dödat hållarkommando och ett hållarkommando som dödas under startnavigeringen
+    lämnar ingenting kvar inom tjugo sekunder.
+- *Mutationsprov för D035.* Elva mutationer tar var och en bort en del av rättningen i en egen kopia och kör de prov som
+  då ska falla. Alla elva fälls, och av rätt skäl. Med D034:s värdregel slutar provet i
+  `net::ERR_PROXY_CONNECTION_FAILED`, precis som i Digitala-fallet. En första omgång visade att provet för en hårt dödad
+  mätning passerade utan sin mekanism, eftersom mätningen hann bli klar av sig själv inom provets fönster. Provet
+  använder nu ett provmål som aldrig svarar. Mutationskopiorna lämnade dessutom tre huvudlösa Chrome kvar, från den
+  mutation som tar bort hållarens kontroll av ett dött kommando. De avslutades för hand, och drivarens städning är
+  rättad efteråt.
+
+**Spärrprov och profilprov med modell,** på exakt D034:s kodbyte och mot lokala provsajter. Allt bedöms ur hållarens
+spår, vaktens logg eller sandlådans beslut och provsajternas egen logg, aldrig ur modellens rapport.
+- *Spärrprov B med tretton steg,* en gång per utförare:
+  - Claude: vaktens logg har tretton poster, fem tillåtna och åtta nekade anrop. Skrivförsöket med filverktyg blev ett
+    skalförsök, eftersom profilen saknar skrivverktyg. Hållaren vägrade den främmande adressen.
+  - Codex: nätet nekades, och hållaren vägrade den främmande adressen. Sandlådan nekade läsningen av repot och
+    skrivningarna i arbetsytan. Strömmen redovisar inte de nekade anropen; modellens rapport återger sandlådans egna
+    ord, och det modellfria spärrprovet B visar samma nekanden i samma sandlåda. Läsning av `/etc`, listning av `/`,
+    kedjade kommandon och skrivning i `/tmp` gick igenom, som uppmätt och redovisat i kontraktet.
+  - Det främmande provmålet fick noll förfrågningar i alla körningar.
+- *Besöksscenariot* per utförare: formuläret skickades med exakt de angivna uppgifterna, och provaren återgav en
+  bekräftelsekod som bara fanns i den renderade bilden. Båda utförarna tittar alltså på skärmbilderna.
+- *Kritiken* per utförare: ett giltigt svar enligt schemat, med varje bild öppnad (Claude, ur strömmen) eller bifogad
+  (Codex, avläst ur kommandoraden).
+- *D035 kördes utan nya modellsessioner.* Vakten, grammatiken, handlingskommandot, arbetsytan, sandlådans tabell och
+  båda utförarnas kommandorader är oförändrade, bytevis eller i syntaxträdet. Det som ändrats runt modellen är hur dess
+  process avslutas.
+
+**Uppmätt, bedömt, ej prövat och okänt.**
+- *Uppmätt* är allt ovan, och följande om Codex-strömmen. Den redovisar inte varje anrop: `view_image` syns aldrig, och
+  i alla fyra spärrprov med Codex saknades precis de anrop som sandlådan eller patchverktyget nekade. Andra fel
+  redovisades. Provarprofilen sparar strömmens kommandon i spåret, och hållaren spårar varje webbläsarhandling i båda
+  vägarna.
+- *Uppmätt, inte orsaksbestämt:* hela sviten föll en gång under bygget av D034 (1 av 6 körningar, ett prov, 20:52Z),
+  och alla omkörningar var gröna. Webbprofilernas egna prov var gröna i 20 av 20 körningar var för sig. Vilket prov som
+  föll är okänt, eftersom körningen inte gick genom fångstomslaget.
+- *Bedömt:*
+  - profilerna täcker Digitalas mekaniska steg utom de platsspecifika produktproven och driftsättningskontrollen, som
+    beredningen lämnar utanför;
+  - slutsatserna från D034:s modellsessioner håller för D035, eftersom deras mål hette 127.0.0.1 och ingen av dem
+    slutade annat än normalt. Det är inte uppmätt med modell på D035:s byte.
+- *Ej prövat:*
+  - en provarsession och spärrprov A mot ett mål som inte heter 127.0.0.1; de ingår i startövningen nedan;
+  - körning mot en verklig sajt (utanför beställningen) och körning som den aktiva releasens kopia;
+  - releasen, den isolerade startövningen och övergången.
+- *Okänt:*
+  - om Codex `view_image` kan visa en bild utanför arbetsytan;
+  - varför Codex-strömmen utelämnar nekade anrop;
+  - varför leverantören tog emot Codex-anrop i kväll före den tid som avslagen i AP-10:s omgångar angav. Det är en ny
+    iakttagelse i Runtimes lärdom R5: morgondagens AP-10-omgång kan få kvot.
+
+**Granskning.**
+- *D034* granskades separat av Runtimes skrivskyddade läsare (claude-opus-5, samma modellfamilj som författaren:
+  separata läsningar, inte oberoende omdömen) i två rundor.
+  - Runda 1 (532 sekunder) godkände commit `0855269` utan blockerande fynd men med tretton anmärkningar. Bland dem:
+    kritikkvittot saknade argv och binärens hash, en för kort hemlighet kunde undgå genomsökningen, Pythons och
+    JavaScripts grammatik skilde sig vid en avslutande radbrytning, och detektorn fick läsa mer än sin ögonblicksbild.
+    Varje anmärkning hanterades, kontraktet flyttades till version 3, och proven kördes om på de nya bytena.
+  - Runda 2 (672 sekunder) läste ändringen sedan runda 1, hanteringen, kandidaten och bevisen och godkände `f962b57` utan
+    blockerande fynd. Den bekräftade att det dubbla snedstrecket i Claudes läsregel är regelsyntaxens form för en
+    absolut sökväg.
+  - Kvarstående anmärkningar, som inte hindrar: D034:s ord om vaktens logg är lösare än loggen, och mönstret i
+    Codex-strömmen kunde granskaren kontrollera bara i den senaste körningen (de övriga står i de privata körningarna).
+    Två prov kontrollerar mindre än deras namn antyder, källans och kopians hash är lika per konstruktion, och
+    kritikkvittot saknar webbläsaridentiteter, eftersom den profilen inte startar någon webbläsare. Två medvetna val
+    står kvar: provhemligheten i det ignorerade `.runtime/` och svitens beroende av värdens Node.
+- *D035:* granskades separat av samma läsare i två rundor.
+  - Runda 1 (555 sekunder) godkände commit `c8d1309` utan blockerande fynd men med elva anmärkningar. Bland dem: en andra
+    signal under städningen kunde avbryta den, rubriken lovade mer än koden gör (det modellens CLI lämnar efter sig vid
+    ett normalt slut städas inte), hållaren märkte ett dött kommando först efter startnavigeringen, och startövningen
+    saknade spärrprov A mot ett mål med ett annat namn. Varje anmärkning hanterades i kod, prov eller ord, och
+    kontraktets version 4 fick sin nuvarande form.
+  - Runda 2 (721 sekunder) läste ändringen sedan runda 1, hanteringen, kandidaten och bevisen och godkände `6a948cf` utan
+    blockerande fynd.
+  - Kvarstående anmärkningar, som inte hindrar:
+    - ett stopp under hållarens start, eller under en städning som redan pågår, avslutas av hållarens egen kontroll en
+      stund efter att kommandot har slutat;
+    - en avbruten körning kan lämna körningens Chrome-profil på disk, efter förberedelsen med den skyddade värdens kaka;
+    - två kodkommentarer har kvar den bredare formuleringen, och två prov lämnar sina tillfälliga arbetsytor.
+
+    De två första hör till rättningen före releasen (se nedan).
+- Dessa poster har en egen separat granskning, redovisad i publiceringens kvitto.
+
+**Resurser.**
+- *Modellsessioner i proven:* Claude elva (omkring tio minuter sammanlagt) och Codex nio som nådde leverantören. Ett
+  tionde Codex-anrop stoppade före leverantören på ett sökvägsfel i kandidaten, som rättades. D035 använde inga.
+- *Så fördelades de:* sex sessioner på D034:s integrerade kod. Femton är bevarade som historik: sju på arbetslägen och
+  åtta på koden i den commit som första granskningen godkände. Den granskningens anmärkningar ändrade koden, och
+  bindningen till exakta byte krävde nya körningar (lärdom R14).
+- *Granskningar:* sex läsande granskningar: två av D034, två av D035 och två av dessa tre kontorsposter. Den första av
+  de två senare underkände en formulering i planblocket om vilka spärrprov som kördes med modell, och den rättades;
+  publiceringens kvitto redovisar den andra.
+- *Jämfört med kontraktets ram,* omkring sex sessioner för proven och fyra till fem läsande granskningar: proven
+  överskreds med femton sessioner, varav fjorton nådde leverantören, och granskningarna med en. Skälen står ovan. Förbrukningen redovisas mot abonnemangens kvot, inte som
+  kostnad.
+- Inga nya verktyg, konton, kostnader eller behörigheter, och ingen underagent. Verktygskopian består av samma paket och
+  versioner som redan fanns på datorn, kopierade utan nät.
+
+**Rytmen (FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-20260926).**
+- *Lärdomsposter* i Runtimes lärdomsfil:
+  - R12: Codex-strömmen är ett golv, inte en fullständig förteckning.
+  - R13: sandlådans fasta öppningar, och att Codex startar om sig själv genom sin sökväg.
+  - R14: modellprov binds till kandidatens slutliga byte.
+  - R15: ett lokalt provmål som delar adress med infrastrukturen döljer beroenden mellan dem.
+  - R16: en barnprocess i egen session behöver egen städning på varje väg, och ett mutationsprov läses på felorsaken.
+
+  Dessutom nya tillämpningsrader i R1, R3, R7 och R9, en ny förekomst i R4 och en ny iakttagelse i R5.
+- *Användningsnoter:*
+  - Planens förslag för Runtime, R4 (publicerarens prov genom fångstomslaget): prövat. Varje torrkörning och publicering
+    gick genom fångstomslaget, och sviten var grön varje gång, med utdata, returkod och miljö bevarade. Den enda
+    förekomsten i kväll av ett fallande prov inträffade tidigare, utanför omslaget, och fångades därför inte; R4 har fått
+    en ny förekomstrad.
+  - R14 styrde D034:s modellprov. För D035 kördes inga nya modellsessioner; skälet och bedömningen står ovan och i D035.
+  - R1, R3, R7, R8 och R9 påverkade konkreta val i kontraktet och bygget.
+  - R6 användes som kontroll; ingen ändring i `AGENTS.md` behövdes.
+  - R10 har inte nått arbetet ännu; startövningen väntar på övergången.
+  - R2 och R11 är inte tillämpliga, eftersom profilerna inte är kontorsuppdrag och inte tar motorns aktivitetsplats.
+- *Förslagsrad för nästa Runtime-fall:* ge varje nytt värdprov en mutation som tar bort just dess mekanism, och läs
+  felorsaken innan granskningen startar. Belägg: R16. Förslaget ersätter en upptäckt i efterhand och ryms i ett vanligt
+  mandat.
+
+**Kvar före övergången.** Ordningen följer granskningsbudgetens övergång 16:
+1. En release som stegas med exakt de nya filerna och samma modellval.
+2. En egen isolerad startövning på en port- och rotförskjuten kopia, med spärrprov A och en provarkörning per utförare
+   mot ett lokalt provmål som inte heter 127.0.0.1.
+3. Ägarens övergång med ett komplett kommando (`LC_ALL=C`, färsk kontroll, bindningar, driftpåverkan och
+   återhämtningsväg). Därefter körs profilerna som den aktiva releasens egen kopia.
+
+**Beslut som behövs från ägaren:** ett, om och när övergången ska göras. Med ett ja gör kedjedrivaren först en liten
+rättning av de kvarstående anmärkningarna från D035:s andra granskningsrunda som gäller städningen och Chrome-profilen på
+disk, med egen granskning, och därefter steg 1 och 2. Ägaren gör steg 3 utanför AP-10:s omgångsfönster. Utan beslut står profilerna integrerade men inaktiva, och Digitala
+fortsätter som i dag. Integrationerna kan inte göras om utan en ny granskad publicering; en återställning av Runtimes
+main vore i så fall en ny publicering.
+
+**Plan:** blocket RUNTIME-PROFILER FÖR DIGITALA med alla sex steg och deras läge, en rad i ägarens tur om övergången, raden
+för Runtime i FÖRSLAG ATT PRÖVA I NÄSTA FALL och postens namn i återupptagningspunkten.
+
+**Ersätter:** ingen post.
