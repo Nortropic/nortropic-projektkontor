@@ -6434,3 +6434,149 @@ Denna post och planändringen granskas separat på samma sätt; kvittot i public
 kräver köpta AI Gateway-krediter; bevarandetid och radering för kundmaterial). Ingen annan planändring.
 
 **Ersätter:** ingen post. Kompletterar HELHET-20260927 och HELHET-TILLAGG-20260927 (intervjuvägen) utan att ändra dem.
+
+## HELHET-RESULTAT-20260927 — slutrapport för HELHET-20260927 med tilläggen: etapp 2–6 genomförda; Digitala har en professionell kedja från beställning till privat leverans, prövad i ett märkt testfall; kvar för ägaren är externa aktiveringar och ett Runtime-mandat för schemalagd drift
+
+**Före och efter.** Före (registreringen HELHET-20260927): Digitala hade ett repo med laddning, mätning, kritik och
+kvalitetsbild, men briefstopp, praxis av antal, Norrglänta som referens, ingen intervju, inga kanalsteg, ingen
+webbläsarväg, ingen start/fortsätt-väg och ingen maskinell publiceringsväg. Efter: Digitala-repot (`Nortropic/
+nortropic-digitala`, main `94dcb0e` efter PR 8; Kundstart-uppdragets PR 9 `0c5e987` följde samma dag) bär 22 steg i `steg/steg.json` från uppstart till drift; en beställning bär hela
+uppdraget utan ägarstopp (`MANDAT.md`); kundintervju med följdregler (`verktyg/intervju.py`), research i 19 sektioner,
+brief §0–§14, koncept med kritikprofilen, bygge med webbläsarinspektion, redaktionellt pass, SEO, mätning och kritik
+genom Runtimes profiler, kodläsning, utforskande QA, avskärmat besökarprov genom Playwright MCP, uppföljning,
+prelaunch med åtta grindar, leverans med kvalitetsbild; kanalstegen sökkonsol, lokal synlighet, annonsberedning,
+lansering och drift som verktyg med egna prov (ingen live-integration: extern åtkomst saknas och är namngiven);
+start/fortsätt-vägen `verktyg/fortsatt.py` med bunden beställning, tillstånd per fall och omprov; publiceringsvägen
+`verktyg/publicera.py` under rulesetet `main-skydd` utan manuellt PR-godkännande; översikten `OVERSIKT.md` med vy A
+(ordinarie väg) och vy B (den verkliga körningen i slutprovet).
+
+**Ordinarie ingång.** Digitala: `README.md` → `AGENTS.md` → `MANDAT.md` → `ARBETSSATT.md` → `python3 -B verktyg/fortsatt.py
+--kund KUNDMAPP --fall FALL` (laddar nästa steg ur `steg/steg.json` och skriver `NASTA.md`); Codex läser samma
+`AGENTS.md`. Kontoret: planblocket HELHET och denna post. Runtime oförändrad (aktiv konfiguration `eb102e4e` sedan
+övergång 18; ingen ny release i detta uppdrag).
+
+**Revisioner.** Digitala: PR 2 `bb4a602` (etapp 2 + beviskedjans A, B, C), PR 3 `4bd1206` (etapp 3), PR 4 `df6cf8c`
+(intervju + restnoter), PR 5 `40b75b0` (etapp 4 webbläsarvägen), PR 6 `e7c3bdf` (etapp 5 start/fortsätt- och
+publiceringsväg, översikten vy A), PR 7 `3c9e448` (efterarbete: publiceringsvägen från klon/worktree), PR 8
+`94dcb0e` (slutprovets fynd, lärdomar L24–L27, översiktens vy B). PR 5–8 publicerades genom `publicera.py`
+(kvitton privat: `PUBLICERING-*.json`). Kontoret: HELHET-20260927 (PR 105), KONTORET-PROBLEMFORMULERING-20260927
+(PR 106), HELHET-ETAPP1-RESULTAT-20260927 och HELHET-TILLAGG-20260927 (PR 107), denna post. Alla kandidater efter
+separat läsargranskning genom Runtimes läsarprofil (claude-opus-5): 25 rundor på uppdragets övriga kandidater —
+17 på Digitala-kandidater (10 underkända och rättade) och 8 på kontorsposter (4 underkända och rättade) —
+plus denna posts egna rundor, bokförda privat (granskningskatalogerna i uppdragets evidence-mapp).
+
+**Etapp för etapp.** *Etapp 2* (PR 2): se planblocket punkt 2. *Etapp 3* (PR 3, PR 4): kontorets beredning bär
+problemformuleringen; Digitala fick beredning, research-, brief-, juridik-, bild-, bygge- och copyunderlag, stegen seo,
+sokkonsol, lokal-synlighet, annonsberedning, uppfoljning, prelaunch, lansering och drift med verktyg, och kundintervjun
+(adaptiv, återupptagbar, följdfrågor ur namngivna regler, status per uppgift, research.md som kundspecifik ingång,
+integrationskedjor formulär/leads, bokning, kundregister, redaktörsupplevelse i `kunskap/integrationer.md`; hemligheter
+i svar vägras; testdialoger märkta). *Etapp 4* (PR 5, tre granskningsrundor): `verktyg/webblasare/` på Playwright
+1.63.0 och Playwright MCP 0.0.82 (pinnade): `inspektera.mjs` (utvecklarinspektion med kontext, vyer 390/768/1440/320,
+tillstånd hover/fokus/meny/reload, tillgänglighetsträd, konsol, nätverk, spill), `utforska.mjs` (utforskande QA: crawl,
+formulärens felvägar, 404, bakåt, tangentbord; skickar bara med flagga och testmarkering; fynd blir `REGRESSION.json`),
+`besok.mjs` (avskärmad förstagångsbesökare i egen modellsession genom verklig MCP: uppgiften vägras om den bär brief,
+kod, facit eller kritik; ursprungsgränsen verkställs i besökarens webbläsare genom en init-page-fil, nätverksloggen
+efterkontrolleras; skyddsundantag bara mot målets ursprung, privat initfil). Två livekörningar med claude-sonnet-5
+(utan och med undantag; privat `BEVIS-BESOK-LIVE*.txt`). Direkt push till main nekades av rulesetet ("Changes must be
+made through a pull request", main oförändrad; privat `BEVIS-GRENSKYDD-DIREKTPUSH.txt`) — det öppna provet från
+etapp 1 är stängt. *Etapp 5* (PR 6, PR 7): `fortsatt.py` avgör nästa steg ur stegordningen, binder beställningen som
+ett hashat utdrag ur beslutsposten (`BESTALLNING.json` i kundmappen; steg utanför omfattningen markeras och omprövas),
+kanalstegen ur `KANALBEHOV.json`, lanseringsstegen bara med lanseringsmandat (annars slutar vägen vid färdig privat
+leverans och återöppnar stegen när mandatet kommer), laddar genom `ladda_steg.py`, bokför utfall, sidoeffekter,
+väntande beroenden och händelser per utförare i `LAGE.json`, gör omprov vid underkänt utan ägarfråga; `publicera.py`
+vägrar utan godkänd granskning bunden till exakt commit (eller identiskt träd efter rebase), grön svit och rena pinnar,
+verifierar mergeläget med `gh pr view` och hämtar main utan checkout. Utförarbytet är verifierat på ett representativt
+steg i slutprovet: qa-steget laddades som Codex och Codex utförde rättningen (nedan). Schemalagd driftkontroll genom
+Runtime är inte byggd: AP-10:s schema är hårdkodat till bedömningen och Runtime har inga generella schemalagda
+kommandon eller nya mål utan eget mandat (ägarpunkt). *Etapp 6* (PR 8): slutprovet nedan; översikten vy B;
+lärdomar L24–L27; tre verktygsfynd rättade.
+
+**Slutprovet (etapp 6; privat `evidence/digitala/local/testfall-helhet-20260927/`, allt märkt TESTFALL).** Fallet
+Provfirma Trädgård är en fiktiv verksamhet med testdialog i stället för kund, platshållarbilder märkta TESTBILD, en
+beställning märkt `testfall: true`, sajten serverad lokalt och aldrig driftsatt; inget i det är kundbevis eller
+kvalitetsreferens. `fortsatt.py` drev fallet från uppstart till "slut: alla tillämpliga steg klara: färdig privat
+leverans" i 38 körhändelser (plus en rättelsehändelse bokförd i efterhand, se nedan): intervju (2 omgångar, 11 svar, 8 fakta, luckor kvar), research (kontrollrad OFULLSTÄNDIG:
+sökintention inte undersökt), brief §0–§14, koncept (två kompar kritiserade genom Runtimes kritikprofil, riktningen
+"Text och foto sida vid sida" vald ur kritiken), bygge (statisk sajt, `server.py` med säkerhetsrubriker,
+servervalidering, honeypot och tidsfälla på en klocka; `DESIGN.md` lintad; CSP-fynd rättat under bygget),
+redaktionellt pass (copy_kontroll 3 → 0), seo (seo_kontroll 13 → 0), mätning genom Runtimes mätprofil (axe 0
+violations, Lighthouse prestanda/tillgänglighet/god praxis 100, SEO 58 på grund av noindex i förhandsvisning,
+handlingen i första vyn, detektorn tre fynd i varje körning: TESTBILD-platshållarna som avsiktlig testartefakt och ett
+radavstånd som rättades), kritik (renderingsläsning godkänd med fyra förbättringar varav en ospårad tjänstedetalj
+togs bort; femsekunderstest avskärmat), kodläsning D (fyra fynd, lämnade till qa-steget), qa (`utforska.mjs`: tre egna fynd; **Codex** utförde
+kodläsningens fyra rättningar — dedupering av dubbla inskick, tidsfällans tröskel, hjälptext om obligatoriska fält och
+rubrikens radavstånd — 59 s, `CODEX-qa-2.out`; regressionen omkörd), besökarprov (claude-sonnet-5 genom verklig Playwright MCP: 13 turer, 67 s,
+nio förfrågningar inom ursprunget, förfrågan levererad till mottagaren med exakt testdata; besökarens eget fält `utfall: "lost"` betyder löst;
+kontrollanten bedömde ur artefakter: lyckat), uppföljning (mätplan utan spårning; leveransen är provet), prelaunch (grind 0–5 och 7 PASS;
+grind 6 människa: ingen `JURIDIK.json` — inte redo, avsiktligt), leverans (kvalitetsbilden i leveranssteget visade sju Runtime-körningar, alla ok, men inte besöket — ett
+fynd; den omkörda bilden efter rättningen visar åtta rader, alla ok; användningsnoter skrivna i efterhand, eftersom vägen
+skriver skelettet men inte tvingar att det fylls före `klart` — ett processfynd; lärdomsposter). Annonsberedning, lokal synlighet, lansering, sökkonsol och drift markerades inte
+tillämpliga av vägen (kanalbehov, inget lanseringsmandat). Provet hittade fyra fel i Digitalas egna verktyg, en avsedd
+vägran och ett processfynd: bokningsregeln i `intervju.py` missade "bokade … kalender" (rättad i PR 6); Runtimes
+kritikprofil vägrade femsekunderstestet för att bildernas sökväg innehöll ordet "kritik" (avskärmningen som avsedd;
+bilderna flyttades); och tre fel rättade i PR 8: `prelaunch.py` läste startposten i stället för mätningens körkatalog (L24),
+`utforska.mjs` fyllde honeypot-fält som en robot (L25), kvalitetsbilden saknade Playwright-besöket; processfyndet är att
+användningsnoterna inte tvingas före `klart`. Det hittade också ett riktigt
+serverfel i testsajten (kombinerade robotsignaler gav 400 med tom fältlista) som QA-vägen avslöjade. Slutgranskningen av
+kandidaten hittade dessutom en felaktig siffra i fallets egen intervju-not (16 svar/4 fakta; facit i INTERVJU.json är 11 svar/8
+fakta), rättad med en rättelsehändelse i LAGE.json. Utförarbytet
+visade att ägarens Codex-CLI (0.147.0) vägrar Runtimes modell `gpt-6-astra`, medan Runtimes pinnade `codex-0.155.1`
+körde (L27).
+
+**Tillägg 1 — statusrapport (avsnitt 3–5).** *Verifierat använda med körspår i slutprovet:* fortsatt-, laddnings-, pinn-,
+intervju-, kör-, verksamhetsuppgifts-, copy-, SEO-, uppföljnings-, prelaunch-, kvalitetsbilds- och publiceringsverktygen, alla tre
+webbläsarverktygen (besökarprovet genom verklig MCP), Runtimes mät- och kritikprofil; professionstexterna för
+intervju, research, brief, bild, bygge, formulärsäkerhet, copy, SEO, redaktionellt pass, webbläsarvägen, uppföljning,
+prelaunch, KVALITET, MANDAT, LARDOMAR; externa metoder Taste §0/§4, frontend-design, emil-prototype, mobile-native,
+Web Interface Guidelines, web-quality-audit, accessibility, design.md (lint körd). *Närvarande men inte använda i
+provet:* sökkonsol-, lokal synlighet-, annonsberednings-, lanserings- och driftverktygen (kanalbehov/mandat saknades;
+egna prov finns), bildverktygen (inga riktiga foton), Hallmark-linsen, emil-design-eng, PICKER, Runtimes provarprofil
+(Playwright-vägen kördes; profilen prövad i Norrglänta samma dag). *Återstående kopplingar:* Google Cloud/OAuth för
+Search Console, Google Ads-utvecklartoken och Meta-token, företagsprofil genom behörig människa, schemalagd
+driftkontroll genom Runtime, verklig skyddad förhandsvisning för webbläsarvägen, juridisk genomgång av människa. Använt
+är inte bevisat bättre: inget jämförande prov mot ett arbetssätt utan dessa resurser är gjort. Ett lyckat testfall är
+inte praxis: lärdomarna är klassade som felorsak eller observation, inte som regler.
+
+**Tillägg 2 — proven i avsnitt 8.** Kända uppgifter återanvänds (`fakta` ur VERKSAMHET.json och tidigare svar; omgång 2
+frågade bara luckor); ett bokningsbehov ger verksamhetsfrågor, inte ett kontaktformulär (följdregeln bokning, vidgad
+med böjda former och med negationsspärr efter en iakttagelse från Kundstart-sessionen); motsägelser är spårbara
+(`avgor` med skäl, båda uppgifterna bevarade); en färsk utförare fortsätter (`fortsatt.py status`/`fortsatt`;
+utförarbytet claude → codex i tillståndet); inget kundmaterial i professionsfilerna (kundklassen laddas skilt; pinnar
+bara på professionsfiler); integrationer prövade i normal- och felväg (servervalidering, honeypot, tidsfälla, 400-vägen,
+dubbletter); färdig privat leverans utan brief- eller konceptstopp (ingen ägarfråga i körningens 38 händelser). Testdialogen är
+märkt i varje utdata och presenteras inte som kundresearch.
+
+**Slutgranskning åt båda hållen.** Denna posts läsare får arbetsordern, båda tilläggen, översikten (vy A och B),
+registret, kedjebeskrivningen, testfallets tillstånd och kvitton, och prövar sambanden i båda riktningarna med
+kontrollerna (bortvald körkedja är inte förbud mot specialistkompetens; installerat är inte använt; använt är inte
+bevisat bättre; ett lyckat testfall är inte praxis; researchen har inte krympt till referensjakt; intervjun har inte
+blivit en kedja av ägarstopp; integrationer har inte reducerats till länkar där mer beställts; frånvaro av data har inte blivit
+påstådd förståelse). Digitala-kandidaterna prövades var för sig i sina rundor; postens egna rundor (underkända versioner ersatta
+före publiceringen) är bokförda privat. Granskarna är av författarens modellfamilj: separat läsning, inte oberoende
+omdöme.
+
+**Läge per del (ordern §9: implementerat, integrerat, aktiverat, körprovat, ännu inte verifierat).** *Implementerat och integrerat:* allt ovan i Digitalas main; kontorets poster. *Aktiverat:*
+inget nytt i Runtime. *Körprovat:* hela kedjan i slutprovet; publiceringsvägen: fyra PR (5–8) genom fem skarpa körningar — en
+avbröts på GitHubs mergekonflikt före rebasen, och PR 5:s kvitto säger "avbrutet" fast mergen skett (gh:s efterarbete i en
+worktree; fyndet bakom PR 7); utförarbytet en gång skarpt. *Ännu inte verifierat:* verklig kund och verklig kunddialog; verklig skyddad förhandsvisning; live-integration
+mot Google och Meta; schemalagd driftkontroll; mänsklig användbarhet (kolumn 3 i kvalitetsbilden).
+
+**Begränsningar.** Teknisk integrationsframgång är inte världsklass och inte ägargodkännande: testsajten är en
+provsajt. Kritik, besökarprov och läsning är modellbedömningar av samma modellfamilj som författaren. Codex kunde bara
+köras med Runtimes pinnade binär. Kvalitetsbilden bär ingen leveransbindning i testfallet (ingen driftsättning).
+Lärdomarna L24–L27 bygger på ett fall.
+
+**Aktiveringshinder och återgång.** Inga aktiveringar krävs. Återgång: Digitala genom git-historik (varje PR en
+squash med granskningskvitto); kontoret raderar inga poster; Runtime orörd.
+
+**Resurser.** Läsande granskningar: 25 rundor på övriga kandidater plus postens egna; slutprovets modellkörningar: fyra kritiker och ett besök
+(claude-sonnet-5), en Codex-körning (och en vägrad), tre modellfria mätningar; därtill etapp 4:s två livekörningar av
+besökarprovet mot en annan lokal provsajt (före testsajten fanns); allt inom abonnemangen — inga nya
+verktyg, konton, kostnader eller behörigheter (npm-paket pinnade: Playwright, MCP, design.md-linten via npx).
+
+**Läge 17:45Z.** Uppdraget är genomfört till klart-när; ägarens tur har fått tre nya rader från detta uppdrag (schemalagd
+driftkontroll kräver eget Runtime-mandat; externa aktiveringar bara vid verklig kund; Codex-CLI:n i PATH är äldre än
+Runtimes pinnade); blocket har nu nio rader: de tre äldre (taket, underhållsformen, nästa fiktiva fall), Kundstarts
+tre och dessa tre. Kundstart-uppdraget (egen session, egen post KUNDSTART-20260927) publicerades samma kväll före denna post, efter
+ägarens klartecken för en rad i publicerarens tabell; dess beställning ingår inte i detta uppdrag. Nästa bygge behöver
+eget accepterat uppdrag. Privat läge: `LAGE.md` i uppdragets evidence-mapp.
