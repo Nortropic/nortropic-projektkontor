@@ -400,9 +400,27 @@ class PreparationTests(unittest.TestCase):
         self.assertNotEqual(result["package"]["gaps"], result["gaps"])
 
 
+def problem(**overrides):
+    value = {
+        "verksamhetsmal": ["fler offertförfrågningar från villaägare i närområdet"],
+        "malgrupper": ["villaägare 35–65 som planerar trädgårdsarbete"],
+        "uppgifter": ["förstå vad som erbjuds", "begära offert"],
+        "erbjudande": ["trädgårdsanläggning och skötsel"],
+        "positionering": ["lokal hantverksfirma med egen personal"],
+        "befintligt_underlag": ["kundens tjänstelista", "tio referensbilder"],
+        "osakerheter": ["om besökarna söker pris eller portfölj först"],
+        "kanalbehov": ["sök (lokal)", "ingen annonsering"],
+        "framgangskriterier": ["offertformuläret används", "telefonnumret nås i varje vy"],
+        "anvandarinsikt": "antaganden",
+        "interventionsbeslut": {"val": "ny-sajt", "skal": "ingen befintlig sajt finns"},
+    }
+    value.update(overrides)
+    return value
+
+
 def forvaltning(**overrides):
     value = {
-        "namn": "digitala", "steg": "kritik", "proportion": "mellan",
+        "namn": "digitala", "steg": "kritik", "proportion": "mellan", "problem": problem(),
         "metod": {"val": "renderingsläsning genom kritikprofilen", "skal": "riktningen är beslutad; osäkerheten gäller det renderade resultatet"},
         "underlag": {"laddningskvitto_sha256": "d" * 64, "steg": "kritik", "sha256_over_underlag": "e" * 64},
         "kriterier": ["KVALITET.md", "matning/PROFIL.json"],
@@ -429,6 +447,75 @@ class ForvaltningTests(unittest.TestCase):
         self.assertIn("Förvaltning: digitala; steg: kritik; proportion: mellan", brief)
         self.assertIn("laddningskvitto " + "d" * 64, brief)
         self.assertIn("Ej observerat hos verkliga användare: verkliga besökare", brief)
+        self.assertIn("Problem (verksamhetsmål): fler offertförfrågningar", brief)
+        self.assertIn("Användarinsiktens källa: antaganden — inga användarintervjuer eller observationer", brief)
+        spec["forvaltning"] = forvaltning(problem=problem(anvandarinsikt="saknas"))
+        self.assertIn("Användarinsiktens källa: saknas — inga användarintervjuer eller observationer", preparation.prepare(case, check, spec)["package"]["brief"])
+        spec["forvaltning"] = forvaltning(problem=problem(anvandarinsikt="intervjuer"))
+        self.assertIn("Användarinsiktens källa: intervjuer\n", preparation.prepare(case, check, spec)["package"]["brief"])
+        spec["forvaltning"] = forvaltning()
+        self.assertIn("Interventionsbeslut: ny-sajt — skäl: ingen befintlig sajt finns", brief)
+        self.assertLess(brief.index("Problem (verksamhetsmål)"), brief.index("- Underlag: laddningskvitto"))
+        self.assertLess(brief.index("- Underlag: laddningskvitto"), brief.index("- Metod: "))
+        self.assertLess(brief.index("- Metod: "), brief.index("- Interventionsbeslut: "))
+        self.assertLess(brief.index("- Interventionsbeslut: "), brief.index("- Kriterier: "))
+        self.assertLess(brief.index("- Kriterier: "), brief.index("- Bedömning, tekniskt"))
+
+    def test_the_problem_formulation_is_proportionate_and_its_absence_is_a_gap_except_for_liten(self):
+        case, check, spec = fixture()
+        spec["forvaltning"] = forvaltning(problem=problem(malgrupper=[], erbjudande=[], osakerheter=[], kanalbehov=[],
+                                                          interventionsbeslut={"val": "oavgjort", "skal": " "}))
+        codes = [g["code"] for g in preparation.prepare(case, check, spec)["gaps"]]
+        self.assertEqual(codes, ["forvaltning_problem_malgrupper_empty", "forvaltning_problem_erbjudande_empty",
+                                 "forvaltning_problem_osakerheter_empty", "forvaltning_problem_kanalbehov_empty",
+                                 "forvaltning_problem_interventionsbeslut_skal_empty"])
+        spec["forvaltning"]["proportion"] = "liten"
+        codes = [g["code"] for g in preparation.prepare(case, check, spec)["gaps"]]
+        self.assertEqual(codes, ["forvaltning_problem_interventionsbeslut_skal_empty"])
+        spec["forvaltning"] = forvaltning(proportion="liten", problem=problem(verksamhetsmal=[], uppgifter=[], framgangskriterier=[]))
+        codes = [g["code"] for g in preparation.prepare(case, check, spec)["gaps"]]
+        self.assertEqual(codes, ["forvaltning_problem_verksamhetsmal_empty", "forvaltning_problem_uppgifter_empty",
+                                 "forvaltning_problem_framgangskriterier_empty"])
+        without = forvaltning()
+        del without["problem"]
+        spec["forvaltning"] = without
+        result = preparation.prepare(case, check, spec)
+        self.assertEqual([g["code"] for g in result["gaps"]], ["forvaltning_problem_missing"])
+        self.assertIn("- Problem: (problemformuleringen saknas)", result["package"]["brief"])
+        self.assertNotIn("problem", result["package"]["forvaltning"])
+        spec["forvaltning"]["proportion"] = "liten"
+        result = preparation.prepare(case, check, spec)
+        self.assertEqual(result["gaps"], [])
+        self.assertNotIn("Problem", result["package"]["brief"].split("## Förvaltning")[1].split("## Derived")[0])
+
+    def test_the_section_for_a_forvaltning_without_problem_is_locked_line_by_line(self):
+        case, check, spec = fixture()
+        without = forvaltning()
+        del without["problem"]
+        spec["forvaltning"] = without
+        brief = preparation.prepare(case, check, spec)["package"]["brief"]
+        section = brief.split("## Förvaltning\n\n")[1].split("\n\n## ")[0].split("\n")
+        self.assertEqual(section, [
+            "- Förvaltning: digitala; steg: kritik; proportion: mellan",
+            "- Problem: (problemformuleringen saknas)",
+            "- Underlag: laddningskvitto " + "d" * 64 + "; underlagets hash " + "e" * 64,
+            "- Metod: renderingsläsning genom kritikprofilen — skäl: riktningen är beslutad; osäkerheten gäller det renderade resultatet",
+            "- Kriterier: KVALITET.md, matning/PROFIL.json",
+            "- Bedömning, tekniskt prövat: axe utan violations i båda vyerna",
+            "- Bedömning, professionellt bedömt: en renderingsläsning",
+            "- Ej observerat hos verkliga användare: verkliga besökare"])
+        spec["forvaltning"]["proportion"] = "liten"
+        section = preparation.prepare(case, check, spec)["package"]["brief"].split("## Förvaltning\n\n")[1].split("\n\n## ")[0].split("\n")
+        self.assertEqual(section[:2], ["- Förvaltning: digitala; steg: kritik; proportion: liten", "- Underlag: laddningskvitto " + "d" * 64 + "; underlagets hash " + "e" * 64])
+
+    def test_a_problem_formulation_with_bad_shape_or_unknown_values_is_an_error(self):
+        case, check, spec = fixture()
+        for bad in (problem(anvandarinsikt="gissning"), problem(interventionsbeslut={"val": "kanske", "skal": "x"}),
+                    problem(interventionsbeslut={"val": "ny-sajt"}), problem(extra="x"), problem(uppgifter=[""]),
+                    problem(verksamhetsmal="text"), "text", None, []):
+            spec["forvaltning"] = forvaltning(problem=bad)
+            with self.assertRaises(ValueError, msg=repr(bad)[:80]):
+                preparation.prepare(case, check, spec)
 
     def test_an_absent_forvaltning_keeps_every_earlier_spec_valid(self):
         case, check, spec = fixture()

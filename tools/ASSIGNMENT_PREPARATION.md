@@ -138,7 +138,7 @@ Fixed caveats are always included even when authored limitations are empty.
 ### Förvaltning (optional)
 
 The office's method competence travels with the assignment. `forvaltning` has exactly
-`{namn, steg, proportion, metod, underlag, kriterier, bedomning}`:
+`{namn, steg, proportion, metod, underlag, kriterier, bedomning}` plus one optional field, `problem`:
 
 - `namn`, `steg`: nonempty, `[a-z][a-z0-9-]{1,39}` (for example `digitala` and a step of its
   `steg/steg.json`).
@@ -152,9 +152,27 @@ The office's method competence travels with the assignment. `forvaltning` has ex
   result will be assessed in each column of the quality picture; an empty list is a gap, except
   `professionellt` for `liten`.
 
+- `problem` (optional; HELHET-20260927 etapp 3): the problem formulation the office worked out with the
+  förvaltning before any method was chosen. Exactly `{verksamhetsmal, malgrupper, uppgifter, erbjudande,
+  positionering, befintligt_underlag, osakerheter, kanalbehov, framgangskriterier, anvandarinsikt,
+  interventionsbeslut}`. The first nine are lists of nonempty strings; an empty list is a gap
+  (`forvaltning_problem_<field>_empty`), for `liten` only for `verksamhetsmal`, `uppgifter` and
+  `framgangskriterier`. `anvandarinsikt` names where the user insight comes from: exactly `intervjuer`,
+  `observationer`, `data`, `antaganden` or `saknas`; the brief says outright when it is `antaganden` or `saknas`,
+  so an absence of user interviews is never dressed up as insight. `interventionsbeslut` is exactly `{val, skal}`
+  with `val` one of `ny-sajt`, `forbattra-befintlig`, `annan-kanal`, `ingen-atgard` or `oavgjort` (a site is not
+  always the answer) and `skal` a string; an empty `skal` is a gap. An unknown value or a wrong shape is an error.
+  Absent `problem` is a gap (`forvaltning_problem_missing`) for `mellan` and `stor`, none for `liten`, and the brief
+  then carries the line `- Problem: (problemformuleringen saknas)` (not for `liten`). A `forvaltning` without
+  `problem` keeps its fields and its gaps, but the section is rendered in the chain order below (underlag before
+  metod), so the brief text and the package hash change for every spec that carries `forvaltning`; a spec without
+  `forvaltning` is exactly as before.
+
 Absent, the spec is exactly as before, no gap is emitted and the package has no `forvaltning` key at all (so every
 earlier packet hashes exactly as before). Present,
-the object is copied to `package.forvaltning` and rendered as a "## Förvaltning" section in the brief. The
+the object is copied to `package.forvaltning` and rendered as a "## Förvaltning" section in the brief, in the order
+problem → underlag → metod → interventionsbeslut → kriterier → bedömning (the produced experience is the delivery
+itself). The
 core verifies shape, contradictions and presence only; whether the receipt exists, the method fits or the
 criteria are the right ones is the host's and the separate reviewer's judgment.
 
@@ -281,6 +299,9 @@ Codes carry the specific missing condition; private traces provide source detail
 | `forvaltning_bedomning_tekniskt_empty` | `forvaltning` | No technical assessment named |
 | `forvaltning_bedomning_professionellt_empty` | `forvaltning` | No professional assessment named (not for `liten`) |
 | `forvaltning_bedomning_ej_observerat_empty` | `forvaltning` | Nothing named as not observed with real users |
+| `forvaltning_problem_missing` | `forvaltning` | No problem formulation (not for `liten`) |
+| `forvaltning_problem_<field>_empty` | `forvaltning` | An empty problem list (`liten`: only verksamhetsmal, uppgifter, framgangskriterier) |
+| `forvaltning_problem_interventionsbeslut_skal_empty` | `forvaltning` | No reason for the intervention decision |
 | `task_field_missing` | Task field name | Key absent |
 | `task_field_empty` | Task field name | Supplied empty/null value |
 | `action_authority_missing` | `brief` | Selected action has no authored grant |

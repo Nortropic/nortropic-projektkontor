@@ -6033,3 +6033,55 @@ skrivs om till en hypotes; postens namn i återupptagningspunkten. Ägarens tur 
 
 **Ersätter:** ingen post. Kompletterar DIGITALA-1-AGARBEDOMNING-20260927 (Norrgläntas status) och
 OMBYGGNAD-RESULTAT-20260927 (nästa uppdrag efter ombyggnaden).
+
+## KONTORET-PROBLEMFORMULERING-20260927 — AP-06:s beredning bär problemformuleringen: en valfri del `forvaltning.problem` med verksamhetsmål, målgrupper, uppgifter, erbjudande, positionering, underlag, osäkerheter, kanalbehov, framgångskriterier, insiktskälla och interventionsbeslut (avsnitt 3 i HELHET-20260927)
+
+**Vad.** Beredningsverktyget `tools/assignment_preparation.py` (AP-06, `prepare(case, check, spec)`) tar nu, inuti den
+valfria delen `forvaltning` (KONTORET-FORVALTNINGSFALT-20260927), en valfri åttonde nyckel `problem` med exakt elva fält:
+nio listor (`verksamhetsmal`, `malgrupper`, `uppgifter`, `erbjudande`, `positionering`, `befintligt_underlag`,
+`osakerheter`, `kanalbehov`, `framgangskriterier`), `anvandarinsikt` (exakt `intervjuer`, `observationer`, `data`,
+`antaganden` eller `saknas`) och `interventionsbeslut` (`val` exakt `ny-sajt`, `forbattra-befintlig`, `annan-kanal`,
+`ingen-atgard` eller `oavgjort`, plus `skal`). Briefens avsnitt "## Förvaltning" renderar kedjan i ordningen problem →
+underlag → metod → interventionsbeslut → kriterier → bedömning; när insiktskällan är `antaganden` eller `saknas` skriver
+briefen ut att inga användarintervjuer eller observationer finns och att insikterna är antaganden. Saknad substans blir
+stabila gap-koder med ämnet `forvaltning`: `forvaltning_problem_<fält>_empty` för tomma listor (för liten bara
+verksamhetsmål, uppgifter och framgångskriterier), `forvaltning_problem_interventionsbeslut_skal_empty`, och
+`forvaltning_problem_missing` när hela delen saknas för mellan eller stor (liten: ingen gap). Okänt värde, okänt fält
+eller fel form vägras med `ValueError`. Avsnittets ordning ändras för varje förvaltningsdel: raden Underlag
+renderas nu före raden Metod (kedjans ordning), och för mellan eller stor utan `problem` skrivs raden
+"- Problem: (problemformuleringen saknas)". En `forvaltning` utan `problem` behåller alltså sina fält och sina gap,
+men briefens text och därmed paketets hash ändras för varje spec som bär `forvaltning` (delen infördes i dag; inga
+skarpa paket bär den); en spec utan `forvaltning` är exakt som förut, byte för byte.
+
+**Varför.** Ordern HELHET-20260927 avsnitt 3: kontoret ska hjälpa Digitala att förstå rätt problem och välja
+proportionerligt arbetssätt, inte bara fylla metodfält; verksamhetsmål, målgrupper, viktigaste användaruppgifter,
+erbjudande, positionering, befintligt underlag, osäkerheter, kanalbehov och framgångskriterier ska in i beredningen;
+sambandet problem → underlag → metod → beslut → producerad upplevelse → bedömning ska visas; avsaknad av
+användarintervjuer får inte döljas med påhittade användarinsikter; en ny sajt är inte alltid svaret (det gamla repots
+interventionsbeslut, återvunnet som fält). Metodinnehållet (hur problemet formuleras, hur metod väljs efter problem)
+bor i Digitala-repots `kunskap/beredning.md`, som beredningen laddar genom förvaltningens steg `beredning` och binder
+med laddningskvittot; kontoret bär formen och gapmekaniken, inte ett obligatoriskt ramverk.
+
+**Vad som inte ändras.** Förvaltningsdelens sju befintliga fält, gap-kodernas ordning och namn; briefens övriga
+avsnitt; verktygets rena form (ingen fil, inget nät). Kontoret väljer ingen metod och avgör inget
+interventionsbeslut: fälten bär förvaltningens och kundens svar, och ett ifyllt schema är inte leverans (ordern
+avsnitt 3); värdet visar sig först i en beredning av ett verkligt fall.
+
+**Prov.** Hela kontorssviten med kontorets tolk: 403 prov gröna (400 före, 3 nya i `test_assignment_preparation.py`:
+problemformuleringen är proportionerlig och dess frånvaro en gap utom för liten; fel form eller okänt värde vägras;
+avsnittets radföljd för en förvaltningsdel utan `problem` är låst rad för rad; det befintliga provet för en komplett
+del prövar kedjans ordning och klartexten för både `antaganden` och `saknas`). Dokumentationen
+`tools/ASSIGNMENT_PREPARATION.md` beskriver fälten, koderna, ordningen och saknad-raden.
+
+**Plan.** Blocket HELHET i `docs/plan.md`: punkt 2 KLAR (Digitala PR 2), punkt 3 PÅBÖRJAD med denna post, punkt 4
+PÅBÖRJAD (beviskedjans rättelser i PR 2; webbläsarvägen kvar), punkt 1 uppdaterad med täckningskartan och PR 2.
+
+**Ersätter.** Inget. Bygger på KONTORET-FORVALTNINGSFALT-20260927 (delen `forvaltning`), som fortsätter att gälla.
+
+**Läge.** Implementerat; integreras i kontoret med denna publicering; inte använt i en skarp beredning ännu.
+Digitalas motsvarande steg `beredning` och `kunskap/beredning.md` byggs i Digitala-kandidaten för avsnitt 3 och 4
+(gren helhet/etapp3-flode); tills den är integrerad pekar beredningens `steg` på ett steg som inte finns i huvudgrenen.
+
+**Granskning.** Separat, skrivskyddad läsning genom Runtimes läsarprofil (samma modellfamilj som författaren: en
+separat läsning, inte ett oberoende omdöme) av kandidatens diff, dokumentation, prov och denna post mot orderns
+avsnitt 3; kvittot i publiceringen.
