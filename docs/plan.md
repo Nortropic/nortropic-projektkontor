@@ -1,3 +1,56 @@
+# Gällande återupptagning — kreativ arbetskedja, 2026-09-28 19:38 UTC
+
+Denna post ersätter äldre nästa-handlingar nedan; hela den tidigare planen är
+bytebevarad som historik. DIGITALA-KREATIV-ARBETSKEDJA-20260928 är den avgränsade
+rättningen före nästa fullständiga bygge. Inget sådant bygge har startats.
+
+Digitala är skyddat integrerad via PR16, main `3702dadbac83b9dadbee4e9882a9c3cec4b3f53e`,
+kandidat `97367af`, träd `796c8d5`. Faktisk credential-isolerad regression 289/289,
+separat exakt ändringsgranskning och Appbundna tests/review passerade. Den rena
+primäringången står på origin/main; vanlig konceptladdning har därefter faktiskt
+laddat obligatoriskt browserunderlag och genererat den förbättrade skaparingången.
+
+Råspår visade provledningens bild-/formatbegränsningar, intern sektionsordning,
+selektiv användning av externa råd och sen renderingsåterkoppling. Kopierad gammal
+HTML/CSS-mall kunde inte beläggas. Vanliga kreativa konsumenter är rättade och användes
+av en färsk utförare. Root gav behov/research/verktyg men ändrade ingen produktkod.
+
+Det begränsade arbetsprovets r2 har separat helhetskritik approved, samtliga sex
+r1-fynd hanterade och fyra icke blockerande förbättringar bevarade. Oberoende browser
+46/46; ren lokal mottagarkatalog 20/20. Beredskap finns för nästa fullständiga test
+när ett accepterat uppdrag ges. Ett förändrat prov med nytt underlag/utförare visar
+inte generell stileffekt, full autonom kundförståelse eller ägaraccept.
+
+Nästa handling: läs `evidence/digitala/local/yrkesformaga-20260928/kreativ-rattning-r1/slutleverans/LEVERANSBESKED.md`
+och det portabla arbetsprovet. Starta inget nytt bygge automatiskt. Inga nya
+ägaråtgärder behövs för den färdiga kreativa rättningen. Detta dokumentuppdrag bär
+endast aktuell återupptagning och beställningspost, med separat granskning och skyddad
+integration; dess faktiska kvitto bevaras i samma arbetslogg under integration-office.
+
+Runtime main/aktiv är oförändrad `af783126`, aktiv config `ec6ecbd9` med fryst Office
+`df5ed5dc`. Kontorets dokument-main ska inte förväxlas med aktiv Office-kod. Inget
+nytt guardbyte, utfärdarinförande eller Runtime-aktivering hör till rättningen.
+Orelaterad restlista består: Cal/Stripe/Tally/CRM saknar teståtkomst; Kundstarts
+redovisade skyddsbegränsning och förbättringspartnern har egna spår, inga nya förkrav.
+
+Arbetsgrenar `kreativ/arbetskedja-20260928`, `kreativ/arbetskedja-integration-20260928`
+och `kreativ/arbetskedja-slut-20260928` är bevarade i verifierad privat Git-bundle
+`kreativ-rattning-r1/arbetsgrenar-digitala.bundle`; sista kandidatens innehåll är
+integrerat. Kontorets gren `digitala/kreativ-arbetskedja-20260928` är denna dokumentkälla
+och arkiveras före publicering. Lokal gren `partner/forbattringspartner-20260928`
+finns i separat arbetsyta och bevaras för sitt eget uppdrag; inget skrivansvar för
+den har tagits här. Andra sessioner och deras arbetsytor lämnas orörda.
+
+## FÖRSLAG ATT PRÖVA I NÄSTA FALL
+
+Använd vanlig skaparingång med kundfakta skilda från intern designhypotes,
+tidig egen mobil-/datorrendering och separat kritik av hela den avgränsade upplevelsen.
+Pröva i nästa accepterade kunduppdrag utan att ärva detta arbetsprovs visuella identitet.
+Lärdom K20260928 och faktisk användning finns i Digitala respektive privat arbetslogg;
+kontorets metodobservation K16 bevaras i dess befintliga privata lärdomsfil.
+
+---
+
 # Gällande återupptagning — 28 september 2026, 19:32 svensk tid / 17:32 UTC
 
 Denna post ersätter äldre nästa-handlingar nedan; deras daterade underlag bevaras som historik.

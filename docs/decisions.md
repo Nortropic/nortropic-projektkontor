@@ -6651,3 +6651,16 @@ Ingen ny generell plattform, prenumeration, köpta krediter, bredare kontoåtkom
 verkliga betalningar eller publik kundlansering. Detta är inte en beställning av guard-activate.
 Skyddad integration och exakta kandidat-/miljöbindningar består. Aktiv drift får inte härledas
 ur kandidatprov. Planen äger aktuellt steg, skrivansvar och fortsatt arbete.
+
+
+## DIGITALA-KREATIV-ARBETSKEDJA-20260928 — avgränsad kreativ rättning
+
+Ägaren beställer riktad orsaksanalys, rättning av Digitalas kreativa produktionsväg,
+ett begränsat ordinarie arbetsprov med befintligt behov, separat produktkritik,
+relevant regression, separat ändringsgranskning och skyddad integration.
+Originalet bevaras privat i `evidence/digitala/local/yrkesformaga-20260928/kreativ-rattning-r1/BESTALLNING.md`.
+Inget nytt fullständigt kund-/demobygge startas. Kundfakta, historik, fungerande kod och
+orelaterade restpunkter bevaras. Inga nya repon, kostnadsvägar, utökade rättigheter eller
+publika kundlanseringar. Interna designval fattas utan rutinmässiga ägarstopp.
+Slutbeskedet ska visa faktisk ordinarie användning och motiverad beredskap för nästa bygge;
+det innebär varken ägaraccept eller mandat att starta nästa bygge.
