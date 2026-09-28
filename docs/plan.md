@@ -1,3 +1,28 @@
+# Gällande återupptagning — 28 september 2026, 19:32 svensk tid / 17:32 UTC
+
+Denna post ersätter äldre nästa-handlingar nedan; deras daterade underlag bevaras som historik.
+Main före denna dokumenträttning: Runtime `af783126`, Digitala `1bfdba88`, kontoret `578512ce`.
+Skyddad integration, Appbundna kontroller och identiskt återspel är återlästa. De ordinarie
+primäringångarnas spårade filer matchar main; historiska ospårade bevis bevaras.
+Digitalas faktiska primära `publicera.py --task` fungerar. Runtime har 44 riktade gröna,
+10 isolerade acceptansfall och separat accepterad 651+1+4-komposit, ingen ny grön 656-helkörning.
+Digitala har 289/289; dess tidigare 19/19-kundprov återanvänds genom fyra oförändrade konsumenter.
+Aktiv Runtime är ännu `3bea86` med fungerande a8-guard och aktiv Office `df5ed5`; main är inte drift.
+Guard-only är redan återställd. Upprepa inte det steget och försök inte starta den gamla guarden.
+
+Återuppta i `evidence/digitala/local/yrkesformaga-20260928/` (E): läs aktuellt leveransbesked,
+`E/inforande/publiceringsingang-r1/PUBLICATION-ACTUAL-FINAL-r2.json` och det exakta
+operatörspaketet `E/inforande/runtime-release-r1/OPERATORSSTEG.md`. Kontrollera separat godkänd
+slutdom samt aktuella stage-/checkbindningar före den färska förkontrollen och ägarens aktivering
+i egen inloggad Terminal. Återläs därefter aktiv config, tre tjänster, guard, modellval, Office,
+AP10 och avslutat AP11. Ingen manuell pekarändring, authorityombindning eller ny kundoperation ingår.
+Efter verifierad aktivering: högst ett motiverat ordinarie formprov med 300 s per textsteg,
+samma modell/schema/sakkrav, inga nya bilder. Positiv faktisk formåterhämtning saknas ännu;
+bevara negativt utfall och diagnos utan blind ytterligare retry. O3 kräver processkontroll före omtag.
+Cal/Stripe/Tally/CRM-teståtkomst saknas enligt ägaren; faktiska livscykler och övriga öppna krav kvarstår.
+
+---
+
 # Rutin: ingången följer main
 
 Gäller varje session (UNDERHALL-INGANGAR-20260924). Börja med `python3 -B tools/ingang.py`: den hämtar och jämför
