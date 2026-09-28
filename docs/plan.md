@@ -49,11 +49,12 @@ stopp-/återhämtningsrepetition. Ägarens konkreta terminalsteg väntar fortfar
 Ingen aktivering har gjorts av utföraren; paketet aktiverar inte nya systemkandidater. Läs faktisk
 pekare, tjänst och schema efter eventuell ägarövergång innan driftbesked ändras.
 
-Ansvar och nästa handling: kedjedrivaren slutför den daterade överlämningen med r4:s två
-avgränsade domar och öppna observationer. Kvarstående produktförbättringar och boknings-/
-betalningskontraktet bevaras öppna; leverantörsflöden kräver faktisk kvalificerad teståtkomst.
-Källpublicering och dess avgränsade audit är genomförda. Verklig betrodd issuer, dess skyddade
-uppgifts-/acceptanskoppling och serverbindning återstår före skyddad integration.
+Ansvar och nästa genomförandesteg: kedjedrivaren kvalificerar en tillåten betrodd issuer med
+skyddad uppgifts-/acceptanskoppling och faktisk serverbindning för efterföljande skyddad
+integration/release. Produktens olösta boknings-/betalningskontrakt och tillåtna kvalificerade
+teståtkomst återstår; kvalitetsförbättringar och r4:s öppna observationer bevaras.
+Daterad överlämning och disposition är dokumentationsaktiviteter, inte återupptagningsmålet.
+Källpublicering och dess avgränsade audit är genomförda.
 Main-integration och senare release kräver separat uppfyllda server-/issuergränser och befintlig
 skyddad holder-/operatörsväg. Ägaren har det redan beredda guard-terminalsteget; ingen ny
 rutinmässig design- eller PR-approval efterfrågas. Planen äger fortsatt nästa handling.
