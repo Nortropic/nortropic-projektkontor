@@ -6597,3 +6597,33 @@ samtidigt: provet stängdes i etapp 4 (direkt push nekad).
 
 **Läge 18:35Z.** Inget mer öppet i HELHET-20260927 (planens punkt 1–6 utan ÖPPET-markering); ägarens tur oförändrad (nio rader). Privat läge: `LAGE.md` i
 uppdragets evidence-mapp.
+
+
+## DIGITALA-SAMLAT-ATGARDSMANDAT-20260927 — genomförande av kända kedje- och kvalitetsbrister
+
+Ägaren har i en ny sammanhållen arbetsorder beställt implementation, kreativ omarbetning, integration,
+verifiering, separat granskning och införande av det genomförda fiktiva kundprovets åtgärder. Originalet är
+bevarat ordagrant privat i `evidence/nasta-uppdrag/local/atgarder-vikskar-20260927/BESTALLNING-ORIGINAL.md`.
+Det tidigare provmandatets förbud mot berörda gemensamma systemändringar ersätts av detta mandat.
+Berörda arbetsytor är Digitala, Kundstart, kontoret, Runtime och den befintliga kundprodukten.
+
+Två jämställda leveranser krävs: en fungerande arbetskedja som förstår kunden, för arbetet vidare och
+bedömer leveransen med giltiga bevis; samt en genomarbetad varm och redaktionell produktupplevelse.
+Ägarens underkännande av den tidigare visuella leveransen registreras som ett nytt omdöme. Gamla
+modellomdömen och frysta krav/prov skrivs inte om. De 36 ursprungliga kraven och 43 gapobjekten
+behålls med spårbar aktuell disposition. Rapportgranskning är inte produktgodkännande.
+
+Mandatet omfattar fem etapper utan mellanliggande ägarstopp: (1) aktuell baslinje, åtgärdskarta och
+visuell diagnos, (2) kreativ omarbetning och korrigerade kvalitets-/bevisregler, (3) intag, samordning
+ och integrationer, (4) kontinuitet, skydd, drift och återstående produktfel, (5) sammanhängande slutprov,
+separat granskning och införande. Normala tekniska och kreativa val fattas inom uppdraget.
+
+Ingen ny generell kontrollplattform, blind återställning, obeställd prenumeration, köpta krediter,
+skarpa utskick, verkliga kundförpliktelser, publik kundlansering eller bredare kontoåtkomst ingår.
+Bokning och betalning använder etablerade tjänster och endast tillåtet testläge; inga annonser
+aktiveras. Kundfunktioner ska fungera hostat utan beroende av ägarens dator. Den nödvändiga avgränsade
+Runtime-integrationen för schemalagd drift omfattas, med befintlig skyddad release-/aktiveringsväg.
+En eventuell särskild operatörsaktivering bereds exakt och redovisas, inte kringgås.
+
+Detta är ägarens beställning, inte ett godkännande av någon ny kandidat. Aktuellt steg, skrivansvar
+och återupptagning ägs av planen. Nya kriterier granskas separat före kandidatbedömningen.
