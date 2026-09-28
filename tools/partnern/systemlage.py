@@ -7,7 +7,6 @@ observation med sin ålder, aldrig en gissning.
 from __future__ import annotations
 
 import json
-import re
 import subprocess
 import sys
 import threading
@@ -118,12 +117,13 @@ class Systemlage:
     def _plan(self) -> dict:
         text = _git(Path(self.k.kontor_primar), 'show', 'origin/main:docs/plan.md') or ''
         block = text.split('\n---\n')[0][:3500]
-        tur = ''
-        m = re.search(r'(^#+ .*ÄGARENS TUR.*$)([\s\S]{0,2500})', text, re.M)
-        if m:
-            tur = (m.group(1) + m.group(2)).split('\n#')[0][:2000]
-        return {'planens_oversta_block': block, 'agarens_tur': tur,
-                'not': 'Planen på kontorets origin/main. Planen ensam äger nästa handling i kontoret.'}
+        rader = agarens_tur(text)
+        return {'planens_oversta_block': block,
+                'agarens_tur': '\n'.join(rader)[:4000] if rader else '(tom: inga öppna rader)',
+                'agarens_tur_antal': len(rader),
+                'not': 'Planen på kontorets origin/main. Planen ensam äger nästa handling i kontoret. ÄGARENS TUR läses '
+                       'med samma regel som Aquarium: raderna "- [beslut] …" och "- [operatörshandling] …" efter en '
+                       'rad som nämner ÄGARENS TUR, fram till första andra raden.'}
 
     def _pr(self) -> dict:
         ut = {}
@@ -152,6 +152,23 @@ class Systemlage:
         data = json.loads(r.stdout)
         return {'aquarium': _komprimera(data),
                 'not': 'Genom Aquariums avgränsade läsning av Runtimes aktiva release, motor och bevakning.'}
+
+
+def agarens_tur(plan: str) -> list:
+    """Ägarens öppna rader i planen, lästa som Aquarium läser dem (tools/aquarium.py, office_reader)."""
+    rader, inne = [], False
+    for rad in plan.splitlines():
+        r = rad.strip()
+        if 'ÄGARENS TUR' in r:
+            inne = True
+            continue
+        if not inne:
+            continue
+        if r.startswith('- [beslut] ') or r.startswith('- [operatörshandling] '):
+            rader.append(r)
+        else:
+            inne = False
+    return rader
 
 
 def _komprimera(x, djup: int = 0):

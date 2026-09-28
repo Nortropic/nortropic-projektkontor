@@ -49,6 +49,18 @@ HEMLIGT_TILLDELNING = re.compile(
     r'(\s*[:=]\s*["\']?)([A-Za-z0-9_\-+/=.]{24,})')
 
 
+BILAGESTATUS = {'CAPTURED_CONTENT': 'fångad', 'RECOVERED_EXACT': 'återvunnen exakt',
+                'RECOVERED_DUPLICATE': 'återvunnen (samma innehåll som en annan bilaga)',
+                'UNAVAILABLE': 'otillgänglig: fångades aldrig, innehållet finns inte i korpusen'}
+
+
+def bilagestatus(b: dict) -> str:
+    text = BILAGESTATUS.get(b.get('status'), b.get('status') or 'okänd')
+    if not b.get('fil') and b.get('status') != 'UNAVAILABLE':
+        text += '; filen saknas i korpusen'
+    return text
+
+
 def tvatta(text: str) -> str:
     """Ta bort hemlighetsliknande värden. Ersättningen syns som [DOLT] så att ingen tror att texten är hel."""
     for m in HEMLIGT:
@@ -471,10 +483,19 @@ class Kallindex:
             ut['samtal'] = {k: data.get(k) for k in ('url', 'fangad', 'uppdaterad', 'revision', 'sha256', 'meddelanden')}
             ut['tid_not'] = ('Meddelandetider saknas i fångsten; datum är samtalets senaste uppdatering eller '
                              'fångstdatum, inte när just detta meddelande skrevs.')
-            bilagor = [b for b in data.get('bilagor') or []
-                       if b.get('meddelande') in [g['ordning'] for g in grannar]]
+            visade = [g['ordning'] for g in grannar]
+            if visade:
+                ut['visar'] = '%s %d–%d av %s' % ('avsnitt' if post['klass'] == 'imp:dokument' else 'meddelande',
+                                                  min(visade), max(visade), totalt['sista'])
+            alla = data.get('bilagor') or []
+            bilagor = [b for b in alla if b.get('meddelande') in visade]
             if bilagor:
-                ut['bilagor'] = [{k: b.get(k) for k in ('id', 'namn', 'mime', 'status', 'meddelande')} for b in bilagor]
+                ut['bilagor'] = [dict({k: b.get(k) for k in ('id', 'namn', 'mime', 'meddelande')},
+                                      status=bilagestatus(b)) for b in bilagor]
+            ovriga = [b for b in alla if b not in bilagor]
+            if ovriga:  # även bilagor utan meddelandebindning; annars ser läsaren aldrig att de finns
+                ut['ovriga_bilagor'] = [dict({k: b.get(k) for k in ('id', 'namn', 'mime', 'meddelande')},
+                                             status=bilagestatus(b)) for b in ovriga]
             if post['ordning'] < (totalt['sista'] or 0):
                 ut['senare_i_samtalet'] = ('%d meddelanden kommer efter detta i samma samtal; senare rättelser kan '
                                            'finnas där.' % ((totalt['sista'] or 0) - post['ordning']))

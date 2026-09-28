@@ -55,6 +55,16 @@ class Overlamning:
             return {'text': 'Det finns redan en överlämning från samma beställning: %s "%s" (status %s, %s). Ingen ny '
                             'skapades.' % (finns['id'], d.get('rubrik'), finns['status'], d.get('katalog_visning'))}
         mottagare = a.get('mottagare') if a.get('mottagare') in MOTTAGARE else 'kontorets-kedjedrivare'
+        oppna = [o for o in self.s.lager.fraga("select * from overlamning where trad=? and status in "
+                                               "('lamnad','mottagen','startad') order by tid", (korning.trad,))
+                 if json.loads(o['data']).get('mottagare') == mottagare]
+        if oppna and a.get('annan_bestallning') is not True:
+            o = oppna[-1]
+            d = json.loads(o['data'])
+            return {'text': 'Det finns redan en öppen överlämning i den här tråden till samma mottagare: %s "%s" (status '
+                            '%s, %s). Ingen ny skapades. Gäller Johnnys nya beställning något annat än den, anropa igen '
+                            'med annan_bestallning: true och skriv i målet vad som skiljer den från %s.' % (
+                                o['id'], d.get('rubrik'), o['status'], d.get('katalog_visning'), o['id'])}
         oid = 'OVL-%s-%s' % (datetime.now(timezone.utc).strftime('%Y%m%d'), inspel['id'][-6:])
         kat = self.katalog(oid)
         if kat.exists():  # rest efter ett avbrott före journalföringen: bevaras vid sidan av, blockerar inte
@@ -89,22 +99,26 @@ class Overlamning:
         order += ['- ' + g for g in granser] or ['- Inga särskilda gränser angivna utöver kontorets gällande regler.']
         order += ['', '## Föreslagen nästa handling', '', nasta, '', '## Mottagare', '', MOTTAGARE[mottagare], '',
                   '## Status', '',
-                  'Lämnad av partnern. Mottagaren kvitterar med `python3 -B tools/partner.py kvittera %s mottagen '
-                  '--av "<session>"`, därefter `startad` och `levererad --bevis "<PR/commit/fil>"`. Partnern visar '
-                  'statusen i tråden. Överlämningen ger inget eget mandat utöver Johnnys beslut ovan och kontorets '
-                  'gällande regler.' % oid, '']
+                  'Lämnad av partnern%s. Aktuell status är sista raden i KVITTENS.jsonl. Mottagaren kvitterar med '
+                  '`python3 -B tools/partner.py kvittera %s mottagen --av "<session>"`, därefter `startad` och '
+                  '`levererad --bevis "<PR/commit/fil>"` (eller `avslagen`). Partnern visar statusen i tråden. '
+                  'Överlämningen ger inget eget mandat utöver Johnnys beslut ovan och kontorets gällande regler.' % (
+                      ('; en annan beställning än den öppna ' + ', '.join(o['id'] for o in oppna)) if oppna else '', oid),
+                  '']
         self._skriv(kat / 'ARBETSORDER.md', '\n'.join(order))
         ap06 = self._ap06(kat, oid, rubrik, mal, citat, granser, nasta, underlag)
         tillstand = {'id': oid, 'status': 'lamnad', 'lamnad': nu(), 'mottagare': mottagare,
                      'mottagare_text': MOTTAGARE[mottagare], 'trad': korning.trad, 'inspel': inspel['id'],
-                     'rubrik': rubrik, 'ap06': ap06}
+                     'rubrik': rubrik, 'ap06': ap06, 'skild_fran': [o['id'] for o in oppna],
+                     'status_not': 'Status vid lämningen. Mottagarens senare kvittenser står i KVITTENS.jsonl '
+                                   '(sista raden gäller).'}
         self._skriv(kat / 'OVERLAMNING.json', json.dumps(tillstand, ensure_ascii=False, indent=1))
         (kat / 'KVITTENS.jsonl').touch(mode=0o600)
         visning = 'kontoret/evidence/nasta-uppdrag/local/partner-%s/' % oid
         self.s.lager.lagg_till('overlamning', overlamning=oid, trad=korning.trad, inspel=inspel['id'],
                                nyckel=inspel['id'], rubrik=rubrik, mal=mal, mottagare=mottagare,
                                katalog=str(kat), katalog_visning=visning, ap06=ap06, granser=granser,
-                               nasta_handling=nasta, agarcitat=citat)
+                               nasta_handling=nasta, agarcitat=citat, skild_fran=[o['id'] for o in oppna])
         korning.handelse('overlamning', 'Överlämning %s lämnad till %s' % (oid, mottagare))
         luckor = ap06.get('luckor') or []
         return {'text': ('Överlämningen %s är LÄMNAD (inte mottagen eller startad) till: %s\nPaket: %s (ARBETSORDER.md, '

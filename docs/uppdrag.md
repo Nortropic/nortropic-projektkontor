@@ -8,12 +8,14 @@ Planen äger aktuellt steg. Äldre uppdrag nedan är historik och startas inte o
 
 ---
 
-# GÄLLANDE PARALLELLT: Projektkontorets förbättringspartner
+# I DRIFT PARALLELLT: Projektkontorets förbättringspartner
 
-FORBATTRINGSPARTNER-20260928 i beslutsloggen och den privata originalordern under
-`evidence/nasta-uppdrag/local/forbattringspartner-20260928/` gäller parallellt med Digitalas yrkesförmåga.
-En intern samtalsyta i kontoret där ägaren lämnar material utan analysprompt och får ett källbundet
-resonemang med kontinuitet; genomförande bereds bara på tydlig beställning. Planen äger aktuellt steg.
+FORBATTRINGSPARTNER-20260928 och slutrapporten FORBATTRINGSPARTNER-RESULTAT-20260928 står i beslutsloggen.
+Samtalsytan (`tools/PARTNER.md`) är levererad: ägaren lämnar material utan analysprompt och får ett källbundet
+resonemang med kontinuitet, och genomförande bereds bara på tydlig beställning. Tjänsten körs ur kontorets
+primärutcheckning och startas om ur main efter varje integration av partnern. Ny utbyggnad kräver ett eget beslut.
+Den privata originalordern ligger under `evidence/nasta-uppdrag/local/forbattringspartner-20260928/`. Planen äger
+aktuellt steg.
 
 ---
 

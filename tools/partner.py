@@ -7,6 +7,7 @@
     python3 -B tools/partner.py index        bygg om källindexet ur originalen
     python3 -B tools/partner.py overlamningar
     python3 -B tools/partner.py kvittera OVL-… mottagen|startad|levererad|avslagen --av "…" [--bevis "…"]
+    python3 -B tools/partner.py autostart    visa hur ägaren gör tjänsten bestående (skriver ingenting)
 
 Se tools/PARTNER.md.
 """
@@ -45,16 +46,22 @@ def _pid(k) -> int | None:
         return None
 
 
+def _privat_fil(p: Path, lage: int):
+    """Öppna för skrivning med rättigheterna 0600, även om filen redan fanns med vidare rättigheter."""
+    fd = os.open(p, os.O_WRONLY | os.O_CREAT | lage, 0o600)
+    os.fchmod(fd, 0o600)
+    return os.fdopen(fd, 'ab' if lage & os.O_APPEND else 'wb')
+
+
 def start(k, args) -> int:
     if _halsa(k):
         print('Tjänsten kör redan på http://127.0.0.1:%d (pid %s).' % (k.port, _pid(k)))
         return 0
     Path(k.data).mkdir(parents=True, exist_ok=True)
     os.chmod(k.data, 0o700)
-    logg = open(Path(k.data) / 'tjanst.log', 'ab')
+    logg = _privat_fil(Path(k.data) / 'tjanst.log', os.O_APPEND)
     proc = subprocess.Popen([sys.executable, '-B', str(Path(__file__).resolve()), 'kor'], stdin=subprocess.DEVNULL,
                             stdout=logg, stderr=logg, start_new_session=True, cwd=str(Path(__file__).resolve().parents[1]))
-    (Path(k.data) / 'tjanst.pid').write_text(str(proc.pid))
     for _ in range(120):
         time.sleep(0.5)
         if _halsa(k):
@@ -68,7 +75,12 @@ def start(k, args) -> int:
 
 def kor(k, args) -> int:
     from partnern.server import starta
-    starta(k, bygg_index=True)
+    Path(k.data).mkdir(parents=True, exist_ok=True)
+    os.chmod(k.data, 0o700)
+    logg = Path(k.data) / 'tjanst.log'
+    if logg.exists():  # launchd skapar loggen med sina egna rättigheter
+        os.chmod(logg, 0o600)
+    starta(k, bygg_index=True, pidfil=Path(k.data) / 'tjanst.pid')  # pid skrivs när porten är bunden
     return 0
 
 
@@ -78,14 +90,14 @@ def stopp(k, args) -> int:
         print('Tjänsten kör inte.')
         return 0
     os.kill(pid, signal.SIGTERM)
-    for _ in range(90):
+    for _ in range(130):  # tjänsten väntar själv upp till 45 s på att pågående körningar journalförs
         time.sleep(0.5)
         try:
             os.kill(pid, 0)
         except OSError:
             print('Tjänsten är stoppad.')
             return 0
-    print('Tjänsten svarade inte på stopp inom 45 s (pid %d).' % pid, file=sys.stderr)
+    print('Tjänsten svarade inte på stopp inom 65 s (pid %d).' % pid, file=sys.stderr)
     return 1
 
 
@@ -132,7 +144,14 @@ def overlamningar(k, args) -> int:
         print('Inga överlämningar.')
     for r in rader:
         d = json.loads(r['data'])
-        print('%s  %-9s  %s  → %s\n    %s' % (r['id'], r['status'], d.get('rubrik'), d.get('mottagare'), d.get('katalog')))
+        status = r['status']
+        try:  # mottagarens senaste kvittens gäller även när tjänsten inte har läst den ännu
+            sista = (Path(d.get('katalog') or '') / 'KVITTENS.jsonl').read_text('utf-8').strip().splitlines()[-1:]
+            if sista:
+                status = json.loads(sista[0]).get('status') or status
+        except (OSError, ValueError, IndexError):
+            pass
+        print('%s  %-9s  %s  → %s\n    %s' % (r['id'], status, d.get('rubrik'), d.get('mottagare'), d.get('katalog')))
     return 0
 
 
@@ -143,10 +162,39 @@ def kvittera(k, args) -> int:
     return 0
 
 
+def autostart(k, args) -> int:
+    """Skriver ingenting: visar en LaunchAgent och ägarens två kommandon. Hanterad policy nekar sessioner launchctl."""
+    etikett = 'se.nortropic.partner'
+    plist = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
+        '<plist version="1.0"><dict>\n'
+        '  <key>Label</key><string>%s</string>\n'
+        '  <key>ProgramArguments</key><array><string>%s</string><string>-B</string><string>%s</string>'
+        '<string>kor</string></array>\n'
+        '  <key>WorkingDirectory</key><string>%s</string>\n'
+        '  <key>EnvironmentVariables</key><dict><key>PATH</key>'
+        '<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string></dict>\n'
+        '  <key>RunAtLoad</key><true/>\n'
+        '  <key>StandardOutPath</key><string>%s</string>\n'
+        '  <key>StandardErrorPath</key><string>%s</string>\n'
+        '</dict></plist>\n' % (etikett, sys.executable, Path(__file__).resolve(), Path(__file__).resolve().parents[1],
+                                Path(k.data) / 'tjanst.log', Path(k.data) / 'tjanst.log'))
+    mal = Path.home() / 'Library/LaunchAgents' / (etikett + '.plist')
+    print('Ägarsteg (skriver ingenting här). Spara texten nedan som %s och kör sedan i din egen Terminal:\n'
+          '  launchctl bootstrap gui/$(id -u) %s\n'
+          'Tjänsten startar då vid varje inloggning ur kontorets primärutcheckning (starta inte samtidigt med\n'
+          'partner.py start). partner.py stopp stoppar den till nästa inloggning; den bestående starten tas bort med\n'
+          '  launchctl bootout gui/$(id -u)/%s\n'
+          % (mal, mal, etikett))
+    print(plist)
+    return 0
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog='partner.py', description='Projektkontorets förbättringspartner')
     sub = p.add_subparsers(dest='kommando', required=True)
-    for namn in ('start', 'kor', 'stopp', 'status', 'oppna', 'index', 'overlamningar'):
+    for namn in ('start', 'kor', 'stopp', 'status', 'oppna', 'index', 'overlamningar', 'autostart'):
         sub.add_parser(namn)
     kv = sub.add_parser('kvittera')
     kv.add_argument('id')
@@ -156,7 +204,7 @@ def main(argv=None) -> int:
     args = p.parse_args(argv)
     k = kf.ladda()
     return {'start': start, 'kor': kor, 'stopp': stopp, 'status': status, 'oppna': oppna, 'index': index,
-            'overlamningar': overlamningar, 'kvittera': kvittera}[args.kommando](k, args)
+            'overlamningar': overlamningar, 'kvittera': kvittera, 'autostart': autostart}[args.kommando](k, args)
 
 
 if __name__ == '__main__':

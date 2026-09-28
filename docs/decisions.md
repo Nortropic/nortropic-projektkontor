@@ -6766,3 +6766,56 @@ kreativa rättning, som bara rör plan och beslutslogg): 35 deterministiska prov
 server, MCP-brygga och webbkrok mot en fejkad `claude`), kontorets hela svit grön, verkliga körningar på en
 utvecklingsinstans och ett webbläsarprov. Denna post och koden integreras tillsammans; driftsättning ur main och
 slutproven på den införda tjänsten följer och redovisas i en egen resultatpost. Planen äger nästa handling.
+
+
+## FORBATTRINGSPARTNER-RESULTAT-20260928 — slutrapport för FORBATTRINGSPARTNER-20260928: förbättringspartnern är integrerad och driftsatt i kontoret, slutproven är gjorda på den införda tjänsten och rättningarna ur dem integreras med denna post; kvar för ägaren är bestående start vid inloggning och en ny fångst av Improvements efter 19 september
+
+**Status:** registrerat 2026-09-28 (21:10 UTC) av sessionen nortropic-repos-9e (Claude Code), parallellt med Digitalas
+spår och Kundstart-dialogen utan överlappande skrivningar. Hela redovisningen står i `evidence/partner/leverans.md`,
+användningen i `tools/PARTNER.md`. Nedan hålls byggt, testat, integrerat, driftsatt och observerat användbart isär.
+
+**Byggt och testat.** `tools/partner.py` och `tools/partnern/` ger en lokal tjänst med samtalsyta på svenska. Journalen
+är original, bilagorna innehållsadresserade och källindexet går att bygga om. Verktygen når modellen genom en
+MCP-brygga, med webbkrok och destinationspolicy, utredningar i bakgrunden och överlämning genom AP-06. Agentloopen är
+Claude Code headless på ägarens befintliga inloggning. 42 deterministiska prov är gröna på Python 3.12 och 3.9.
+Kandidat 1 mättes med kontorets hela svit (448) i en profil utan inloggningsuppgifter och med fjorton beteendefall i
+utfärdarens egen sandlåda.
+
+**Integrerat.** Kandidat 1 i PR 117, main `76727e9`, med `runtime/tests` och `runtime/review` från App 5110369. Den
+separata granskningen underkände två rundor på tre respektive ett blockerande fynd, som rättades. Den tredje rundan
+godkände utan blockerande fynd, med `claude-opus-5`: Fable-kvoten var slut och den fastlåsta granskarbinären
+stöder inte `claude-opus-5-5`. Kandidat 2, med rättningarna ur slutproven, denna post, planblocket och
+redovisningen, integreras genom samma skyddade väg efter egen separat granskning.
+
+**Driftsatt.** Tjänsten körs sedan 2026-09-28 20:17Z ur kontorets primärutcheckning på main, på 127.0.0.1:4760.
+`partner.py status` visade samma kod som origin/main, och hälsa, inloggning och yta kontrollerades ur en ren
+webbläsarprofil. Driftregeln är att tjänsten startas om ur main efter varje integration av partnern
+(`partner.py stopp`, `partner.py start`), och `partner.py status` ska då visa samma kod som origin/main. Tjänsten
+startar inte vid inloggning; det är ett synligt lokalt beroende.
+
+**Observerat användbart.** Tio slutprov enligt arbetsordningens avsnitt 8 kördes som verkliga körningar på en
+provinstans. Den hade samma kod, egen data och egen nyckel, och kontrollfallens facit var dolt. Inspelen skrevs av
+utvärderaren och märktes som prov. Nio prov godkändes. Ett godkändes delvis: partnern nämnde inte ett samtals
+bilagor som aldrig fångats och påstod att den läst hela samtalet. Det är rättat och omprövat mot gammal kod med
+samma fråga. Partnerns bakgrundsutredning hittade dessutom själv ett fel i sitt systemläge (ÄGARENS TUR lästes
+som tom), och det är rättat. Ägaren har ännu inte använt tjänsten själv, så att den är användbar för honom är
+inte observerat.
+
+**Korpus och luckor.** Improvements fram till källgränsen 2026-09-19 14:12Z omfattar 61 samtal, 3 111
+meddelanden och 132 bilagefiler; 3 registrerade bilagor saknar bytes och 4 är historiskt otillgängliga. Senare
+samtal saknas, och tjänsten har ingen direktåtkomst till ChatGPT. Ljud och video sparas men läses inte. Privata
+filer utöver sparade ägarord, beställningar och lägesloggar går inte att söka i.
+
+**Val i genomförandet (reversibla).** Slutproven kördes på en provinstans, så att ägarens riktiga minne inte
+innehåller provinspel i hans namn. Provets överlämningspaket flyttades efter kvittensen från beställningsvägen till
+provinstansens data. Rättningarna prövades i verkliga körningar på kandidatkoden före integrationen.
+
+**Ägarens tur.** Två rader läggs i planens ÄGARENS TUR:
+- en operatörshandling för bestående start vid inloggning; `partner.py autostart` visar filen och kommandona
+- ett beslut om en ny fångst av Improvements efter 19 september; den kräver ägarens ChatGPT-inloggning i en
+  webbläsare som en session får styra
+
+Inget annat hindrar att tjänsten används.
+
+**Avslut.** Uppdraget är fullgjort när denna post är integrerad och tjänsten har startats om ur main enligt
+driftregeln. Nästa bygge, till exempel ljudläsning, kräver ett eget beslut. Planen äger nästa handling.

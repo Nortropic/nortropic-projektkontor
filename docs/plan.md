@@ -84,16 +84,19 @@ förbättringspartnern har egna spår. Skrivansvar: sessionen nortropic-repos-9e
 `tools/test_partner.py`, `tools/PARTNER.md`, detta block och partnerns beslutsposter. Inga ändringar i Digitala,
 Kundstart eller Runtime ingår; samordning med Kundstart-dialogen (nortropic-repos-f1) är bekräftad 18:14Z.
 
-Läge när detta block skrevs (28 september 2026, 21:24 svensk tid / 19:24 UTC): partnern är byggd och provad och integreras med denna
-ändring. Den är inte driftsatt förrän tjänsten körs ur kontorets primärutcheckning på main och slutproven gjorts där.
+Läge när detta block skrevs (28 september 2026, 23:11 svensk tid / 21:11 UTC): partnern är integrerad (PR 117, main
+`76727e9`) och driftsatt. Tjänsten körs sedan 20:17 UTC ur primärutcheckningen på main (127.0.0.1:4760). De tio
+slutproven är gjorda på den införda koden: nio godkändes och ett delvis, och det är rättat och omprövat. Resultatet
+står i FORBATTRINGSPARTNER-RESULTAT-20260928 och `evidence/partner/leverans.md`, och rättningarna integreras med denna
+ändring.
 
-Nästa handling: efter integrationen snabbspolas primärutcheckningen; tjänsten startas ur den med
-`python3 -B tools/partner.py start` (datan i `evidence/partner/local/`, nyckeln i `~/.nortropic-hemligheter/partner/`);
-kontrollen `partner.py status` ska visa samma kod som origin/main. Därefter körs de tio slutproven i arbetsordningens
-avsnitt 8 på den införda tjänsten, med de reserverade kontrollfallen ur Improvements (CONV-064, CONV-061 meddelande 9,
-CONV-006, CONV-051) och episodens eget samtal dolt för provinstansen. Resultatet redovisas i en resultatpost, en
-publik leveransredovisning under `evidence/partner/` och en uppdatering av detta block. En bestående autostart
-(LaunchAgent) är ett ägarsteg eftersom hanterad policy nekar sessioner `launchctl`.
+Nästa handling: efter integrationen snabbspolas primärutcheckningen, och tjänsten startas om ur main med
+`python3 -B tools/partner.py stopp` och sedan `start`. `partner.py status` ska då visa samma kod som origin/main. Det
+är driftregeln efter varje integration av partnern. Därmed är uppdraget fullgjort, och nästa bygge kräver ett eget
+beslut. Ägarens två rader står i ÄGARENS TUR: bestående start vid inloggning och en ny fångst av Improvements efter
+19 september. Arbetsgrenen `partner/forbattringspartner-resultat-20260928` publiceras med denna ändring och tas
+sedan bort lokalt. Kandidat 1:s gren är publicerad i PR 117, och dess mellanversioner finns i en privat bundle i
+uppdragets mapp.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
@@ -941,7 +944,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27) är nio rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27) och FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28) är elva rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
@@ -955,6 +958,8 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [beslut] Digitala: schemalagd driftkontroll (drift_kontroll.py) genom Runtime kräver ett eget Runtime-mandat med release och övergång (AP-10:s schema är hårdkodat till bedömningen; inga generella schemalagda kommandon) — beställ eller avstå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [beslut] Digitala: externa aktiveringar bara vid verklig kund — Google Cloud-projekt med OAuth eller tjänstekonto för Search Console, Google Ads-utvecklartoken, Meta-token, företagsprofil genom behörig människa; inget av det ingår i uppdraget (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [operatörshandling] Codex-CLI:n i PATH (0.147.0) vägrar Runtimes modell gpt-6-astra; Runtimes pinnade codex-0.155.1 fungerar — uppdatera CLI:n eller låt det stå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
+- [operatörshandling] Förbättringspartnern: bestående start vid inloggning — `python3 -B tools/partner.py autostart` visar LaunchAgent-filen och de två launchctl-kommandona för ditt eget Terminalfönster; utan den startas tjänsten med `python3 -B tools/partner.py start` (FORBATTRINGSPARTNER-RESULTAT-20260928) — sedan 2026-09-28
+- [beslut] Förbättringspartnern: Improvements-samtal efter 2026-09-19 finns inte i partnerns underlag; en ny fångst genom Intake kräver din ChatGPT-inloggning i en webbläsare som en session får styra — beställ eller avstå (FORBATTRINGSPARTNER-RESULTAT-20260928) — sedan 2026-09-28
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade

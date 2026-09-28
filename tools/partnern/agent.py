@@ -27,6 +27,17 @@ from . import bilagor as bil
 from .lager import nu, nytt_id
 
 PAKET = Path(__file__).resolve().parent
+FORSTAELSE_AGARE_TECKEN = 10000   # Johnnys egna ord i läget
+FORSTAELSE_EGNA_TECKEN = 6000     # partnerns bedömningar i sin helhet (trådens, kopplade, relevanta)
+FORSTAELSE_RADER_TECKEN = 2500    # övriga bedömningar som en rad var
+FORSTAELSE_RELEVANTA = 6
+STOPPORD = frozenset((  # vanliga ord som annars gör varje post "relevant"
+    'och att det som en ett är på av för med till den de om vi jag du han hon mig dig oss er vad hur nu just har hade '
+    'kan ska var så men inte eller när där här från ut upp också bara vill skulle finns alla detta dessa denna vara '
+    'blir blev sig sin sitt sina min mitt mina din ditt dina vår vårt våra över under efter före mot utan hos kring '
+    'genom vid kommer göra gör gjorde någon något några tycker tror kanske jaha titta kolla').split())
+MELLANRAD_MAX = 400   # en kortare text före fler verktygsanrop räknas som mellanrad om ett längre svar följer
+SVAR_MIN = 600
 STATUS_TEXT = {'mottaget': 'mottaget', 'sparat': 'sparat', 'i_ko': 'i kö', 'undersoker': 'undersöker',
                'svarad': 'svarat', 'begransad': 'begränsat', 'avbruten': 'avbrutet', 'fel': 'fel'}
 UTREDARE_PROMPT = (
@@ -55,7 +66,8 @@ class Korning:
         self.steg = []
         self.kallor = []
         self.delsvar = ''
-        self.svarstext = []
+        self.svarstext = []      # huvudagentens textblock: {'text', 'fore_verktyg'}
+        self.sedda_meddelanden = {}  # Improvements-samtal → meddelandenummer som visats i körningen
         self.url_varder = set()
         self.sokvardar = set()
         self.soksanrop = set()   # tool_use-id för WebSearch; bara deras resultat ger tillåtna värdar
@@ -176,15 +188,22 @@ class Agent:
             lokal = nu_utc.strftime('%Y-%m-%d %H:%M') + ' UTC'
         del_ = ['# Läget för den här körningen (återgivet av partnerns server, inte skrivet av Johnny)',
                 'Tid nu: %s (Stockholm), %s.' % (lokal, nu_utc.strftime('%Y-%m-%dT%H:%MZ'))]
+        kod = self.s.kodrevision or {}
+        if kod.get('head'):
+            del_.append('Tjänsten kör kontorets kod %s (%s%s), startad %s.' % (
+                kod['head'][:8], 'samma som origin/main' if kod.get('ar_main') else 'origin/main är %s' % (
+                    kod.get('origin_main') or 'okänd')[:8], ', med lokala ändringar' if kod.get('lokala_andringar') else '',
+                (self.s.startad or '')[:16]))
         t = self.s.lager.trad(korning.trad) or {}
         antal = self.s.lager.en('select count(*) as n from inspel where trad=?', (korning.trad,))['n']
         del_.append('Tråd: "%s" (%s), startad %s, %d inspel.' % (t.get('titel') or 'Ny tråd', korning.trad,
                                                                  (t.get('skapad') or '')[:16], antal))
         r = self.s.lager.resonemang_senast(korning.trad)
         if r:
-            del_.append('Där ni är i tråden (senast uppdaterat %s): %s' % (r['tid'][:16], r.get('lage') or ''))
-            for namn, rubrik in (('fraga', 'Huvudfråga'), ('spar', 'Spår'), ('invandningar', 'Invändningar'),
-                                 ('nasta', 'Att undersöka härnäst')):
+            del_.append('Din egen sammanfattning av tråden ("Där vi är", skriven av partnern, inte Johnnys ord; '
+                        'senast uppdaterad %s): %s' % (r['tid'][:16], r.get('lage') or ''))
+            for namn, rubrik in (('fraga', 'Huvudfråga (din formulering)'), ('spar', 'Spår'),
+                                 ('invandningar', 'Invändningar'), ('nasta', 'Att undersöka härnäst')):
                 v = r.get(namn)
                 if v:
                     del_.append('%s: %s' % (rubrik, '; '.join(v) if isinstance(v, list) else v))
@@ -194,28 +213,7 @@ class Agent:
             annan = kp['trad'] if kp['till'] == korning.trad else kp['till']
             at = self.s.lager.trad(annan) or {}
             del_.append('Kopplad tråd: "%s" (%s) — %s' % (at.get('titel'), annan, kp['skal'] or ''))
-        aktiv = self.s.lager.forstaelse_aktiv()
-        ersatta = self.s.lager.en('select count(*) as n from forstaelse where ersatt_av is not null')['n']
-        if aktiv:
-            del_.append('\n## Gällande förståelse i partnerns lager (bär mellan trådar och sessioner)')
-            del_.append('Ägarens rättelser och beslut går före allt annat. Återinför aldrig en ersatt tolkning.')
-            ordning = {'rattelse': 0, 'beslut': 1, 'bortval': 2, 'preferens': 3, 'oppen_fraga': 4, 'slutsats': 5,
-                       'observation': 6}
-            budget = 14000
-            for f in sorted(aktiv, key=lambda x: (ordning.get(x['slag'], 9), -x['nr'])):
-                data = json.loads(f['data'])
-                rad = '- F-%d [%s · %s · %s]: %s' % (f['nr'], f['slag'], f['auktoritet'], f['tid'][:10], f['text'])
-                if data.get('agarcitat'):
-                    rad += ' — Johnnys ord: "%s"' % data['agarcitat'][:300]
-                if data.get('ersatter'):
-                    rad += ' (ersätter tidigare poster)'
-                if budget - len(rad) < 0:
-                    del_.append('- … fler poster finns; sök i omfånget partner.')
-                    break
-                budget -= len(rad)
-                del_.append(rad)
-            if ersatta:
-                del_.append('(%d ersatta poster finns kvar som historik; öppna F-nummer för kedjan.)' % ersatta)
+        del_ += self._forstaelseblock(korning, [kp['trad'] if kp['till'] == korning.trad else kp['till'] for kp in kopplingar])
         del_.append('\n## Källtäckning')
         del_.append(self.s.tackningstext())
         lage = self.s.systemlage.las(['repon'], farsk=False).get('repon') or {}
@@ -230,6 +228,92 @@ class Agent:
         f = self.dygnsforbrukning()
         del_.append('\nModellkörningar i dag: %d av %d.' % (f['korningar'], f['max_korningar']))
         return '\n'.join(del_)
+
+    def _forstaelseblock(self, korning: Korning, kopplade: list) -> list:
+        """Gällande förståelse: Johnnys egna rättelser och beslut i sin helhet; partnerns egna tidigare bedömningar
+        i sin helhet bara när de hör till tråden, en kopplad tråd eller det Johnny tar upp nu, övriga som en rad.
+        Så styr inte partnerns äldre domar varje ny tråd, och det som inte visas sägs uttryckligen."""
+        aktiv = self.s.lager.forstaelse_aktiv()
+        ersatta = self.s.lager.en('select count(*) as n from forstaelse where ersatt_av is not null')['n']
+        if not aktiv:
+            return []
+        ut = ['\n## Gällande förståelse i partnerns lager (bär mellan trådar och sessioner)']
+        agare = [f for f in aktiv if f['auktoritet'] == 'agarens_ord']
+        egna = [f for f in aktiv if f['auktoritet'] != 'agarens_ord']
+
+        def rad(f, hel=True):
+            data = json.loads(f['data'])
+            text = f['text'] if hel else (f['text'][:160] + ('…' if len(f['text']) > 160 else ''))
+            r = '- F-%d [%s · %s · %s]: %s' % (f['nr'], f['slag'], f['auktoritet'], f['tid'][:10], text)
+            if hel and data.get('agarcitat'):
+                r += ' — Johnnys ord: "%s"' % data['agarcitat'][:300]
+            if hel and data.get('ersatter'):
+                r += ' (ersätter tidigare poster)'
+            return r
+
+        if agare:
+            ut.append('### Johnnys egna rättelser och beslut (hans ord; går före allt annat, återinför aldrig en '
+                      'ersatt tolkning)')
+            budget, utelamnade = FORSTAELSE_AGARE_TECKEN, 0
+            for f in sorted(agare, key=lambda x: -x['nr']):
+                r = rad(f)
+                if budget - len(r) < 0:
+                    utelamnade += 1
+                    continue
+                budget -= len(r)
+                ut.append(r)
+            if utelamnade:
+                ut.append('- (%d äldre poster med Johnnys ord ryms inte här; sök i omfånget partner eller öppna '
+                          'F-numren.)' % utelamnade)
+        if egna:
+            ut.append('### Dina egna tidigare bedömningar och iakttagelser (inte Johnnys beslut)')
+            ut.append('Pröva dem mot underlaget och mot det Johnny säger nu, och upprepa dem inte som fakta. En '
+                      'bedömning som Johnny inte har bekräftat är fortfarande bara din.')
+            nara = {korning.trad} | set(kopplade)
+            relevanta = self._relevanta_forstaelse(korning)
+            hela = [f for f in egna if f['trad'] in nara or f['id'] in relevanta]
+            ovriga = [f for f in egna if f not in hela]
+            budget = FORSTAELSE_EGNA_TECKEN
+            for f in sorted(hela, key=lambda x: -x['nr']):
+                r = rad(f)
+                if budget - len(r) < 0:
+                    ovriga.append(f)
+                    continue
+                budget -= len(r)
+                ut.append(r)
+            if ovriga:
+                ut.append('Övriga (bara första raden; öppna F-numret om det behövs):')
+                budget, visade = FORSTAELSE_RADER_TECKEN, 0
+                for f in sorted(ovriga, key=lambda x: -x['nr']):
+                    r = rad(f, hel=False)
+                    if budget - len(r) < 0:
+                        break
+                    budget -= len(r)
+                    visade += 1
+                    ut.append(r)
+                if visade < len(ovriga):
+                    ut.append('- (%d äldre bedömningar visas inte här; sök i omfånget partner.)' % (len(ovriga) - visade))
+        if ersatta:
+            ut.append('(%d ersatta poster finns kvar som historik; öppna F-nummer för kedjan.)' % ersatta)
+        return ut
+
+    def _relevanta_forstaelse(self, korning: Korning) -> set:
+        """Förståelseposter som liknar det Johnny tar upp i den här turen (ordsökning i lagrets eget index)."""
+        from .kallor import Kallindex
+        text = ' '.join((i.get('text') if isinstance(i, dict) else i['text']) or '' for i in korning.inspel)
+        if korning.jobb:
+            text += ' ' + str(korning.jobb.get('rubrik') or '') + ' ' + str(korning.jobb.get('uppdrag') or '')
+        ord_ = [o for o in re.findall(r'[\w-]+', re.sub(r'https?://\S+', ' ', text)[:1500])
+                if len(o) >= 3 and o.lower() not in STOPPORD]
+        q = Kallindex._fts_fraga(' '.join(ord_), True)
+        if not q:
+            return set()
+        try:
+            rader = self.s.lager.fraga("select kalla_id from sok where sok match ? and klass='partner:forstaelse' "
+                                       "order by bm25(sok, 0, 0, 3.0, 0, 0, 1.0) limit ?", [q, FORSTAELSE_RELEVANTA])
+        except Exception:
+            return set()
+        return {r['kalla_id'][8:] for r in rader}
 
     def historiktext(self, trad: str, utom: set) -> str:
         rader = self.s.historik(trad, max_tecken=40000, utom=utom)
@@ -337,10 +421,14 @@ class Agent:
                 '--tools', verktyg, '--allowedTools', 'mcp__partner', 'WebFetch', 'WebSearch', 'Agent',
                 '--permission-mode', 'dontAsk', '--permission-prompts', 'none', '--no-chrome',
                 '--disable-slash-commands', '--settings', json.dumps(installningar), '--agents', json.dumps(agenter),
-                '--max-turns', str(g.tur_max_steg), '--max-budget-usd', str(g.tur_max_listpris_usd)]
+                '--max-turns', str(self.maxsteg(korning)), '--max-budget-usd', str(g.tur_max_listpris_usd)]
         argv += (['--session-id', session] if ny else ['--resume', session])
         korning.maxtid = maxtid
         return argv
+
+    def maxsteg(self, korning: Korning) -> int:
+        g = self.k.gransar
+        return g.tur_max_steg if korning.typ == 'tur' else g.jobb_max_steg
 
     def miljo(self, korning: Korning, ateruppta: bool) -> dict:
         env = {k: os.environ[k] for k in ('HOME', 'USER', 'LOGNAME', 'TMPDIR') if k in os.environ}
@@ -478,9 +566,12 @@ class Agent:
                 if b.get('type') == 'tool_use':
                     if b.get('name') == 'WebSearch' and b.get('id'):
                         korning.soksanrop.add(b['id'])
+                    if huvud:
+                        for t in korning.svarstext:
+                            t['fore_verktyg'] = True
                     korning.handelse('verktyg' if huvud else 'utredare', _beskriv_verktyg(b.get('name'), b.get('input') or {}))
                 elif b.get('type') == 'text' and huvud and b.get('text', '').strip():
-                    korning.svarstext.append(b['text'])
+                    korning.svarstext.append({'text': b['text'], 'fore_verktyg': False})
         elif typ == 'user':
             innehall = (ev.get('message') or {}).get('content')
             if isinstance(innehall, list):
@@ -513,9 +604,7 @@ class Agent:
                 steg=resultat.get('num_turns'), modell=korning.modell,
                 webbsokningar=((u.get('server_tool_use') or {}).get('web_search_requests')))
             korning.session = resultat.get('session_id') or korning.session
-        # Svaret är alla huvudagentens textblock i ordning: modellen skriver ofta sin analys före de sista
-        # verktygsanropen och avslutar med en kort rad, som ensam är det som står i resultatet.
-        helt = '\n\n'.join(t.strip() for t in korning.svarstext if t.strip())
+        helt = svarstext(korning.svarstext)
         svar = (resultat or {}).get('result') or ''
         if helt and (not svar.strip() or svar.strip() in helt):
             svar = helt
@@ -528,8 +617,8 @@ class Agent:
         if resultat and resultat.get('subtype') == 'success' and not resultat.get('is_error') and svar.strip():
             return self._avsluta(korning, 'svarad', svar=svar, forbrukning=forbrukning, start=start)
         if resultat and resultat.get('subtype') in ('error_max_turns', 'error_max_budget_usd'):
-            skal = ('stegtaket (%d verktygssteg)' % self.k.gransar.tur_max_steg if resultat['subtype'] == 'error_max_turns'
-                    else 'kostnadstaket per tur')
+            skal = ('stegtaket (%d verktygssteg)' % self.maxsteg(korning) if resultat['subtype'] == 'error_max_turns'
+                    else 'kostnadstaket per körning')
             return self._avsluta(korning, 'begransad', orsak='Arbetet stoppades av %s.' % skal, delsvar=delsvar,
                                  forbrukning=forbrukning, start=start)
         text = (svar or '') + ' ' + (resultat or {}).get('subtype', '')
@@ -549,6 +638,20 @@ class Agent:
         return {'status': status, 'svar': svar, 'orsak': orsak, 'delsvar': delsvar, 'session': korning.session,
                 'modell': korning.modell, 'forbrukning': forbrukning or {'modellanrop': False},
                 'steg': korning.steg[-60:], 'kallor': _unika(korning.kallor)[:120]}
+
+
+def svarstext(block: list) -> str:
+    """Svaret är huvudagentens textblock i ordning. Modellen skriver ofta sin analys före de sista verktygsanropen
+    och avslutar med en kort rad, så alla block behövs. En kort mellanrad som följdes av fler verktygsanrop och
+    efter vilken ett längre svar kommer ("Kort läge: … nu läser jag …") hör till arbetet, inte till svaret; den
+    finns kvar i delsvaret och strömmen."""
+    texter = [(b['text'].strip(), b.get('fore_verktyg')) for b in block if b['text'].strip()]
+    ut = []
+    for i, (text, fore) in enumerate(texter):
+        if fore and len(text) <= MELLANRAD_MAX and any(len(t) >= SVAR_MIN for t, _ in texter[i + 1:]):
+            continue
+        ut.append(text)
+    return '\n\n'.join(ut)
 
 
 def _unika(kallor: list) -> list:
