@@ -39,7 +39,7 @@ class Overlamning:
         self.s = server
 
     def katalog(self, oid: str) -> Path:
-        return Path(self.s.k.kontor_primar) / 'evidence/nasta-uppdrag/local' / ('partner-' + oid)
+        return paketrot(self.s.k) / ('partner-' + oid)
 
     def bered(self, korning, a: dict) -> dict:
         citat = str(a.get('agarcitat') or '')
@@ -114,7 +114,8 @@ class Overlamning:
                                    '(sista raden gäller).'}
         self._skriv(kat / 'OVERLAMNING.json', json.dumps(tillstand, ensure_ascii=False, indent=1))
         (kat / 'KVITTENS.jsonl').touch(mode=0o600)
-        visning = 'kontoret/evidence/nasta-uppdrag/local/partner-%s/' % oid
+        visning = (('provinstansens data: overlamningar/partner-%s/' if getattr(self.s.k, 'prov_dolj', ())
+                    else 'kontoret/evidence/nasta-uppdrag/local/partner-%s/') % oid)
         self.s.lager.lagg_till('overlamning', overlamning=oid, trad=korning.trad, inspel=inspel['id'],
                                nyckel=inspel['id'], rubrik=rubrik, mal=mal, mottagare=mottagare,
                                katalog=str(kat), katalog_visning=visning, ap06=ap06, granser=granser,
@@ -232,12 +233,22 @@ class _Tyst:
         pass
 
 
-def kvittera(kontor_primar: Path, oid: str, status: str, av: str, bevis: str = '') -> Path:
+def paketrot(k) -> Path:
+    """Kontorets beställningsväg. En provinstans (PARTNER_PROV_DOLJ) skriver i sin egen data: den vanliga tjänsten
+    indexerar AGARENS-ORD.md i beställningsvägen som Johnnys ord, och provtext i hans namn får aldrig hamna där."""
+    if getattr(k, 'prov_dolj', ()):
+        return Path(k.data) / 'overlamningar'
+    return Path(k.kontor_primar) / 'evidence/nasta-uppdrag/local'
+
+
+def kvittera(k, oid: str, status: str, av: str, bevis: str = '') -> Path:
+    """k är tjänstens konfiguration (eller, som tidigare, kontorets primärutcheckning)."""
     if status not in STATUSAR[1:]:
         raise ValueError('status måste vara en av ' + ', '.join(STATUSAR[1:]))
     if not re.match(r'^OVL-\d{8}-[A-Za-z0-9]{6}$', oid):
         raise ValueError('okänt överlämnings-id')
-    fil = Path(kontor_primar) / 'evidence/nasta-uppdrag/local' / ('partner-' + oid) / 'KVITTENS.jsonl'
+    rot = paketrot(k) if hasattr(k, 'kontor_primar') else Path(k) / 'evidence/nasta-uppdrag/local'
+    fil = rot / ('partner-' + oid) / 'KVITTENS.jsonl'
     if not fil.exists():
         raise FileNotFoundError(str(fil))
     with open(fil, 'a', encoding='utf-8') as f:

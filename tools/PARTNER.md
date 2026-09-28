@@ -45,7 +45,7 @@ ska bära framåt och håller trådens läge aktuellt.
 | --- | --- | --- |
 | Lager: journal (original, append-only, fsync), innehållsadresserade bilagor, härlett index | `partnern/lager.py` | Indexet byggs om ur journalen |
 | Bilagor: typ ur innehållet, textlager (pdftotext, textutil, zip-XML), sidbilder (pdftoppm), modellbild (sips) | `partnern/bilagor.py` | Ljud, video och okänt sparas men märks olästa |
-| Källindex: Improvements-korpusen, ägarens sparade ord och beställningar, kontorets beslut/plan, andra repons dokument, förberedelsens syntes | `partnern/kallor.py` | `partner.py index` bygger om; privata filer tvättas från hemligheter |
+| Källindex: Improvements-korpusen, ägarens sparade ord och beställningar, kontorets beslut/plan, andra repons dokument, förberedelsens syntes | `partnern/kallor.py` | Byggs om vid start och inom tio minuter när repons lokala origin/main, de sparade ägarorden eller korpusens manifest ändras (`partner.py index` gör det direkt); privata filer tvättas från hemligheter |
 | Systemläge: git (origin/main, primärutcheckning), planen på main, Runtimes drift genom Aquariums läsning, öppna PR | `partnern/systemlage.py` | Alltid med lästid och ålder |
 | Verktyg för modellen: sök, öppna i sammanhang, bilaga, systemläge, repo, GitHub (GET), förståelse, resonemang, tråd, bered_uppdrag, utred | `partnern/verktyg.py` | Genom MCP-bryggan, per körning |
 | Agentloop: Claude Code headless (`claude -p`, dvs. Agent SDK via CLI) i begränsat läge | `partnern/agent.py` | Se modell och drift nedan |
@@ -124,7 +124,10 @@ meddelanden, 3 projektfiler och 132 unika bilagefiler; 3 registrerade bilagor sa
 otillgängliga. Samtal i ChatGPT-projektet efter källgränsen finns inte i korpusen. Tjänsten har ingen
 direktåtkomst till ChatGPT. Senare arbetsordrar och ägarord finns där sessioner sparat dem ordagrant i kontorets
 privata bevis. En ny fångst genom befintlig Intake-väg (Chrome-session med ChatGPT-inloggning) läggs in genom att
-peka `PARTNER_IMPROVEMENTS` på den nya korpusen och köra `partner.py index`.
+peka `PARTNER_IMPROVEMENTS` på den nya korpusen och starta om tjänsten (eller köra `partner.py index`). Ägarord och
+beställningar som sessioner sparar blir sökbara inom tio minuter. Nya beslut och planändringar blir det när
+primärutcheckningens origin/main har uppdaterats; tjänsten hämtar inte själv från GitHub, men sessioner gör det vid
+start (`ingang.py`) och efter varje publicering. Repo-verktygen läser den senast hämtade origin/main.
 
 ## Överlämning
 
@@ -142,9 +145,9 @@ python3 -B tools/partner.py kvittera OVL-… levererad --av "<session>" --bevis 
 python3 -B tools/partner.py kvittera OVL-… avslagen --av "<session>" --bevis "<skäl>"
 ```
 
-En provinstans (egen `PARTNER_DATA`, `PARTNER_PORT` och `PARTNER_HEMLIGHETER`) skriver sina paket i samma
-beställningsväg. Paket från prov flyttas efter kvittensen till provinstansens data, annars indexerar den vanliga
-tjänsten provtexten som Johnnys ord.
+En provinstans (egen `PARTNER_DATA`, `PARTNER_PORT` och `PARTNER_HEMLIGHETER` samt `PARTNER_PROV_DOLJ`) skriver sina
+paket i sin egen data (`overlamningar/`), inte i beställningsvägen: den vanliga tjänsten indexerar `AGARENS-ORD.md`
+där som Johnnys ord, och provtext i hans namn får aldrig hamna där.
 
 ## Prov
 

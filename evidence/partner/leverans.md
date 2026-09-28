@@ -1,8 +1,8 @@
 # Förbättringspartnern: leveransredovisning (FORBATTRINGSPARTNER-20260928)
 
 Skriven 2026-09-28 av sessionen nortropic-repos-9e (Claude Code). Beställningen och gränserna står i beslutet
-FORBATTRINGSPARTNER-20260928. Resultatet sammanfattas i FORBATTRINGSPARTNER-RESULTAT-20260928, och hur tjänsten
-används står i `tools/PARTNER.md`. Privata underlag (provtrådar, lägeslogg, granskningar, mätningar) ligger under
+FORBATTRINGSPARTNER-20260928. Resultatet sammanfattas i FORBATTRINGSPARTNER-RESULTAT-20260928 och dess tillägg, och
+hur tjänsten används står i `tools/PARTNER.md`. Privata underlag (provtrådar, lägeslogg, granskningar, mätningar) ligger under
 `evidence/nasta-uppdrag/local/forbattringspartner-20260928/` och publiceras inte.
 
 ## Vad Johnny har nu
@@ -19,10 +19,10 @@ Stegen redovisas var för sig.
 
 | Steg | Vad | Belägg |
 | --- | --- | --- |
-| Byggt | `tools/partner.py`, `tools/partnern/` (lager, bilagor, källindex, systemläge, verktyg via MCP-brygga, agentloop, webbkrok och -policy, utredningar, överlämning, server och svensk yta), `tools/PARTNER.md` | Kandidat 1 `eb6f4c9`, kandidat 2 är denna ändring |
-| Testat | 42 deterministiska prov (riktig server, MCP-brygga och webbkrok mot en fejkad `claude`), gröna på Python 3.12 och 3.9. Kontorets hela svit kördes i en profil utan inloggningsuppgifter och fjorton beteendefall i utfärdarens egen sandlåda (kandidat 1). Tio slutprov gjordes som verkliga körningar på den införda tjänsten, och rättningarna prövades om i verkliga körningar på kandidatkoden. | Se nedan |
-| Integrerat | Kandidat 1: PR 117, main `76727e9`, med `runtime/tests` och `runtime/review` utfärdade av App 5110369 efter förseglad beteendeacceptans. Kandidat 2: denna ändring. | Beslutsloggen och PR:erna |
-| Driftsatt | Tjänsten körs sedan 2026-09-28 20:17Z ur kontorets primärutcheckning på main, på 127.0.0.1:4760, och `partner.py status` visar samma kod som origin/main. Hälsa, inloggning och yta är kontrollerade ur en ren webbläsarprofil. Efter kandidat 2 startas tjänsten om ur main. | Planens block för partnern |
+| Byggt | `tools/partner.py`, `tools/partnern/` (lager, bilagor, källindex, systemläge, verktyg via MCP-brygga, agentloop, webbkrok och -policy, utredningar, överlämning, server och svensk yta), `tools/PARTNER.md` | Kandidat 1 `eb6f4c9`, kandidat 2 `905843d`, kandidat 3 är den senaste ändringen |
+| Testat | 44 deterministiska prov (riktig server, MCP-brygga och webbkrok mot en fejkad `claude`), gröna på Python 3.12 och 3.9. Kontorets hela svit kördes i en profil utan inloggningsuppgifter, och beteendefallen kördes i utfärdarens egen sandlåda: 448 prov och fjorton fall för kandidat 1, 455 prov och 22 fall för kandidat 2, 457 prov och 24 fall för kandidat 3. Tio slutprov gjordes som verkliga körningar på den införda tjänsten, och rättningarna prövades om i verkliga körningar på kandidatkoden. | Se nedan |
+| Integrerat | Kandidat 1: PR 117, main `76727e9`. Kandidat 2: PR 118, main `ec87c06`. Båda fick `runtime/tests` och `runtime/review` utfärdade av App 5110369 efter förseglad beteendeacceptans. Kandidat 3 (källindexet byggs om automatiskt) integreras på samma sätt. | Beslutsloggen och PR:erna |
+| Driftsatt | Tjänsten körs ur kontorets primärutcheckning på main, på 127.0.0.1:4760: kandidat 1 från 2026-09-28 20:17Z och kandidat 2 från 21:30Z. `partner.py status` och tjänstens egen vy visade samma kod som main. Kontrollen ur en ren webbläsarprofil gick igenom med 11 av 11. Efter kandidat 3 startas tjänsten om ur main på samma sätt. | Planens block för partnern |
 | Observerat användbart | Slutproven: nio godkända, ett delvis godkänt som nu är rättat och omprövat. Johnny har ännu inte använt tjänsten själv. | Tabellen nedan |
 
 ## Slutproven (arbetsordningens avsnitt 8)
@@ -51,7 +51,7 @@ Två iakttagelser utanför själva proven. Bakgrundsutredningen i prov 10 hittad
 systemläge: ÄGARENS TUR lästes som tom. I tre svar och i utredningens resultat hamnade dessutom korta mellanrader
 ("nu läser jag …").
 
-## Rättat efter slutproven och omprövat (kandidat 2)
+## Rättat efter slutproven och omprövat (kandidat 2 och 3)
 
 - **Öppna i sammanhang** visar samtalets alla bilagor med status, även sådana som saknar meddelandebindning i
   fångsten. Den visar också vilket fönster som öppnades och hur stor del av samtalet körningen har sett. Omprov
@@ -76,6 +76,12 @@ systemläge: ÄGARENS TUR lästes som tom. I tre svar och i utredningens resulta
   `partner.py autostart` visar ägarens LaunchAgent utan att skriva något.
 - **Webbpolicyn** prövar även procentavkodade adresser, och dess beskrivning säger var gränsen går (granskningens
   restpunkter).
+- **Källindexets färskhet (kandidat 3).** Efter omstarten med kandidat 2 syntes att källindexet bara byggdes vid
+  första start eller med `partner.py index`, så nya beslut och ägarord blev inte sökbara av sig själva. Nu byggs
+  indexet om vid start och inom tio minuter när repons lokala origin/main, de sparade ägarorden eller korpusens
+  manifest ändras. På de verkliga källorna tar avtrycket under en sekund och ombyggnaden ett par sekunder. Eftersom
+  ägarord nu indexeras automatiskt skriver en provinstans sina överlämningspaket i sin egen data i stället för i
+  beställningsvägen.
 
 ## Korpus, täckning och luckor
 
@@ -117,8 +123,8 @@ systemläge: ÄGARENS TUR lästes som tom. I tre svar och i utredningens resulta
   1,2 USD. Sparande, sökning och öppning av källor anropar aldrig en modell.
 - **Verkställda gränser:** två samtidiga körningar, 15 minuter och 40 steg per tur, 30 minuter och 150 steg per
   utredning, 8 USD per körning, 150 körningar och 250 USD per dygn.
-- **Granskningar:** Runtimes läsarprofil med `claude-fable-5-1` (två rundor) och `claude-opus-5` (en runda på
-  kandidat 1, se nedan).
+- **Granskningar:** Runtimes läsarprofil, med `claude-fable-5-1` i kandidat 1:s två första rundor och sedan
+  `claude-opus-5` (se nedan).
 
 ## Överlämningen i praktiken
 
@@ -127,7 +133,8 @@ Prov 9 lämnade ett paket i kontorets beställningsväg (`evidence/nasta-uppdrag
 underlag och ett AP-06-utkast. Luckorna var krav utan prov och fält i uppgiften som bara mottagaren kan fylla.
 Kontorets kedjedrivare, här utvärderaren, kvitterade `mottagen` och sedan `avslagen`, och tråden visade båda. Eftersom
 provtexten stod i Johnnys namn flyttades paketet sedan till provinstansens data, så att den vanliga tjänsten inte
-indexerar den som hans ord. Beställningsvägen har inga paket från partnern.
+indexerar den som hans ord. Sedan kandidat 3 skriver en provinstans sina paket där direkt. Beställningsvägen har inga
+paket från partnern.
 
 ## Revisioner, granskning, integration, drift och återställning
 
@@ -141,8 +148,12 @@ indexerar den som hans ord. Beställningsvägen har inga paket från partnern.
 
   Kandidat 1 mättes med 448 prov och fjorton beteendefall, förseglades och publicerades med torrkörning först
   genom den adopterade utfärdaren: PR 117, main `76727e9`.
-- **Kandidat 2** (denna ändring): rättningarna ovan, resultatposten, planblocket och denna redovisning. Den
-  integreras på samma sätt efter egen separat granskning.
+- **Kandidat 2** (`905843d`): rättningarna ovan, resultatposten, planblocket och denna redovisning. Den separata
+  granskningen med `claude-opus-5` godkände den utan blockerande fynd, med 13 restpunkter. Kandidaten mättes med
+  455 prov och 22 beteendefall; de åtta nya fallen faller på den gamla koden. Den publicerades som PR 118, main
+  `ec87c06`.
+- **Kandidat 3:** automatisk ombyggnad av källindexet, provinstansens paket i egen data (44 prov) och uppdaterat
+  läge i planblocket och här. Den integreras på samma sätt efter egen separat granskning.
 - **Drift:** tjänsten körs ur primärutcheckningen på main och startas om ur main efter varje integration av
   partnern. Provinstansen och omprovsinstansen körde på egna portar med egen data.
 - **Återställning:** `python3 -B tools/partner.py stopp` stoppar tjänsten. Kod återställs genom att en PR vänds, och

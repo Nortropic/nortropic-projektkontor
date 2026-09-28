@@ -157,7 +157,7 @@ def overlamningar(k, args) -> int:
 
 def kvittera(k, args) -> int:
     from partnern.overlamning import kvittera as kv
-    fil = kv(k.kontor_primar, args.id, args.status, args.av, args.bevis or '')
+    fil = kv(k, args.id, args.status, args.av, args.bevis or '')
     print('Kvitterat %s som %s i %s. Partnern visar statusen i tråden (inom 30 s när tjänsten kör).' % (args.id, args.status, fil))
     return 0
 

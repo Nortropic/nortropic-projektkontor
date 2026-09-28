@@ -14,7 +14,10 @@ import json
 import os
 import re
 import subprocess
+import threading
 from pathlib import Path
+
+from .lager import nu
 
 KLASSER = {
     'imp:samtal': 'Improvements-samtal (original, fångat)',
@@ -118,6 +121,15 @@ def _rubrikdelar(text: str, niva: str = r'#{1,3} ') -> list:
     return delar
 
 
+PRIVATA_MONSTER = [(re.compile(r'^owner-words.*\.md$'), 'privat:agarens-ord'),
+                   (re.compile(r'^.*agarens-ord.*\.md$', re.I), 'privat:agarens-ord'),
+                   (re.compile(r'^owner-directive.*\.md$'), 'privat:agarens-ord'),
+                   (re.compile(r'^ARBETSORDER-ORIGINAL.*\.md$'), 'privat:bestallning'),
+                   (re.compile(r'^BESTALLNING.*\.md$'), 'privat:bestallning'),
+                   (re.compile(r'^tillagg-.*\.md$'), 'privat:bestallning'),
+                   (re.compile(r'^LAGE\.md$'), 'privat:lage')]
+HOPPA = re.compile(r'^(\.git|node_modules|\.scratch|arbetsyta|arbetsytor|integration-.*|review.*|granskning.*|'
+                   r'worktrees?|blobs|harlett|turer|journal|tmp|partner)$')
 MEDDELANDE = re.compile(r'^## Meddelande (\d+) — (.+?) \((användare|assistent|system|verktyg)\)\s*$', re.M)
 
 
@@ -126,6 +138,7 @@ class Kallindex:
         self.lager = lager
         self.k = konfig
         self.dolda = tuple(getattr(konfig, 'prov_dolj', ()) or ())
+        self._bygglas = threading.Lock()
 
     def dold(self, kid: str) -> bool:
         if not self.dolda:
@@ -137,6 +150,7 @@ class Kallindex:
 
     # --------------------------------------------------------------- bygg
     def bygg(self) -> dict:
+        avtryck = self.fingeravtryck()  # före läsningen: en ändring under bygget ger ett nytt bygge nästa gång
         poster = []
         tackning = {}
         for namn, fn in (('improvements', self._improvements), ('kampanj', self._kampanj),
@@ -160,7 +174,54 @@ class Kallindex:
                                 p['datum'], bit))
             db.execute("insert or replace into meta values('kalltackning', ?)",
                        (json.dumps(tackning, ensure_ascii=False),))
+            db.execute("insert or replace into meta values('kallavtryck', ?)", (json.dumps(avtryck, sort_keys=True),))
+            db.execute("insert or replace into meta values('kallindex_byggt', ?)", (nu(),))
         return {'poster': len(poster), 'tackning': tackning}
+
+    # --------------------------------------------------------------- färskhet
+    def fingeravtryck(self) -> dict:
+        """Billigt avtryck av det källindexet byggs ur: repons origin/main, de privata ägarord-, beställnings- och
+        lägesfilerna (sökväg, storlek, ändringstid) och korpusens manifest. Ändras det byggs indexet om."""
+        def main(rot) -> str | None:
+            try:
+                r = subprocess.run(['git', '-C', str(rot), 'rev-parse', '--verify', '-q', 'origin/main'],
+                                   capture_output=True, text=True, timeout=10)
+            except (OSError, subprocess.SubprocessError):
+                return None
+            return r.stdout.strip() or None
+
+        def stat(p: Path):
+            try:
+                st = p.stat()
+                return [st.st_size, st.st_mtime_ns]
+            except OSError:
+                return None
+        repon = {'kontoret': main(self.k.kontor_primar)}
+        for namn, rot in sorted((self.k.repon or {}).items()):
+            if namn != 'kontoret':
+                repon[namn] = main(rot)
+        privata = hashlib.sha256()
+        for p, _ in self._privata_filer():
+            privata.update(json.dumps([str(p), stat(p)]).encode())
+        return {'repon': repon, 'privata': privata.hexdigest(),
+                'korpus': stat(Path(self.k.improvements) / 'project-manifest.json'),
+                'kampanj': stat(Path(self.k.kampanj) / 'evidence/source-boundary-20260919.json')}
+
+    def inaktuellt(self) -> bool:
+        r = self.lager.en("select varde from meta where nyckel='kallavtryck'")
+        return not r or json.loads(r['varde']) != json.loads(json.dumps(self.fingeravtryck(), sort_keys=True))
+
+    def uppdatera_om_inaktuellt(self) -> bool:
+        """Bygg om källindexet om något av det det byggs ur har ändrats. Returnerar om det byggdes om."""
+        with self._bygglas:
+            if not self.inaktuellt():
+                return False
+            self.bygg()
+            return True
+
+    def byggt(self) -> str | None:
+        r = self.lager.en("select varde from meta where nyckel='kallindex_byggt'")
+        return r['varde'] if r else None
 
     def tackning(self) -> dict:
         r = self.lager.en("select varde from meta where nyckel='kalltackning'")
@@ -319,48 +380,49 @@ class Kallindex:
                               capture_output=True, text=True, timeout=10).stdout.strip()
         return poster, {'beslut': len(ids), 'main': main}
 
-    def _privat(self):
+    def _privata_filer(self):
+        """Ägarord, beställningar och lägesloggar under kontorets evidence/**/local, som (sökväg, klass)."""
         rot = Path(self.k.kontor_primar) / 'evidence'
-        monster = [(re.compile(r'^owner-words.*\.md$'), 'privat:agarens-ord'),
-                   (re.compile(r'^.*agarens-ord.*\.md$', re.I), 'privat:agarens-ord'),
-                   (re.compile(r'^owner-directive.*\.md$'), 'privat:agarens-ord'),
-                   (re.compile(r'^ARBETSORDER-ORIGINAL.*\.md$'), 'privat:bestallning'),
-                   (re.compile(r'^BESTALLNING.*\.md$'), 'privat:bestallning'),
-                   (re.compile(r'^tillagg-.*\.md$'), 'privat:bestallning'),
-                   (re.compile(r'^LAGE\.md$'), 'privat:lage')]
-        hoppa = re.compile(r'^(\.git|node_modules|\.scratch|arbetsyta|arbetsytor|integration-.*|review.*|granskning.*|'
-                           r'worktrees?|blobs|harlett|turer|journal|tmp|partner)$')
-        sedda, innehall, poster = set(), set(), []
         for mapp, kataloger, filer in os.walk(rot):
-            kataloger[:] = [d for d in kataloger if not hoppa.match(d)
-                            and not os.path.exists(os.path.join(mapp, d, '.git'))]
+            kataloger[:] = sorted(d for d in kataloger if not HOPPA.match(d)
+                                  and not os.path.exists(os.path.join(mapp, d, '.git')))
             if '/local' not in mapp.replace(str(rot), ''):
                 continue
             for namn in sorted(filer):
-                klass = next((k for m, k in monster if m.match(namn)), None)
-                if not klass:
-                    continue
+                klass = next((k for m, k in PRIVATA_MONSTER if m.match(namn)), None)
                 p = Path(mapp) / namn
-                if not p.is_file() or p.stat().st_size > 400_000:
-                    continue
+                try:  # en annan session kan flytta eller ta bort filen under vandringen
+                    ok = bool(klass) and p.is_file() and p.stat().st_size <= 400_000
+                except OSError:
+                    ok = False
+                if ok:
+                    yield p, klass
+
+    def _privat(self):
+        rot = Path(self.k.kontor_primar) / 'evidence'
+        sedda, innehall, poster = set(), set(), []
+        talare = {'privat:agarens-ord': 'Johnny (ordagrant, sparat av session)',
+                  'privat:bestallning': 'Johnny lämnade (sammanställt underlag, inte ordagranna ägarord)',
+                  'privat:lage': 'arbetande session (lägeslogg)'}
+        for p, klass in self._privata_filer():
+            try:
                 data = p.read_bytes()
-                h = hashlib.sha256(data).hexdigest()
-                if h in innehall:
+            except OSError:
+                continue
+            h = hashlib.sha256(data).hexdigest()
+            if h in innehall:
+                continue
+            innehall.add(h)
+            sedda.add(p)
+            rel = str(p.relative_to(rot))
+            text = tvatta(data.decode('utf-8', errors='replace'))
+            datum = _datum_ur_id(rel)
+            for i, (rubrik, bit) in enumerate(_rubrikdelar(text) or [('', text)]):
+                if not bit.strip():
                     continue
-                innehall.add(h)
-                sedda.add(p)
-                rel = str(p.relative_to(rot))
-                text = tvatta(data.decode('utf-8', errors='replace'))
-                datum = _datum_ur_id(rel)
-                talare = {'privat:agarens-ord': 'Johnny (ordagrant, sparat av session)',
-                          'privat:bestallning': 'Johnny lämnade (sammanställt underlag, inte ordagranna ägarord)',
-                          'privat:lage': 'arbetande session (lägeslogg)'}[klass]
-                for i, (rubrik, bit) in enumerate(_rubrikdelar(text) or [('', text)]):
-                    if not bit.strip():
-                        continue
-                    poster.append(self._post('privat:%s:%d' % (rel, i + 1), klass, '%s — %s' % (rel, rubrik),
-                                             talare, datum, 'kontoret/evidence/%s#%d' % (rel, i + 1), bit,
-                                             'privat:' + rel, i + 1, {}))
+                poster.append(self._post('privat:%s:%d' % (rel, i + 1), klass, '%s — %s' % (rel, rubrik),
+                                         talare[klass], datum, 'kontoret/evidence/%s#%d' % (rel, i + 1), bit,
+                                         'privat:' + rel, i + 1, {}))
         return poster, {'filer': len(sedda)}
 
     def _repon(self):
