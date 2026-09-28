@@ -114,6 +114,14 @@ for rad in rader:
         ut({'type': 'result', 'subtype': 'success', 'is_error': False, 'result': 'Sparat.', 'session_id': session, 'num_turns': 3,
             'total_cost_usd': 0.01, 'usage': {'input_tokens': 10, 'output_tokens': 5}})
         bro.stdin.close(); bro.wait(timeout=5); sys.exit(0)
+    if rad == 'MELLANRAD':
+        ut({'type': 'assistant', 'parent_tool_use_id': None, 'message': {'content': [{'type': 'text', 'text': 'Kort läge: nu läser jag vidare.'}]}})
+        ut({'type': 'assistant', 'parent_tool_use_id': None, 'message': {'content': [{'type': 'tool_use', 'id': 'toolu_mellan', 'name': 'mcp__partner__sok', 'input': {'fraga': 'x'}}]}})
+        lang = 'SLUTSVARET ' + 'resonemang ' * 70
+        ut({'type': 'assistant', 'parent_tool_use_id': None, 'message': {'content': [{'type': 'text', 'text': lang}]}})
+        ut({'type': 'result', 'subtype': 'success', 'is_error': False, 'result': lang, 'session_id': session, 'num_turns': 3,
+            'total_cost_usd': 0.01, 'usage': {'input_tokens': 10, 'output_tokens': 5}})
+        bro.stdin.close(); bro.wait(timeout=5); sys.exit(0)
     if rad == 'FELA':
         bro.terminate(); sys.exit(1)
     if rad == 'KVOT':
@@ -163,6 +171,9 @@ def korpus(rot: Path) -> Path:
 
         Rättelse: testsajten är inte målet, målet är förmågan.
         '''), 'utf-8')
+    (imp / 'sources' / 'CONV-001' / 'attachments-r1.json').write_text(json.dumps({'attachments': [
+        {'attachment_id': 'ATT-001-001', 'capture_status': 'UNAVAILABLE', 'original_filename': 'Inklistrad text.txt',
+         'media_type': 'text/plain'}]}), 'utf-8')
     (imp / 'sources' / 'CONV-002' / 'conversation.md').write_text(textwrap.dedent('''\
         # Provsamtal två — fullständigt transkript
 
@@ -386,7 +397,10 @@ class WebbpolicyProv(unittest.TestCase):
                        'https://www.w3.org/TR/?q=x',                                        # dokumentation med frågedel
                        'https://blogg.exempel.se/save/https://angripare.example/data',      # inbäddad adress i sökväg
                        'https://blogg.exempel.se/?u=angripare.example',                     # domän i frågedel
-                       'https://blogg.exempel.se/?u=https%3A%2F%2Fangripare.example'):
+                       'https://blogg.exempel.se/?u=https%3A%2F%2Fangripare.example',
+                       'https://blogg.exempel.se/?t=angripare%2Eexample',                  # kodad punkt (r3c)
+                       'https://blogg.exempel.se/?t=angripare%252Eexample',                # dubbelkodad
+                       'https://blogg.exempel.se/r/https%253A%252F%252Fangripare.example'):
             self.assertEqual(webbpolicy.prova(k, 'WebFetch', {'url': adress})[0], 'deny', adress)
         self.assertEqual(webbpolicy.prova(k, 'WebFetch', {'url': 'https://www.w3.org/TR/'})[0], 'allow')
         self.assertEqual(webbpolicy.prova(k, 'WebSearch', {'query': 'data site:angripare.example'})[0], 'deny')
@@ -403,6 +417,24 @@ class WebbpolicyProv(unittest.TestCase):
         self.assertNotIn('D' * 43, t)
         self.assertNotIn('E' * 40, t)
         self.assertIn('[DOLT]', t)
+
+
+class SystemlageProv(unittest.TestCase):
+    def test_agarens_tur_lases_som_aquarium(self):
+        from partnern.systemlage import agarens_tur
+        plan = textwrap.dedent('''\
+            Prosa som nämner ÄGARENS TUR i förbigående.
+            Nästa stycke.
+
+            ÄGARENS TUR
+            - [beslut] Välj nästa fall — sedan 2026-09-27
+            - [operatörshandling] Uppdatera CLI:n — sedan 2026-09-27
+
+            - [beslut] Efter blocket räknas inte
+            ''')
+        self.assertEqual(agarens_tur(plan), ['- [beslut] Välj nästa fall — sedan 2026-09-27',
+                                             '- [operatörshandling] Uppdatera CLI:n — sedan 2026-09-27'])
+        self.assertEqual(agarens_tur('ÄGARENS TUR\n\nInget öppet.'), [])
 
 
 class AgarcitatProv(unittest.TestCase):
@@ -457,6 +489,11 @@ class AtkomstProv(Miljo):
         self.assertEqual(kod, 401)
         kod, _, _ = self.anrop('POST', '/intern/verktyg/sok', {'fraga': 'x'}, huvud={'X-Partner-Korning': 'gissad'})
         self.assertEqual(kod, 403)
+
+    def test_session_svarar_utan_fel_nar_man_ar_utloggad(self):
+        self.assertEqual(self.json('GET', '/api/session'), (200, {'inloggad': False}))
+        self.logga_in()
+        self.assertEqual(self.json('GET', '/api/session'), (200, {'inloggad': True}))
 
     def test_for_manga_felaktiga_inloggningar_stoppas(self):
         for _ in range(8):
@@ -520,6 +557,14 @@ class SamtalProv(Miljo):
         self.assertIn('ANALYSEN FÖRST.', svar)
         self.assertTrue(svar.index('ANALYSEN FÖRST.') < svar.index('Sparat.'))
         self.assertEqual(vy['resonemang']['lage'], 'prov')
+
+    def test_mellanrad_fore_verktyg_hamnar_inte_i_svaret(self):
+        self.logga_in()
+        trad = self.skicka('MELLANRAD')['inspel']['trad']
+        vy = self.vanta(trad, lambda v: self.turer(v, 'svarad'))
+        svar = self.turer(vy, 'svarad')[0]['svar']
+        self.assertTrue(svar.startswith('SLUTSVARET'))
+        self.assertNotIn('Kort läge', svar)
 
     def test_bara_spara_efter_misslyckad_tur_startar_ingen_modell(self):
         self.logga_in()
@@ -620,6 +665,18 @@ class AvbrottProv(Miljo):
         self.assertIn('redan skickat i det avbrutna arbetet', sista['text'])
         self.assertIn('jag menar kontoret', sista['text'])
 
+    def test_bara_spara_med_avbryt_pagaende_avbryter_utan_ny_tur(self):
+        self.logga_in()
+        trad = self.skicka('SOV 30')['inspel']['trad']
+        self.vanta(trad, lambda v: v['aktiv'] and 'arbetar' in (v['aktiv']['delsvar'] or ''))
+        d = self.skicka('bara spara', trad=trad, avbryt_pagaende=True)
+        self.assertIsNone(d['tur'])
+        vy = self.vanta(trad, lambda v: self.turer(v, 'avbruten') and not v['aktiv'], 45)
+        self.assertEqual(self.turer(vy, 'avbruten')[0]['orsak'], srv.BARA_SPARA_AVBROTT)
+        time.sleep(0.8)
+        self.assertEqual(len(self.fejkanrop()), 1)
+        self.assertEqual(len(self.turer(self.json('GET', '/api/trad/' + trad)[1])), 1)
+
     def test_avbrott_innan_modellen_startat_tappas_inte(self):
         self.logga_in()
         trad = self.S.ny_trad()['id']
@@ -714,6 +771,17 @@ class VerktygProv(Miljo):
         self.assertIn('meddelanden kommer efter detta', s)
         self.assertIn('Meddelandetider saknas', s)
 
+    def test_oppna_visar_alla_bilagor_i_samtalet_och_tackningen(self):
+        self.logga_in()
+        trad = self.ring('ny', [('oppna', {'id': 'imp:CONV-001:m1', 'omkrets': 0}),
+                                ('oppna', {'id': 'imp:CONV-001:m3', 'omkrets': 0})])['inspel']['trad']
+        s = self.svar(trad, 1)
+        self.assertIn('Visar meddelande 1–1 av 3.', s)
+        self.assertIn('imp:ATT-001-001 Inklistrad text.txt (text/plain, otillgänglig', s)
+        self.assertIn('inte knuten till något meddelande', s)
+        self.assertIn('sett 1 av 3 meddelanden i samtalet (1)', s)
+        self.assertIn('sett 2 av 3 meddelanden i samtalet (1, 3)', s)
+
     def test_korpusbilaga_ses_och_saknad_bilaga_markeras(self):
         self.logga_in()
         trad = self.ring('ny', [('bilaga', {'id': 'imp:ATT-002-001'}), ('bilaga', {'id': 'imp:ATT-002-002'})])['inspel']['trad']
@@ -779,6 +847,86 @@ class VerktygProv(Miljo):
         self.assertIn('F-2 [rattelse · agarens_ord', system)
         self.assertIn('Testsajten är inte målet', system)
         self.assertNotIn('Målet är att bygga klart testsajten', system)
+
+    def test_laget_skiljer_johnnys_ord_fran_partnerns_egna_bedomningar(self):
+        L = self.S.lager
+        for t in ('t_a', 't_b', 't_c', 't_d'):
+            L.lagg_till('trad', trad=t, titel=t)
+        agare = L.lagg_till('inspel', trad='t_a', klient_id='klient-laget-01', text='Testsajten är inte målet, målet är förmågan.',
+                            lage='svara', bilagor=[])
+        L.lagg_till('forstaelse', trad='t_a', tur='x', slag='rattelse', text='Målet är förmågan.', auktoritet='agarens_ord',
+                    kallor=[], ersatter=[], agarcitat='Testsajten är inte målet', agarinspel=agare['id'], agarinspel_tid=agare['tid'])
+        L.lagg_till('forstaelse', trad='t_b', tur='x', slag='slutsats', text='ccusage räknar tokens men inte kvoten ' + 'x' * 300,
+                    auktoritet='modellbedomning', kallor=[], ersatter=[])
+        L.lagg_till('forstaelse', trad='t_c', tur='x', slag='slutsats', text='En planeringsvägg med magneter på kylskåpet liknar Aquarium.',
+                    auktoritet='modellbedomning', kallor=[], ersatter=[])
+        L.lagg_till('forstaelse', trad='t_b', tur='x', slag='slutsats', text='Det var inte med i planen på den tiden.',
+                    auktoritet='modellbedomning', kallor=[], ersatter=[])      # bara vanliga ord gemensamt
+        inspel = L.lagg_till('inspel', trad='t_d', klient_id='klient-laget-02', text='Hur var det med magneter på kylskåpet?',
+                             lage='svara', bilagor=[])
+        korning = srv.Korning(self.S, 'tur', 't_d', [L.en('select * from inspel where id=?', (inspel['id'],))])
+        block = self.S.agent.lagesblock(korning)
+        agarens = block.index('### Johnnys egna rättelser och beslut')
+        egna = block.index('### Dina egna tidigare bedömningar')
+        self.assertLess(agarens, block.index('F-1 [rattelse · agarens_ord'))
+        self.assertLess(block.index('F-1 [rattelse · agarens_ord'), egna)
+        self.assertIn('Johnnys ord: "Testsajten är inte målet"', block)
+        self.assertIn('inte Johnnys beslut', block)
+        self.assertIn('F-3 [slutsats · modellbedomning · %s]: En planeringsvägg med magneter på kylskåpet liknar Aquarium.'
+                      % inspel['tid'][:10], block)                       # liknar det Johnny tar upp: i sin helhet
+        rad = [r for r in block.splitlines() if r.startswith('- F-2 ')][0]
+        self.assertTrue(rad.endswith('…') and len(rad) < 260, rad)   # orelaterad: bara första raden
+        self.assertIn('Övriga (bara första raden', block)
+        self.assertGreater(block.index('- F-4 [slutsats'), block.index('Övriga (bara första raden'))
+        self.assertIn('Tjänsten kör kontorets kod', block)
+
+    def test_oppen_overlamning_i_traden_ger_ingen_ny_utan_annan_bestallning(self):
+        self.logga_in()
+        trad = self.skicka('Genomför det: lägg till en statusrad i Aquarium.')['inspel']['trad']
+        self.svar(trad, 1)
+        args = {'rubrik': 'Statusrad i Aquarium', 'mal': 'Statusrad.', 'agarcitat': 'Genomför det: lägg till en statusrad i Aquarium.',
+                'nasta_handling': 'Bered', 'mottagare': 'kontorets-kedjedrivare'}
+        self.manus('RING bered_uppdrag ' + json.dumps(args))
+        self.skicka('Kör.', trad=trad)
+        self.assertIn('LÄMNAD', self.svar(trad, 2))
+        ny = {'rubrik': 'Arkivera kunskapsrepot', 'mal': 'Annat arbete.', 'agarcitat': 'Genomför också arkiveringen av kunskapsrepot.',
+              'nasta_handling': 'Bered', 'mottagare': 'kontorets-kedjedrivare'}
+        self.manus('RING bered_uppdrag ' + json.dumps(ny), 'RING bered_uppdrag ' + json.dumps(dict(ny, annan_bestallning=True)))
+        self.skicka('Genomför också arkiveringen av kunskapsrepot.', trad=trad)
+        s = self.svar(trad, 3)
+        self.assertIn('Det finns redan en öppen överlämning i den här tråden', s)
+        self.assertIn('LÄMNAD', s)
+        rader = self.S.lager.fraga('select * from overlamning order by tid')
+        self.assertEqual(len(rader), 2)
+        forsta, andra = rader
+        self.assertEqual(json.loads(andra['data'])['skild_fran'], [forsta['id']])
+        paket = json.loads((Path(json.loads(andra['data'])['katalog']) / 'OVERLAMNING.json').read_text())
+        self.assertEqual(paket['skild_fran'], [forsta['id']])
+        # mottagarens kvittens syns i listan även innan tjänsten har läst den
+        from partnern.overlamning import kvittera
+        import partner
+        kvittera(self.k.kontor_primar, forsta['id'], 'mottagen', 'provsession')
+        miljo = {'PARTNER_DATA': str(self.k.data), 'PARTNER_KONTOR_PRIMAR': str(self.k.kontor_primar),
+                 'PARTNER_HEMLIGHETER': str(self.k.hemligheter)}
+        fore = {n: os.environ.get(n) for n in miljo}
+        os.environ.update(miljo)
+        try:
+            import contextlib, io
+            ut = io.StringIO()
+            with contextlib.redirect_stdout(ut):
+                partner.main(['overlamningar'])
+            self.assertRegex(ut.getvalue(), r'%s\s+mottagen' % forsta['id'])
+            ut = io.StringIO()
+            with contextlib.redirect_stdout(ut):
+                partner.main(['autostart'])
+            self.assertIn('<key>Label</key><string>se.nortropic.partner</string>', ut.getvalue())
+            self.assertFalse((Path(os.environ['HOME']) / 'Library' / 'LaunchAgents').exists())  # skriver ingenting
+        finally:
+            for n, v in fore.items():
+                if v is None:
+                    os.environ.pop(n, None)
+                else:
+                    os.environ[n] = v
 
     def test_overlamning_bara_pa_bestallning_och_aldrig_dubbel(self):
         self.logga_in()
@@ -851,6 +999,9 @@ class JobbProv(Miljo):
         self.assertIn('FEJKSVAR', jobb[0]['resultat'])
         sista = self.fejkanrop()[-1]
         self.assertEqual(sista['argv'][sista['argv'].index('--tools') + 1], 'WebFetch,WebSearch')
+        self.assertEqual(sista['argv'][sista['argv'].index('--max-turns') + 1], str(self.k.gransar.jobb_max_steg))
+        tur = self.fejkanrop()[0]
+        self.assertEqual(tur['argv'][tur['argv'].index('--max-turns') + 1], str(self.k.gransar.tur_max_steg))
         self.assertIn('Registrerad utredning', sista['text'])
 
 

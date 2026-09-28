@@ -42,6 +42,7 @@ BARA_SPARA = re.compile(r'^\s*(bara\s+spara|spara\s+bara|spara\s+(det\s+här|det
 BARA_SPARA_START = re.compile(r'^\s*bara\s+spara\b', re.I)
 NYTT_INSPEL = 'Johnny skickade ett nytt inspel under arbetet'
 OMSTART = 'serveromstart under arbetet'
+BARA_SPARA_AVBROTT = 'Johnny avbröt och sparade utan svar'
 ATERUPPTA_INOM = 3600
 
 
@@ -233,6 +234,12 @@ class Server:
             if not vantar or all(i['lage'] == 'bara_spara' for i in vantar):
                 return None
             return self._starta(trad, vantar, None)
+
+    def avbryt_pagaende(self, trad: str, orsak: str) -> bool:
+        """Avbryt trådens pågående tur utan att starta en ny (bara spara med avbryt pågående)."""
+        with self._las:
+            pagar = self.aktiv_tur(trad)
+            return bool(pagar and pagar.avbryt(orsak))
 
     def ateruppta_tur(self, tur_id: str, orsak: str = 'Johnny återupptog') -> str | None:
         t = self.lager.en('select * from tur where id=?', (tur_id,))
@@ -557,6 +564,8 @@ class Hanterare(BaseHTTPRequestHandler):
             return self._svara(200, {'verktyg': specifikationer(k.typ)})
         if not p.startswith('/api/'):
             return self._fel(404, 'finns inte')
+        if p == '/api/session':  # svarar även utloggad, så att ytan kan visa inloggningen utan ett fel
+            return self._svara(200, {'inloggad': self._inloggad()})
         if not self._inloggad():
             return self._fel(401, 'logga in')
         try:
@@ -566,8 +575,6 @@ class Hanterare(BaseHTTPRequestHandler):
 
     def _get_api(self, p, q):
         S = self.S
-        if p == '/api/session':
-            return self._svara(200, {'inloggad': True})
         if p == '/api/lage':
             S.overlamning.las_kvittenser()
             return self._svara(200, S.lagevy())
@@ -725,6 +732,8 @@ class Hanterare(BaseHTTPRequestHandler):
             tur = None
             if not dubblett and inspel['lage'] != 'bara_spara':  # att spara anropar aldrig en modell
                 tur = S.starta_tur_om_behov(inspel['trad'], avbryt_pagaende=bool(d.get('avbryt_pagaende')))
+            elif not dubblett and d.get('avbryt_pagaende'):
+                S.avbryt_pagaende(inspel['trad'], BARA_SPARA_AVBROTT)
             return self._svara(200, {'inspel': inspel, 'dubblett': dubblett, 'tur': tur})
         m = re.match(r'^/api/trad/(t_[A-Za-z0-9]+)/(titel|arkivera)$', p)
         if m:
@@ -793,13 +802,18 @@ class _Visning:
         pass
 
 
-def starta(k: Konfig, bygg_index: bool = True):
+def starta(k: Konfig, bygg_index: bool = True, pidfil: Path | None = None):
     S = Server(k)
     if bygg_index and not S.kallor.tackning():
         S.kallor.bygg()
     Hanterare.S = S
     httpd = ThreadingHTTPServer(('127.0.0.1', k.port), Hanterare)
     httpd.daemon_threads = True
+    if pidfil:  # först när porten är bunden, så att en andra instans aldrig skriver över den körandes pid
+        fd = os.open(pidfil, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        os.fchmod(fd, 0o600)
+        os.write(fd, str(os.getpid()).encode())
+        os.close(fd)
     S.jobb.starta_arbetare()
     aterhamtat = S.aterhamta()
 

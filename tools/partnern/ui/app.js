@@ -185,7 +185,7 @@ function ritaDar(r) {
   if (!r || !(r.lage || r.fraga)) { d.hidden = true; return; }
   const oppen = d.querySelector('details') ? d.querySelector('details').open : false;
   const lista = (rubrik, v) => (v && v.length ? el('div', null, el('b', null, rubrik), el('ul', null, v.map((x) => el('li', null, x)))) : null);
-  const det = el('details', { open: oppen }, el('summary', null, el('b', null, 'Där vi är: '), r.lage || r.fraga),
+  const det = el('details', { open: oppen }, el('summary', null, el('b', null, 'Där vi är (partnerns bild): '), r.lage || r.fraga),
     r.fraga ? el('div', null, el('b', null, 'Fråga: '), r.fraga) : null,
     lista('Spår', r.spar), lista('Invändningar', r.invandningar), lista('Att undersöka härnäst', r.nasta),
     el('div', { class: 'kl', text: 'Uppdaterat ' + tid(r.tid) + ' av partnern' }));
@@ -369,7 +369,11 @@ window.addEventListener('dragleave', () => { dragDjup = Math.max(0, dragDjup - 1
 window.addEventListener('dragover', (e) => e.preventDefault());
 window.addEventListener('drop', (e) => { e.preventDefault(); dragDjup = 0; $('slapp').hidden = true; if (e.dataTransfer && e.dataTransfer.files.length) laggTillFiler([...e.dataTransfer.files]); });
 window.addEventListener('storage', (e) => { if (e.key === 'utkorg') ritaTrad(); });
-window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if ((/^t_/.test(h) || h === 'ny') && h !== tillstand.trad) oppnaTrad(h); });
+window.addEventListener('hashchange', () => {
+  const h = location.hash.slice(1);
+  if (h.startsWith('nyckel=')) { loggaInMedFragment(h); return; }  // partner.py oppna i en redan öppen flik
+  if ((/^t_/.test(h) || h === 'ny') && h !== tillstand.trad) oppnaTrad(h);
+});
 
 // ------------------------------------------------------------------ paneler
 function oppnaPanel(titel, innehall) {
@@ -442,11 +446,14 @@ async function starta() {
   await oppnaTrad(valt);
   if (las('utkorg', []).length) tomUtkorg();
 }
+async function loggaInMedFragment(hash) {
+  history.replaceState(null, '', location.pathname);
+  try { await loggaIn(decodeURIComponent(hash.slice(7))); } catch (f) { visaInloggning(); $('inloggningsfel').textContent = f.message; }
+}
 (async () => {
   const hash = location.hash.slice(1);
-  if (hash.startsWith('nyckel=')) {
-    history.replaceState(null, '', location.pathname);
-    try { await loggaIn(decodeURIComponent(hash.slice(7))); return; } catch (f) { visaInloggning(); $('inloggningsfel').textContent = f.message; return; }
-  }
-  try { await api('GET', '/api/session'); await starta(); } catch { visaInloggning(); }
+  if (hash.startsWith('nyckel=')) { await loggaInMedFragment(hash); return; }
+  let session = null;
+  try { session = await api('GET', '/api/session'); } catch { /* tjänsten svarar inte; inloggningen visas */ }
+  if (session && session.inloggad) await starta(); else visaInloggning();
 })();

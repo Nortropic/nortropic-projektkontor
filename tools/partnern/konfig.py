@@ -39,6 +39,7 @@ class Gransar:
     dygn_max_korningar: int = 150
     dygn_max_listpris_usd: float = 250.0
     jobb_max_sekunder: int = 1800
+    jobb_max_steg: int = 150
     bilaga_max_byte: int = 40_000_000
     inspel_max_bilagor: int = 20
     inspel_max_tecken: int = 60_000

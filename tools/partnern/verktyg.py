@@ -80,6 +80,19 @@ def hitta_agarcitat(lager, trad: str, citat: str, bestallning: bool = False):
     return None
 
 
+def _intervall(nr: set) -> str:
+    """{1, 2, 3, 8} → '1–3, 8'"""
+    ut, rad = [], sorted(nr)
+    i = 0
+    while i < len(rad):
+        j = i
+        while j + 1 < len(rad) and rad[j + 1] == rad[j] + 1:
+            j += 1
+        ut.append(str(rad[i]) if i == j else '%d–%d' % (rad[i], rad[j]))
+        i = j + 1
+    return ', '.join(ut)
+
+
 def _kallblock(kid: str, text: str) -> str:
     return '%s\n%s\n%s' % (START % kid, text, SLUT)
 
@@ -165,7 +178,9 @@ def specifikationer(typ: str) -> list:
              'agarcitat': {'type': 'string'}}, 'required': ['slag', 'text', 'auktoritet']}},
         {'name': 'resonemang', 'description': (
             'Uppdatera var ni är i den här tråden: huvudfrågan, spåren/hypoteserna, invändningarna och vad som ska '
-            'undersökas härnäst. Johnny ser det som trådens "Där vi är". Uppdatera när läget faktiskt ändras.'),
+            'undersökas härnäst. Johnny ser det som trådens "Där vi är" (märkt som din bild). Har Johnny inte själv '
+            'formulerat huvudfrågan, skriv den som ditt antagande ("Jag tolkar frågan som …"). Uppdatera när läget '
+            'faktiskt ändras.'),
          'inputSchema': {'type': 'object', 'properties': {
              'fraga': {'type': 'string'}, 'spar': {'type': 'array', 'items': {'type': 'string'}},
              'invandningar': {'type': 'array', 'items': {'type': 'string'}},
@@ -188,13 +203,15 @@ def specifikationer(typ: str) -> list:
                 'beställningsordet, t.ex. "genomför det", "kör", "bygg"), föreslagen nästa handling och mottagare. '
                 'Servern skriver ett överlämningspaket i kontorets ordinarie beställningsväg och kör AP-06-beredningen '
                 'som utkast. Status blir "lämnat"; mottagaren kvitterar mottaget/startat/levererat. Samma beslut ger '
-                'aldrig två uppdrag.'),
+                'aldrig två uppdrag, och medan en överlämning i tråden är öppen skapas ingen ny till samma mottagare '
+                'om du inte anger annan_bestallning (bara när Johnny beställer något annat än den öppna).'),
              'inputSchema': {'type': 'object', 'properties': {
                  'rubrik': {'type': 'string'}, 'mal': {'type': 'string'},
                  'underlag': {'type': 'array', 'items': {'type': 'string'}},
                  'granser': {'type': 'array', 'items': {'type': 'string'}},
                  'agarcitat': {'type': 'string'}, 'nasta_handling': {'type': 'string'},
-                 'mottagare': {'type': 'string', 'enum': ['kontorets-kedjedrivare', 'digitala', 'runtime', 'kundstart']}},
+                 'mottagare': {'type': 'string', 'enum': ['kontorets-kedjedrivare', 'digitala', 'runtime', 'kundstart']},
+                 'annan_bestallning': {'type': 'boolean'}},
                  'required': ['rubrik', 'mal', 'agarcitat', 'nasta_handling', 'mottagare']}},
             {'name': 'utred', 'description': (
                 'Registrera en längre, motiverad utredning som körs i bakgrunden och återkommer till samma tråd '
@@ -256,6 +273,16 @@ class Verktyg:
             huvud.append('Samtal: %s · fångat %s · senast uppdaterat %s · revision %s · %s meddelanden' % (
                 s.get('url'), s.get('fangad'), s.get('uppdaterad') or 'okänt', s.get('revision'), s.get('meddelanden')))
             huvud.append(ut['tid_not'])
+            if ut.get('visar'):
+                huvud.append('Visar %s.' % ut['visar'])
+            sedda = getattr(k, 'sedda_meddelanden', None)
+            if sedda is not None and ut['klass'] == 'imp:samtal':
+                grupp = kid.rsplit(':', 1)[0]
+                nr = sedda.setdefault(grupp, set())
+                nr.update(g['nr'] for g in ut['sammanhang'])
+                huvud.append('Hittills i den här körningen har du sett %d av %s meddelanden i samtalet (%s). Säg '
+                             'inte att du läst hela samtalet förrän alla är sedda.' % (
+                                 len(nr), s.get('meddelanden') or '?', _intervall(nr)))
         if ut.get('varning'):
             huvud.append('VARNING: ' + ut['varning'])
         kropp = []
@@ -267,6 +294,12 @@ class Verktyg:
             slut.append('Bilagor bundna till dessa meddelanden: ' + '; '.join(
                 '%s %s (%s, %s, meddelande %s)' % (b['id'], b['namn'], b['mime'], b['status'], b['meddelande'])
                 for b in ut['bilagor']) + ' — läs med verktyget bilaga.')
+        if ut.get('ovriga_bilagor'):
+            slut.append('Övriga bilagor i samma samtal: ' + '; '.join(
+                '%s %s (%s, %s, %s)' % (b['id'], b['namn'], b['mime'], b['status'],
+                                        'meddelande %s' % b['meddelande'] if b.get('meddelande') else
+                                        'inte knuten till något meddelande i fångsten')
+                for b in ut['ovriga_bilagor']) + '.')
         if ut.get('senare_i_samtalet'):
             slut.append(ut['senare_i_samtalet'])
         for f in ut.get('partnerns_forstaelse_som_citerar') or []:

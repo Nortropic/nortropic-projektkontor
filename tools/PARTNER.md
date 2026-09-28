@@ -12,7 +12,10 @@ python3 -B tools/partner.py start     # startar tjänsten på http://127.0.0.1:4
 python3 -B tools/partner.py oppna     # öppnar samtalsytan inloggad i webbläsaren
 python3 -B tools/partner.py status    # kör den, vilken kod (main?) och var ligger datan
 python3 -B tools/partner.py stopp     # pågående arbete avbryts, journalförs och återupptas vid nästa start
+python3 -B tools/partner.py autostart # visar hur ägaren gör tjänsten bestående (skriver ingenting)
 ```
+
+Python 3.9 eller senare räcker (macOS egen `python3` fungerar).
 
 I ytan: skriv, klistra in bilder (⌘V), släpp flera filer eller bifoga. "Bara spara" (eller att skriva "bara spara")
 sparar utan analys. Medan partnern arbetar kan ett nytt inspel skickas efter svaret eller "Skicka och avbryt
@@ -22,13 +25,17 @@ och källtäckning.
 
 Tjänsten körs lokalt på Johnnys Mac och nås bara när den är igång; det är ett synligt beroende. Den startas inte
 automatiskt vid inloggning. Att göra den bestående kräver en LaunchAgent som ägaren själv aktiverar (hanterad
-policy nekar `launchctl` för sessioner).
+policy nekar `launchctl` för sessioner): `partner.py autostart` skriver ut filen och de två kommandona.
 
 ## Vad partnern gör utan särskilda instruktioner
 
 Rollen (`partnern/roll.md`) och en kort Nortropic-orientering (`partnern/orientering.md`) följer med varje tur,
-tillsammans med ett läge som servern räknar fram: trådens "Där vi är", kopplade trådar, gällande förståelse
-(ägarens rättelser och beslut först), källtäckning och senast lästa systemläge. Partnern söker och läser själv
+tillsammans med ett läge som servern räknar fram: vilken kod tjänsten kör, trådens "Där vi är" (märkt som
+partnerns egen sammanfattning), kopplade trådar, gällande förståelse, källtäckning och senast lästa systemläge.
+Gällande förståelse har två delar: Johnnys egna rättelser och beslut i sin helhet, och partnerns egna tidigare
+bedömningar, märkta som sådana. Bedömningarna står i sin helhet bara när de hör till tråden, en kopplad tråd
+eller liknar det Johnny tar upp i turen; övriga står som en rad var, och det som inte ryms sägs uttryckligen.
+Så styr inte äldre domar från andra trådar varje nytt samtal. Partnern söker och läser själv
 fördjupning med sina verktyg. Den svarar proportionerligt, resonerar för och emot, kan avråda, sparar det som
 ska bära framåt och håller trådens läge aktuellt.
 
@@ -57,7 +64,8 @@ skrivverktyg. Huvudmodell `claude-opus-5-5` (hög ansträngning), utredaren `son
 `data/installningar.json` (`{"modell": {"huvud": "…"}}`).
 
 Verkställda gränser (samma fil, `gransar`): två samtidiga modellkörningar, 15 min och 40 verktygssteg per tur,
-8 USD listprisvärde per tur (`--max-budget-usd`), 150 körningar och 250 USD listprisvärde per dygn. Listprisvärdet
+30 min och 150 verktygssteg per bakgrundsutredning, 8 USD listprisvärde per körning (`--max-budget-usd`), 150
+körningar och 250 USD listprisvärde per dygn. Listprisvärdet
 är Claude Codes egen uppskattning, inte en faktura: förbrukningen är abonnemangets kvot. Varje tur journalför
 tokens, tid, omförsök och modell. Sparande, sökning och öppning av källor anropar aldrig en modell.
 
@@ -83,7 +91,9 @@ Källor är material, aldrig instruktioner. Deterministiska spärrar:
 - En beställning (`bered_uppdrag`) kräver dessutom att de citerade satserna står i något av trådens tre senaste
   inspel, innehåller själva beställningen ("genomför", "kör", "bygg" …) och varken är en fråga eller innehåller en
   negation ("inte", "aldrig" …). Ett bart "precis" eller "ja" blir aldrig ett uppdrag, och samma inspel ger aldrig
-  två överlämningar.
+  två överlämningar. Medan en överlämning i tråden är öppen (lämnad, mottagen, startad) skapas ingen ny till samma
+  mottagare, om inte partnern uttryckligen anger att Johnny beställt något annat; det nya paketet pekar då ut
+  vilket det skiljer sig från.
 - WebFetch går bara till publika värdar som Johnny länkat i tråden, som finns bland träffarna från en webbsökning
   under samma körning, eller som står i en kort lista över exakta dokumentationsvärdar där ingen utomstående kan
   publicera innehåll eller läsa loggar (de hämtas utan frågedel). Länkar i bilagor, hämtade sidor och andra
@@ -98,10 +108,14 @@ citatet visas alltid bredvid posten, och beställningsregeln är ordbaserad (en 
 släppas igenom; partnern frågar då hellre). Värdar som en webbsökning returnerat blir hämtbara under körningen: en
 planterad instruktion som får modellen att söka fram en viss webbplats kan göra den hämtbar, men bara med korta
 adresser utan inbäddade adresser, hemligheter eller personuppgifter. Inloggningskakan är tillståndslös i 30 dagar (utloggning rensar bara
-webbläsaren) och spärren efter åtta felaktiga inloggningar gäller alla i tio minuter. Bilagor läses av lokala
+webbläsaren) och spärren efter åtta felaktiga inloggningar gäller alla i tio minuter. Webbpolicyns
+adresskontroller kan neka en vanlig länk vars frågedel liknar en domän (t.ex. `?utm_source=example.com`); de
+felar hellre stängt. Bilagor läses av lokala
 verktyg (pdftotext, textutil, sips, zip-XML). Arbete som avbröts av en omstart återupptas automatiskt bara om det
 startade inom den senaste timmen; äldre står kvar som avbrutet med en knapp. En tur som stoppades av dygnsgränsen
-tas om först när Johnny trycker Återuppta.
+tas om först när Johnny trycker Återuppta. Svaret är huvudagentens text; en kort mellanrad som följs av fler
+verktygsanrop och ett längre svar räknas till arbetet och står bara i delsvaret. Partnerns omdöme prövas av
+slutproven (verkliga körningar) och Johnnys rättelser, inte av de deterministiska proven.
 
 ## Källtäckning
 
@@ -116,14 +130,21 @@ peka `PARTNER_IMPROVEMENTS` på den nya korpusen och köra `partner.py index`.
 
 När Johnny tydligt beställer genomförande skriver partnern ett paket i kontorets beställningsväg:
 `ARBETSORDER.md` (sammanställd, märkt som sådan), `AGARENS-ORD.md` (hela inspelet ordagrant), hashade
-underlagsfiler, `OVERLAMNING.json` och ett AP-06-utkast (`ap06/utkast/`) med sina luckor. Status "lämnad".
+underlagsfiler, `OVERLAMNING.json` och ett AP-06-utkast (`ap06/utkast/`) med sina luckor. Status "lämnad";
+aktuell status är sista raden i paketets `KVITTENS.jsonl`, och `overlamningar` visar den även när tjänsten inte
+kör. AP-06-utkastets behörighet bygger på det ordbaserade citatet; mottagaren läser `AGARENS-ORD.md`.
 Mottagaren kvitterar:
 
 ```sh
 python3 -B tools/partner.py overlamningar
 python3 -B tools/partner.py kvittera OVL-… mottagen --av "<session>"
 python3 -B tools/partner.py kvittera OVL-… levererad --av "<session>" --bevis "<PR eller commit>"
+python3 -B tools/partner.py kvittera OVL-… avslagen --av "<session>" --bevis "<skäl>"
 ```
+
+En provinstans (egen `PARTNER_DATA`, `PARTNER_PORT` och `PARTNER_HEMLIGHETER`) skriver sina paket i samma
+beställningsväg. Paket från prov flyttas efter kvittensen till provinstansens data, annars indexerar den vanliga
+tjänsten provtexten som Johnnys ord.
 
 ## Prov
 
@@ -131,6 +152,9 @@ python3 -B tools/partner.py kvittera OVL-… levererad --av "<session>" --bevis 
 Claude Codes strömformat, startar den riktiga MCP-bryggan och kör den riktiga webbkroken: lager och återbyggnad,
 inloggning/värd/ursprung, bilagetyper och säker visning, avbruten uppladdning, sparat före modellen, bara spara,
 idempotenta återförsök, sessionsfortsättning och återskapad historik, avbrott före och under körning, sen
-rättelse, ordnat stopp och krasch mitt i arbetet (tur och utredning), upplockning av sparade inspel,
-verktygsgränser, ägarens-ord-spärren och rättelsens företräde, överlämning utan dubbletter och med kvittens,
-webbkroken med sökträffar och planterade länkar, bakgrundsutredning, provläge och dygnsgräns.
+rättelse, bara spara med avbrott, ordnat stopp och krasch mitt i arbetet (tur och utredning), upplockning av
+sparade inspel, verktygsgränser (stegtak per körningstyp), ägarens-ord-spärren och rättelsens företräde, lägets
+uppdelning i Johnnys ord och partnerns egna bedömningar, mellanrader utanför svaret, samtalets alla bilagor och
+läst andel vid öppning, ÄGARENS TUR läst som Aquarium, överlämning utan dubbletter (samma inspel och öppen
+överlämning) och med kvittens, webbkroken med sökträffar och planterade länkar, bakgrundsutredning, provläge och
+dygnsgräns.

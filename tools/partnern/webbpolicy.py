@@ -5,14 +5,18 @@ webbsökning (WebSearch) under samma körning, eller som står i en kort lista �
 ingen utomstående kan publicera innehåll eller läsa loggar (dem hämtas utan frågedel). Länkar i bilagor, hämtade
 sidor eller andra verktygssvar gör aldrig en värd tillåten, och en adress som bär en annan adress (validerare,
 arkiv, proxy) hämtas aldrig. En sökning med site: görs bara mot dokumentationsvärdar och Johnnys länkar.
-Det gör att text i ett dokument eller på en webbsida inte kan få partnern att skicka data till en godtycklig
-adress. Sökfrågor och adresser som innehåller hemlighetsliknande värden eller personuppgifter nekas.
+Sökfrågor och adresser som innehåller hemlighetsliknande värden eller personuppgifter nekas.
+
+Det begränsar vad text i ett dokument eller på en webbsida kan få partnern att skicka ut, men stänger det inte
+helt: en planterad instruktion kan få modellen att söka fram en viss värd, som då blir hämtbar under körningen,
+dock bara med en kort adress utan inbäddade adresser, hemligheter eller personuppgifter (PARTNER.md, Kända
+gränser). Kontrollerna görs även på den procentavkodade adressen.
 """
 from __future__ import annotations
 
 import ipaddress
 import re
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 from .kallor import HEMLIGT, HEMLIGT_TILLDELNING
 
@@ -95,7 +99,11 @@ def prova(korning, verktyg: str, indata: dict, hemligheter: tuple = ()) -> tuple
         if (len(url) > MAX_URL or len(p.query) > 300 or any(len(s) > MAX_SEGMENT for s in p.path.split('/'))
                 or _hemligt(url, hemligheter) or any(m.search(p.query) for m in PERSONUPPGIFT)):
             return 'deny', 'Adressen bär mer data än en vanlig länk (lång sökväg eller frågedel, hemlighets- eller personuppgiftsliknande värden).'
-        if INBADDAD_ADRESS.search(p.path + '?' + p.query + '#' + p.fragment) or DOMANVARDE.search(p.query):
+        bar = p.path + '?' + p.query + '#' + p.fragment
+        fraga = p.query
+        for _ in range(2):  # dubbelkodat (%252E) avkodas också
+            bar, fraga = bar + ' ' + unquote(bar), fraga + '&' + unquote(fraga)
+        if INBADDAD_ADRESS.search(bar) or DOMANVARDE.search(fraga):
             return 'deny', 'Adressen bär en annan adress (vidarebefordran genom validerare, arkiv eller proxy) och hämtas inte.'
         if _matchar(vard, korning.url_varder) or _matchar(vard, korning.sokvardar):
             return 'allow', ''
