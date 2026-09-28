@@ -16,6 +16,70 @@ bevaras; kundspecifika provkrav generaliseras inte. Generella brister och tidiga
 kandidaträttningar består. Originalmandat och daterad förändringskarta finns privat i
 `evidence/digitala/local/yrkesformaga-20260928/`. Denna plan ensam äger nästa handling.
 
+Aktiv fortsättning: ägarens genomförandeinstruktion gäller fortsatt. Root äger samordning,
+plan, sammanfogning och sammanhängande prov; separata skrivare har avgränsade arbetsytor
+för Runtime-format, betrodd kontrollutfärdare respektive kundimport/standardintegration.
+Kontrollera faktiska kvitton vid återupptagning; en daterad uppgift här ersätter inte dem.
+
+Lägesavläsning 2026-09-28 17:40 svensk tid (15:40 UTC):
+
+- Guard-only är genomförd av ägaren och oberoende återläst. Activation/readback
+  14:42:49–14:42:56 UTC: recovered=true, konfiguration a8fcb55d…, tre tjänster,
+  release.installed PASS och oförändrade Runtime/Office-kodbytes. AP10 är återbundet,
+  AP11 stängt. Det gamla guardsteget ska inte beställas igen. Ny guard är baslinje;
+  vanlig återgång till den gamla guarden saknas.
+- Digitalas samlade källkandidat 736cb67 har 286/286 regressioner och separat
+  approved kundpaket-r3. Den vanliga överföringen bevarar bytebunden historik även
+  vid processavbrott; brief får faktisk materialkälla och kan omarbeta äldre paket.
+  Import/källstatus, journalfel/GET-återläsning och formatkonsument är rättade.
+  Formatdelens separata approved r2 gäller sina frysta bytes; JSON-projektionens
+  följdrättning ingår i kundpaket-r3. Icke blockerande fynd behåller sin disposition.
+- Faktisk lokal HTTP-inlämning/import har 18/18 kontroller på oförändrade Kundstart-
+  handlers med explicit testlager. Färsk research använder tre kunduppgivna avtal.
+  Briefens första obelagda existenspåstående underkändes; sakretur plus generell
+  källvägsrättning gav en separat läst brief utan blockerare för det lilla provet.
+  Vanlig överföring/skaparpaketsladdning fungerar utan manuell fil-/hashreparation.
+  Modellutfört koncept, browserkontroll och sen HTTP-rättelse slutförs i samma fall.
+- Kompositionsprovets 38 browserkontroller och separata godkännande gäller enbart
+  det rättade faktaradsfyndet. Privat portabelt visuellt ZIP r2 är färdigt: 31 filer,
+  300/300 mottagarkontroller i ren uppackning. Tidigare kvalitetsgränser består.
+- Runtime-utfärdare 10c1563 är separat approved med 635/635 regressioner; formatets
+  e24a9db har godkänd grundgranskning och separat läst liten proveniens-/promptdelta,
+  59/59 riktade prov. Ett verkligt tvåtextprov vägrade korrekt ändrad innebörd;
+  ett enda diagnosmotiverat omprov bereds. Inga gamla sakdomar skrivs om.
+- Main är vid avläsningen oförändrad i Digitala, Runtime och kontoret; kandidatkod
+  är inte aktiverad. Ägaren har nu godkänt införande av en begränsad GitHub App och
+  fått exakta formulärval: Checks write/Metadata read, endast de tre offentliga
+  reporna. Faktisk App-/installationsidentitet återläses före auktoritetsbindning;
+  ingen privat nyckel placeras före nödvändiga verkliga svit-/hostprov.
+- Ägaren bekräftar att Cal/Stripe/Tally/CRM-teståtkomst saknas tills vidare. Just
+  dessa liveprov står öppna. Kundstarts privata reposkydd har separat 403/Free-
+  planhinder; ingen kostnads- eller synlighetsändring ingår.
+
+Nästa handling: slutför aktuella redan startade prov, bevara utfall och stäng endast
+konkreta blockerare. Foga ihop de godkända Runtime-deltana och bered slutkandidater
+med exakt godkänt träd och aktuell main som ensam förälder; bevara originalcommits,
+råreviews och trädlikhet. Kör de verkliga nödvändiga slut-/hostproven före Appnyckeln.
+Återläs sedan faktisk Appinstallation, gör legitim hållaradoption och uppgiftsbunden
+kvalificering samt Appbundna serverkontroller. Skyddad publicerare inför kedjorna;
+PAT-status eller ett självskrivet success-fält ersätter inte utfärdaren.
+
+När integrationskvitton finns: återläs main, snabbspola rena ordinarie ingångar och
+prova den faktiskt införda Digitala-vägen. Runtime-release är ett eget efterföljande
+kvalificerat steg med återläsning; begär endast verkligt nödvändig ägarhandling där
+runbooken uttryckligen kräver den. Ny kunddrift kräver fortfarande sitt mandat,
+registrering, stående schema, operativa mottagare och observerade signal/återhämtning.
+Ingen ny stor beställningsprompt behövs för att fortsätta detta uppdrag.
+
+Återupptagning: samma privata hemvist `evidence/digitala/local/yrkesformaga-20260928/`,
+aktuellt LEVERANSBESKED, GAP-DISPOSITION och exakta gransknings-/införandekvitton.
+Ursprungliga 36 krav/43 gap bevaras. Arbetsgrenar under fortsatt/* och inforande/*
+bevarar granskat källursprung respektive konkreta integrationsobjekt tills skyddad
+publicering är kvitterad. Äldre test/fiktivt-e2e-20260927 bevaras som historisk provbas.
+Inga pågående IDE-/Runtimeprocesser stoppas som följd av en sessionsomstart.
+
+Daterad föregående källleverans:
+
 Aktuellt steg: Digitalas källkandidat abc51ddc122c4ef4366b31c82b4bac8ea9279604 är
 separat granskad och publicerad i draft-PR12 ovanpå tidigare 4047703. 228/228 regressioner
 passerade på exakt abc. Kod-r1/r2/r4/r5 är approved för sina avgränsade deltan; kod-r3:s
