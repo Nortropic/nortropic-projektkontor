@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Förbättringspartner · Projektkontoret</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/app.css">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<div id="inloggning" class="inloggning" hidden>
+  <form id="inloggningsformular" class="inloggningsruta">
+    <h1>Förbättringspartnern</h1>
+    <p>Projektkontorets interna samtalsyta. Logga in med nyckeln från <code>tools/partner.py oppna</code>.</p>
+    <label for="nyckel">Nyckel</label>
+    <input id="nyckel" type="password" autocomplete="current-password" required>
+    <button type="submit">Logga in</button>
+    <p id="inloggningsfel" class="fel" role="alert"></p>
+  </form>
+</div>
+
+<div id="app" class="app" hidden>
+  <aside class="sida" aria-label="Trådar">
+    <div class="sida-huvud">
+      <span class="marke" aria-hidden="true"></span>
+      <div>
+        <div class="namn">Förbättringspartnern</div>
+        <div class="undertext">Projektkontoret</div>
+      </div>
+    </div>
+    <button id="nytrad" class="knapp-bred">Ny tråd</button>
+    <form id="sokformular" class="sok" role="search">
+      <input id="sokfalt" type="search" placeholder="Hitta tidigare resonemang…" aria-label="Sök i tidigare resonemang och underlag">
+    </form>
+    <nav id="tradlista" class="tradlista" aria-label="Trådar"></nav>
+    <div class="sida-fot">
+      <button id="visaforstaelse" class="lank">Bestående förståelse</button>
+      <button id="visaoverlamningar" class="lank">Överlämningar</button>
+      <button id="visalage" class="lank">Tjänst och källor</button>
+    </div>
+  </aside>
+
+  <main class="huvud">
+    <header class="tradhuvud">
+      <h2 id="tradtitel" class="tradtitel" tabindex="0" title="Klicka för att byta namn">Ny tråd</h2>
+      <div id="tradstatus" class="tradstatus" aria-live="polite"></div>
+    </header>
+    <section id="dar" class="dar" hidden aria-label="Där vi är"></section>
+    <section id="flode" class="flode" aria-live="polite"></section>
+
+    <form id="komponera" class="komponera">
+      <div id="utkorg" class="utkorg" aria-live="polite"></div>
+      <div id="bilagelista" class="bilagelista"></div>
+      <div class="skrivrad">
+        <textarea id="text" rows="2" placeholder="Skriv, klistra in en bild eller släpp filer här…" aria-label="Meddelande"></textarea>
+      </div>
+      <div class="kontroller">
+        <label class="filknapp">Bifoga<input id="filval" type="file" multiple hidden></label>
+        <label class="baraspara"><input id="baraspara" type="checkbox"> Bara spara</label>
+        <span id="utkaststatus" class="utkaststatus"></span>
+        <span class="fyll"></span>
+        <button id="skickaavbryt" type="button" class="sekundar" hidden>Skicka och avbryt pågående</button>
+        <button id="skicka" type="submit">Skicka</button>
+      </div>
+    </form>
+  </main>
+
+  <aside id="panel" class="panel" hidden aria-label="Panel">
+    <div class="panel-huvud"><h3 id="paneltitel">Källa</h3><button id="stangpanel" class="lank" aria-label="Stäng panelen">Stäng</button></div>
+    <div id="panelinnehall" class="panel-innehall"></div>
+  </aside>
+</div>
+<div id="slapp" class="slapp" hidden>Släpp filerna för att bifoga dem</div>
+</body>
+</html>
