@@ -10,16 +10,20 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 # Gällande arbete — samlade åtgärder efter fiktivt kundprov
 
+Senare dokumentkontinuitet 2026-09-28 efter r4; frysta rapport-/granskningsunderlag ändras inte.
+
 DIGITALA-SAMLAT-ATGARDSMANDAT-20260927 är det aktuella genomförandeuppdraget. Ägaren har underkänt
 kundproduktens tidigare visuella kvalitet; tidigare privata modellgodkännanden är historiska och
 innebär inte ägaraccept. Formgivning och tekniska rättningar drivs parallellt från början.
 
 Kodkandidaterna i kontor (`58f938e`), Runtime (`ac5bcd9`), Digitala (`d61141d`) och Kundstart
 (`defcbac`) har separata avgränsade granskningar. De är inte gemensamt main-integrerade eller
-aktiverade i Runtime. Sena produkt-r9 är underkänd historik. Slutprodukt-r11 `0de4ffd` är
-hostad bakom skydd och har grön driftkontroll med exakt kodidentitet; produktkritiken väntar
-på en minimal `#fraga`-ankarrättning i separat gren. Varken tekniska prov eller kriteriernas
-godkännande ersätter aktuell produktdom eller ägaraccept.
+aktiverade i Runtime. Sena produkt-r9 och driftprovet mot `0de4ffd` är historik. Språk-/ankarrättningen
+är genomförd. R4 avslutades 2026-09-28 med två separata approved: rapporten och enradsdeltan
+`2cf`→`f25`. Basproduktdomen är fortsatt r12 på `2cf`; ingen ny full produkt-, drift- eller
+ägaraccept följer. Det skyddade aliaset flyttades därefter till exakt `f25` och återlästes
+08:20 UTC, med tillgänglig lagring och oförändrat granskat dataläge. Ingen ny full browser-,
+provider- eller återgångskörning påstås.
 
 Kundens svar och material har passerat Kundstart och Digitalas ordinarie konsument. Samma
 ärendes revision 46 är importerad och fjärrkvitterad. R1 importerade vid första starten och
@@ -45,27 +49,40 @@ stopp-/återhämtningsrepetition. Ägarens konkreta terminalsteg väntar fortfar
 Ingen aktivering har gjorts av utföraren; paketet aktiverar inte nya systemkandidater. Läs faktisk
 pekare, tjänst och schema efter eventuell ägarövergång innan driftbesked ändras.
 
-Ansvar och nästa handling: kedjedrivaren sluter produktens ankardelta och faktiska kritik,
-slutför offentlighets-/deltaaudit och publicerar rutinmässiga draft-PR för källgranskning inom mandatet.
+Ansvar och nästa handling: kedjedrivaren slutför den daterade överlämningen med r4:s två
+avgränsade domar och öppna observationer. Kvarstående produktförbättringar och boknings-/
+betalningskontraktet bevaras öppna; leverantörsflöden kräver faktisk kvalificerad teståtkomst.
+Källpublicering och dess avgränsade audit är genomförda. Verklig betrodd issuer, dess skyddade
+uppgifts-/acceptanskoppling och serverbindning återstår före skyddad integration.
 Main-integration och senare release kräver separat uppfyllda server-/issuergränser och befintlig
 skyddad holder-/operatörsväg. Ägaren har det redan beredda guard-terminalsteget; ingen ny
 rutinmässig design- eller PR-approval efterfrågas. Planen äger fortsatt nästa handling.
 
-Den frysta dokumentkandidaten lämnas för draft-PR/källpublicering. Faktisk gren-/PR-kvittens
-binds separat i publiceringsunderlaget; main-integration och aktivering är egna kvalificerade steg.
+Före denna senare dokumentnot publicerades Office `1301ac08` och Runtime `477b20a5` på draft-PR
+111 respektive 70, samt Kundstart `c2b68d7` som privat källgren med kvarstående draft-/
+skyddshinder. Digitalas draft-PR 11 snabbspolades senare till `4047703` och ändras inte här.
+De äldre dokumenthuvudena är daterade publiceringsutfall, inte denna nots nya heads;
+main-integration och aktivering är inte genomförda och förblir egna kvalificerade steg.
 
 ÅTERUPPTAGNING: denna post samt privata
 `evidence/nasta-uppdrag/local/atgarder-vikskar-20260927/drift/intake-schema-r2/LAS-MIG.md`,
-`drift/issuer-bindning-r1/LAS-MIG.md`, `drift/releaseberedning/OPERATORSSTEG.md` och
-`slutleverans/PR-BEREDNING-r2.md` under samma privata åtgärdsyta.
+`drift/issuer-bindning-r1/LAS-MIG.md` och `drift/releaseberedning/OPERATORSSTEG.md` under samma
+privata åtgärdsyta. Senare kvarläge läses i `slutleverans/LAS-MIG.md`; genomförd källpublicering i
+`slutleverans/PUBLICERING-EFTERKONTROLL.md` och `digitala/seen-kontrakt-r1/PUBLICERING.md`.
+Denna senare dokumentkontinuitets exakta heads och nätåterläsning binds separat i
+`drift/plan-kontinuitet-efter-r4/PUBLICERING-EFTER-R4.json` när publiceringen är gjord.
+Leveransbeskedet är daterade fakta; denna plan äger fortsatt nästa handling.
+Äldre berednings-/HOLD-text i issuer- och PR-underlagen är daterad historik; r2:s schema ska inte
+startas igen och redan kvitterat kundunderlag ska inte återimporteras för produktdeltan.
 
 Grenar kvar lokalt med namngivet skäl: kontor/Runtime `atgarder/vikskar-20260927`, Digitala
 `atgarder-kvalitet-bevis-20260927` och Kundstart `atgarder/intag-20260927` är frysta gransknings-
 och provbaslinjer. Runtime `atgarder/trusted-issuer-20260928` bevarar exakt godkända `4384329`.
-De fyra `atgarder/dokumentkontinuitet-20260928`-grenarna tillför endast dessa dokumentfakta
-inför källpublicering; deras nya heads är inte de äldre granskningsdomarnas exakta SHA.
-Icke-dokumentbytes ska verifieras identiska före publicering. Produktens omarbetningsgrenar
-bevarar historiska underkända versioner och pågående ankardelta. Äldre `test/fiktivt-e2e-20260927`
+De ursprungliga fyra dokumentkandidaterna hade verifierat identiska icke-dokumentbytes mot
+respektive kodbas. Källgrenarna `atgarder/dokumentkontinuitet-20260928` är nu publicerade;
+Digitalas senare bild-/seen_files-kontraktsdelta har egna koddomar och prov. Äldre domar gäller
+fortsatt sina exakta SHA. Produktens omarbetningsgrenar bevarar historiska versioner och de
+separat bedömda senare deltorna. Äldre `test/fiktivt-e2e-20260927`
 är arkiverat provunderlag, inte publicerad registrering. Ingen gren är implicit integrerad.
 
 Den äldre HELHET-noten om R39:s saknade merge är inaktuell: faktisk PR12-merge verifierades i
