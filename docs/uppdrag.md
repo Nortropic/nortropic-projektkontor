@@ -1,3 +1,13 @@
+# GÄLLANDE: Digitalas återanvändbara yrkesförmåga
+
+DIGITALA-YRKESFORMAGA-20260928 i beslutsloggen och den privata originalbeställningen under
+`evidence/digitala/local/yrkesformaga-20260928/` gäller. Förbättra och verifiera den ordinarie
+kund-, research-, skapande-, kvalitets- och integrationsvägen. Vikskär är provhistorik,
+inte ett fristående leveransmål. Befintliga rättningar och generella säkerhetsgränser består.
+Planen äger aktuellt steg. Äldre uppdrag nedan är historik och startas inte om.
+
+---
+
 # Gällande uppdrag: samlade åtgärder efter fiktivt kundprov
 
 Ägarens genomförandemandat DIGITALA-SAMLAT-ATGARDSMANDAT-20260927 gäller kontoret, Digitala,

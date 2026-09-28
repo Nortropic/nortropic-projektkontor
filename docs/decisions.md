@@ -6627,3 +6627,27 @@ En eventuell särskild operatörsaktivering bereds exakt och redovisas, inte kri
 
 Detta är ägarens beställning, inte ett godkännande av någon ny kandidat. Aktuellt steg, skrivansvar
 och återupptagning ägs av planen. Nya kriterier granskas separat före kandidatbedömningen.
+
+
+## DIGITALA-YRKESFORMAGA-20260928 — Digitalas yrkesförmåga är huvudmålet
+
+Ägaren beställer genomförande av förbättrad återanvändbar professionell förmåga och arbetskedja.
+Den fulla nya prompten bevaras privat i `evidence/digitala/local/yrkesformaga-20260928/BESTALLNING-ORIGINAL.md`.
+Endast dess markerade citat är ordagranna ägarord; övrig text är den beställda sammanställningen.
+
+Ersätter tidigare tolkning i DIGITALA-SAMLAT-ATGARDSMANDAT-20260927 att färdigställa Vikskär
+är ett fristående jämställt huvudmål. Vikskär är historik, felreproduktion och möjligt
+provunderlag. Kundspecifik femtonminutersreservation är inte ett standardkrav. Alla 36 krav
+ och 43 gap bevaras med ny disposition; generella luckor och giltiga tidigare rättningar
+kvarstår. Historiska domar/ägaromdömen skrivs inte om.
+
+Mandatet omfattar nödvändiga ändringar i Digitala, Kundstart och kontorets användning, konkret
+nödvändiga befintliga Runtime-anslutningar, öppnad referensresearch, motiverat verktygsval,
+begränsade representativa visuella prov och jämförelse med tillgänglig direkt produktionsväg,
+aktuellt undersökta lågkostnadsintegrationer med körbara exempel, sammanhängande verifiering,
+separat granskning samt skyddat införande där tillåtet. Inga rutinmässiga ägarstopp.
+
+Ingen ny generell plattform, prenumeration, köpta krediter, bredare kontoåtkomst, skarpa annonser,
+verkliga betalningar eller publik kundlansering. Detta är inte en beställning av guard-activate.
+Skyddad integration och exakta kandidat-/miljöbindningar består. Aktiv drift får inte härledas
+ur kandidatprov. Planen äger aktuellt steg, skrivansvar och fortsatt arbete.

@@ -8,7 +8,52 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Gällande arbete — samlade åtgärder efter fiktivt kundprov
+# Gällande arbete — Digitalas återanvändbara yrkesförmåga
+
+DIGITALA-YRKESFORMAGA-20260928 ersätter tolkningen att färdigställande av Vikskär är ett
+fristående huvudmål jämställt med Digitalas utveckling. Ursprungliga 36 krav och 43 gap
+bevaras; kundspecifika provkrav generaliseras inte. Generella brister och tidigare granskade
+kandidaträttningar består. Originalmandat och daterad förändringskarta finns privat i
+`evidence/digitala/local/yrkesformaga-20260928/`. Denna plan ensam äger nästa handling.
+
+Aktuellt steg: fyra samordnade arbetsområden från tidigare källkandidater, i nya isolerade
+worktrees. Kedjedrivaren äger mål/plan, behovsbunden referensresearch, representativa visuella
+prov, jämförelse med direkt produktionsväg och slutlig samordning. Separata utförare äger
+(1) referens-/skapande-/kritikvägen, (2) kundförståelse/import/fortsättning, (3) daterad
+lågkostnadsresearch och körbara integrationsexempel. Skrivområdena binds i privata START.json.
+Gamla arbetsytor, main, kunddata och aktiv Runtime är inte ändringsytor.
+
+Nästa handling: rätta faktiska aktiva konsumenter och pröva dem genom den ordinarie
+laddnings-/fortsättningsvägen. Avgränsade sid-/interaktionsunderlag för olika verksamheter
+ska visa behovsstyrd variation och användas för separat produktbedömning. Samma relevanta
+brief och tillgångar används i en enklare direkt jämförelse. Inga nya fulla kundbyggen.
+
+Etapper: (1) mål och ändringsbild, (2) kundförståelse/referenser/skapande/resurser,
+(3) valda integrationsexempel och generella kedjerättningar, (4) sammanhängande prov,
+separat produkt-/kodgranskning och skyddat införande där dess verkliga förutsättningar finns.
+Etapper är inte rutinmässiga godkännandestopp. Nytt arbete använder befintliga mekanismer;
+ingen ny generell agent-, kunskaps- eller kontrollplattform.
+
+Införandegräns: tidigare huvudkandidater är publicerade men inte main-integrerade eller
+aktiverade. Betrodd kontrollutfärdare och serverbindning, Kundstarts privata reposkydd och
+verkliga kontoberoenden ska kontrolleras och redovisas separat. Ingen egen grön status,
+sänkning av skydd, konto-/planändring eller ny kostnad. Guard-paketet är separat och detta
+mandat beställer INTE activate; befintlig ägarväg gäller. Dessa led stoppar bara beroende
+införande, inte oberoende design-, kod- eller integrationsarbete.
+
+Återupptagning: originalmandat, START.json och FORANDRINGSKARTA.json i den privata hemvisten;
+exakta nya heads/prov/granskningsutfall läggs där när de finns. Historiska leveransbeskedet
+för Vikskär behåller sina daterade fakta. Ingen faktisk kundlansering eller ägaraccept följer.
+Grenarna `yrkesformaga/*-20260928` bevaras lokalt under pågående arbete och avslutas med
+kontrollerad källpublicering eller namngivet hinder, aldrig implicit integration.
+
+---
+
+# Historik och kvarstående generella beroenden — samlade åtgärder efter fiktivt kundprov
+
+Målprioriteringen nedan är delvis ersatt av DIGITALA-YRKESFORMAGA-20260928 ovan.
+Daterade kod-, prov-, gransknings- och leveransfakta samt olösta generella beroenden består.
+
 
 Senare dokumentkontinuitet 2026-09-28 efter r4; frysta rapport-/granskningsunderlag ändras inte.
 
