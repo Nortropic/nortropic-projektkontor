@@ -44,6 +44,7 @@ NYTT_INSPEL = 'Johnny skickade ett nytt inspel under arbetet'
 OMSTART = 'serveromstart under arbetet'
 BARA_SPARA_AVBROTT = 'Johnny avbröt och sparade utan svar'
 ATERUPPTA_INOM = 3600
+KALLVAKT_SEKUNDER = 600   # källindexet byggs om inom tio minuter när det det byggs ur har ändrats
 
 
 def las_hemlighet(katalog: Path, namn: str, skapa: bool = True) -> str:
@@ -338,8 +339,13 @@ class Server:
     def tackningstext(self) -> str:
         t = self.kallor.tackning()
         imp = t.get('improvements') or {}
+        bygge = (' Källindexet byggdes %s ur kontorets main %s och byggs om inom tio minuter när repons origin/main, '
+                 'de sparade ägarorden eller korpusens manifest ändras; repo-verktygen läser alltid origin/main.') % (
+            (self.kallor.byggt() or '?')[:16].replace('T', ' ') + ' UTC',
+            ((t.get('kontoret') or {}).get('main') or '?')[:8])
         if not imp or imp.get('fel'):
-            return 'Improvements-korpusen är inte ansluten just nu (%s).' % (imp.get('fel') or 'inget index byggt')
+            return 'Improvements-korpusen är inte ansluten just nu (%s).%s' % (imp.get('fel') or 'inget index byggt',
+                                                                                bygge)
         grans = imp.get('kallgrans') or {}
         b = imp.get('bilagor') or {}
         return ('Improvements: %d samtal (%d meddelanden) och %d projektfiler, fångade till och med %s (källgräns '
@@ -352,7 +358,7 @@ class Server:
             imp.get('samtal', 0), imp.get('meddelanden', 0), imp.get('dokument', 0),
             (grans.get('observation_slut') or '?')[:16], (grans.get('fryst') or '?')[:16], imp.get('inventering'),
             b.get('fangade', 0), b.get('saknade', 0), grans.get('historiskt_otillgangliga', 0),
-            (t.get('privat') or {}).get('filer', 0))
+            (t.get('privat') or {}).get('filer', 0)) + bygge
 
     def tradvy(self, trad: str) -> dict:
         t = self.lager.trad(trad)
@@ -804,8 +810,11 @@ class _Visning:
 
 def starta(k: Konfig, bygg_index: bool = True, pidfil: Path | None = None):
     S = Server(k)
-    if bygg_index and not S.kallor.tackning():
-        S.kallor.bygg()
+    if bygg_index:  # även när källorna ändrats sedan förra bygget (ny main, nya sparade ägarord)
+        try:
+            S.kallor.uppdatera_om_inaktuellt()
+        except Exception as fel:  # det tidigare indexet gäller; vakten försöker igen
+            sys.stderr.write('%s källindexet kunde inte byggas om vid start (%s)\n' % (nu()[:19], type(fel).__name__))
     Hanterare.S = S
     httpd = ThreadingHTTPServer(('127.0.0.1', k.port), Hanterare)
     httpd.daemon_threads = True
@@ -830,6 +839,16 @@ def starta(k: Konfig, bygg_index: bool = True, pidfil: Path | None = None):
             except Exception:
                 pass
     threading.Thread(target=kvittensvakt, daemon=True).start()
+
+    def kallvakt():
+        while True:
+            time.sleep(KALLVAKT_SEKUNDER)
+            try:
+                S.kallor.uppdatera_om_inaktuellt()
+            except Exception:
+                pass
+    if bygg_index:
+        threading.Thread(target=kallvakt, daemon=True).start()
     sys.stderr.write('%s partner lyssnar på %s (kod %s, data %s); återhämtat: %s\n' % (
         nu()[:19], S.url, S.kodrevision.get('head'), k.data, json.dumps(aterhamtat)))
     httpd.serve_forever()

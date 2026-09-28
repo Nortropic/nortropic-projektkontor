@@ -789,6 +789,38 @@ class VerktygProv(Miljo):
         self.assertIn('bilden bifogas', s)
         self.assertIn('inte fångade', s)
 
+    def test_kallindexet_byggs_om_nar_kallorna_andras(self):
+        K = self.S.kallor
+        self.assertFalse(K.inaktuellt())
+        self.assertFalse(K.uppdatera_om_inaktuellt())
+        self.assertIn('Källindexet byggdes', self.S.tackningstext())
+        ny = self.k.kontor_primar / 'evidence' / 'nasta-uppdrag' / 'local' / 'prov-20260928' / 'owner-words-20260929.md'
+        ny.write_text('Johnny sade: kylskåpsväggen är viktigast nu.', 'utf-8')
+        self.assertEqual([t for t in K.sok('kylskåpsväggen') if t['klass'].startswith('privat:')], [])
+        self.assertTrue(K.inaktuellt())
+        self.assertTrue(K.uppdatera_om_inaktuellt())
+        self.assertTrue([t for t in K.sok('kylskåpsväggen') if t['klass'] == 'privat:agarens-ord'])
+        self.assertFalse(K.inaktuellt())
+        repo = self.rot / 'runtime'   # ett repo vars origin/main flyttar
+        git = lambda *a: subprocess.run(['git', '-C', str(repo), '-c', 'user.name=prov', '-c', 'user.email=prov@example.invalid']
+                                        + list(a), check=True, capture_output=True)
+        repo.mkdir()
+        git('init', '-q', '-b', 'main')
+        (repo / 'README.md').write_text('# Runtime\n\nFörsta.\n', 'utf-8')
+        git('add', 'README.md')
+        git('commit', '-q', '-m', 'ett')
+        git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        self.k.repon['runtime'] = repo
+        self.assertTrue(K.uppdatera_om_inaktuellt())
+        self.assertFalse(K.inaktuellt())
+        (repo / 'README.md').write_text('# Runtime\n\nAndra versionen med blåmesar.\n', 'utf-8')
+        git('commit', '-q', '-am', 'två')
+        self.assertFalse(K.inaktuellt())                    # bara lokalt: origin/main har inte flyttat
+        git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        self.assertTrue(K.inaktuellt())
+        self.assertTrue(K.uppdatera_om_inaktuellt())
+        self.assertTrue(K.sok('blåmesar'))
+
     def test_provlage_doljer_episodens_eget_facit(self):
         self.S.kallor.dolda = ('imp:CONV-002',)
         self.assertEqual([t for t in self.S.kallor.sok('kylskåpet magneter') if t['kalla_id'].startswith('imp:CONV-002')], [])
@@ -963,6 +995,26 @@ class VerktygProv(Miljo):
         self.assertEqual(self.S.overlamning.las_kvittenser(), 1)
         self.assertEqual(self.S.overlamning.las_kvittenser(), 0)
         self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'mottagen')
+
+    def test_provinstansens_paket_hamnar_i_egen_data(self):
+        self.logga_in()
+        self.S.k.prov_dolj = ('imp:CONV-002',)   # som en provinstans: provtext i Johnnys namn stannar i provdatan
+        trad = self.skicka('Genomför det: lägg till en statusrad i Aquarium.')['inspel']['trad']
+        self.svar(trad, 1)
+        self.manus('RING bered_uppdrag ' + json.dumps({
+            'rubrik': 'Statusrad', 'mal': 'Statusrad.', 'agarcitat': 'Genomför det: lägg till en statusrad i Aquarium.',
+            'nasta_handling': 'Bered', 'mottagare': 'kontorets-kedjedrivare'}))
+        self.skicka('Kör.', trad=trad)
+        self.assertIn('provinstansens data', self.svar(trad, 2))
+        rad = self.S.lager.en('select id, data from overlamning')
+        kat = Path(json.loads(rad['data'])['katalog'])
+        self.assertEqual(kat.parent, Path(self.k.data) / 'overlamningar')
+        self.assertTrue((kat / 'AGARENS-ORD.md').exists())
+        self.assertEqual(list((self.k.kontor_primar / 'evidence' / 'nasta-uppdrag' / 'local').glob('partner-*')), [])
+        from partnern.overlamning import kvittera
+        kvittera(self.k, rad['id'], 'avslagen', 'provsession', 'prov')
+        self.assertEqual(self.S.overlamning.las_kvittenser(), 1)
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'avslagen')
 
     def test_webbkroken_i_verklig_korning(self):
         self.logga_in()

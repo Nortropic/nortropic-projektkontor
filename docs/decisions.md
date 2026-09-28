@@ -6819,3 +6819,31 @@ Inget annat hindrar att tjänsten används.
 
 **Avslut.** Uppdraget är fullgjort när denna post är integrerad och tjänsten har startats om ur main enligt
 driftregeln. Nästa bygge, till exempel ljudläsning, kräver ett eget beslut. Planen äger nästa handling.
+
+
+## FORBATTRINGSPARTNER-RESULTAT-TILLAGG-20260928 — kandidat 2 är integrerad (PR 118) och driftsatt; källindexet byggs nu om av sig självt när källorna ändras (kandidat 3)
+
+**Status:** registrerat 2026-09-28 (21:38 UTC) av sessionen nortropic-repos-9e (Claude Code) som tillägg till
+FORBATTRINGSPARTNER-RESULTAT-20260928, inom samma beställning.
+
+**Kandidat 2** integrerades i PR 118 (main `ec87c06`). Den separata granskningen (`claude-opus-5`) godkände den
+utan blockerande fynd, med 13 restpunkter. Hela sviten, 455 prov, kördes i en profil utan inloggningsuppgifter, och
+22 beteendefall kördes i utfärdarens egen sandlåda; de åtta nya fallen faller på den gamla koden. Tjänsten startades
+om ur main 21:30Z, och `partner.py status` och tjänstens egen vy visade samma kod som main. En ren webbläsarprofil
+klarade elva kontroller: inloggning via fragment även i en öppen flik, inga konsolfel som utloggad, sökning och
+öppning utan modell samt kod och källtäckning i tjänstvyn. Den vanliga tjänstens journal är tom och innehåller alltså
+inga provinspel.
+
+**Kandidat 3.** Efter omstarten syntes att källindexet bara byggdes vid första start eller med `partner.py index`.
+Indexet omfattar kontorets beslut och plan, andra repons dokument och sparade ägarord och beställningar. Nya beslut
+och ägarord blev därför inte sökbara av sig själva, även om repo-verktygen alltid läser aktuellt main. Nu byggs
+indexet om vid start och inom tio minuter när repons origin/main, de privata ägarord-, beställnings- och
+lägesfilerna eller korpusens manifest ändras. Nya beslut blir sökbara när primärutcheckningens origin/main har
+uppdaterats, vilket sessioner gör vid start och efter varje publicering; tjänsten hämtar inte själv. På de verkliga
+källorna tar avtrycket under en sekund och ombyggnaden ett par sekunder. Tjänstens källtäckning anger när indexet
+byggdes och ur vilken main. Ett misslyckat källbygge vid start stoppar inte längre tjänsten. Eftersom ägarord nu
+indexeras automatiskt skriver en provinstans sina överlämningspaket i sin egen data i stället för i
+beställningsvägen. Två prov har lagts till, så de är nu 44.
+
+**Avslut.** Uppdraget är fullgjort när kandidat 3 är integrerad och tjänsten har startats om ur main enligt
+driftregeln. ÄGARENS TUR är oförändrad med elva rader. Planen äger nästa handling.
