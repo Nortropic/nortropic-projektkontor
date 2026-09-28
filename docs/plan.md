@@ -14,41 +14,59 @@ DIGITALA-SAMLAT-ATGARDSMANDAT-20260927 är det aktuella genomförandeuppdraget. 
 kundproduktens tidigare visuella kvalitet; tidigare privata modellgodkännanden är historiska och
 innebär inte ägaraccept. Formgivning och tekniska rättningar drivs parallellt från början.
 
-Etapp 1 är säkrad: originalmandat, nuläge och historik är bevarade. Alla 36 frysta krav och 43 gapobjekt
-står kvar. Åtgärdskartan är en dispositionsbilaga, inte en ny plan. Etapp 2 har påbörjats med faktisk
-visuell diagnos och nya riktningar; intagsspåret implementerar robusta modellsvar och beständig
-signal-/returfrågeväg. Etapp 3–5 återstår till verifierat resultat.
+Kodkandidaterna i kontor (`58f938e`), Runtime (`ac5bcd9`), Digitala (`d61141d`) och Kundstart
+(`defcbac`) har separata avgränsade granskningar. De är inte gemensamt main-integrerade eller
+aktiverade i Runtime. Sena produkt-r9 är underkänd historik. Slutprodukt-r11 `0de4ffd` är
+hostad bakom skydd och har grön driftkontroll med exakt kodidentitet; produktkritiken väntar
+på en minimal `#fraga`-ankarrättning i separat gren. Varken tekniska prov eller kriteriernas
+godkännande ersätter aktuell produktdom eller ägaraccept.
 
-Skrivansvar: kedjedrivaren äger kontoret, Runtime, drift och produktens backend. En separat utförare
-äger produktens form, UI och tillgångar; en annan Kundstart; en annan Digitalas gemensamma verktyg
- och kvalitetsregler. Alla arbetar i isolerade grenar/arbetskopior. Ingen skriver i den frysta
-kundprovskopian. Gemensamma filer och publicering samordnas av kedjedrivaren.
+Kundens svar och material har passerat Kundstart och Digitalas ordinarie konsument. Samma
+ärendes revision 46 är importerad och fjärrkvitterad. R1 importerade vid första starten och
+gav inget nytt vid andra. Det nya r2-provet körde två verkliga 60-sekunders Temporal-starter
+2026-09-28 kl. 06:20 och 06:21 UTC på frysta RTac5/Office58/Digitala d611: båda completed+healthy,
+inget nytt, ingen import och oförändrade kundhashar. Skyddad health svarade HTTP200 med exakt
+produkt `0de4ffd` och tillgänglig lagring. Endast health använde intern skyddsnyckel; Kundstart
+lästes via legitim alias. Testschema är raderat med NOT_FOUND-återläsning. Aktiv pekare, service
+och AP10/AP11-definitioner var oförändrade. Detta är temporär kandidatkvalificering, inte aktiv
+kunddrift. Senare produktankarrättning kräver ingen ny import av redan kvitterade kunduppgifter.
 
-Nästa handling: färdigställ och separat granska kvalitetskriterier före kandidatbedömning; bygg
-informationskedjans och leveransbevisens rättningar; fortsätt de kreativa riktningarna samt undersök
-befintlig hostad lagring och tillåtna integrationskonton. Registreringsvägens fasta namntabell
-rättas med bibehållna mål-, mandat- och granskningsgrindar före skyddad publicering av detta uppdrag.
+Runtime `4384329`, separat gren från ac5, stänger Publisherns interna issuerlucka: inga egna
+PAT-success och ingen integration med null/any-app-bindning. Tolv riktade prov och fullsuite
+614 tester passerar; separat faktisk issuer-r1 är approved för exakt den kodkandidaten med
+fem öppna kommentarer och inget livegodkännande. Issuer438 ingick inte i r2:s körda runtime.
+Verklig betrodd utfärdare, dess uppgifts-/acceptansbindning och serverkonfiguration återstår.
+Office/Runtime har checknamn men app_id=null; Digitalas ruleset saknar obligatoriska checks;
+Kundstarts privata skydd/draft har planhinder. Ingen installerad App är därför utsedd till
+betrodd granskare, och inga manuella rutinapprovals, konto- eller planändringar införs.
 
-Senaste arbetsläge 2026-09-27T22:45Z: nya skyddade produktpreviewn har privat Blob-lagring och
-38 faktiska hostade kontroller passerar, inklusive beständig förfrågan, roller, innehållsåtergång,
-Resend-testefterled och mediapolicy. Färsk mobilbesökare har lämnat en syntetisk fråga genom den
-faktiska sidan. Previewns manuellt felaktiga tree-metadata gör att slutpreview måste byggas om
-med maskinberäknad bindning. Kvalitetskriterier r4 granskas separat före produktdom; generell
-Digitala-granskning delas i bevis/fortsättning, intag och kanaler. Kundstart r2 och adapter r2 är
-frysta och granskas. Kundrollens nya syntetiska regler är bevarade separat men ännu inte införda
-genom Kundstarts kedja. Runtime/Office r1 fick fyra blockerare; r2 har nu egen kö, separat intagslarm,
-validerad outbox och bunden Python. Isolerat trestartsprov med upptagen parallell kö passerar.
-Guard-only övergång för samma 203 redan integrerade kodfiler har klarat verklig isolerad start-
-och databasåterställningsövning; exakt operatörsskript granskas separat. Ingen aktiv release,
-kunddrift eller skyddad main-integration har ändrats i detta arbete.
+Guard-only-paket r3 för samma gamla 203 kodfiler är separat approved, med verklig isolerad
+stopp-/återhämtningsrepetition. Ägarens konkreta terminalsteg väntar fortfarande återkoppling.
+Ingen aktivering har gjorts av utföraren; paketet aktiverar inte nya systemkandidater. Läs faktisk
+pekare, tjänst och schema efter eventuell ägarövergång innan driftbesked ändras.
 
+Ansvar och nästa handling: kedjedrivaren sluter produktens ankardelta och faktiska kritik,
+slutför offentlighets-/deltaaudit och publicerar rutinmässiga draft-PR för källgranskning inom mandatet.
+Main-integration och senare release kräver separat uppfyllda server-/issuergränser och befintlig
+skyddad holder-/operatörsväg. Ägaren har det redan beredda guard-terminalsteget; ingen ny
+rutinmässig design- eller PR-approval efterfrågas. Planen äger fortsatt nästa handling.
 
-ÅTERUPPTAGNING: denna planpost och privat
-`evidence/nasta-uppdrag/local/atgarder-vikskar-20260927/BASLINJE.json` samt `ATGARDSKARTA.json`.
-Aktiva arbetsgrenar: `atgarder/vikskar-20260927` i kontor/Runtime, `atgarder/intag-20260927` i
-Kundstart och produktens `omarbetning/visuell-20260927` och Digitalas `atgarder-kvalitet-bevis-20260927`. De är pågående kandidater, inte godkända integrationer. Den äldre lokala grenen
-`test/fiktivt-e2e-20260927` är arkiverad som bevarat provunderlag; dess registrering blockerades av
-den dåvarande publiceringsvägens fasta namnlista och får inte beskrivas som publicerad.
+Den frysta dokumentkandidaten lämnas för draft-PR/källpublicering. Faktisk gren-/PR-kvittens
+binds separat i publiceringsunderlaget; main-integration och aktivering är egna kvalificerade steg.
+
+ÅTERUPPTAGNING: denna post samt privata
+`evidence/nasta-uppdrag/local/atgarder-vikskar-20260927/drift/intake-schema-r2/LAS-MIG.md`,
+`drift/issuer-bindning-r1/LAS-MIG.md`, `drift/releaseberedning/OPERATORSSTEG.md` och
+`slutleverans/PR-BEREDNING-r2.md` under samma privata åtgärdsyta.
+
+Grenar kvar lokalt med namngivet skäl: kontor/Runtime `atgarder/vikskar-20260927`, Digitala
+`atgarder-kvalitet-bevis-20260927` och Kundstart `atgarder/intag-20260927` är frysta gransknings-
+och provbaslinjer. Runtime `atgarder/trusted-issuer-20260928` bevarar exakt godkända `4384329`.
+De fyra `atgarder/dokumentkontinuitet-20260928`-grenarna tillför endast dessa dokumentfakta
+inför källpublicering; deras nya heads är inte de äldre granskningsdomarnas exakta SHA.
+Icke-dokumentbytes ska verifieras identiska före publicering. Produktens omarbetningsgrenar
+bevarar historiska underkända versioner och pågående ankardelta. Äldre `test/fiktivt-e2e-20260927`
+är arkiverat provunderlag, inte publicerad registrering. Ingen gren är implicit integrerad.
 
 Den äldre HELHET-noten om R39:s saknade merge är inaktuell: faktisk PR12-merge verifierades i
 kundprovets källspår. Merge och avgränsad sakläsning är olika uppgifter; inget automatiskt införande
