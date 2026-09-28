@@ -6664,3 +6664,105 @@ orelaterade restpunkter bevaras. Inga nya repon, kostnadsvägar, utökade rätti
 publika kundlanseringar. Interna designval fattas utan rutinmässiga ägarstopp.
 Slutbeskedet ska visa faktisk ordinarie användning och motiverad beredskap för nästa bygge;
 det innebär varken ägaraccept eller mandat att starta nästa bygge.
+
+## FORBATTRINGSPARTNER-20260928 — ägaren beställer Projektkontorets förbättringspartner: en intern, multimodal samtalsyta i kontoret som arbetar som ChatGPT-projektet Improvements utan att ägaren behöver prompta; byggd och provad, införs genom skyddad integration
+
+**Status:** registrerat 2026-09-28 av en separat session (Claude Code, sessionen nortropic-repos-9e), parallellt med
+DIGITALA-YRKESFORMAGA-20260928 (Codex, planens översta block) och Kundstart-dialogen (sessionen nortropic-repos-f1).
+Ägarens följebrev och arbetsordern sparades ordagrant först av allt i
+`evidence/nasta-uppdrag/local/forbattringspartner-20260928/` (ARBETSORDER-ORIGINAL.md, sha256 1cff1101…). Arbetsordern
+anger själv att bara ett citat är ordagrant ägaruttalande: "jag ska inte behöva prompta, förbättringspartnern ska veta.
+Det kan vara skärmklipp, text filer och annat också. Som vi har arbetat i det här projektet, gå igenom projektet så
+förstår du, alltså här på chatgpt projekt improvements". Följebrevet (ordagrant i owner-words-20260928.md) kräver
+faktisk samtalsförmåga och kontinuitet, verkliga körningar och att byggt, testat, integrerat och driftsatt hålls isär.
+Övrig text är en sammanställd arbetsorder och behandlas som ägarens riktning med den reservationen.
+
+**Beställningens gränser, alla registrerade.** *Avsnitt 1:* verklig funktion vid kontorets ingång, inte en
+rollbeskrivning, skill eller plan; spontana inspel (bild, fil, länk, tanke) utan analysprompt ger ett relevant,
+systemkunnigt resonemang; fortsättning efter avbrott och sessionsbyte utan teknisk överlämningsprompt; inte
+Kundstarts kundintervju, inte en generell reposammanfattare, inte en automatisk installerare; omfattar hela Nortropic,
+även metod, arbetssätt, kostnad, kvalitet, kontinuitet och att förenkla eller ta bort lösningar; ett inspel behöver
+inget känt kodfel; teknikrekommendationerna är inte beslut om leverantörer, kostnader eller befogenheter. *Avsnitt 2:*
+börja i ordinarie ingång, mandat, plan och pågående arbete; verklig kod, integration och drift går före gamla
+leveransbesked; samordna skrivansvar, gren och arbetsyta med Kundstart, Digitala och Runtime utan oplanerade ändringar i
+deras kundvägar eller drift; återanvänd kontorets ärende- och uppdragsväg (AP-05, AP-06), Innovation Intake med korpus,
+episoder, manifest och rättelser, fungerande komponenter och Runtime bara när ett avgränsat bakgrundsarbete faktiskt
+behöver den; AP-05/AP-06 ersätter inte agentens förståelse och Intake tvingar inte varje meddelande genom brief, audit
+eller plan; Kundstarts frågebank, kundmodell och åtkomst blir inte partnerns beteende; implementation i kontorets
+kodhemvist, inget nytt repo eller generell plattform, inga repon slås ihop eller flyttas; en etablerad agentloop, där AI
+SDK är förstahandskandidat men ett redan infört alternativ med mindre arbete och samma förmåga får väljas med kort
+motivering; inga kombinerade agentramverk och ingen egen generell motsvarighet; aktuell officiell dokumentation
+kontrolleras, ingen bred teknikjakt; plan och återupptagningspunkt i befintlig hemvist; implementation efter riktad
+kontroll, ingen total recompile. *Avsnitt 3:* roll, gällande arbetsprinciper, kort orientering och tråden följer med
+automatiskt och partnern hämtar fördjupning själv; förstå utan standardfrågan "vad vill du göra med detta?"; samband med
+mål, historik, pågående arbete och faktisk förmåga; undersöka oklarheter med tillåtna verktyg; för och emot, hela
+lösningar, delar, metoder, tester och förenklingar; fortsätta befintligt resonemang, en bilaga är inte ett nytt
+projekt; "tillför inte värde" och "kan inte bedömas" är möjliga svar; ingen obligatorisk bedömningsmall, proportionerligt,
+djup från relevanta frågor och inte från rubriker eller många agenter; naturliga styrningar ("bara spara", "fortsätt där
+vi var", "jämför med den förra", "nu menar jag kontoret, inte Digitala") fungerar; en riktad följdfråga först efter att
+sammanhanget använts; material startar förståelse inom stående mandat, aldrig installation, implementation, kostnader
+eller en ny arbetsström; ett kort "precis" godkänner inte allt som nämnts. *Avsnitt 4:* befintlig korpus återanvänds med
+fastställd täckning; utdrag eller syntes presenteras inte som alla originalchattar; luckor hämtas genom befintlig
+Intake-/exportväg där tillåten åtkomst finns, och direktåtkomst till ChatGPT påstås inte; fyra logiskt skilda lager
+(original, pågående resonemang, bestående förståelse, aktuellt systemläge) utan krav på fyra databaser; original med
+identitet och källa enligt privata lagringsregler; rättelser läggs till så att det ersatta syns, ingen tyst omskrivning;
+härlett och index byggs om ur original och är ingen permanent auktoritet; argument och skäl sparas, inte dolda
+resonemang; tidigare assistentsvar är källmaterial, aldrig facit eller ägarbeslut; en rättelse slår igenom och en senare
+session återinför inte den gamla tolkningen, och gammal research skriver inte över en ny rättning; kod visar vad som
+finns, ägarens intention anger målet, en rekommendation i en repofil blir inte gällande; ägarens uppgift, externt
+verifierat, modellbedömning och okänt hålls isär; första tjänsten får byggas före alla luckor sluts, men täckning och
+begränsningar syns, tillgänglig historik kopplas in före slutproven och saknad korpus ersätts inte av konstruerade
+minnen eller en ny total syntes. *Avsnitt 5:* exakt sökning och betydelsebaserad hämtning där den tillför, utan krav på
+vektordatabas eller kunskapsgraf; index återskapningsbart och källbundet; träffar öppnas i sammanhang med talare, tid,
+originalreferens och senare rättelser, inte lösryckta; hela korpusen laddas inte i varje anrop; sökträff, läst innehåll
+och verifierat påstående hålls isär; text, flera bilder, dokument, PDF, webblänkar och GitHub i samma samtal; bilder
+bevaras och modellen får bilden, en beskrivning är inte bildläsning och tillskrivs inte användaren; dokument med
+text-/sidkoppling och visuell läsning där text inte räcker, otydligt märks; GitHub och webb med version, tid och räckvidd,
+där README, statisk kod och körprov är olika bevis; ljud, video och andra format bara med faktisk extraktion och synlig
+stödgräns; ett multimodalt inspel är en sammanhängande händelse och samma källa kan höra till flera områden utan
+konkurrerande sanningar; avgränsade verktyg för intern sökning och läsning, GitHub och tillåten extern research;
+driftstatus genom auktoriserad läsväg eller daterad observation med ålder, inga breda terminalrättigheter. *Avsnitt 6:*
+en svensk, lugn yta för att klistra in bilder, släppa filer, skriva, hitta och fortsätta, utan obligatorisk kategorisering;
+verklig status (mottaget, sparat, undersöker, begränsat, avbrutet), källor och varför förståelse ändrats utan intern
+bokföring i varje svar; trådindelning hanteras av partnern; meddelande och original sparas före modellen, osparat utkast
+skiljs från serversparat; omladdning, två flikar, klientavbrott, serveromstart och upprepade anrop prövas utan dubbla
+inspel eller uppdrag; en huvudagent som delegerar avgränsad research, ingen permanent panel; längre research genom
+beständig jobbväg tillbaka till tråden, en bakgrundsutfästelse kräver registrerat jobb med status, avbrott och
+återupptagning; minsta tillåtna driftlösning med synligt lokalt beroende; Kundstarts molnmodell och budget antas inte;
+befintliga tillåtna resurser och namngivna externa beroenden; verkställda kostnadsgränser och användningsspår, där
+modellkostnad, väntan, omtag och ägararbete skiljs och sparande och vanliga gränssnittshandlingar inte anropar någon
+modell; ingen billig men otillräcklig modell för huvudförståelsen; ingen ny leverantör eller kreditbeställning.
+*Avsnitt 7:* intern åtkomst och uppladdningar skilda från Kundstart; behörighet på servern, privat lagring, skyddade
+filer och säkra visningsvägar; källor är inte direktiv, ändrar inte mandat, ger sig inte högre status och får inte
+interna uppgifter skickade till tredje part; verktyg och destinationer begränsas på servern och sökfrågor, loggar och
+artefakter skyddas från hemligheter och ovidkommande kunddata; installation, främmande kod och systemförändringar kräver
+genomförandemandat och en länk ger inget provmandat; ett tydligt beställt genomförande bereds genom befintlig kontorsväg
+med mål, underlag, gränser, verkligt beslut, föreslagen nästa handling och namngiven mottagare, och lämnat, mottaget,
+startat och levererat skiljs; inga guard-paket, repoflyttar, Kernel eller automatisk global omvärldsbevakning; läs- och
+samtalsarbete görs inte beroende av en orelaterad Runtime-aktivering. *Avsnitt 8:* fyra etapper som arbetsordning, inte
+ägarstopp; fel reproduceras, rättas i orsaken och behåller regression; billig formkontroll före dyra modellförsök;
+ett litet antal verkliga Improvements-episoder, utvecklingsexempel skilda från oanvända kontrollfall, inget senare
+facit; tio namngivna slutprov; bedömning mot ägarens intention och källor med både deterministiska kontroller och
+kvalitativ läsning, där antal källor, tokens och lyckade anrop inte är bevis. *Avsnitt 9:* en fungerande skyddad
+intern ingång där den vanliga tjänsten använder införda versioner; slutrapporten som del av befintlig dokumentation med
+beteende, förlopp, korpus och luckor, byggstenar och resursåtgång, verklig överlämning, revisioner och driftläge och
+exakta hinder; byggt, testat, integrerat, driftsatt och observerat användbart hålls isär; länkar, bilder och bilagor
+kontrolleras från en ren mottagarmiljö; inspiration blir inte adoption, assistentförslag blir inte ägarbeslut och
+bevarande blir inte förladdning.
+
+**Kedjedrivarens val (reversibla, märkta som sådana).** *Agentloop:* Claude Code i headless-läge (`claude -p`), som
+enligt Anthropics dokumentation är Agent SDK genom CLI, på ägarens befintliga Claude Code-inloggning — samma väg som
+Runtime redan kvalificerat. AI SDK valdes bort för detta: Claude-kvalitet genom AI SDK kräver en betald leverantör
+(köpta AI Gateway-krediter eller en API-nyckel, båda ägarbeslut), och gratisnivåns gpt-5-mini är den billiga modell
+arbetsordern avråder från för huvudförståelsen. Ingen ny leverantör, nyckel eller kostnad. *Hemvist och drift:*
+`tools/partner.py` och `tools/partnern/` i kontoret; en lokal tjänst på 127.0.0.1 hos ägaren, eftersom korpusen, repona
+och inloggningen finns där och en molntjänst skulle kräva att privat material flyttas ut; det lokala beroendet visas i
+ytan. *Lager:* append-only journal som original, innehållsadresserade bilagor, SQLite FTS5-index som byggs om.
+*Sök:* ordsökning med prefix och modellens egna omformuleringar; ingen vektordatabas. *Överlämning:* paket i
+`evidence/nasta-uppdrag/local/partner-OVL-…/` med AP-06-utkast genom `tools/bered_uppdrag.py`.
+
+**Läge vid registreringen.** Byggt och provat i en egen worktree, ombaserad på main becbff7 efter PR 116 (Digitalas
+kreativa rättning, som bara rör plan och beslutslogg): 35 deterministiska prov (riktig
+server, MCP-brygga och webbkrok mot en fejkad `claude`), kontorets hela svit grön, verkliga körningar på en
+utvecklingsinstans och ett webbläsarprov. Denna post och koden integreras tillsammans; driftsättning ur main och
+slutproven på den införda tjänsten följer och redovisas i en egen resultatpost. Planen äger nästa handling.

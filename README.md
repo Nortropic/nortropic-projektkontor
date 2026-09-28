@@ -75,3 +75,10 @@ Kedjedrivaren sköter sammanställningen enligt planen. Den verkliga privata
 ingången återfinns lokalt via `evidence/ap08/local/LAS-MIG.md`; den ingår inte i
 en publik klon. Rapporten är daterad, inte live. Läsning ger inga befogenheter,
 startar inget arbete och skickar inga godkännanden.
+
+## Förbättringspartnern
+
+En intern samtalsyta där ägaren lämnar tankar, skärmklipp, filer och länkar utan analysprompt och får ett
+källbundet resonemang som minns tidigare trådar, beslut och rättelser. [Anvisningen](tools/PARTNER.md)
+beskriver start (`python3 -B tools/partner.py start` och `oppna`), gränser och källtäckning. Tjänsten körs
+lokalt; datan är privat. Aktuellt läge finns som alltid bara i [planen](docs/plan.md).

@@ -76,6 +76,30 @@ Cal/Stripe/Tally/CRM-teståtkomst saknas enligt ägaren; faktiska livscykler och
 
 ---
 
+# Parallellt gällande — Projektkontorets förbättringspartner (FORBATTRINGSPARTNER-20260928)
+
+Parallellt uppdrag med eget skrivansvar. Blocken om Digitala ovanför (och ett senare sådant block överst)
+ersätter inte detta block, och detta ersätter inte dem; Digitalas block 19:38 UTC anger själv att
+förbättringspartnern har egna spår. Skrivansvar: sessionen nortropic-repos-9e (Claude Code) för `tools/partner.py`, `tools/partnern/`,
+`tools/test_partner.py`, `tools/PARTNER.md`, detta block och partnerns beslutsposter. Inga ändringar i Digitala,
+Kundstart eller Runtime ingår; samordning med Kundstart-dialogen (nortropic-repos-f1) är bekräftad 18:14Z.
+
+Läge när detta block skrevs (28 september 2026, 21:24 svensk tid / 19:24 UTC): partnern är byggd och provad och integreras med denna
+ändring. Den är inte driftsatt förrän tjänsten körs ur kontorets primärutcheckning på main och slutproven gjorts där.
+
+Nästa handling: efter integrationen snabbspolas primärutcheckningen; tjänsten startas ur den med
+`python3 -B tools/partner.py start` (datan i `evidence/partner/local/`, nyckeln i `~/.nortropic-hemligheter/partner/`);
+kontrollen `partner.py status` ska visa samma kod som origin/main. Därefter körs de tio slutproven i arbetsordningens
+avsnitt 8 på den införda tjänsten, med de reserverade kontrollfallen ur Improvements (CONV-064, CONV-061 meddelande 9,
+CONV-006, CONV-051) och episodens eget samtal dolt för provinstansen. Resultatet redovisas i en resultatpost, en
+publik leveransredovisning under `evidence/partner/` och en uppdatering av detta block. En bestående autostart
+(LaunchAgent) är ett ägarsteg eftersom hanterad policy nekar sessioner `launchctl`.
+
+Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
+arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
+
+---
+
 # Rutin: ingången följer main
 
 Gäller varje session (UNDERHALL-INGANGAR-20260924). Börja med `python3 -B tools/ingang.py`: den hämtar och jämför

@@ -8,6 +8,15 @@ Planen äger aktuellt steg. Äldre uppdrag nedan är historik och startas inte o
 
 ---
 
+# GÄLLANDE PARALLELLT: Projektkontorets förbättringspartner
+
+FORBATTRINGSPARTNER-20260928 i beslutsloggen och den privata originalordern under
+`evidence/nasta-uppdrag/local/forbattringspartner-20260928/` gäller parallellt med Digitalas yrkesförmåga.
+En intern samtalsyta i kontoret där ägaren lämnar material utan analysprompt och får ett källbundet
+resonemang med kontinuitet; genomförande bereds bara på tydlig beställning. Planen äger aktuellt steg.
+
+---
+
 # Gällande uppdrag: samlade åtgärder efter fiktivt kundprov
 
 Ägarens genomförandemandat DIGITALA-SAMLAT-ATGARDSMANDAT-20260927 gäller kontoret, Digitala,
