@@ -8,7 +8,86 @@ publicerad, arkiverad eller kvar med namngivet skäl i planen. Nästa steg står
 
 ---
 
-# Gällande arbete — samlade åtgärder efter fiktivt kundprov
+# Gällande arbete — Digitalas återanvändbara yrkesförmåga
+
+DIGITALA-YRKESFORMAGA-20260928 ersätter tolkningen att färdigställande av Vikskär är ett
+fristående huvudmål jämställt med Digitalas utveckling. Ursprungliga 36 krav och 43 gap
+bevaras; kundspecifika provkrav generaliseras inte. Generella brister och tidigare granskade
+kandidaträttningar består. Originalmandat och daterad förändringskarta finns privat i
+`evidence/digitala/local/yrkesformaga-20260928/`. Denna plan ensam äger nästa handling.
+
+Aktuellt steg: Digitalas källkandidat abc51ddc122c4ef4366b31c82b4bac8ea9279604 är
+separat granskad och publicerad i draft-PR12 ovanpå tidigare 4047703. 228/228 regressioner
+passerade på exakt abc. Kod-r1/r2/r4/r5 är approved för sina avgränsade deltan; kod-r3:s
+blockerande intagsfynd är faktiskt rättat. Låga kommentarer kvarstår med disposition.
+Bevarade mekanismprov: 22/22 på 2c05fb4 med samma syntetiska ärende/färsk CLI-process,
+25/25 på 27a7 av ordinarie standardväg/HTTP-mottagning. Testantal är ingen produktdom.
+
+Genomförda förändringar: faktiska referenskonsumenter och kritikväg är rättade; fokuserat
+skaparpaket laddar valda källbilder/metoder; sen kundrevision/materialändring öppnar relevanta
+steg och okänt bevaras; behovsstyrda integrationsval laddas genom ordinarie research/brief/
+bygge och kopplas till körbara exempel. Resend har verkligt syntetiskt leveransprov. Cal/
+Stripe/Tally är kontraktsprövade utan nya externa kontobevis. Befintliga kanaler bevaras.
+
+Den avgränsade professionella fortsättningen är genomförd i samma importerade revision 3
+på separat godkänd 49ea. Tre färska nativeprocesser skrev research, brief och ett litet
+koncept via vanlig laddning. En intern sakretur rättade ett obelagt nulägespåstående genom
+vanlig omprövning och fjärde kort nativeprocess. Konceptet kunde återbrukas byteidentiskt
+med ny källbindning och konsekvensläsning. Browserprovet gav 31/31 på mobil/dator. Ett senare
+negativprov återöppnade tre steg vid bunden filändring och bevarade historik; återställda
+bytes gav ingen automatisk återaccept. Privat provläge lämnas avsiktligt återöppnat.
+Teknisk assistans med vald underlagsbilaga/tre null-hashar och privata harnessfel redovisas.
+Materialets uppgift om tre avtal nedgraderades för försiktigt till okänt. Ingen helt
+obemannad kedja, full kundförståelse eller produktaccept påstås.
+
+Energi-r3 är approved enbart för rättad grafetikett och konsekvenser; öppna förbättringar
+består. Senare namndelta är separat provat. Keramik-r4-form är approved inom bunden lokal
+produktbedömning på 5ea, med tolv förbättringar. R3:s timeout, delvis lästa råfiler och en
+obelagd textläsningsdeklaration bevaras. Alla 45 manifestbilder öppnades i r4. Bildleveransens
+simulerade mobilförbättring är mätbar men ingen fält-/driftaccept. Direktbaslinjen är orörd.
+
+Den generella kritikpåminnelsen når vanlig laddning/frågeberedning; schema/kriterier/domkod
+är oförändrade. Professionell kundfortsättning behåller exakt 49ea; slutdeltan till abc
+påverkar inte dess Kundstartkällor. Det privata leveransbeskedet samlar A–F, källor,
+begränsningar, alla 36 krav/43 gap och daterade domar. Separat rapportläsning granskar
+påståenden mot dessa källor; kod-, produkt- och rapportdom är olika bedömningar.
+
+Nästa handling efter denna källleverans: kvalificera tillåten betrodd kontrollutfärdare
+med uppgifts-/acceptanskoppling och verklig serverbindning före skyddad integration av
+kandidaterna. Följ befintlig skyddad publiceringsväg; enbart kontrollnamn eller installerad
+App räcker inte. Leverantörslivscykler behöver dessutom tillåtna testobjekt. Därefter kräver
+kunddrift egen registrering, release, stående schema, operativ mottagare och observerad
+återhämtning. Dessa är kvarstående beroenden, inte gröna leveransresultat. Inga nya fulla
+fiktiva byggen eller kosmetiska Vikskär-omtag ingår i återupptagningen.
+
+Införandegräns återläst 2026-09-28: Office/Runtime required checks har `app_id:null`;
+Digitalas ruleset saknar obligatoriska checks; Kundstarts privata skydd har 403/planhinder.
+Kvalificerad verklig utfärdare och bindande skydd kvarstår före integration. Befintliga
+kandidater och nya källgrenar är inte main-integrerade eller aktiverade. Ingen egen grön
+status, sänkning av skydd, konto-/planändring, nytt abonnemang eller köpta krediter. Guard-paketet är separat och
+mandatet beställer INTE activate. Dessa gränser hindrar beroende införande, inte självständigt
+skapande, research, kod och prov. Aktiv pekare återlästes 11:00 UTC till äldre 3bea86-release;
+processerna fanns, vilket inte är ett nytt health- eller driftgodkännande.
+
+Återupptagning: läs privat originalmandat, senare leveransbesked och dess granskningsdisposition;
+kontrollera faktiska heads, serverregler och aktiv release före nästa införande. Samlade
+Digitala-grenen `yrkesformaga/samlat-20260928` är publicerad som draft-PR12 ovanpå föregående
+källkandidat. Kontorsgrenen `yrkesformaga/office-20260928` bär mål/status i separat källpublicering.
+Delgrenarna kreativ, kundkedja, kedjeprov och integration bevaras lokalt som namngivna frysta
+prov-/granskningsbaser vars kod är samlad i huvudkandidaten. Den rena detached-kopian
+digitala-granskningsbas på 27a7 bevarar produktbedömningens faktiska laddare. Den nya
+motsagelse-grenen på 49ea och kritikformat-grenen på abc bevarar separat granskade
+följddeltan; båda ingår nu i den publicerade samlade källkandidaten. Kundstart-grenen är en oförändrad
+läskopia av 133f37f. Exakta källpubliceringsutfall dokumenteras privat. Ingen gren är implicit
+integrerad, ingen ägaraccept eller aktiv kunddrift följer av leveransen.
+
+---
+
+# Historik och kvarstående generella beroenden — samlade åtgärder efter fiktivt kundprov
+
+Målprioriteringen nedan är delvis ersatt av DIGITALA-YRKESFORMAGA-20260928 ovan.
+Daterade kod-, prov-, gransknings- och leveransfakta samt olösta generella beroenden består.
+
 
 Senare dokumentkontinuitet 2026-09-28 efter r4; frysta rapport-/granskningsunderlag ändras inte.
 
