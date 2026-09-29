@@ -317,15 +317,24 @@ class Startvakt:
             return []
         hant = []
         with self._las:
-            for o in self.s.lager.fraga("select * from overlamning where status in ('lamnad','mottagen','startad') "
-                                        "order by tid"):
+            for o in self.s.lager.fraga("select * from overlamning where status in ('lamnad','mottagen','startad',"
+                                        "'levererad','avslagen') order by tid"):
                 try:
+                    if o['status'] in ('levererad', 'avslagen') and not self._ouppfoljd(o):
+                        continue  # kvitterad och uppföljd; tjänstens slinga läser kvittensen före varvet
                     h = self._en(o)
                 except Exception as fel:  # en överlämning som inte går att hantera får inte stoppa de andra
                     h = {'typ': 'fel', 'skal': type(fel).__name__}
                 if h:
                     hant.append((o['id'], h['typ']))
         return hant
+
+    @staticmethod
+    def _ouppfoljd(o: dict) -> bool:
+        """En kvitterad överlämning vars session ännu inte följts upp: paketets sista START-händelse är 'startad'."""
+        katalog = json.loads(o['data']).get('katalog')
+        hist = handelser(Path(katalog)) if katalog else []
+        return bool(hist) and hist[-1].get('typ') == 'startad'
 
     def _en(self, o: dict) -> dict | None:
         d = json.loads(o['data'])
