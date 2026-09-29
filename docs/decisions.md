@@ -7944,6 +7944,24 @@ kvittots egna rader är överens och den namngivna filen ligger i kundens mapp. 
 sekund och en omkörning inom samma sekund skriver över det, så en ny filnamnsförekomst är inget bevis;
 det är bokfört, inte gömt.
 
+**Ägarens beslut om kvittensen, 2026-09-29 före 16:07Z.** Granskningsrunda 1 (klar 15:41Z) fällde
+kandidaten på att signalhämtningen inte är renodlat läsande. Frågan gick då till ägaren genom hans egen
+session (nortropic-repos-22 i VS Code), och han svarade medan runda 2 pågick: rundans uppdrag skrevs
+16:04:55Z och dess svar blev klart 16:09:11Z, alltså efter hans besked. Runda 2 fällde kandidaten på
+samma punkt innan beskedet nått den här sessionen. Tiderna är tagna ur filernas mtime, inte ur minnet.
+Frågan var ordagrant ställd så: "Frågan är om det är okej att signalhämtningen
+skickar en kvittens till Kundstart när en ny kundsignal kommer. Jag rekommenderar att du godtar det.
+Håller du med behöver du inte göra något alls."
+
+Johnnys svar, ordagrant: **"ja, fixa och kör"**
+
+Beskedet gäller den frågan. Det gäller inte staging, aktivering eller schemat; den raden står kvar i
+ÄGARENS TUR. Ingen kodändring följer av beskedet. Skälen som lades fram för honom var att arbetsordern
+själv kräver ett beständigt importläge och att KUNDSTART-KONTRAKT.md bokför det med just den kvittensen,
+att kvittensen skrivs bara i Nortropics egen Kundstart och inte ändrar ärendets exportrevision, att
+kundens sajt, material och svar inte rörs, och att en strikt läsande hämtning skulle kräva en ändring i
+Digitalas frysta konsument.
+
 **Om "läsande".** Driftkontrollen är renodlat läsande, och ingenting skrivs på en kunds sajt. Men
 signalhämtningen är inte renodlat läsande, och en oreserverad formulering om det vore för bred. Vid en
 verklig ny signal sparar Digitalas konsument exportbyten och gör sedan sin egen `POST

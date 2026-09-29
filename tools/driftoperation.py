@@ -20,6 +20,7 @@ from pathlib import Path
 import re
 import stat
 import subprocess
+import threading
 import time
 import uuid
 import urllib.error
@@ -33,12 +34,15 @@ import urllib.request
 INTAKE_BOUND = 120
 DRIFT_BOUND = 90
 MONITOR_TIMEOUT = 8                              # per blocking socket operation
-MONITOR_DEADLINE = 25                            # enforced wall clock for both attempts
-# A urlopen timeout bounds each blocking socket operation, not the whole attempt: a
-# server that trickles bytes slower than the timeout keeps read() going indefinitely.
-# The monitor therefore carries its own wall clock, and its ceiling allows for one
-# operation that was already blocked when the deadline passed.
-MONITOR_BOUND = MONITOR_DEADLINE + MONITOR_TIMEOUT
+MONITOR_DEADLINE = 33                            # the monitor channel's wall clock
+# A urlopen timeout bounds each blocking socket operation, not a whole attempt, and
+# nothing inside the request covers the status line and headers at all: a server that
+# trickles header bytes just inside the timeout stalls for as long as it likes. Checking
+# a deadline between reads cannot bound that, so the attempts run in their own daemon
+# thread and the channel returns when the join times out. A stranded thread holds no
+# durable lock - the handler returns and releases its state lock on time - and ends by
+# itself as soon as its socket does. This IS the ceiling, with nothing added to it.
+MONITOR_BOUND = MONITOR_DEADLINE
 TERMINATION_BOUND = 6                            # SIGTERM wait then SIGKILL wait
 BOUND_SECONDS = INTAKE_BOUND + DRIFT_BOUND + 2 * TERMINATION_BOUND + MONITOR_BOUND
 
@@ -94,6 +98,32 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def monitor(config):
+    """Health observation under a real wall clock, never a socket timeout alone.
+
+    The binding is checked here, before the thread: a misconfigured endpoint must be
+    refused loudly rather than reported as a bound that ran out. Only the I/O is bounded.
+    """
+    headers = monitor_binding(config)
+    answer, failure = {}, []
+    def work():
+        try:
+            answer.update(observe_health(config, headers))
+        except BaseException as error:              # noqa: BLE001 - re-raised below
+            failure.append(error)
+    thread = threading.Thread(target=work, daemon=True)
+    thread.start()
+    thread.join(MONITOR_DEADLINE)
+    if failure:
+        raise failure[0]
+    if thread.is_alive() or not answer:
+        # The thread keeps no lock and is never waited on again; the channel is over.
+        return {'healthy': False, 'reason': 'monitor_bound_exceeded',
+                'attempts': [{'error': 'monitor_bound_exceeded', 'healthy': False}],
+                'observed_at': now(), 'candidate': config['candidate']}
+    return answer
+
+
+def monitor_binding(config):
     parsed = urllib.parse.urlsplit(config['url'])
     test_loopback = config.get('isolated_test') is True and parsed.hostname in ('127.0.0.1', 'localhost')
     if (parsed.username or parsed.password or parsed.fragment or not parsed.hostname
@@ -104,22 +134,20 @@ def monitor(config):
     headers = {'Accept': 'application/json', 'Cache-Control': 'no-cache'}
     if config.get('bypass_file'):
         headers['x-vercel-protection-bypass'] = secret(config['bypass_file'])
+    return headers
+
+
+def observe_health(config, headers):
     opener = urllib.request.build_opener(NoRedirect())
     attempts = []
-    deadline = time.monotonic() + MONITOR_DEADLINE
     for number in range(2):
         transient = False
-        if time.monotonic() > deadline:
-            attempts.append({'error': 'monitor_bound_exceeded', 'healthy': False})
-            break
         try:
             with opener.open(urllib.request.Request(config['url'], headers=headers), timeout=MONITOR_TIMEOUT) as response:
                 raw = b''
                 while len(raw) <= 65536:
-                    if time.monotonic() > deadline:
-                        raise TimeoutError('Health read exceeded the monitor bound')
-                    # read1, not read: read(n) blocks until it has all n bytes, so a
-                    # server trickling inside the socket timeout would never be cut.
+                    # read1, not read: read(n) blocks until it has all n bytes, so one
+                    # call could hold the whole body. The outer join is the real bound.
                     chunk = response.read1(min(8192, 65537 - len(raw)))
                     if not chunk:
                         break
@@ -274,6 +302,30 @@ def drift(config, output):
             'findings': [{'adress': str(row.get('adress'))[:200],
                           'fynd': [str(item)[:200] for item in (row.get('fynd') or [])][:10]}
                          for row in rows if row.get('incident')][:20], **base}
+
+
+def channel_result(output, channel, config_sha256, produce):
+    """Each channel's own outcome is durable the moment it is known.
+
+    A run interrupted before its receipt was written can then finish that receipt from
+    work already done, instead of reading the customer's site and Kundstart a second
+    time - which would also overwrite a same-second drift receipt in the customer path.
+    A stored result from another configuration is preserved and not reused.
+    """
+    path = regular(output / (channel + '.result.json'))
+    if path.exists():
+        try:
+            stored = load_state(path)
+            if (not isinstance(stored, dict) or set(stored) != {'config_sha256', 'result'}
+                    or stored['config_sha256'] != config_sha256
+                    or not isinstance(stored['result'], dict)):
+                raise StateError('invalid_channel_result')
+            return stored['result'], True
+        except StateError:
+            path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
+    value = produce()
+    write(path, {'config_sha256': config_sha256, 'result': value})
+    return value, False
 
 
 class StateError(ValueError):
@@ -504,26 +556,36 @@ def run(config, run_id):
         else:
             write(binding_file, {'config_sha256': config_sha256})
         result = {'run_id': run_id, 'config_sha256': config_sha256, 'started_at': now(), 'completed': True}
+        result['resumed_channels'] = []
+
+        def bounded(channel, produce, failure=None):
+            """One durable channel. With `failure` its errors are named so they cannot
+            hide the other channels; without one they propagate, because a monitor
+            binding that is wrong is a release error for the operator, not an incident
+            to record for weeks (D038's behaviour, kept)."""
+            def attempt():
+                # A prior interrupted consumer is resumed through its ordinary
+                # idempotency journal; each attempt keeps all earlier output.
+                work = output / (channel + '-' + str(time.time_ns())); work.mkdir(mode=0o700)
+                if failure is None:
+                    return produce(work)
+                try:
+                    return produce(work)
+                except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as error:
+                    # Store only the error class, never credentials or tool output.
+                    return {**failure, 'error_type': type(error).__name__}
+            value, resumed = channel_result(output, channel, config_sha256, attempt)
+            if resumed:
+                result['resumed_channels'].append(channel)
+            return value
+
         if config.get('intake'):
-            # A prior interrupted consumer is resumed through its ordinary idempotency
-            # journal, with a new attempt directory preserving all earlier output.
-            attempt = output / ('attempt-' + str(time.time_ns())); attempt.mkdir(mode=0o700)
-            try:
-                result['intake'] = consume(config['intake'], attempt)
-            except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as error:
-                # A broken intake binding must not suppress the independent health
-                # monitor. Store only the error class, never credentials or output.
-                result['intake'] = {'completed': False, 'reason': 'consumer_failed',
-                                    'error_type': type(error).__name__}
+            result['intake'] = bounded('intake', lambda work: consume(config['intake'], work),
+                                       {'completed': False, 'reason': 'consumer_failed'})
             result['completed'] = result['intake']['completed']
         if config.get('drift'):
-            attempt = output / ('drift-' + str(time.time_ns())); attempt.mkdir(mode=0o700)
-            try:
-                result['drift'] = drift(config['drift'], attempt)
-            except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as error:
-                # A broken drift binding must not suppress the other channels.
-                result['drift'] = {'ran': False, 'reason': 'drift_binding_failed',
-                                   'error_type': type(error).__name__}
+            result['drift'] = bounded('drift', lambda work: drift(config['drift'], work),
+                                      {'ran': False, 'reason': 'drift_binding_failed'})
             result['completed'] = result['completed'] and result['drift'].get('healthy') is True
         result['deliveries'] = {}
         if 'intake' in result:
@@ -535,9 +597,14 @@ def run(config, run_id):
             result['deliveries']['drift'] = transition(home, 'drift', observation(
                 check.get('healthy') is True, check['reason'], check))
         if config.get('monitor'):
-            current = monitor(config['monitor']); result['monitor'] = current
-            current['access_scope'] = ('internal_protection_bypass' if config['monitor'].get('bypass_file')
-                                       else 'ordinary_endpoint')
+            def probe(_work):
+                observed = monitor(config['monitor'])
+                observed['access_scope'] = ('internal_protection_bypass'
+                                            if config['monitor'].get('bypass_file')
+                                            else 'ordinary_endpoint')
+                return observed
+            current = bounded('monitor', probe)
+            result['monitor'] = current
             result['deliveries']['monitor'] = transition(home, 'monitor', observation(
                 current['healthy'], current['reason'], current))
             result['completed'] = result['completed'] and current['healthy']

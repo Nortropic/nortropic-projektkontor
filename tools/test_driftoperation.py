@@ -3,6 +3,7 @@ import copy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
+import socket
 import tempfile
 import sys
 import threading
@@ -312,20 +313,25 @@ class WeeklyDriftTests(unittest.TestCase):
         self.assertFalse(result['drift']['ran'])
         self.assertEqual(result['drift']['reason'], 'drift_receipt_unreadable')
 
-    def test_a_same_second_rerun_is_still_evidence_of_its_own_check(self):
-        # drift_kontroll.py names its receipt to the whole second and overwrites a
-        # same-second rerun, so a new filename cannot be what proves a check ran.
-        first = operation.run(self.config, 'same-second-one')
-        second = operation.run(self.config, 'same-second-two')
-        self.assertTrue(first['drift']['ran']); self.assertTrue(second['drift']['ran'])
-        self.assertTrue(first['performed']); self.assertTrue(second['performed'])
-        if first['drift']['receipt'] == second['drift']['receipt']:
-            # Recorded rather than hidden: the later check overwrote the earlier
-            # receipt in the customer path. A weekly period cannot collide, and each
-            # run's own result.json keeps the hash of the bytes that run read.
-            self.assertEqual(len(self.receipts()), 1)
-            self.assertEqual(operation.digest((self.customer / second['drift']['receipt']).read_bytes()),
-                             second['drift']['receipt_sha256'])
+    def test_a_receipt_name_that_already_exists_is_still_this_checks_own_evidence(self):
+        # drift_kontroll.py names its receipt to the whole second and overwrites any
+        # file of that name, so a newly appeared filename cannot be what proves a check
+        # ran. The collision is forced here rather than left to the clock: every second
+        # this test could run in already holds a stale receipt.
+        from datetime import datetime, timedelta, timezone
+        base = datetime.now(timezone.utc)
+        stale = {}
+        for offset in range(-2, 4):
+            name = 'DRIFT-%s.json' % (base + timedelta(seconds=offset)).strftime('%Y%m%dT%H%M%SZ')
+            (self.customer / name).write_text(json.dumps(
+                {'schema': 1, 'incidenter': 9, 'sajter': [{'adress': 'gammal', 'incident': True}]}))
+            stale[name] = 9
+        result = operation.run(self.config, 'kollision')
+        self.assertTrue(result['drift']['ran']); self.assertTrue(result['performed'])
+        self.assertIn(result['drift']['receipt'], stale, 'the name was already taken')
+        written = self.customer / result['drift']['receipt']
+        self.assertEqual(json.loads(written.read_text(encoding='utf-8'))['incidenter'], 0)
+        self.assertEqual(operation.digest(written.read_bytes()), result['drift']['receipt_sha256'])
 
     def test_the_tools_own_count_must_agree_with_the_receipt(self):
         actual = operation.bounded_start
@@ -374,11 +380,11 @@ class WeeklyDriftTests(unittest.TestCase):
         self.assertEqual(operation.BOUND_SECONDS,
                          operation.INTAKE_BOUND + operation.DRIFT_BOUND
                          + 2 * operation.TERMINATION_BOUND + operation.MONITOR_BOUND)
-        # The monitor's ceiling is its own enforced wall clock plus one socket
-        # operation that may already have been blocked when the deadline passed.
-        self.assertEqual(operation.MONITOR_BOUND,
-                         operation.MONITOR_DEADLINE + operation.MONITOR_TIMEOUT)
-        self.assertGreater(operation.MONITOR_DEADLINE, 2 * operation.MONITOR_TIMEOUT)
+        # The monitor's ceiling IS its enforced wall clock: the attempts run in their
+        # own thread and the channel returns when the join times out, so nothing is
+        # added for a socket operation that was still blocked.
+        self.assertEqual(operation.MONITOR_BOUND, operation.MONITOR_DEADLINE)
+        self.assertGreater(operation.MONITOR_DEADLINE, 4 * operation.MONITOR_TIMEOUT)
 
     def test_an_operation_without_a_channel_is_refused(self):
         with self.assertRaises(ValueError):
@@ -501,24 +507,42 @@ class WeeklyDriftTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 operation.run(self.config, 'bad-period-' + str(period))
 
-    def test_a_run_interrupted_after_closing_its_period_does_not_close_it_twice(self):
+    def test_a_run_interrupted_after_closing_its_period_finishes_without_redoing_it(self):
         # The receipt is written after the period is closed, so a crash in between
-        # leaves a record naming this run. Resuming must finish the receipt without
-        # advancing the sequence again and without reporting the period as not due.
+        # leaves a record naming this run. Resuming must finish that receipt from work
+        # already done: no second sequence step, and no second read of the site.
         self.week()
         first = operation.run(self.config, 'week-one')
         self.assertEqual(first['period_recorded']['sequence'], 1)
+        self.assertEqual(first['resumed_channels'], [])
         (self.state / 'week-one/result.json').unlink()
+        calls, receipts = self.calls, self.receipts()
         resumed = operation.run(self.config, 'week-one')
         self.assertNotIn('skipped', resumed)
         self.assertTrue(resumed['performed'])
         self.assertEqual(resumed['period']['reason'], 'own_period_record')
         self.assertEqual(resumed['period_recorded']['sequence'], 1, 'one period, one sequence step')
         self.assertEqual(json.loads((self.state / 'period.json').read_text())['run_id'], 'week-one')
+        self.assertEqual(resumed['resumed_channels'], ['drift'])
+        self.assertEqual(self.calls, calls, 'the site is not read a second time')
+        self.assertEqual(self.receipts(), receipts, 'no second receipt can overwrite the first')
+        self.assertEqual(resumed['drift'], first['drift'])
         # The next period still advances normally for a different run.
         self.set_period(604800, sequence=1, run_id='week-one')
         later = operation.run(self.config, 'week-two')
         self.assertEqual(later['period_recorded']['sequence'], 2)
+        self.assertEqual(later['resumed_channels'], [])
+
+    def test_a_stored_channel_result_from_another_configuration_is_not_reused(self):
+        first = operation.run(self.config, 'bunden')
+        stored = self.state / 'bunden/drift.result.json'
+        value = json.loads(stored.read_text())
+        stored.write_text(json.dumps({**value, 'config_sha256': '0' * 64}))
+        (self.state / 'bunden/result.json').unlink()
+        again = operation.run(self.config, 'bunden')
+        self.assertEqual(again['resumed_channels'], [], 'a foreign result is not this run\'s work')
+        self.assertTrue(again['drift']['ran'])
+        self.assertEqual(len(list((self.state / 'bunden').glob('drift.result.json.invalid-*'))), 1)
 
     def test_another_runs_record_does_not_make_this_run_due(self):
         self.week()
@@ -564,22 +588,63 @@ class MonitorWallClockTests(unittest.TestCase):
         self.config = {'url': 'http://127.0.0.1:%s/health' % self.server.server_port,
                        'candidate': 'a' * 40, 'isolated_test': True}
 
-    def test_a_trickling_endpoint_is_cut_at_the_monitor_deadline(self):
-        # Shortened only to keep the test quick; the enforced relationship is the same.
-        with patch.object(operation, 'MONITOR_DEADLINE', 2), \
-             patch.object(operation, 'MONITOR_TIMEOUT', 5):
+    def bounded(self, deadline=2, timeout=5):
+        """Shortened only to keep the test quick; the enforced relation is the same."""
+        with patch.object(operation, 'MONITOR_DEADLINE', deadline), \
+             patch.object(operation, 'MONITOR_TIMEOUT', timeout):
             started = time.monotonic()
             result = operation.monitor(self.config)
-            elapsed = time.monotonic() - started
+            return result, time.monotonic() - started
+
+    def test_a_trickling_body_is_cut_at_the_monitor_deadline(self):
+        result, elapsed = self.bounded()
         self.assertFalse(result['healthy'])
-        self.assertEqual(result['reason'], 'endpoint_unavailable')
-        self.assertLess(elapsed, 2 + 5, 'the deadline plus one blocked operation is the ceiling')
-        self.assertGreaterEqual(len(result['attempts']), 1)
-        self.assertTrue(any(a.get('error') in ('transport_unavailable', 'monitor_bound_exceeded')
-                            for a in result['attempts']), result['attempts'])
+        self.assertEqual(result['reason'], 'monitor_bound_exceeded')
+        self.assertLess(elapsed, 4, 'the deadline is the ceiling, with nothing added')
+
+    def test_trickling_status_line_and_headers_are_cut_too(self):
+        # The case a deadline between body reads could never bound: nothing inside the
+        # request covers the status line and headers, so a server that trickles those
+        # just inside the socket timeout stalls for as long as it likes.
+        self.server.shutdown(); self.thread.join(timeout=2); self.server.server_close()
+        gap, stop = 0.4, threading.Event()
+        def serve(connection):
+            with connection:
+                try:
+                    connection.recv(4096)
+                    for byte in b'HTTP/1.1 200 OK\r\nX-Slow: aaaaaaaaaaaaaaaaaaaa\r\n\r\n':
+                        if stop.is_set():
+                            return
+                        connection.sendall(bytes([byte])); time.sleep(gap)
+                except OSError:
+                    pass
+        listener = socket.socket(); listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        listener.bind(('127.0.0.1', 0)); listener.listen(4)
+        self.addCleanup(listener.close); self.addCleanup(stop.set)
+        def accept():
+            while not stop.is_set():
+                try:
+                    connection, _ = listener.accept()
+                except OSError:
+                    return
+                threading.Thread(target=serve, args=(connection,), daemon=True).start()
+        threading.Thread(target=accept, daemon=True).start()
+        self.config['url'] = 'http://127.0.0.1:%s/health' % listener.getsockname()[1]
+        result, elapsed = self.bounded(deadline=2, timeout=30)
+        self.assertFalse(result['healthy'])
+        self.assertEqual(result['reason'], 'monitor_bound_exceeded')
+        self.assertLess(elapsed, 4, 'header bytes cannot outlast the channel either')
+
+    def test_a_misconfigured_endpoint_is_refused_loudly_not_reported_as_a_bound(self):
+        # The bound must not turn a wrong binding into an ordinary unhealthy answer.
+        for change in ({'url': self.config['url'].replace('http://127.0.0.1', 'http://example.com')},
+                       {'candidate': 'not-a-candidate'}, {'isolated_test': False}):
+            with self.assertRaises(ValueError):
+                operation.monitor({**self.config, **change})
 
     def test_a_prompt_endpoint_is_unaffected_by_the_deadline(self):
         self.chunks, self.gap = 1, 0
         result = operation.monitor(self.config)
         self.assertFalse(result['healthy'])          # a space is not the health body
+        self.assertEqual(result['reason'], 'endpoint_unavailable')
         self.assertEqual(result['attempts'][0]['error'], 'invalid_health_response')

@@ -28,6 +28,12 @@ renodlat läsande: vid en verklig ny signal gör Digitalas frysta konsument sin 
 /api/intern/arenden/{id}/kvittens` enligt KUNDSTART-KONTRAKT.md, vilket är den idempotenta bokföring som
 beställningens beständiga importläge vilar på. Den rör inte kundens sajt, material eller svar.
 
+Ägaren avgjorde det 2026-09-29 före 16:07Z, efter att granskningsrunda 1 (klar 15:41Z) fällt kandidaten
+på just den punkten och medan runda 2 pågick; runda 2 (klar 16:09Z) fällde den på samma punkt innan
+beskedet nått sessionen. Frågan han svarade på och hans svar ordagrant står i
+DIGITALA-VECKODRIFT-20260929. Beskedet gäller bara kvittensen: staging, aktivering och schemat står kvar
+som hans rad i ÄGARENS TUR.
+
 Ingen riktig kund finns i dag, så ingen operation är bunden till någon sajt: det finns bara en mall i
 Runtimes `config/veckodrift-operation.example.json`. Provsajten och signalytan är loopback-provdata, aldrig
 en kundadress och aldrig Kundstarts produktion eller dess lokala provtjänst. Ingen release är stagad, vald
