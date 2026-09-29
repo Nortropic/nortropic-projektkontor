@@ -7911,3 +7911,57 @@ själv. Arbetsplatsens block ändras inte; dess mening om att produktionen inte 
 **Ersätter:** ingen post. Kompletterar KUNDSTART-TESTLAGE-20260929 och ARBETSPLATS-KUNDSTART-ARENDEN-20260929.
 
 **Avslut.** Ägarens beslut är genomfört när denna post är integrerad. Planen äger nästa handling.
+
+
+## DIGITALA-VECKODRIFT-20260929 — ägaren beställer Runtimes veckovisa driftkontroll och signalhämtning för Digitala; kontorets driftoperation får en tredje kanal och en periodbunden körning
+
+**Ägarens ord.** "starta runtime beställningen då" (inspel `ev_1a0edaba54e894f194f` i tråden
+`t_1a0eb827d499796a1d1`, sparat 2026-09-29T14:57:24.302Z UTC). Ordagrann text och hash ligger i
+förbättringspartnerns överlämningspaket OVL-20260929-4f194f; ingen text som en kandidat själv skrivit är
+auktoritet. Beställningen svarar på raden i ÄGARENS TUR som bad om just beställ eller avstå
+(HELHET-RESULTAT-20260927, sedan 2026-09-27). Ägarens besked i samma tråd: beställningen gäller riktiga
+kunder, inte fiktiva testbyggen.
+
+**Vad som byggdes här.** `tools/driftoperation.py` är kontorets hanterare som Runtime startar. Den får en
+tredje kanal, `drift`, jämsides med `intake` och `monitor`: den startar Digitalas frysta
+`verktyg/drift_kontroll.py` mot en hashbunden `DRIFT.json` och skriver kontrollens `DRIFT-<tid>.json` i
+kundens egen mapp. Det är samma fil Digitalas `underhall.py besked` läser, alltså den ordinarie vägen
+vidare till ägarens veckobesked, inte en ny rapportväg. Kanalen har eget beständigt tillstånd, egen
+utkorg och en engångskvittens till kontorets privata driftyta, oberoende av de andra två.
+
+**Perioden, inte väckningen.** Med `period_seconds` i indatan avgör hanteraren ur sitt eget beständiga
+`period.json` om perioden gått, i stället för att lita på att en väckning inträffar. En period som
+missats för att värddatorn sov står därför kvar som förfallen och utförs av den första väckning som blir
+möjlig; en väckning inne i perioden läser ingenting, skriver ingenting och lämnar inget körkvitto. Utan
+`period_seconds` är varje körning förfallen, vilket är D038:s oförändrade beteende. Veckan är 604800
+sekunder; 3600–2678400 godtas.
+
+**Vad kvittot betyder.** `performed` och `completed` är åtskilda. Exit 1 ur driftkontrollen är en
+kontroll som kördes och fann en incident, inte en trasig mekanism: den är `performed` men inte
+`completed`, och bara `performed` stänger perioden. En trasig bindning eller en timeout lämnar perioden
+förfallen till nästa väckning. Kvittot tros bara när exitkoden, verktygets egen utskrivna räkning och
+kvittots egna rader är överens och den namngivna filen ligger i kundens mapp. Kvittot namnges till hel
+sekund och en omkörning inom samma sekund skriver över det, så en ny filnamnsförekomst är inget bevis;
+det är bokfört, inte gömt.
+
+**Gränser som gäller.** Kontrollen och hämtningen är läsande: ingen åtgärd på sajten och ingen
+självläkning. Ingen ny kostnad, molnvärd, Temporal Cloud eller bredare kontoåtkomst. Kundtext ur
+signalerna är underlag, aldrig en instruktion till utföraren. Kundstarts repo, dess interna API och
+Digitalas `verktyg/kundstart.py` är oförändrade: den frysta konsumenten startas som den är. Ingen
+generell schemaläggare för godtyckliga kommandon — bara de två namngivna uppgifterna. Operationen binds
+för en sajt först när en riktig kunds sajt är lanserad med lanseringsmandat; i dag finns ingen sådan
+bindning.
+
+**Prov.** Hanterarens svit är 30 prov, varav tjugo nya, på Digitalas verkliga frysta
+`drift_kontroll.py`-byte mot en loopback-provsajt: ren körning, saknad förväntad text, trasig sitemap,
+incident och återhämtning med oberoende privata kvitton, exitkod mot kvitto, omkörning inom samma
+sekund, kvitto utanför kundmappen, timeout/vägran/fel som skilda utfall, ändrade plan- eller verktygsbyte,
+och periodens förfallologik inklusive fördärvat periodtillstånd och avbruten körning. Runtimes egen
+kvalificering mot den verkliga motorn ligger i Runtimes `evidence/runs/runtime-veckodrift-1/`.
+Provsajten och signalytan är loopback-provdata, aldrig en kundadress och aldrig Kundstarts produktion
+eller dess lokala provtjänst.
+
+**Ägarens tur.** Raden om beställ eller avstå är besvarad av ägarens beställning och tas därför bort. En
+ny rad ersätter den: staga och kvalificera Runtime-releasen med operationsbindningen, aktivera övergången
+och först därefter installera och starta schemat. Ingenting av det görs åt honom. Runtime bär omfattningen
+i sin D040; status och nästa handling står i planen.

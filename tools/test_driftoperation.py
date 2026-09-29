@@ -156,3 +156,322 @@ class OperationTests(unittest.TestCase):
 
 
 if __name__ == '__main__': unittest.main()
+
+
+class WeeklyDriftTests(unittest.TestCase):
+    """The drift channel on Digitala's real drift_kontroll.py bytes, and dueness.
+
+    The site is a loopback fixture, never a customer's real address. The checked
+    tool is the actual frozen file from Digitala, so a passing check here is a pass
+    of the bytes the release would schedule.
+    """
+    DIGITALA = Path(__file__).resolve().parents[2] / 'nortropic-digitala'
+
+    def setUp(self):
+        scratch = Path('.scratch'); scratch.mkdir(exist_ok=True)
+        self.directory = tempfile.TemporaryDirectory(dir=scratch)
+        self.addCleanup(self.directory.cleanup)
+        self.home = Path(self.directory.name).absolute()
+        self.site_status, self.sitemap_status, self.body, self.calls = 200, 200, 'Välkommen till provsajten', 0
+        owner = self
+        class Site(BaseHTTPRequestHandler):
+            def log_message(self, *_): pass
+            def do_GET(self):
+                owner.calls += 1
+                sitemap = self.path.endswith('/sitemap.xml')
+                self.send_response(owner.sitemap_status if sitemap else owner.site_status)
+                self.end_headers()
+                self.wfile.write(('<urlset/>' if sitemap else owner.body).encode())
+        self.server = ThreadingHTTPServer(('127.0.0.1', 0), Site)
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True); self.thread.start()
+        self.addCleanup(self.server.server_close); self.addCleanup(self.server.shutdown)
+        self.address = 'http://127.0.0.1:%s/' % self.server.server_port
+
+        source = self.DIGITALA / 'verktyg/drift_kontroll.py'
+        if not source.is_file():
+            self.skipTest('Digitala checkout with verktyg/drift_kontroll.py is required')
+        root = self.home / 'digitala'; (root / 'verktyg').mkdir(parents=True)
+        frozen = root / 'verktyg/drift_kontroll.py'; frozen.write_bytes(source.read_bytes())
+        self.customer = self.home / 'kund'; self.customer.mkdir()
+        self.plan = self.home / 'DRIFT.json'
+        self.write_plan({'schema': 1, 'kund': 'Provkund',
+                         'sajter': [{'adress': self.address, 'forvantat': 'provsajten',
+                                     'max_ms': 30000, 'sitemap': True}]})
+        interpreter = Path(sys.executable).resolve()
+        self.state = self.home / 'state'
+        self.config = {'schema': 'office-drift/1', 'state': str(self.state),
+            'drift': {'digitala_root': str(root),
+                      'digitala_files': {'verktyg/drift_kontroll.py': operation.digest(frozen.read_bytes())},
+                      'python_path': str(interpreter),
+                      'python_sha256': operation.digest(interpreter.read_bytes()),
+                      'plan': str(self.plan), 'plan_sha256': self.plan_sha,
+                      'receipts': str(self.customer), 'isolated_test': True}}
+
+    def write_plan(self, value):
+        raw = (json.dumps(value, ensure_ascii=False) + '\n').encode()
+        self.plan.write_bytes(raw); self.plan_sha = operation.digest(raw)
+        if getattr(self, 'config', None):
+            self.config['drift']['plan_sha256'] = self.plan_sha
+
+    def receipts(self):
+        return sorted(p.name for p in self.customer.glob('DRIFT-*.json'))
+
+    def events(self):
+        return [json.loads(p.read_text())['event']
+                for p in sorted((self.state / 'inbox').glob('*.json'))]
+
+    def test_clean_run_incident_and_recovery_land_in_the_customer_path(self):
+        clean = operation.run(self.config, 'clean')
+        self.assertTrue(clean['completed']); self.assertTrue(clean['performed'])
+        self.assertTrue(clean['drift']['ran']); self.assertTrue(clean['drift']['healthy'])
+        self.assertEqual(clean['drift']['incidents'], 0)
+        self.assertEqual(clean['drift']['returncode'], 0)
+        self.assertEqual(clean['deliveries']['drift']['receipts'], [])
+        # The receipt is the DRIFT-<tid>.json artefact underhall.py besked reads.
+        self.assertEqual(self.receipts(), [clean['drift']['receipt']])
+        written = json.loads((self.customer / clean['drift']['receipt']).read_text(encoding='utf-8'))
+        self.assertEqual(written['incidenter'], 0)
+        self.assertEqual(operation.digest((self.customer / clean['drift']['receipt']).read_bytes()),
+                         clean['drift']['receipt_sha256'])
+
+        self.site_status = 503
+        incident = operation.run(self.config, 'incident')
+        self.assertTrue(incident['performed'], 'a check that found an incident still ran')
+        self.assertFalse(incident['completed'])
+        self.assertTrue(incident['drift']['ran']); self.assertFalse(incident['drift']['healthy'])
+        self.assertEqual(incident['drift']['returncode'], 1)
+        self.assertEqual(incident['drift']['incidents'], 1)
+        self.assertEqual(incident['drift']['reason'], 'site_incident')
+        self.assertIn('svarar 503', ' '.join(incident['drift']['findings'][0]['fynd']))
+        self.assertEqual(incident['deliveries']['drift']['receipts'][0]['recipient'],
+                         'kontorets-privata-driftyta')
+        # The receipt the result names carries this run's own finding.
+        named = json.loads((self.customer / incident['drift']['receipt']).read_text(encoding='utf-8'))
+        self.assertEqual(named['incidenter'], 1)
+        self.assertTrue(named['sajter'][0]['incident'])
+
+        self.site_status = 200
+        recovered = operation.run(self.config, 'recovered')
+        self.assertTrue(recovered['completed'])
+        self.assertEqual([(e['channel'], e['kind']) for e in self.events()],
+                         [('drift', 'incident'), ('drift', 'recovered')]
+                         if self.events()[0]['kind'] == 'incident' else
+                         [('drift', 'recovered'), ('drift', 'incident')])
+        self.assertCountEqual([e['kind'] for e in self.events()], ['incident', 'recovered'])
+        self.assertEqual(json.loads((self.customer / recovered['drift']['receipt'])
+                                    .read_text(encoding='utf-8'))['incidenter'], 0)
+
+    def test_expected_text_and_sitemap_are_each_an_incident(self):
+        self.body = 'helt annan text'
+        first = operation.run(self.config, 'missing-text')
+        self.assertEqual(first['drift']['findings'][0]['fynd'], ['förväntad text saknas'])
+        self.body = 'Välkommen till provsajten'
+        self.sitemap_status = 404
+        second = operation.run(self.config, 'missing-sitemap')
+        self.assertEqual(second['drift']['findings'][0]['fynd'], ['sitemap svarar 404'])
+
+    def test_exit_code_must_agree_with_the_receipt_it_wrote(self):
+        actual = operation.bounded_start
+        def rewrite(argv, *args, **kwargs):
+            status = actual(argv, *args, **kwargs)
+            target = Path(argv[argv.index('--ut') + 1])
+            for path in target.glob('DRIFT-*.json'):
+                value = json.loads(path.read_text(encoding='utf-8'))
+                value['incidenter'] = 3          # disagrees with both the rows and exit 0
+                path.write_text(json.dumps(value) + '\n', encoding='utf-8')
+            return status
+        with patch.object(operation, 'bounded_start', rewrite):
+            result = operation.run(self.config, 'disagreeing-receipt')
+        self.assertFalse(result['drift']['ran']); self.assertFalse(result['performed'])
+        self.assertEqual(result['drift']['reason'], 'drift_receipt_inconsistent')
+        self.assertFalse(result['completed'])
+
+    @staticmethod
+    def stub(status, stdout=b''):
+        """bounded_start always creates its two streams; a stub must do the same."""
+        def started(argv, root, environment, bound, out, err):
+            out.write_bytes(stdout); err.write_bytes(b'')
+            return status
+        return started
+
+    def test_a_check_that_wrote_nothing_is_not_green(self):
+        with patch.object(operation, 'bounded_start', self.stub(0)):
+            result = operation.run(self.config, 'no-receipt')
+        self.assertFalse(result['drift']['ran'])
+        self.assertEqual(result['drift']['reason'], 'drift_receipt_unreadable')
+        self.assertFalse(result['completed'])
+
+    def test_a_receipt_claimed_outside_the_customer_path_is_refused(self):
+        elsewhere = self.home / 'DRIFT-20260929T000000Z.json'
+        elsewhere.write_text(json.dumps({'schema': 1, 'sajter': [{'adress': 'x', 'incident': False}],
+                                         'incidenter': 0}))
+        declared = json.dumps({'incidenter': 0, 'ut': str(elsewhere)}).encode()
+        with patch.object(operation, 'bounded_start', self.stub(0, declared)):
+            result = operation.run(self.config, 'escaped-receipt')
+        self.assertFalse(result['drift']['ran'])
+        self.assertEqual(result['drift']['reason'], 'drift_receipt_unreadable')
+
+    def test_a_same_second_rerun_is_still_evidence_of_its_own_check(self):
+        # drift_kontroll.py names its receipt to the whole second and overwrites a
+        # same-second rerun, so a new filename cannot be what proves a check ran.
+        first = operation.run(self.config, 'same-second-one')
+        second = operation.run(self.config, 'same-second-two')
+        self.assertTrue(first['drift']['ran']); self.assertTrue(second['drift']['ran'])
+        self.assertTrue(first['performed']); self.assertTrue(second['performed'])
+        if first['drift']['receipt'] == second['drift']['receipt']:
+            # Recorded rather than hidden: the later check overwrote the earlier
+            # receipt in the customer path. A weekly period cannot collide, and the
+            # per-run result.json keeps each check's own hash regardless.
+            self.assertEqual(len(self.receipts()), 1)
+            self.assertNotEqual(first['drift']['receipt_sha256'], second['drift']['receipt_sha256'])
+
+    def test_the_tools_own_count_must_agree_with_the_receipt(self):
+        actual = operation.bounded_start
+        def miscount(argv, root, environment, bound, out, err):
+            status = actual(argv, root, environment, bound, out, err)
+            declared = json.loads(out.read_bytes().splitlines()[-1])
+            declared['incidenter'] = 7
+            out.write_bytes((json.dumps(declared) + '\n').encode())
+            return status
+        with patch.object(operation, 'bounded_start', miscount):
+            result = operation.run(self.config, 'miscounted')
+        self.assertFalse(result['drift']['ran'])
+        self.assertEqual(result['drift']['reason'], 'drift_receipt_inconsistent')
+
+    def test_timeout_refusal_and_failure_are_distinct_and_never_green(self):
+        for status, reason in ((None, 'drift_timeout'), (2, 'drift_refused'), (9, 'drift_failed')):
+            with patch.object(operation, 'bounded_start', self.stub(status)):
+                result = operation.run(self.config, 'bounded-' + str(status))
+            self.assertEqual(result['drift']['reason'], reason)
+            self.assertFalse(result['drift']['ran']); self.assertFalse(result['completed'])
+
+    def test_changed_plan_or_tool_bytes_refuse_the_channel(self):
+        self.config['drift']['plan_sha256'] = '0' * 64
+        result = operation.run(self.config, 'tampered-plan')
+        self.assertEqual(result['drift']['reason'], 'drift_binding_failed')
+        self.assertEqual(result['drift']['error_type'], 'ValueError')
+        self.assertEqual(self.receipts(), [])
+        self.config['drift']['plan_sha256'] = self.plan_sha
+        self.config['drift']['digitala_files'] = {'verktyg/kundstart.py': '0' * 64}
+        missing = operation.run(self.config, 'wrong-tool')
+        self.assertEqual(missing['drift']['reason'], 'drift_binding_failed')
+        self.config['drift']['digitala_files'] = {}
+        empty = operation.run(self.config, 'no-tool')
+        self.assertEqual(empty['drift']['reason'], 'drift_binding_failed')
+
+    def test_http_site_needs_the_isolated_test_flag(self):
+        # drift_kontroll.py itself refuses a non-https address without --tillat-http,
+        # so the receipt exists but names the incident rather than passing quietly.
+        del self.config['drift']['isolated_test']
+        result = operation.run(self.config, 'plain-http')
+        self.assertTrue(result['drift']['ran']); self.assertFalse(result['drift']['healthy'])
+        self.assertEqual(result['drift']['findings'][0]['fynd'], ['adressen är inte https'])
+        self.assertEqual(self.calls, 0, 'no request is made to a refused address')
+
+    def test_bound_seconds_is_the_sum_of_its_named_channel_bounds(self):
+        self.assertEqual(operation.BOUND_SECONDS,
+                         operation.INTAKE_BOUND + operation.DRIFT_BOUND
+                         + 2 * operation.TERMINATION_BOUND + operation.MONITOR_BOUND)
+        self.assertEqual(operation.MONITOR_BOUND, 2 * operation.MONITOR_TIMEOUT + 1)
+
+    def test_an_operation_without_a_channel_is_refused(self):
+        with self.assertRaises(ValueError):
+            operation.run({'schema': 'office-drift/1', 'state': str(self.state)}, 'empty')
+
+    # --- dueness: a missed period is performed, never skipped ---
+
+    def week(self, **change):
+        self.config['period_seconds'] = 604800
+        self.config.update(change)
+
+    def set_period(self, ago_seconds, sequence=1):
+        from datetime import datetime, timedelta, timezone
+        stamp = (datetime.now(timezone.utc) - timedelta(seconds=ago_seconds)).isoformat()
+        (self.state / 'period.json').write_text(
+            json.dumps({'completed_at': stamp, 'sequence': sequence}) + '\n')
+
+    def test_first_run_is_due_and_a_wakeup_inside_the_period_reads_nothing(self):
+        self.week()
+        first = operation.run(self.config, 'week-one')
+        self.assertTrue(first['performed'])
+        self.assertEqual(first['period']['reason'], 'no_period_recorded')
+        self.assertEqual(first['period_recorded']['sequence'], 1)
+        self.assertEqual(first['period_recorded']['completed_at'], first['started_at'])
+        calls, receipts = self.calls, self.receipts()
+
+        inside = operation.run(self.config, 'week-one-tick-two')
+        self.assertEqual(inside['skipped'], 'not_due')
+        self.assertFalse(inside['performed']); self.assertTrue(inside['completed'])
+        self.assertEqual(inside['period']['reason'], 'not_due')
+        self.assertEqual(inside['period']['overdue_seconds'], 0)
+        self.assertEqual(self.calls, calls, 'a wakeup inside the period makes no request')
+        self.assertEqual(self.receipts(), receipts)
+        self.assertFalse((self.state / 'week-one-tick-two').exists(),
+                         'a tick that reads nothing writes no run record')
+
+    def test_a_period_missed_while_the_host_slept_is_performed_on_the_next_wakeup(self):
+        self.week()
+        operation.run(self.config, 'week-one')
+        # Nine days without a run: the Mac slept through the weekly time.
+        self.set_period(9 * 86400)
+        late = operation.run(self.config, 'after-sleep')
+        self.assertTrue(late['performed'], 'the missed period is run, not skipped')
+        self.assertEqual(late['period']['reason'], 'period_elapsed')
+        self.assertGreaterEqual(late['period']['overdue_seconds'], 2 * 86400)
+        self.assertEqual(late['period_recorded']['sequence'], 2)
+        self.assertEqual(json.loads((self.customer / late['drift']['receipt'])
+                                    .read_text(encoding='utf-8'))['incidenter'], 0)
+
+    def test_a_period_that_did_not_actually_run_stays_due(self):
+        self.week()
+        with patch.object(operation, 'bounded_start', self.stub(None)):
+            failed = operation.run(self.config, 'broken')
+        self.assertFalse(failed['performed']); self.assertNotIn('period_recorded', failed)
+        self.assertFalse((self.state / 'period.json').exists())
+        retried = operation.run(self.config, 'retry')
+        self.assertTrue(retried['performed'])
+        self.assertEqual(retried['period']['reason'], 'no_period_recorded')
+
+    def test_invalid_period_state_is_preserved_and_the_work_still_runs(self):
+        self.week()
+        operation.run(self.config, 'week-one')
+        (self.state / 'period.json').write_text(json.dumps({'completed_at': 'inte en tid', 'sequence': 1}))
+        result = operation.run(self.config, 'after-corrupt-period')
+        self.assertTrue(result['performed'])
+        self.assertFalse(result['completed'], 'the corrupt period state is reported, not hidden')
+        self.assertEqual(result['period']['reason'], 'invalid_period_state')
+        self.assertEqual(len(list((self.state).glob('period.json.invalid-*'))), 1)
+        self.assertEqual(result['period_recorded']['sequence'], 1)
+
+    def test_closed_period_state_shapes_are_refused(self):
+        self.week()
+        for value in ({'completed_at': operation.now()}, {'completed_at': operation.now(), 'sequence': 0},
+                      {'completed_at': operation.now(), 'sequence': True},
+                      {'completed_at': operation.now(), 'sequence': 1, 'extra': 1}):
+            self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
+            (self.state / 'period.json').write_text(json.dumps(value))
+            self.assertEqual(operation.due(self.state, self.config)['reason'], 'invalid_period_state')
+
+    def test_period_outside_its_bounds_is_refused(self):
+        for period in (60, 3599, 2678401, True, '604800'):
+            self.config['period_seconds'] = period
+            with self.assertRaises(ValueError):
+                operation.run(self.config, 'bad-period-' + str(period))
+
+    def test_an_interrupted_due_run_resumes_instead_of_reporting_its_own_period(self):
+        self.week()
+        operation.run(self.config, 'week-one')
+        # The run recorded its period and then died before writing result.json.
+        interrupted = self.state / 'interrupted'; interrupted.mkdir(mode=0o700)
+        config_sha = operation.digest(json.dumps(self.config, sort_keys=True,
+                                                 separators=(',', ':')).encode())
+        (interrupted / 'binding.json').write_text(json.dumps({'config_sha256': config_sha}))
+        resumed = operation.run(self.config, 'interrupted')
+        self.assertNotIn('skipped', resumed)
+        self.assertTrue(resumed['performed'])
+        self.assertEqual(resumed['period_recorded']['sequence'], 2)
+
+    def test_a_cached_result_is_returned_before_dueness_is_consulted(self):
+        self.week()
+        first = operation.run(self.config, 'week-one')
+        self.assertEqual(operation.run(self.config, 'week-one'), first)

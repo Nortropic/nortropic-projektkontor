@@ -1,3 +1,41 @@
+# Gällande återupptagning — Runtimes veckovisa driftkontroll och signalhämtning, 2026-09-29
+
+DIGITALA-VECKODRIFT-20260929 är registrerad: ägaren beställde 2026-09-29 14:57:24Z ("starta runtime
+beställningen då", överlämning OVL-20260929-4f194f) det egna Runtime-mandatet för Digitalas veckovisa
+driftkontroll och signalhämtning. Detta block äger nästa handling för den schemalagda körningen och
+ersätter inget annat block nedan; de ersätter inte detta.
+
+Kontorets del är byggd på grenen `veckodrift/kontor-20260929`: `tools/driftoperation.py` får en tredje
+kanal `drift`, som startar Digitalas frysta `verktyg/drift_kontroll.py` och skriver kontrollens
+`DRIFT-<tid>.json` i kundens egen mapp — samma fil `underhall.py besked` läser — plus en periodbunden
+körning. Hanterarens svit är 30 prov, varav tjugo nya. Runtimes del ligger på `veckodrift/digitala-20260929`
+med D040, en ny `--operations`-bindning i `scripts/install_ap10.py` och kvalificeringen i Runtimes
+`evidence/runs/runtime-veckodrift-1/`: tre verkliga schemalagda väckningar på den befintliga motorn, en ren
+kontroll, en väckning inne i perioden som inte gjorde ett enda anrop, och en förfallen period som utfördes
+som incident med kundkvitto och en privat kvittens.
+
+Väckningen är inte perioden: en körning som missats för att Macen sov står kvar som förfallen och utförs av
+den första väckning som blir möjlig, ur kontorets eget beständiga periodkvitto och inte ur Temporals
+catch-up-fönster. Kontrollen och hämtningen är läsande, och Kundstarts repo, dess interna API och Digitalas
+`verktyg/kundstart.py` är oförändrade.
+
+Ingen riktig kund finns i dag, så ingen operation är bunden till någon sajt: det finns bara en mall i
+Runtimes `config/veckodrift-operation.example.json`. Provsajten och signalytan är loopback-provdata, aldrig
+en kundadress och aldrig Kundstarts produktion eller dess lokala provtjänst. Ingen release är stagad, vald
+eller aktiverad, och AP-10:s schema, tjänst och arbetare är orörda.
+
+Detta block äger nästa handling för den schemalagda körningen och ersätter inte underhållsformens block,
+Digitala-blocken, förbättringspartnerns block eller Kundstart-blocket nedan; de ersätter inte detta.
+
+Nästa handling: separat granskning av båda kandidaterna, sedan uppgiftsbunden skyddad integration i Runtime
+och kontoret. Därefter är kvar bara ägarens rad i ÄGARENS TUR: staga och kvalificera releasen med
+operationsbindningen, aktivera övergången, och först då installera och starta schemat.
+
+Återupptagning: paketet i `evidence/nasta-uppdrag/local/partner-OVL-20260929-4f194f` (ägarens ord ordagrant)
+och Runtimes `docs/plan.md` gällande post.
+
+---
+
 # Gällande återupptagning — Digitalas underhållsform och tak, 2026-09-29
 
 DIGITALA-UNDERHALL-20260929 är registrerad: ägaren beslutade underhållsformen för riktiga kunder och taket 20 läsande
@@ -37,8 +75,10 @@ står i kundens egen bild. Körningen ligger i
 
 Nästa handling: ingen i detta spår. Formen gäller när en riktig kund finns; då hålls kundens Kundstart-ärende öppet med
 `underhall.py oppna` och veckorytmen följer `kunskap/drift.md`. Två rader i ÄGARENS TUR är stängda (underhållsformen
-och taket). Den schemalagda veckokörningen genom Runtime är ett eget uppdrag och står kvar som egen rad i ÄGARENS TUR;
-kravet att en kontroll som missades medan värden sov ska köras när värden vaknar hör till det uppdraget. Bevarandetid
+och taket). Den schemalagda veckokörningen genom Runtime är beställd 2026-09-29 och byggd i ett eget uppdrag; den har
+sitt eget block överst (DIGITALA-VECKODRIFT-20260929), och kravet att en kontroll som missades medan värden sov ska
+köras när värden vaknar är uppfyllt där genom en periodbunden körning. Den gamla raden i ÄGARENS TUR om beställ eller
+avstå är därmed besvarad och ersatt av en rad om ägarens aktivering. Bevarandetid
 och radering i Blob-lagret är obeslutade och hänger ihop med öppna ärenden efter leverans (egen rad, KUNDSTART-20260927).
 Att vidga listan över faktarättelser är ägarens beslut, och frågan om en medarbetare som slutat står i ÄGARENS TUR.
 Nästa bygge kräver ett eget accepterat uppdrag.
@@ -551,7 +591,8 @@ nortropic-repos-f0. Etapperna är arbetsordning, inte ägarstopp; läge och näs
     `verktyg/fortsatt.py` (bunden beställning, tillstånd per fall, omprov, väntande beroenden) och publiceringsvägen
     `verktyg/publicera.py` (PR-vägen utan manuellt godkännande; från klon eller worktree) — Digitala PR 6 (main e7c3bdf)
     och PR 7 (main 3c9e448); utförarbytet verifierat på ett representativt steg i slutprovet (Codex genom Runtimes
-    pinnade binär). Schemalagd driftkontroll genom Runtime kräver eget Runtime-mandat, release och övergång (ÄGARENS TUR).
+    pinnade binär). Schemalagd driftkontroll genom Runtime är beställd och byggd 2026-09-29
+    (DIGITALA-VECKODRIFT-20260929, eget block överst); kvar är bara ägarens aktivering (ÄGARENS TUR).
  6. KLAR 2026-09-27 (HELHET-RESULTAT-20260927): slutprovet på det märkta testfallet Provfirma Trädgård (privat
     `evidence/digitala/local/testfall-helhet-20260927/`): hela vägen från uppstart till färdig privat leverans i 38
     körhändelser (plus en rättelsehändelse), tilläggens prov (avsnitt 8), tre verktygsfynd rättade (Digitala PR 8, main 94dcb0e), lärdomar
@@ -1060,7 +1101,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28), KUNDSTART-TESTLAGE-20260929 (2026-09-29) och DIGITALA-UNDERHALL-20260929 (2026-09-29) är nio rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. DIGITALA-UNDERHALL-20260929 stängde raderna om Digitalas underhållsform och taket för stående arbete: ägaren beslutade båda 2026-09-29, och lade till raden om en medarbetare som slutat. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28), KUNDSTART-TESTLAGE-20260929 (2026-09-29) och DIGITALA-UNDERHALL-20260929 (2026-09-29) är nio rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. DIGITALA-UNDERHALL-20260929 stängde raderna om Digitalas underhållsform och taket för stående arbete: ägaren beslutade båda 2026-09-29, och lade till raden om en medarbetare som slutat. DIGITALA-VECKODRIFT-20260929 (2026-09-29) besvarade raden om schemalagd driftkontroll genom Runtime: ägaren beställde den, så beslutsraden är borta och ersatt av en operatörshandling om hans egen aktivering. Antalet öppna rader är därmed oförändrat nio. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
@@ -1068,7 +1109,7 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [beslut] Digitala: nästa fiktiva fall — välj och beställ det med dina ändringar från Norrglänta (DIGITALA-1-AGARBEDOMNING-20260927) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: kundredo kräver att förhandsvisningens inloggningsskydd lyfts för kundlänkar, en delbar länk till utomstående enligt MANDAT §2; beställ när ett kunduppdrag finns (KUNDSTART-20260927) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: bevarandetid och radering för kundmaterial i Blob-lagret är inte beslutade (KUNDSTART-20260927) — sedan 2026-09-27
-- [beslut] Digitala: schemalagd driftkontroll (drift_kontroll.py) genom Runtime kräver ett eget Runtime-mandat med release och övergång (AP-10:s schema är hårdkodat till bedömningen; inga generella schemalagda kommandon) — beställ eller avstå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
+- [operatörshandling] Digitala: Runtimes veckovisa driftkontroll och signalhämtning är byggd och kvalificerad men inte i drift — staga och kvalificera Runtime-releasen med operationsbindningen (`install_ap10.py stage --operations`), aktivera övergången, och först därefter `operation_schedule install` och `resume`; operationen binds till en sajt först när en riktig kunds sajt är lanserad med lanseringsmandat (DIGITALA-VECKODRIFT-20260929) — sedan 2026-09-29
 - [beslut] Digitala: externa aktiveringar bara vid verklig kund — Google Cloud-projekt med OAuth eller tjänstekonto för Search Console, Google Ads-utvecklartoken, Meta-token, företagsprofil genom behörig människa; inget av det ingår i uppdraget (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [operatörshandling] Codex-CLI:n i PATH (0.147.0) vägrar Runtimes modell gpt-6-astra; Runtimes pinnade codex-0.155.1 fungerar — uppdatera CLI:n eller låt det stå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [operatörshandling] Förbättringspartnern: bestående start vid inloggning — `python3 -B tools/partner.py autostart` visar LaunchAgent-filen och de två launchctl-kommandona för ditt eget Terminalfönster; utan den startas tjänsten med `python3 -B tools/partner.py start`, och startvakten startar överlämningarnas sessioner först när tjänsten kör (FORBATTRINGSPARTNER-RESULTAT-20260928, FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929) — sedan 2026-09-28

@@ -1,10 +1,17 @@
-"""Office's bounded intake/monitor handler. Runtime/Temporal supplies the schedule.
+"""Office's bounded intake/drift/monitor handler. Runtime/Temporal supplies the wakeup.
 
 No model execution, publication, mail or arbitrary command is selected by input
 events. This module is loaded only from the reviewed release with frozen config.
 The local recipient is Office's private incident inbox; it is not an email claim.
+
+With `period_seconds` the work is due-based, never tick-based: the wakeup interval
+only asks whether the period has elapsed against durable state. A period missed
+because the host slept is therefore performed by the first wakeup that becomes
+possible instead of being skipped, and a wakeup inside the current period reads
+nothing and writes nothing. Without `period_seconds` every run is due, which is
+D038's unchanged behaviour.
 """
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import fcntl
 import hashlib
 import json
@@ -18,6 +25,24 @@ import uuid
 import urllib.error
 import urllib.parse
 import urllib.request
+
+
+# Each bounded channel's own wall-clock ceiling. BOUND_SECONDS is what Runtime's
+# activity/schedule timeouts must exceed; a test asserts the sum, so the bound and
+# its parts can never drift apart silently.
+INTAKE_BOUND = 120
+DRIFT_BOUND = 90
+MONITOR_TIMEOUT = 8
+MONITOR_BOUND = 2 * MONITOR_TIMEOUT + 1          # two attempts and one backoff
+TERMINATION_BOUND = 6                            # SIGTERM wait then SIGKILL wait
+BOUND_SECONDS = INTAKE_BOUND + DRIFT_BOUND + 2 * TERMINATION_BOUND + MONITOR_BOUND
+
+# Weekly is the ordered period; the range keeps an hour's floor and a month's ceiling
+# so neither a busy loop nor an unbounded silence can be bound as an accepted period.
+PERIOD_FLOOR, PERIOD_CEILING = 3600, 2678400
+
+CHANNELS = {'monitor': 'pending.json', 'intake': 'intake-pending.json',
+            'drift': 'drift-pending.json'}
 
 
 def now():
@@ -75,7 +100,7 @@ def monitor(config):
     for number in range(2):
         transient = False
         try:
-            with opener.open(urllib.request.Request(config['url'], headers=headers), timeout=8) as response:
+            with opener.open(urllib.request.Request(config['url'], headers=headers), timeout=MONITOR_TIMEOUT) as response:
                 raw = response.read(65537)
                 if len(raw) > 65536:
                     raise ValueError('Oversized health response')
@@ -101,7 +126,12 @@ def monitor(config):
             'observed_at': now(), 'candidate': config['candidate']}
 
 
-def consume(config, output):
+def frozen_digitala(config, required):
+    """The exact reviewed interpreter and Digitala bytes, for every channel alike.
+
+    `required` names the tool this channel actually starts, so a binding that omits
+    it is refused instead of running whatever else happens to be frozen.
+    """
     interpreter = regular(config['python_path'])
     if (not Path(config['python_path']).is_absolute() or not interpreter.is_file()
             or not os.access(interpreter, os.X_OK)
@@ -109,8 +139,8 @@ def consume(config, output):
         raise ValueError('Consumer interpreter differs from reviewed binding')
     root = regular(config['digitala_root'])
     files = config['digitala_files']
-    if not files or 'verktyg/kundstart.py' not in files:
-        raise ValueError('Missing frozen Digitala consumer')
+    if not files or required not in files:
+        raise ValueError('Missing frozen Digitala tool: ' + required)
     for name, expected in files.items():
         relative = Path(name)
         if relative.is_absolute() or '..' in relative.parts:
@@ -120,6 +150,28 @@ def consume(config, output):
             raise ValueError('Digitala consumer changed after release review')
     if any(str(path.relative_to(root)) not in files for path in (root / 'verktyg').rglob('*.py')):
         raise ValueError('Unbound Python module in consumer directory')
+    return interpreter, root
+
+
+def bounded_start(argv, root, environment, bound, stdout, stderr):
+    """Start a frozen tool in its own session and end it inside `bound` seconds."""
+    with stdout.open('xb') as out, stderr.open('xb') as err:
+        process = subprocess.Popen(argv, cwd=root, env=environment, stdout=out, stderr=err,
+                                   start_new_session=True)
+        try:
+            return process.wait(timeout=bound)
+        except subprocess.TimeoutExpired:
+            import signal
+            os.killpg(process.pid, signal.SIGTERM)
+            try:
+                process.wait(timeout=TERMINATION_BOUND // 2)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL); process.wait(timeout=TERMINATION_BOUND // 2)
+            return None
+
+
+def consume(config, output):
+    interpreter, root = frozen_digitala(config, 'verktyg/kundstart.py')
     environment = {k: v for k, v in os.environ.items() if k in ('PATH', 'HOME', 'LANG', 'LC_ALL', 'TMPDIR')}
     environment.update(PYTHONDONTWRITEBYTECODE='1', KUNDSTART_BAS_URL=config['base_url'],
                        KUNDSTART_NYCKEL_FIL=str(regular(config['key_file'])))
@@ -127,23 +179,79 @@ def consume(config, output):
         environment['KUNDSTART_BYPASS_FIL'] = str(regular(config['bypass_file']))
     argv = [str(interpreter), '-I', '-B', str(root / 'verktyg/kundstart.py'), 'konsumera',
             '--kund', str(regular(config['customer'])), '--utforare', config['executor']]
-    with (output / 'intake.stdout').open('xb') as out, (output / 'intake.stderr').open('xb') as err:
-        process = subprocess.Popen(argv, cwd=root, env=environment, stdout=out, stderr=err,
-                                   start_new_session=True)
-        try:
-            status = process.wait(timeout=120)
-        except subprocess.TimeoutExpired:
-            import signal
-            os.killpg(process.pid, signal.SIGTERM)
-            try:
-                process.wait(timeout=3)
-            except subprocess.TimeoutExpired:
-                os.killpg(process.pid, signal.SIGKILL); process.wait(timeout=3)
-            return {'completed': False, 'reason': 'consumer_timeout'}
+    status = bounded_start(argv, root, environment, INTAKE_BOUND,
+                           output / 'intake.stdout', output / 'intake.stderr')
+    if status is None:
+        return {'completed': False, 'reason': 'consumer_timeout'}
     return {'completed': status == 0, 'returncode': status,
             'python_sha256': config['python_sha256'],
             'stdout_sha256': digest((output / 'intake.stdout').read_bytes()),
             'stderr_sha256': digest((output / 'intake.stderr').read_bytes())}
+
+
+def drift(config, output):
+    """Digitala's own reading drift check on its frozen bytes, into the customer path.
+
+    `drift_kontroll.py` exits 1 when it found an incident. That is a check that ran,
+    not a broken mechanism, so `ran` and `healthy` are reported separately. The exit
+    code is believed only when the receipt it wrote agrees with it: the receipt is
+    the same artefact `underhall.py besked` later reads, so a green result here can
+    not come from a check that wrote nothing.
+    """
+    interpreter, root = frozen_digitala(config, 'verktyg/drift_kontroll.py')
+    plan = regular(config['plan'])
+    if digest(plan.read_bytes()) != config['plan_sha256']:
+        raise ValueError('Drift plan changed after release review')
+    target = regular(config['receipts'])
+    if not target.is_dir():
+        raise ValueError('Drift receipt directory must be the existing customer path')
+    argv = [str(interpreter), '-I', '-B', str(root / 'verktyg/drift_kontroll.py'),
+            '--plan', str(plan), '--ut', str(target)]
+    if config.get('isolated_test') is True:
+        # Only an isolated loopback fixture may be read over plain HTTP.
+        argv.append('--tillat-http')
+    environment = {k: v for k, v in os.environ.items() if k in ('PATH', 'HOME', 'LANG', 'LC_ALL', 'TMPDIR')}
+    environment['PYTHONDONTWRITEBYTECODE'] = '1'
+    status = bounded_start(argv, root, environment, DRIFT_BOUND,
+                           output / 'drift.stdout', output / 'drift.stderr')
+    base = {'plan_sha256': config['plan_sha256'], 'returncode': status,
+            'stdout_sha256': digest((output / 'drift.stdout').read_bytes()),
+            'stderr_sha256': digest((output / 'drift.stderr').read_bytes())}
+    if status is None:
+        return {'ran': False, 'reason': 'drift_timeout', **base}
+    if status not in (0, 1):
+        return {'ran': False, 'reason': 'drift_refused' if status == 2 else 'drift_failed', **base}
+    # The receipt is named to the whole second and is overwritten by a same-second
+    # rerun, so a newly appeared filename cannot be the evidence. The tool's own
+    # stdout names the file it wrote; that name is then held to the customer path.
+    try:
+        declared = json.loads((output / 'drift.stdout').read_bytes().splitlines()[-1])
+        receipt = regular(target / Path(declared['ut']).name)
+        if (Path(declared['ut']).resolve() != receipt or receipt.parent != target
+                or not re.fullmatch(r'DRIFT-[0-9TZ]{1,40}\.json', receipt.name)
+                or not receipt.is_file()):
+            raise ValueError('Receipt outside the customer path')
+        raw = receipt.read_bytes()
+        value = json.loads(raw)
+        rows = value['sajter']
+        incidents = value['incidenter']
+    except (ValueError, OSError, KeyError, TypeError, IndexError):
+        return {'ran': False, 'reason': 'drift_receipt_unreadable', **base}
+    if (value.get('schema') != 1 or not isinstance(rows, list) or not rows
+            or type(incidents) is not int
+            or declared.get('incidenter') != incidents
+            or incidents != sum(1 for row in rows if isinstance(row, dict) and row.get('incident'))
+            or (incidents > 0) != (status == 1)):
+        # Exit code, the tool's own count and the receipt's rows must agree; if they
+        # do not, this is not evidence either way and the check did not run.
+        return {'ran': False, 'reason': 'drift_receipt_inconsistent', **base}
+    return {'ran': True, 'healthy': incidents == 0,
+            'reason': 'verified' if not incidents else 'site_incident',
+            'incidents': incidents, 'sites': len(rows), 'receipt': receipt.name,
+            'receipt_sha256': digest(raw),
+            'findings': [{'adress': str(row.get('adress'))[:200],
+                          'fynd': [str(item)[:200] for item in (row.get('fynd') or [])][:10]}
+                         for row in rows if row.get('incident')][:20], **base}
 
 
 class StateError(ValueError):
@@ -171,7 +279,7 @@ def validate_state(value):
 
 def validate_event(event, channel=None):
     if (not isinstance(event, dict) or set(event) != {'id', 'channel', 'kind', 'state', 'observation'}
-            or event['channel'] not in ('monitor', 'intake')
+            or event['channel'] not in CHANNELS
             or (channel is not None and event['channel'] != channel)
             or not isinstance(event['id'], str)
             or not re.fullmatch(event['channel'] + '-[0-9a-f]{32}', event['id'])):
@@ -229,7 +337,7 @@ def deliver(home, event):
 def transition(home, channel, current):
     """Independent channels, durable outbox before actual inbox acknowledgement."""
     state_file = regular(home / (channel + '.json'))
-    pending = regular(home / ('pending.json' if channel == 'monitor' else 'intake-pending.json'))
+    pending = regular(home / CHANNELS[channel])
     receipts = []
     previous = {'healthy': True, 'sequence': 0, 'observed_at': now()}
     try:
@@ -268,6 +376,50 @@ def transition(home, channel, current):
     return {'receipts': receipts, 'state_error': state_error}
 
 
+def due(home, config):
+    """Is the period's work due? Read from durable state, never from the wakeup.
+
+    A period missed because the host slept stays due, so the first wakeup after the
+    host returns performs it. Malformed period state is preserved and treated as due:
+    silence about a week is worse than one extra reading run.
+    """
+    period = config['period_seconds']
+    if type(period) is not int or not PERIOD_FLOOR <= period <= PERIOD_CEILING:
+        raise ValueError('Invalid bounded operation period')
+    path = regular(home / 'period.json')
+    observed = datetime.now(timezone.utc)
+    overdue = {'due': True, 'period_seconds': period, 'completed_at': None,
+               'due_at': observed.isoformat(), 'overdue_seconds': 0, 'sequence': 0}
+    if not path.exists():
+        return {**overdue, 'reason': 'no_period_recorded'}
+    try:
+        value = load_state(path)
+        if (not isinstance(value, dict) or set(value) != {'completed_at', 'sequence'}
+                or type(value['sequence']) is not int or value['sequence'] < 1):
+            raise StateError('invalid_period_state')
+        timestamp(value['completed_at'])
+        last = datetime.fromisoformat(value['completed_at'])
+    except StateError:
+        path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
+        return {**overdue, 'reason': 'invalid_period_state'}
+    due_at = last + timedelta(seconds=period)
+    late = int((observed - due_at).total_seconds())
+    return {'due': late >= 0, 'reason': 'period_elapsed' if late >= 0 else 'not_due',
+            'period_seconds': period, 'completed_at': value['completed_at'],
+            'due_at': due_at.isoformat(), 'overdue_seconds': max(0, late),
+            'sequence': value['sequence']}
+
+
+def record_period(home, period, completed_at):
+    """The next period is counted from this run, and only after a read-back."""
+    state = {'completed_at': completed_at, 'sequence': period['sequence'] + 1}
+    path = regular(home / 'period.json')
+    write(path, state)
+    if load_state(path) != state:
+        raise StateError('period_readback_failed')
+    return state
+
+
 def observation(healthy, reason, detail):
     return {'healthy': healthy, 'reason': reason, 'observed_at': now(),
             'detail_sha256': digest(json.dumps(detail, sort_keys=True).encode())}
@@ -276,6 +428,10 @@ def observation(healthy, reason, detail):
 def run(config, run_id):
     if config.get('schema') != 'office-drift/1' or not re.fullmatch('[a-zA-Z0-9-]{1,100}', run_id):
         raise ValueError('Unknown operation schema or run identity')
+    if not any(config.get(channel) for channel in CHANNELS):
+        # Without a channel there is nothing to read, and a recorded period would
+        # then claim a week's check that never happened.
+        raise ValueError('Operation binds no intake, drift or monitor channel')
     config_sha256 = digest(json.dumps(config, sort_keys=True, separators=(',', ':')).encode())
     home = regular(config['state'])
     home.mkdir(mode=0o700, parents=True, exist_ok=True); home.chmod(0o700)
@@ -288,6 +444,17 @@ def run(config, run_id):
             if prior.get('config_sha256') != config_sha256:
                 raise ValueError('Run identity already belongs to another configuration')
             return prior
+        # Dueness is read after the cache: a run interrupted after it recorded the
+        # period must resume its own work, not report the period it just closed.
+        interrupted = (output / 'binding.json').exists()
+        period = due(home, config) if 'period_seconds' in config else None
+        if period is not None and not period['due'] and not interrupted:
+            # Inside the current period this wakeup reads nothing and writes nothing,
+            # so it needs no run record; the native schedule already counts the tick.
+            observed = now()
+            return {'run_id': run_id, 'config_sha256': config_sha256, 'completed': True,
+                    'performed': False, 'skipped': 'not_due', 'period': period,
+                    'started_at': observed, 'finished_at': observed}
         output.mkdir(mode=0o700, exist_ok=True)
         binding_file = output / 'binding.json'
         if binding_file.exists():
@@ -308,11 +475,24 @@ def run(config, run_id):
                 result['intake'] = {'completed': False, 'reason': 'consumer_failed',
                                     'error_type': type(error).__name__}
             result['completed'] = result['intake']['completed']
+        if config.get('drift'):
+            attempt = output / ('drift-' + str(time.time_ns())); attempt.mkdir(mode=0o700)
+            try:
+                result['drift'] = drift(config['drift'], attempt)
+            except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as error:
+                # A broken drift binding must not suppress the other channels.
+                result['drift'] = {'ran': False, 'reason': 'drift_binding_failed',
+                                   'error_type': type(error).__name__}
+            result['completed'] = result['completed'] and result['drift'].get('healthy') is True
         result['deliveries'] = {}
         if 'intake' in result:
             intake = result['intake']
             result['deliveries']['intake'] = transition(home, 'intake', observation(
                 intake['completed'], 'verified' if intake['completed'] else 'consumer_failed', intake))
+        if 'drift' in result:
+            check = result['drift']
+            result['deliveries']['drift'] = transition(home, 'drift', observation(
+                check.get('healthy') is True, check['reason'], check))
         if config.get('monitor'):
             current = monitor(config['monitor']); result['monitor'] = current
             current['access_scope'] = ('internal_protection_bypass' if config['monitor'].get('bypass_file')
@@ -320,7 +500,22 @@ def run(config, run_id):
             result['deliveries']['monitor'] = transition(home, 'monitor', observation(
                 current['healthy'], current['reason'], current))
             result['completed'] = result['completed'] and current['healthy']
-        result['completed'] = result['completed'] and not any(
-            item['state_error'] for item in result['deliveries'].values())
+        state_error = any(item['state_error'] for item in result['deliveries'].values())
+        result['completed'] = result['completed'] and not state_error
+        # `performed` is the honest answer to "did the period's reading actually run".
+        # `completed` additionally requires that nothing it read was unhealthy, so an
+        # incident found by a check that ran is performed but not completed.
+        result['performed'] = (result.get('intake', {'completed': True})['completed']
+                               and result.get('drift', {'ran': True})['ran'] and not state_error)
+        if period is not None:
+            result['period'] = period
+            if result['performed']:
+                try:
+                    result['period_recorded'] = record_period(home, period, result['started_at'])
+                except StateError as error:
+                    result['period_recorded'] = {'error_code': str(error)}
+                    result['completed'] = False
+            if period['reason'] == 'invalid_period_state':
+                result['completed'] = False
         result['finished_at'] = now(); write(result_file, result)
         return result
