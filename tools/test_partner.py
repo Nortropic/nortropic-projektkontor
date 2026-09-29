@@ -632,6 +632,40 @@ class SamtalProv(Miljo):
         self.assertIn('kvot', self.turer(vy2, 'begransad')[0]['orsak'].lower())
 
 
+class ModellvalProv(Miljo):
+    def test_modell_och_anstrangning_valjs_i_ytan_och_galler_nasta_tur(self):
+        self.assertEqual(self.json('GET', '/api/installningar')[0], 401)
+        self.logga_in()
+        kod, d = self.json('GET', '/api/installningar')
+        self.assertEqual((kod, d['huvud'], d['anstrangning']), (200, 'claude-opus-5-5', 'high'))
+        self.assertEqual(d['nivaer'], ['low', 'medium', 'high', 'xhigh', 'max'])
+        self.assertIn('claude-sonnet-5', [m['id'] for m in d['modeller']])
+        fil = Path(self.k.data) / 'installningar.json'
+        fil.write_text(json.dumps({'gransar': {'tur_max_steg': 40}}), 'utf-8')
+        self.assertEqual(self.json('POST', '/api/installningar', {'huvud': 'gpt-5', 'anstrangning': 'high'})[0], 400)
+        self.assertEqual(self.json('POST', '/api/installningar', {'huvud': 'claude-sonnet-5', 'anstrangning': 'ultra'})[0], 400)
+        kod, _, _ = self.anrop('POST', '/api/installningar', {'huvud': 'claude-sonnet-5'}, huvud={'X-Partner': ''})
+        self.assertEqual(kod, 403)
+        kod, d = self.json('POST', '/api/installningar', {'huvud': 'claude-sonnet-5', 'anstrangning': 'max'})
+        self.assertEqual((kod, d['huvud'], d['anstrangning']), (200, 'claude-sonnet-5', 'max'))
+        self.assertEqual(json.loads(fil.read_text()), {'gransar': {'tur_max_steg': 40},
+                                                       'modell': {'huvud': 'claude-sonnet-5', 'anstrangning': 'max'}})
+        self.assertEqual(stat.S_IMODE(fil.stat().st_mode), 0o600)
+        handelser = [json.loads(r) for r in self.S.lager.journal.read_text().splitlines()]
+        self.assertEqual([(h['huvud'], h['anstrangning'], h['fore']) for h in handelser if h['typ'] == 'installning'],
+                         [('claude-sonnet-5', 'max', {'huvud': 'claude-opus-5-5', 'anstrangning': 'high'})])
+        trad = self.skicka('Vilken modell kör du?')['inspel']['trad']
+        vy = self.vanta(trad, lambda v: self.turer(v, 'svarad'))
+        a = self.fejkanrop()[-1]['argv']
+        self.assertEqual((a[a.index('--model') + 1], a[a.index('--effort') + 1]), ('claude-sonnet-5', 'max'))
+        self.assertEqual(self.turer(vy, 'svarad')[0]['forbrukning']['anstrangning'], 'max')
+        system = sorted((Path(self.k.data) / 'turer').glob('*/system.md'), key=lambda p: p.stat().st_mtime)[-1].read_text()
+        self.assertIn('Du kör som claude-sonnet-5 med ansträngningen max', system)
+        fil.write_text('{inte json', 'utf-8')  # en oläsbar fil skrivs aldrig över
+        self.assertEqual(self.json('POST', '/api/installningar', {'huvud': 'claude-opus-5-5', 'anstrangning': 'high'})[0], 400)
+        self.assertEqual(fil.read_text(), '{inte json')
+
+
 class AvbrottProv(Miljo):
     def test_avbrott_bevarar_delsvar_och_ateruppta_fortsatter_sessionen(self):
         self.logga_in()

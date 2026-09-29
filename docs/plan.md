@@ -84,19 +84,20 @@ förbättringspartnern har egna spår. Skrivansvar: sessionen nortropic-repos-9e
 `tools/test_partner.py`, `tools/PARTNER.md`, detta block och partnerns beslutsposter. Inga ändringar i Digitala,
 Kundstart eller Runtime ingår; samordning med Kundstart-dialogen (nortropic-repos-f1) är bekräftad 18:14Z.
 
-Läge när detta block skrevs (28 september 2026, 23:38 svensk tid / 21:38 UTC): partnern är driftsatt. Tjänsten körs ur
-primärutcheckningen på main (127.0.0.1:4760), sedan 21:30 UTC med kandidat 2 (PR 118, main `ec87c06`). De tio
-slutproven och omproven är gjorda. Resultatet står i FORBATTRINGSPARTNER-RESULTAT-20260928 med tillägget
-FORBATTRINGSPARTNER-RESULTAT-TILLAGG-20260928 och i `evidence/partner/leverans.md`. Kandidat 3, där källindexet byggs
-om av sig självt när källorna ändras, integreras med denna ändring.
+Läge när detta block skrevs (29 september 2026, 07:14 svensk tid / 05:14 UTC): partnern är driftsatt och i bruk. Tjänsten
+körs ur primärutcheckningen på main (127.0.0.1:4760), sedan 2026-09-28 22:02 UTC med kandidat 3 (PR 119, main
+`f22ffd8`). Uppdraget FORBATTRINGSPARTNER-20260928 är fullgjort; resultatet står i FORBATTRINGSPARTNER-RESULTAT-20260928
+med tillägget FORBATTRINGSPARTNER-RESULTAT-TILLAGG-20260928 och i `evidence/partner/leverans.md`. Ägaren har därefter
+beställt en yta i Claude-appens form med val av modell och ansträngning i inmatningsrutan
+(FORBATTRINGSPARTNER-MODELLVAL-20260929). Den integreras med denna ändring.
 
 Nästa handling: efter integrationen snabbspolas primärutcheckningen, och tjänsten startas om ur main med
 `python3 -B tools/partner.py stopp` och sedan `start`. `partner.py status` ska då visa samma kod som origin/main. Det
-är driftregeln efter varje integration av partnern. Därmed är uppdraget fullgjort, och nästa bygge kräver ett eget
-beslut. Ägarens två rader står i ÄGARENS TUR: bestående start vid inloggning och en ny fångst av Improvements efter
-19 september. Arbetsgrenen `partner/forbattringspartner-kallfarskhet-20260928` publiceras med denna ändring och tas
-sedan bort lokalt. De tidigare arbetsgrenarna är publicerade i PR 117 och 118 och borttagna lokalt; kandidat 1:s
-mellanversioner finns i en privat bundle i uppdragets mapp.
+är driftregeln efter varje integration av partnern. Därefter finns inget öppet i partnerns spår; nästa bygge kräver
+ett eget beslut. Ägarens två rader står i ÄGARENS TUR: bestående start vid inloggning och en ny fångst av
+Improvements efter 19 september. Arbetsgrenen `partner/forbattringspartner-modellval-20260929` publiceras med denna
+ändring och tas sedan bort lokalt. De tidigare arbetsgrenarna är publicerade i PR 117–119 och borttagna lokalt;
+kandidat 1:s mellanversioner finns i en privat bundle i uppdragets mapp.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.

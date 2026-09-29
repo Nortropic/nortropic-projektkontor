@@ -6847,3 +6847,47 @@ beställningsvägen. Två prov har lagts till, så de är nu 44.
 
 **Avslut.** Uppdraget är fullgjort när kandidat 3 är integrerad och tjänsten har startats om ur main enligt
 driftregeln. ÄGARENS TUR är oförändrad med elva rader. Planen äger nästa handling.
+
+
+## FORBATTRINGSPARTNER-MODELLVAL-20260929 — partnerns yta får Claude-appens form, och ägaren väljer modell och ansträngning i inmatningsrutan
+
+**Status:** registrerat och byggt 2026-09-29 (05:14 UTC) av sessionen nortropic-repos-9e (Claude Code) inom
+förbättringspartnerns förvaltning. Ägarens ord är sparade ordagrant i
+`evidence/nasta-uppdrag/local/forbattringspartner-20260928/owner-words-20260929-modellval.md`.
+
+**Beställningen.** Med ett skärmklipp av ytan frågade ägaren: "vilken effort level är det inställt på? och varför kan
+jag inte byta modell i vyn". Nivån var high, och någon väljare fanns inte, eftersom inställningen bara lästes vid
+start. På frågan om väljaren skulle byggas svarade han "ja och även effort level" och lade till: "egentligen vill jag
+att du replikerar en claude terminal i det fönstret så jag kan välja både modell och effort level". Med ett
+skärmklipp av Claude-appen skrev han sedan: "det här är så här jag tänker mig att det ska se ut mer eller mindre,
+vyn för förbättringspartnern".
+
+**Tolkning och val.** Ytan får ungefär Claude-appens form:
+- en sidomeny med "Ny tråd", sökning, verktygen och trådarna
+- en tom tråd med hälsning, inmatningsrutan i mitten och förslag under
+- svaren i en centrerad kolumn och rutan längst ned
+- i rutan: "+" för bilagor, växeln Svara/Bara spara, modellknappen "Opus 5.5 · high" och skicka; Enter skickar och
+  Skift+Enter ger ny rad
+
+Modellknappen öppnar en meny med modellerna och ansträngningen. Där väljer ↑↓ modell, ←→ ansträngning, och Enter
+och Esc fungerar som i Claude. `/model <namn>` och `/effort <nivå>` byter direkt. Valet gäller från nästa svar i alla
+trådar, och varje svar visar vilken modell och nivå det kördes med.
+
+Kommandona hanteras i ytan och skickas aldrig till partnern. En riktig Claude Code-terminal bäddas inte in: den
+skulle ge webbsidan skal- och filverktyg på ägarens dator, utanför partnerns säkerhetsgränser
+(FORBATTRINGSPARTNER-20260928 avsnitt 7). Valbara modeller är de som prövades med Claude Code 2.1.280 på ägarens
+inloggning 2026-09-29 05:07Z: Opus 5.5 (standard), Sonnet 5, Opus 5 och Haiku 4.5 svarade. Fable 5.1 finns med men
+hade slut på sin kvot; ett svar med Fable stoppas då med ett besked om kvoten. Ansträngningen är low, medium,
+high, xhigh eller max.
+
+**Byggt och provat.** Servern har `GET` och `POST /api/installningar`. Valen kontrolleras mot listorna, och ett ogiltigt
+värde ger 400. Skrivningen kräver inloggning och ytans eget huvud. `installningar.json` skrivs atomärt med
+rättigheterna 0600, övriga inställningar lämnas orörda, och en oläsbar fil skrivs aldrig över. Valet journalförs med
+det tidigare värdet. Turens start och förbrukning bär ansträngningen, och läget i varje tur säger vilken modell och
+nivå som kör. 45 partnerprov. Ett webbläsarprov på en utvecklingsinstans gick igenom med 20 av 20, i ljust och mörkt
+läge: hälsningen, förslagen, menyn med pilar och klick, `/effort` och `/model`, lägesväxeln, att Enter sparar i läget
+Bara spara utan modellkörning, trådlistan, panelen och att inga skriptfel uppstår.
+
+**Införande.** Ändringen integreras genom den ordinarie skyddade vägen efter separat granskning, och tjänsten startas
+sedan om ur main enligt driftregeln. Standardläget efter omstart är Opus 5.5 med high tills ägaren väljer annat.
+Planen äger nästa handling.

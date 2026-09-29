@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import threading
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
@@ -50,6 +51,19 @@ class Modell:
     huvud: str = 'claude-opus-5-5'
     anstrangning: str = 'high'
     utredare: str = 'sonnet'
+
+
+# Valbara i samtalsytan (/model), prövade med Claude Code 2.1.280 på ägarens inloggning 2026-09-29. Fable har egen kvot
+# i abonnemanget; är den slut stoppas svaret med ett besked om kvoten.
+MODELLER = (
+    {'id': 'claude-opus-5-5', 'namn': 'Opus 5.5', 'om': 'standard, djupast förståelse'},
+    {'id': 'claude-fable-5-1', 'namn': 'Fable 5.1', 'om': 'egen kvot; tar den slut stoppas svaret med ett besked'},
+    {'id': 'claude-sonnet-5', 'namn': 'Sonnet 5', 'om': 'snabbare, något grundare'},
+    {'id': 'claude-opus-5', 'namn': 'Opus 5', 'om': 'föregående Opus'},
+    {'id': 'claude-haiku-4-5-20251001', 'namn': 'Haiku 4.5', 'om': 'snabbast, svagast på djup förståelse'},
+)
+ANSTRANGNING = ('low', 'medium', 'high', 'xhigh', 'max')
+_SPARLAS = threading.Lock()
 
 
 @dataclass
@@ -115,6 +129,37 @@ def ladda() -> Konfig:
             if hasattr(k.gransar, namn) and isinstance(varde, (int, float)) and not isinstance(varde, bool):
                 setattr(k.gransar, namn, type(getattr(k.gransar, namn))(varde))
     return k
+
+
+def spara_modellval(k: Konfig, huvud: str, anstrangning: str) -> dict:
+    """Johnnys val i samtalsytan: skrivs i installningar.json (övriga inställningar orörda) och gäller från nästa
+    modellkörning i alla trådar. En pågående körning påverkas inte."""
+    if huvud not in {m['id'] for m in MODELLER}:
+        raise ValueError('Okänd modell.')
+    if anstrangning not in ANSTRANGNING:
+        raise ValueError('Okänd ansträngningsnivå.')
+    fil = Path(k.data) / 'installningar.json'
+    with _SPARLAS:
+        val = {}
+        if fil.is_file():
+            try:
+                val = json.loads(fil.read_text('utf-8'))
+            except ValueError:
+                raise ValueError('installningar.json går inte att läsa; rätta filen först.')
+            if not isinstance(val, dict):
+                raise ValueError('installningar.json har fel form; rätta filen först.')
+        modell = val.get('modell') if isinstance(val.get('modell'), dict) else {}
+        val['modell'] = dict(modell, huvud=huvud, anstrangning=anstrangning)
+        tmp = fil.with_name('.installningar.json.tmp')
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(val, ensure_ascii=False, indent=1) + '\n')
+            f.flush()
+            os.fsync(f.fileno())
+        os.chmod(tmp, 0o600)
+        os.replace(tmp, fil)
+        k.modell.huvud, k.modell.anstrangning = huvud, anstrangning
+    return {'huvud': huvud, 'anstrangning': anstrangning}
 
 
 def _hitta_claude() -> str:

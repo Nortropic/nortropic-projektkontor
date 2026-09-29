@@ -75,6 +75,7 @@ class Korning:
         self.avbruten_av = None
         self.session = None
         self.modell = None
+        self.anstrangning = None
         self.forsok = 0
         self.fortsatt_avbruten = False
         self.maxtid = 900
@@ -188,6 +189,8 @@ class Agent:
             lokal = nu_utc.strftime('%Y-%m-%d %H:%M') + ' UTC'
         del_ = ['# Läget för den här körningen (återgivet av partnerns server, inte skrivet av Johnny)',
                 'Tid nu: %s (Stockholm), %s.' % (lokal, nu_utc.strftime('%Y-%m-%dT%H:%MZ'))]
+        del_.append('Du kör som %s med ansträngningen %s; Johnny väljer modell och ansträngning i ytan (/model).' % (
+            korning.modell or self.k.modell.huvud, korning.anstrangning or self.k.modell.anstrangning))
         kod = self.s.kodrevision or {}
         if kod.get('head'):
             del_.append('Tjänsten kör kontorets kod %s (%s%s), startad %s.' % (
@@ -415,7 +418,8 @@ class Agent:
         verktyg = 'WebFetch,WebSearch' + (',Agent' if korning.typ == 'tur' else '')
         maxtid = g.tur_max_sekunder if korning.typ == 'tur' else g.jobb_max_sekunder
         argv = [self.k.claude, '-p', '--input-format', 'stream-json', '--output-format', 'stream-json', '--verbose',
-                '--include-partial-messages', '--model', self.k.modell.huvud, '--effort', self.k.modell.anstrangning,
+                '--include-partial-messages', '--model', korning.modell or self.k.modell.huvud,
+                '--effort', korning.anstrangning or self.k.modell.anstrangning,
                 '--system-prompt-file', str(korning.katalog / 'system.md'), '--system-prompt-snapshot', 'off',
                 '--restricted', '--strict-mcp-config', '--mcp-config', json.dumps(mcp),
                 '--tools', verktyg, '--allowedTools', 'mcp__partner', 'WebFetch', 'WebSearch', 'Agent',
@@ -455,6 +459,7 @@ class Agent:
             session = str(uuid.uuid4())
         korning.session = session
         korning.modell = self.k.modell.huvud
+        korning.anstrangning = self.k.modell.anstrangning  # samma värden i processens argument och i journalen
         (korning.katalog / 'system.md').write_text(self.systemprompt(korning), 'utf-8')
         os.chmod(korning.katalog / 'system.md', 0o600)
         redan = set()
@@ -601,7 +606,7 @@ class Agent:
                 tokens_in=int(u.get('input_tokens') or 0) + int(u.get('cache_read_input_tokens') or 0) +
                 int(u.get('cache_creation_input_tokens') or 0),
                 tokens_ut=int(u.get('output_tokens') or 0), listpris_usd=float(resultat.get('total_cost_usd') or 0),
-                steg=resultat.get('num_turns'), modell=korning.modell,
+                steg=resultat.get('num_turns'), modell=korning.modell, anstrangning=korning.anstrangning,
                 webbsokningar=((u.get('server_tool_use') or {}).get('web_search_requests')))
             korning.session = resultat.get('session_id') or korning.session
         helt = svarstext(korning.svarstext)

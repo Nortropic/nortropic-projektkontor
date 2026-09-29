@@ -12,7 +12,7 @@
 <body>
 <div id="inloggning" class="inloggning" hidden>
   <form id="inloggningsformular" class="inloggningsruta">
-    <h1>Förbättringspartnern</h1>
+    <h1><span class="gnista" aria-hidden="true"></span>Förbättringspartnern</h1>
     <p>Projektkontorets interna samtalsyta. Logga in med nyckeln från <code>tools/partner.py oppna</code>.</p>
     <label for="nyckel">Nyckel</label>
     <input id="nyckel" type="password" autocomplete="current-password" required>
@@ -24,25 +24,31 @@
 <div id="app" class="app" hidden>
   <aside class="sida" aria-label="Trådar">
     <div class="sida-huvud">
-      <span class="marke" aria-hidden="true"></span>
-      <div>
-        <div class="namn">Förbättringspartnern</div>
-        <div class="undertext">Projektkontoret</div>
-      </div>
+      <span class="namn">Förbättringspartnern</span>
     </div>
-    <button id="nytrad" class="knapp-bred">Ny tråd</button>
-    <form id="sokformular" class="sok" role="search">
-      <input id="sokfalt" type="search" placeholder="Hitta tidigare resonemang…" aria-label="Sök i tidigare resonemang och underlag">
-    </form>
+    <nav class="sidnav" aria-label="Meny">
+      <button id="nytrad" class="navrad nytrad" type="button">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>Ny tråd</button>
+      <form id="sokformular" class="navrad sok" role="search">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l3.5 3.5"/></svg>
+        <input id="sokfalt" type="search" placeholder="Sök i tidigare resonemang" aria-label="Sök i tidigare resonemang och underlag">
+      </form>
+      <button id="visaforstaelse" class="navrad" type="button">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5h8.5L15.5 6v10.5H5z"/><path d="M8 8.5h5M8 11.5h5"/></svg>Bestående förståelse</button>
+      <button id="visaoverlamningar" class="navrad" type="button">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10h11M11 6.5l3.5 3.5-3.5 3.5"/></svg>Överlämningar</button>
+      <button id="visalage" class="navrad" type="button">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M10 6.5V10l2.5 1.5"/></svg>Tjänst och källor</button>
+    </nav>
+    <div class="sektion">Trådar</div>
     <nav id="tradlista" class="tradlista" aria-label="Trådar"></nav>
     <div class="sida-fot">
-      <button id="visaforstaelse" class="lank">Bestående förståelse</button>
-      <button id="visaoverlamningar" class="lank">Överlämningar</button>
-      <button id="visalage" class="lank">Tjänst och källor</button>
+      <span class="avatar" aria-hidden="true">J</span>
+      <span class="vem">Johnny <span class="dampad">· Projektkontoret</span></span>
     </div>
   </aside>
 
-  <main class="huvud">
+  <main id="huvud" class="huvud">
     <header class="tradhuvud">
       <h2 id="tradtitel" class="tradtitel" tabindex="0" title="Klicka för att byta namn">Ny tråd</h2>
       <div id="tradstatus" class="tradstatus" aria-live="polite"></div>
@@ -52,18 +58,25 @@
 
     <form id="komponera" class="komponera">
       <div id="utkorg" class="utkorg" aria-live="polite"></div>
-      <div id="bilagelista" class="bilagelista"></div>
-      <div class="skrivrad">
-        <textarea id="text" rows="2" placeholder="Skriv, klistra in en bild eller släpp filer här…" aria-label="Meddelande"></textarea>
+      <div class="ruta">
+        <div id="modellval" class="modellval" hidden tabindex="0" role="dialog" aria-label="Välj modell och ansträngning"></div>
+        <div id="bilagelista" class="bilagelista"></div>
+        <textarea id="text" rows="2" placeholder="Vad tänker du på? Skriv, klistra in en bild eller släpp filer här…" aria-label="Meddelande"></textarea>
+        <div class="kontroller">
+          <label class="plus" title="Bifoga filer"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg><span class="dold">Bifoga</span><input id="filval" type="file" multiple hidden></label>
+          <div class="lagesval" role="group" aria-label="Läge">
+            <button id="lage-svara" type="button" class="vald" aria-pressed="true">Svara</button>
+            <button id="lage-spara" type="button" aria-pressed="false">Bara spara</button>
+          </div>
+          <input id="baraspara" type="checkbox" hidden>
+          <span class="fyll"></span>
+          <button id="modellrad" type="button" class="modellrad" title="Byt modell och ansträngning (/model)" aria-haspopup="dialog"></button>
+          <button id="skickaavbryt" type="button" class="sekundar" hidden>Avbryt och skicka</button>
+          <button id="skicka" type="submit" class="skicka" aria-label="Skicka" title="Skicka (Enter)"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4M5 9l5-5 5 5"/></svg></button>
+        </div>
       </div>
-      <div class="kontroller">
-        <label class="filknapp">Bifoga<input id="filval" type="file" multiple hidden></label>
-        <label class="baraspara"><input id="baraspara" type="checkbox"> Bara spara</label>
-        <span id="utkaststatus" class="utkaststatus"></span>
-        <span class="fyll"></span>
-        <button id="skickaavbryt" type="button" class="sekundar" hidden>Skicka och avbryt pågående</button>
-        <button id="skicka" type="submit">Skicka</button>
-      </div>
+      <div id="utkaststatus" class="utkaststatus" aria-live="polite"></div>
+      <div id="forslag" class="forslag" hidden></div>
     </form>
   </main>
 
