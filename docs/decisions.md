@@ -7733,6 +7733,11 @@ kontexten nekas utan den. Objekt och hänvisningar prövas mot sina källor, och
 **Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main. Journalen behåller
 eventuella `kontext`-fält, och äldre kod ignorerar dem. Webbläsarens nycklar `arbetsplats:*` är ofarliga.
 
+**Delvis ersatt av:** HEM-RUTOR-20260929, i fråga om Hems innehåll och Förbättringars sidomeny: ägaren tog 2026-09-29
+bort alla rutor från Hem (Fortsätt där du var, Levererat och ändrat, Behöver dig, Kontoret just nu och sökningen), så
+Hem visar bara hälsningen. Han tog också bort Sök i tidigare resonemang, Bestående förståelse och Tjänst och källor ur
+Förbättringars sidomeny. Övrigt gäller.
+
 
 ## ARBETSPLATS-RESULTAT-20260929 — slutrapport för ARBETSPLATS-20260929: Nortropics arbetsplats är integrerad, driftsatt och prövad mot den verkliga tjänsten; kvar för ägaren är bara den befintliga raden om bestående start vid inloggning
 
@@ -8022,3 +8027,89 @@ markeringen står sist i den posten.
 
 **Avslut.** Klart när denna ändring är integrerad och tjänsten omstartad ur main enligt driftregeln (`aktiva`
 kontrollerad tom före omstart). Nästa bygge i detta spår kräver ett eget beslut.
+
+## HEM-RUTOR-20260929 — ägaren bantar arbetsplatsen: alla rutor bort från Hem och tre val bort ur Förbättringars sidomeny
+
+**Status:** registrerat 2026-09-29 (19:15 UTC) av sessionen nortropic-repos-6d (Claude Code). Ägaren gav beskeden med
+skärmdumpar av Hem och Förbättringar i Nortropic.app.
+
+**Ägarens besked** (ordagrant i `evidence/nasta-uppdrag/local/hem-rutor-20260929/owner-words-hem-rutor-20260929.md`):
+- Om Hem: "Jag vill ta bort informationsrutorna: - Fortsätt där du är - Kontoret just nu - Behöver dig - Sök i
+  underlaget". "Fortsätt där du är" läses som rutan Fortsätt där du var, som syns i skärmdumpen.
+- Sessionen frågade om den femte rutan, Levererat och ändrat. Ägaren svarade: "den ska bort också".
+- Om Förbättringar: "jag känner vi kan banta ner här också, behöver även kunna ta bort trådar. Behöver bestående,
+  förståelse vara med här? överlämningar kan vara denna backlog, tjänst och källor, sök i tidigare resonomenaget".
+  Sessionen frågade vilka menyval som ska bort. Svaren:
+  - "alla" (Bestående förståelse, Tjänst och källor och Sök i tidigare resonemang);
+  - "Radera för gott" om att ta bort trådar;
+  - "du säger till d7 gör om den" om Överlämningar som backlog.
+
+**Genomfört i denna ändring.**
+- Hem, i `tools/partnern/ui/arbetsplats.js`:
+  - Hem visar bara hälsningen. En okänd adress visar fortfarande att du är på Hem.
+  - Sidan läser ingenting och anropar inte servern.
+  - Borttaget: rutorna `hemFortsatt`, `hemAndrat`, `hemBehover` med `BORDGRUPPER`, `hemKontoret` och `hemSok`,
+    efterläsningen `uppdateraHemKontor`, besöksmarkören `besok()` med nyckeln `arbetsplats:besok` och hjälpfunktionen
+    `utanId`.
+  - Kvar för Kundstart-delen: `bordrad`, `tidEl` och `sektion`.
+- Förbättringar, i `tools/partnern/ui/index.html` och `app.js`:
+  - Sidomenyn har Ny tråd, Överlämningar och trådarna.
+  - Borttaget: sökfältet (`sokformular`), Bestående förståelse (`visaforstaelse`) och Tjänst och källor (`visalage`),
+    med sina lyssnare.
+  - Källpanelen står kvar. Den öppnas från en sparad punkt i tråden (till exempel "Sparat som F-26") och från "Lästa
+    källor".
+- `tools/partnern/ui/app.css`: de klasser som bara det borttagna använde är borttagna.
+- `tools/test_arbetsplats.py`: två nya prov, `test_hem_visar_bara_halsningen` och
+  `test_forbattringars_meny_har_ny_trad_och_overlamningar`. Båda fäller på den tidigare koden.
+- Dokumentation:
+  - `tools/ARBETSPLATS.md`: raderna för `/` och `/forbattringar`, meningen om efterläsning och listan över det som
+    sparas i webbläsaren, som nu är fullständig.
+  - `tools/PARTNER.md`: stycket om sidomenyn och uppräkningen av ytans form.
+- `tools/partnern/ui/app.js`: den oanvända tillståndsnyckeln `sokOmkrets` är borttagen. Den fanns redan på main.
+
+**Oförändrat.**
+- Serverns `GET /api/arbetsplats/hem`, `/api/sok`, `/api/forstaelse` och `/api/lage` svarar som förut. Sidan anropar
+  dem inte längre, men deras läsfunktioner prövas i sviten och i utfärdarens beteendefall. Att ta bort dem är en egen
+  städning.
+- Partnern söker och sparar sin bestående förståelse som förut.
+- Det mesta av det som visades i de borttagna rutorna finns kvar på andra platser:
+  - trådarna i Förbättringar;
+  - ägarens bord, både i Aquarium och i gruppen Behöver dig i listan bredvid;
+  - överlämningarna och kontorets arkiv i Kontoret;
+  - provärendet i Kundstart.
+- Undantaget är tidslinjen över sammanfogningar i repona, med tid, PR och beslutsid ur lokala origin/main, och
+  jämförelsen med förra besöket. Den fanns bara i Levererat och ändrat och visas inte längre någonstans i ytan.
+- Hem visar ingen lästid längre. Raden "Läst … Läs om" hörde till rutorna.
+- Partnerns vy över tjänst, modell och förbrukning (`/api/lage`) och listan över sparad förståelse (`/api/forstaelse`)
+  har ingen knapp i ytan längre. En sparad punkt öppnas från sin notis i tråden. När de oanvända vägarna städas bort
+  får läsfunktionerna inte tas bort utan vidare, eftersom sviten och utfärdarens beteendefall prövar dem.
+- En äldre besöksmarkör kan ligga kvar i webbläsaren. Den är ofarlig och läses inte längre.
+
+**Följer som egna ändringar.**
+- Överlämningar blir backlog: nortropic-repos-d7 gör om knappen och panelen tillsammans med sin backlog.
+- Att radera trådar för gott byggs av denna session som en egen ändring efter d7:s publicering. Den kräver ny kod i
+  servern och journalen och får ett eget beslut.
+
+**Samordning.**
+- Enligt planblocket för arbetsplatsen har nortropic-repos-04 skrivansvaret för `tools/partnern/`. 04 fick en notis
+  före ändringen och svarade att den inte hade något på väg i filerna.
+- nortropic-repos-d7 skriver samtidigt i partnerns övriga filer. Den har bekräftat vilka filer och ställen var och en
+  rör:
+  - i `index.html` och `app.js` rör d7 bara Överlämningar;
+  - i `PARTNER.md` ändrar denna ändring bara stycket om sidomenyn.
+- d7 publicerar efter denna ändring.
+
+**Granskning.** Den första separata granskningen (claude-opus-5) bedömde koden, proven och mätningarna som riktiga. Den
+underkände kandidaten för ett dokumentationsfel: `tools/PARTNER.md` räknade fortfarande upp sökningen i sidomenyn. Felet
+är rättat. Tre av granskarens noter är också åtgärdade:
+- posten säger nu vad som inte finns kvar;
+- listan över webbläsarens nycklar är fullständig;
+- den oanvända `sokOmkrets` är borttagen.
+
+**Ersätter:** ingen post helt. Posten ersätter delvis ARBETSPLATS-20260929 i fråga om Hems innehåll och Förbättringars
+sidomeny, och markeringen står sist i den posten.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main.
+
+**Avslut.** Ändringen är klar när den är integrerad och tjänsten har startats om ur main enligt driftregeln. Nästa
+bygge i detta spår är raderingen av trådar, med eget beslut.

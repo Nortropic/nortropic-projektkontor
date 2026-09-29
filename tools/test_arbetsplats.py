@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import tempfile
 import threading
@@ -263,6 +264,27 @@ class Hem(ArbetsplatsMiljo):
         kod, d = self.json('GET', '/api/arbetsplats/hem')
         self.assertEqual(d['kontoret']['verkstaden'], {'status': 'otillgänglig', 'pagar': None, 'vilar': None})
         self.assertIsNone(d['kontoret']['headline']['pagar'])
+
+    def test_hem_visar_bara_halsningen(self):  # HEM-RUTOR-20260929: ägaren tog bort alla rutor på Hem
+        ui = (tp.srv.UI / 'arbetsplats.js').read_text('utf-8')
+        hem = ui[ui.index('// ' + '-' * 66 + ' Hem'):ui.index('// ' + '-' * 66 + ' Kontoret')]
+        for borta in ('Fortsätt där du var', 'Kontoret just nu', 'Behöver dig', 'Sök i underlaget', 'Levererat och ändrat',
+                      'Läs om', 'api('):
+            self.assertFalse(borta in hem, 'kvar på Hem: ' + borta)  # "Behöver dig" är kvar som grupp i Kontorets lista
+        for borta in ('h-fortsatt', 'h-kontoret', 'h-behover', 'h-sok', 'h-andrat', 'hemsok', 'uppdateraHemKontor',
+                      'hem-rutnat', 'arbetsplats:besok', '/api/arbetsplats/hem'):
+            self.assertFalse(borta in ui, 'kvar i ytan: ' + borta)
+        self.assertIn("el('h1', { id: 'hem-rubrik', tabindex: '-1' }, halsning())", hem)
+        self.assertIn("r.okand ?", hem)  # en okänd adress säger fortfarande att du är på Hem
+
+    def test_forbattringars_meny_har_ny_trad_och_overlamningar(self):  # HEM-RUTOR-20260929: tre menyval bort
+        index = (tp.srv.UI / 'index.html').read_text('utf-8')
+        app = (tp.srv.UI / 'app.js').read_text('utf-8')
+        meny = index[index.index('<nav class="sidnav"'):index.index('</nav>', index.index('<nav class="sidnav"'))]
+        self.assertEqual(re.findall(r'<(?:button|form) id="(\w+)"', meny), ['nytrad', 'visaoverlamningar'])
+        for borta in ('sokformular', 'sokfalt', 'visaforstaelse', 'visalage'):
+            self.assertFalse(borta in index or borta in app, 'kvar: ' + borta)
+        self.assertIn('async function visaKalla(', app)  # källpanelen öppnas fortfarande från notiser och källor
 
     def test_andringar_bar_commitens_tid_och_beslutsid(self):
         repo = self.rot / 'kontor'
