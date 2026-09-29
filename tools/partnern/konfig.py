@@ -38,7 +38,6 @@ class Gransar:
     tur_max_steg: int = 40
     tur_max_listpris_usd: float = 8.0      # Claude Codes egen uppskattning (listpris), inte en faktura
     dygn_max_korningar: int = 150
-    dygn_max_listpris_usd: float = 250.0
     jobb_max_sekunder: int = 1800
     jobb_max_steg: int = 150
     bilaga_max_byte: int = 40_000_000

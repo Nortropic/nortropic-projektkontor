@@ -83,10 +83,13 @@ huvudmodell och ansträngning i ytan (`/model`); valbara är Opus 5.5, Fable 5.1
 `data/installningar.json` (`{"modell": {"huvud": "…", "anstrangning": "…"}}`).
 
 Verkställda gränser (samma fil, `gransar`): två samtidiga modellkörningar, 15 min och 40 verktygssteg per tur,
-30 min och 150 verktygssteg per bakgrundsutredning, 8 USD listprisvärde per körning (`--max-budget-usd`), 150
-körningar och 250 USD listprisvärde per dygn. Listprisvärdet
-är Claude Codes egen uppskattning, inte en faktura: förbrukningen är abonnemangets kvot. Varje tur journalför
-tokens, tid, omförsök och modell. Sparande, sökning och öppning av källor anropar aldrig en modell.
+30 min och 150 verktygssteg per bakgrundsutredning, 8 USD listprisvärde per körning (`--max-budget-usd`, en
+körväktare mot en enskild skenande tur) och 150 körningar per dygn. Dygnstaket räknas i antal körningar, inte i
+listprisvärde: vi har abonnemang, inget per-token-pris, så ett dygnstak i USD vore ett tak mot ingenting. Listpris-
+värdet (per tur och summerat per dygn i ytan) är bara Claude Codes egen uppskattning, inte en faktura, och spärrar
+inget; förbrukningen som faktiskt kan ta slut är abonnemangets egen kvot, vilket i så fall syns som ett vanligt
+"begränsat"-svar från körningen själv. Varje tur journalför tokens, tid, omförsök och modell. Sparande, sökning
+och öppning av källor anropar aldrig en modell.
 
 Claude Code sparar modellens egen sessionsfil under `~/.claude/projects/<arbetsyta>/`; den är en cache för
 trådens modellkontext. Partnerns journal är originalet: saknas sessionen startar en ny med trådens historik ur

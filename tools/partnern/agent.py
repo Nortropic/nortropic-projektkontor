@@ -163,15 +163,17 @@ class Agent:
                     tokens_in += int(h.get('tokens_in') or 0)
                     tokens_ut += int(h.get('tokens_ut') or 0)
         return {'dag': idag, 'korningar': antal, 'listpris_usd': round(pris, 4), 'tokens_in': tokens_in,
-                'tokens_ut': tokens_ut, 'max_korningar': self.k.gransar.dygn_max_korningar,
-                'max_listpris_usd': self.k.gransar.dygn_max_listpris_usd}
+                'tokens_ut': tokens_ut, 'max_korningar': self.k.gransar.dygn_max_korningar}
 
     def sparrad(self) -> str | None:
+        # listpris_usd redovisas i dygnsforbrukning() bara som information (Claude Codes egen
+        # listprisuppskattning för körda tokens); vi har abonnemang, ingen faktura, så den spärrar
+        # inte arbetet. Det som faktiskt kan ta slut är abonnemangets egen kvot, vilket Claude Code
+        # själv då svarar på i turen (jfr _avsluta(..., 'begransad', 'Modellkvoten eller en
+        # hastighetsgräns nåddes: ...')). Dygnstaket här är antalet körningar, inte deras listpris.
         f = self.dygnsforbrukning()
         if f['korningar'] >= f['max_korningar']:
             return 'Dagens gräns för modellkörningar (%d) är nådd.' % f['max_korningar']
-        if f['listpris_usd'] >= f['max_listpris_usd']:
-            return 'Dagens gräns för modellarbete (%.0f USD i listprisvärde) är nådd.' % f['max_listpris_usd']
         return None
 
     # ---------------------------------------------------------------- kontext

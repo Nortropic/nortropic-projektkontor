@@ -629,7 +629,7 @@ $('visalage').addEventListener('click', async () => {
     el('p', { text: d.beroende }),
     el('p', { text: 'Kod: ' + d.kodrevision.head + (d.kodrevision.ar_main ? ' (samma som kontorets main)' : ' (inte main: ' + d.kodrevision.gren + ')') + (d.kodrevision.lokala_andringar ? ', med lokala ändringar' : '') + ' · startad ' + tid(d.startad) }),
     el('p', { text: 'Modell: ' + d.modell.huvud + ' (' + d.modell.anstrangning + '), utredare ' + d.modell.utredare + '.' }),
-    el('p', { text: 'I dag: ' + f.korningar + ' av ' + f.max_korningar + ' modellkörningar · ' + Math.round(f.tokens_in / 1000) + 'k tokens in, ' + Math.round(f.tokens_ut / 1000) + 'k ut · listprisvärde ' + f.listpris_usd.toFixed(2) + ' USD av tak ' + f.max_listpris_usd + ' (inte en kostnad; abonnemangets kvot förbrukas).' }),
+    el('p', { text: 'I dag: ' + f.korningar + ' av ' + f.max_korningar + ' modellkörningar (dagens tak) · ' + Math.round(f.tokens_in / 1000) + 'k tokens in, ' + Math.round(f.tokens_ut / 1000) + 'k ut · listprisvärde ' + f.listpris_usd.toFixed(2) + ' USD, Claude Codes egen uppskattning (inte en kostnad; abonnemangets kvot förbrukas).' }),
     el('p', { text: 'Källtäckning: ' + d.tackning }),
     el('p', { text: 'Pågår nu: ' + (d.aktiva.length ? d.aktiva.map((a) => a.typ + ' ' + a.sekunder + ' s').join(', ') : 'inget') }),
     d.startvakt ? el('p', { text: 'Startvakten: ' + (d.startvakt.pa ? 'på' : 'av (bara den ordinarie tjänsten startar sessioner)') + ' · ' + d.startvakt.i_dag + ' av ' + d.startvakt.tak + ' nya starter i dag · utföraren ur ' + d.startvakt.utforare_ur + ' · ansträngning ' + d.startvakt.anstrangning + '.' }) : null,
