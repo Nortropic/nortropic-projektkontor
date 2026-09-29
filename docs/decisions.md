@@ -8090,7 +8090,25 @@ Johnnys svar, ordagrant: **"pausa den"**
 
 Runda 5 underkände, så arbetet stannade där.
 
-**Pausen upphävd 2026-09-29 ca 18:32Z.** Pausens enda skäl var veckokvoten, och det skälet är borta.
+**Pausat igen 2026-09-29 ca 20:0xZ, och nu av ett annat skäl.** Granskningsrunda 7 underkände. Frågan
+gick till ägaren genom hans egen session, ordagrant ställd så: "Min bedömning: pausa. Nyttan kommer först
+med den första riktiga kunden, och bygget har blivit krångligare än det är värt just nu. Låt ändå den
+pågående granskningen avgöra först. Den kostar ingen Claude-kvot och är klar om några minuter. — Godkänns
+den: sessionen lägger in bygget och levererar, och då är det klart. — Underkänns den: pausa tills en
+riktig kund är på väg. Vid omstarten kan en enklare lösning prövas, där kontrollen hellre körs en gång för
+mycket än exakt en gång. En extra körning skadar ingenting här. Svara "låt granskningen avgöra" eller
+"pausa nu"."
+
+Johnnys svar, ordagrant: **"låt granskningen avgöra"**
+
+Runda 7 underkände, så arbetet pausas tills en riktig kund är på väg. Fyra blockerare och en anmärkning
+står öppna och orättade i Runtimes `evidence/runs/runtime-veckodrift-7/GRANSKNING-r7-DOM-OATGARDAD.md`.
+Ingen integration är gjord. Granskaren drog själv slutsatsen att det inte finns någon generell lösning som
+både undviker omläsning och säkerställer utförande när utfallet saknar beständigt bevis — vilket pekar mot
+ägarens eget förslag, hellre en körning för mycket än exakt en gång. Det tar bort hela
+settle-then-commit-mekaniken och bör prövas före något annat vid omstarten.
+
+**Pausen dessförinnan, upphävd 2026-09-29 ca 18:32Z.** Pausens enda skäl var veckokvoten, och det skälet är borta.
 Johnny skrev i sin egen session, ordagrant: **"vi är inne på ett nytt konto så kvoten är 100 %"** och
 strax därefter **"rättelse, 0 % blir det ju."** Kvotprov på inloggningen omedelbart före återupptagningen:
 veckoandel saknades, fönstren `five_hour` 0,05 och `seven_day` 0,01. Arbetet återupptogs därför: runda 5:s
