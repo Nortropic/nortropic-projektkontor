@@ -205,12 +205,14 @@ Läge (29 september 2026, 12:28 UTC): uppdraget är fullgjort. Arbetsplatsen är
 driftsatt: tjänsten på 127.0.0.1:4760 kör main sedan 12:24:56Z. Den är prövad mot den verkliga tjänsten
 (ARBETSPLATS-RESULTAT-20260929). Nortropic öppnas med `python3 -B tools/partner.py oppna`.
 
-Tillägg 13:25 UTC (ARBETSPLATS-APP-20260929): `python3 -B tools/partner.py app` skapar Nortropic.app, en klickbar ingång
-som startar tjänsten om den inte kör och öppnar Nortropic inloggad. Den integreras med detta stycke; därefter skapar
-sessionen appen en gång i `~/Applications` och prövar ett klick.
+Tillägg (ARBETSPLATS-APP-20260929, PR 128): `python3 -B tools/partner.py app` skapar Nortropic.app, en klickbar ingång
+som startar tjänsten om den inte kör och öppnar Nortropic inloggad. Appen är skapad i `~/Applications` och prövad
+2026-09-29 13:34Z: ett klick startade den stoppade tjänsten ur main och öppnade Nortropic.
 
-Nästa handling: ingen i detta spår. Driftregeln är partnerns: tjänsten startas om ur main efter varje integration av
-`tools/partnern/`. Bestående start vid inloggning är partnerns befintliga rad i ÄGARENS TUR och gäller hela
+Nästa handling: ägaren har sagt ja till två förslag till (privat i `owner-words-forslag-20260929.md`): arbetsplatsens
+resor prövas också i WebKit, och Kundstart-delen får en lista över ärendenas metadata genom en ny intern läsväg i
+Kundstart. Den andra kräver en ändring i Kundstart-repot, samordnad med dess skrivare, och en egen beslutspost. Driftregeln
+är partnerns: tjänsten startas om ur main efter varje integration av `tools/partnern/`. Bestående start vid inloggning är partnerns befintliga rad i ÄGARENS TUR och gäller hela
 arbetsplatsen. Nästa bygge kräver ett eget beslut.
 
 Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md`. Arbetsgrenarna är publicerade eller
