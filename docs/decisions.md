@@ -7936,13 +7936,23 @@ möjlig; en väckning inne i perioden läser ingenting, skriver ingenting och l�
 `period_seconds` är varje körning förfallen, vilket är D038:s oförändrade beteende. Veckan är 604800
 sekunder; 3600–2678400 godtas.
 
-**Perioden är per kanal** (`period-<kanal>.json`), och det är det som gör att beställningens båda halvor
+**Perioden är per kanal** (`period-<kanal>.json`), och varje kanal levererar och stänger sin period i
+samma stund dess eget arbete är klart. Det är det som gör att beställningens båda halvor
 håller samtidigt. En kanal som fortsätter misslyckas görs om vid varje väckning, medan en kanal som redan
 gjort sin vecka står stängd hela veckan: ett trasigt intag kan alltså inte göra den veckovisa
 driftkontrollen timvis. En period stängs bara av den körning som gjorde just den kanalens arbete, med den
-körningens egen starttid, så arbete i en gammal period kan aldrig stänga en ny. En körning som avbröts
-efter att den stängt sin egen kanal känner igen sitt eget kvitto, läser ingenting igen, flyttar ingen
-sekvens och skriver bara klart sitt kvitto; det läget heter `already_performed`, inte `not_due`.
+körningens egen starttid, så arbete i en gammal period kan aldrig stänga en ny. Att stänga per kanal och
+inte i slutet av körningen är nödvändigt: monitorns bindningsfel kastas med avsikt vidare, och skulle
+annars hindra en redan utförd driftkontroll från att stänga sin vecka — ett bestående monitorfel hade då
+gjort veckokontrollen timvis. En kanal räknas som utförd bara om dess egen läsning faktiskt skedde: en
+hälsokontroll som aldrig nådde ändpunkten (`monitor_bound_exceeded`, `monitor_stranded_limit`) bär
+`observed: false` och lämnar sin period öppen, eftersom ingenting kontrollerades.
+
+En körning som avbröts efter att den stängt sin egen kanal känner igen sitt eget kvitto, läser ingenting
+igen, flyttar ingen sekvens och skriver bara klart sitt kvitto; det läget heter `already_performed`, inte
+`not_due`. Den kan inte se outfallet om igen, så den läser tillbaka kanalernas egna beständiga
+hälsolägen och märker svaret `attested_by: persisted_channel_state`: en avbruten incidentkörning förblir
+`completed: false`, och ett oläsbart hälsoläge läses aldrig som grönt.
 
 **Vad kvittot betyder.** `performed` och `completed` är åtskilda. Exit 1 ur driftkontrollen är en
 kontroll som kördes och fann en incident, inte en trasig mekanism: den är `performed` men inte
@@ -8002,6 +8012,14 @@ nu i egen daemontråd och kanalen återvänder när join:en löper ut; det ÄR t
 tråden, eftersom en felkonfigurerad monitor ska vägras högt och inte rapporteras som slut på tiden —
 den regressionen fälldes av D038:s eget prov.
 
+Runda 4: fyra fel till, alla mina. Trådtaket gällde inte alls mellan Runtime-aktiviteter — Runtime laddar
+hanteraren på nytt varje gång, så ett register i modultillståndet nollställdes vid varje väckning medan
+tidigare trådar levde; registret är nu förankrat i tolken, och ett prov laddar modulen på nytt tre gånger
+precis som Runtime gör. Ett bestående monitorfel kunde fortfarande göra veckokontrollen timvis, och en
+monitor som aldrig nådde ändpunkten stängde ändå sin period: båda lösta av stängningen per kanal ovan.
+Och återupptagning svarade ovillkorligt `completed: true`, vilket kunde redovisa en avbruten
+incidentkörning som ett grönt resultat.
+
 Runda 3: min rättning av dubbelarbetet var sämre än felet. En beständig kanalcache per körning lät ett
 resultat ur en period stänga en senare med den senare körningens klocka, alltså dölja precis den missade
 vecka beställningen förbjuder, samtidigt som nästa väckning inte kunde använda den. Cachen är
@@ -8010,17 +8028,19 @@ join:en binder kanalen men inte uttaget, så övergivet nätarbete kunde samlas 
 och en sent frigjord transport kunde starta ett andra försök efter att kanalen redan svarat. Övergivna
 trådar får nu en stoppflagga och är högst två; därutöver vägrar kanalen direkt.
 
-**Prov.** Hanterarens svit är 42 prov, mot 10 på oförändrad main, på Digitalas verkliga frysta
+**Prov.** Hanterarens svit är 61 prov, mot 10 på oförändrad main, på Digitalas verkliga frysta
 `drift_kontroll.py`-byte mot en loopback-provsajt: ren körning, saknad förväntad text, trasig sitemap,
 incident och återhämtning med oberoende privata kvitton, exitkod mot kvitto, verktygets egen räkning mot
 kvittot, omkörning inom samma sekund, kvitto utanför kundmappen, timeout/vägran/fel som skilda utfall,
 ändrade plan- eller verktygsbyte, monitorns väggklocka mot en droppande server, och periodens
 förfallologik inklusive framtida och överflödande kvitto, en annan körnings kvitto, fördärvat tillstånd,
 en körning avbruten efter att den stängt sin egen period, en kanal som fortsätter misslyckas utan att dra
-med sig en som gjort sin vecka, monitorns väggklocka mot en droppande statusrad, och de övergivna
-trådarnas tak. Kontorets helsvit är 541 prov OK i tre körningar efter varandra, mätt mot 509 prov OK i
-tre körningar på oförändrad main `34bcedd` med samma maskin och tolk; alla sex kvitton i Runtimes
-`evidence/runs/runtime-veckodrift-4/`, där också kvalificeringen mot den verkliga motorn ligger.
+med sig en som gjort sin vecka, ett bestående monitorfel som inte får göra veckan timvis, en monitor som
+aldrig nådde ändpunkten, en avbruten incidentkörning som inte får bli grön, monitorns väggklocka mot en
+droppande statusrad, och de övergivna trådarnas tak över modulomladdningar. Kontorets helsvit är 560 prov
+OK i tre körningar efter varandra, mätt mot 509 prov OK i tre körningar på oförändrad main `34bcedd` med
+samma maskin och tolk; alla sex kvitton i Runtimes `evidence/runs/runtime-veckodrift-5/`, där också
+kvalificeringen mot den verkliga motorn ligger.
 Provsajten och signalytan är loopback-provdata, aldrig en kundadress och aldrig Kundstarts produktion
 eller dess lokala provtjänst.
 

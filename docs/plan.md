@@ -8,19 +8,23 @@ ersätter inget annat block nedan; de ersätter inte detta.
 Kontorets del är byggd på grenen `veckodrift/kontor-20260929`: `tools/driftoperation.py` får en tredje
 kanal `drift`, som startar Digitalas frysta `verktyg/drift_kontroll.py` och skriver kontrollens
 `DRIFT-<tid>.json` i kundens egen mapp — samma fil `underhall.py besked` läser — plus en periodbunden
-körning, med en egen period per kanal. Kontorets helsvit är 541 prov OK i tre körningar mot 509 OK i tre
-på oförändrad main `34bcedd`; hanterarens egen provfil går från 10 till 42 prov. Runtimes del ligger på
+körning, med en egen period per kanal som varje kanal stänger när dess eget arbete är klart. Kontorets
+helsvit är 560 prov OK i tre körningar mot 509 OK i tre på oförändrad main `34bcedd`; hanterarens egen
+provfil går från 10 till 61 prov. Runtimes del ligger på
 `veckodrift/digitala-20260929` med D040, en ny `--operations`-bindning i `scripts/install_ap10.py` och
-kvalificeringen i Runtimes `evidence/runs/runtime-veckodrift-4/`: tre verkliga schemalagda väckningar på
+kvalificeringen i Runtimes `evidence/runs/runtime-veckodrift-5/`: tre verkliga schemalagda väckningar på
 den befintliga motorn, en ren kontroll, en väckning inne i perioden som inte gjorde ett enda anrop, och en
 förfallen period som utfördes som incident med kundkvitto och en privat kvittens — där bara driftkanalens
 kvitto flyttats bakåt, så intaget stod kvar inne i sin egen period.
 
-Tre granskningsrundor underkände kandidaterna. Runda 1 fällde fem blockerare. Runda 2 visade att
+Fyra granskningsrundor underkände kandidaterna. Runda 1 fällde fem blockerare. Runda 2 visade att
 monitorns nya gräns inte täckte statusrad och headers. Runda 3 visade att min rättning av dubbelarbetet
 var sämre än felet: en beständig kanalcache kunde stänga en ny period med gammalt arbete, alltså dölja en
-missad vecka, och den är tillbakadragen och ersatt av en period per kanal. Alla tre domarna ordagrant i
-`evidence/runs/runtime-veckodrift-4/` i Runtime.
+missad vecka, och den är tillbakadragen och ersatt av en period per kanal. Runda 4 fällde fyra fel till:
+trådtaket gällde inte mellan Runtime-aktiviteter, ett bestående monitorfel kunde göra veckan timvis, en
+monitor som aldrig nådde ändpunkten stängde ändå sin period, och återupptagning kunde redovisa en
+avbruten incidentkörning som grön. Alla fyra domarna ordagrant i
+`evidence/runs/runtime-veckodrift-5/` i Runtime.
 
 Väckningen är inte perioden: en körning som missats för att Macen sov står kvar som förfallen och utförs av
 den första väckning som blir möjlig, ur kontorets eget beständiga periodkvitto och inte ur Temporals

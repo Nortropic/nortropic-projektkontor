@@ -1,8 +1,10 @@
 """Real loopback HTTP and crash-boundary checks, no external provider claims."""
 import copy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import importlib.util
 import json
 from pathlib import Path
+import uuid
 import socket
 import tempfile
 import sys
@@ -162,8 +164,10 @@ class OperationTests(unittest.TestCase):
 if __name__ == '__main__': unittest.main()
 
 
-class WeeklyDriftTests(unittest.TestCase):
-    """The drift channel on Digitala's real drift_kontroll.py bytes, and dueness.
+class DriftFixture:
+    """Shared fixture only; not collected, so no test is counted twice.
+
+    The drift channel on Digitala's real drift_kontroll.py bytes, and dueness.
 
     The site is a loopback fixture, never a customer's real address. The checked
     tool is the actual frozen file from Digitala, so a passing check here is a pass
@@ -223,6 +227,36 @@ class WeeklyDriftTests(unittest.TestCase):
     def events(self):
         return [json.loads(p.read_text())['event']
                 for p in sorted((self.state / 'inbox').glob('*.json'))]
+
+    def week(self, **change):
+        self.config['period_seconds'] = 604800
+        self.config.update(change)
+
+    def intake_fixture(self):
+        """A frozen consumer that succeeds, so intake can be a second real channel."""
+        root = self.home / 'digitala-intake'; (root / 'verktyg').mkdir(parents=True)
+        script = root / 'verktyg/kundstart.py'
+        script.write_text("print('fixture consumer completed')\n")
+        customer = self.home / 'intake-kund'; customer.mkdir(exist_ok=True)
+        interpreter = Path(sys.executable).resolve()
+        self.config['intake'] = {
+            'digitala_root': str(root),
+            'digitala_files': {'verktyg/kundstart.py': operation.digest(script.read_bytes())},
+            'python_path': str(interpreter),
+            'python_sha256': operation.digest(interpreter.read_bytes()),
+            'base_url': self.address, 'key_file': str(self.home / 'private-key'),
+            'customer': str(customer), 'executor': 'isolated-fixture'}
+        return script
+
+    def set_period(self, channel, ago_seconds, sequence=1, run_id='tidigare-korning'):
+        from datetime import datetime, timedelta, timezone
+        stamp = (datetime.now(timezone.utc) - timedelta(seconds=ago_seconds)).isoformat()
+        self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
+        (self.state / ('period-%s.json' % channel)).write_text(
+            json.dumps({'completed_at': stamp, 'sequence': sequence, 'run_id': run_id}) + '\n')
+
+    def period_state(self, channel):
+        return json.loads((self.state / ('period-%s.json' % channel)).read_text())
 
     def test_clean_run_incident_and_recovery_land_in_the_customer_path(self):
         clean = operation.run(self.config, 'clean')
@@ -392,37 +426,8 @@ class WeeklyDriftTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             operation.run({'schema': 'office-drift/1', 'state': str(self.state)}, 'empty')
 
-    # --- dueness: per channel, a missed period performed and never skipped ---
-
-    def week(self, **change):
-        self.config['period_seconds'] = 604800
-        self.config.update(change)
-
-    def intake_fixture(self):
-        """A frozen consumer that succeeds, so intake can be a second real channel."""
-        root = self.home / 'digitala-intake'; (root / 'verktyg').mkdir(parents=True)
-        script = root / 'verktyg/kundstart.py'
-        script.write_text("print('fixture consumer completed')\n")
-        customer = self.home / 'intake-kund'; customer.mkdir(exist_ok=True)
-        interpreter = Path(sys.executable).resolve()
-        self.config['intake'] = {
-            'digitala_root': str(root),
-            'digitala_files': {'verktyg/kundstart.py': operation.digest(script.read_bytes())},
-            'python_path': str(interpreter),
-            'python_sha256': operation.digest(interpreter.read_bytes()),
-            'base_url': self.address, 'key_file': str(self.home / 'private-key'),
-            'customer': str(customer), 'executor': 'isolated-fixture'}
-        return script
-
-    def set_period(self, channel, ago_seconds, sequence=1, run_id='tidigare-korning'):
-        from datetime import datetime, timedelta, timezone
-        stamp = (datetime.now(timezone.utc) - timedelta(seconds=ago_seconds)).isoformat()
-        self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
-        (self.state / ('period-%s.json' % channel)).write_text(
-            json.dumps({'completed_at': stamp, 'sequence': sequence, 'run_id': run_id}) + '\n')
-
-    def period_state(self, channel):
-        return json.loads((self.state / ('period-%s.json' % channel)).read_text())
+class WeeklyDriftTests(DriftFixture, unittest.TestCase):
+    """Dueness per channel: a missed period performed, never skipped."""
 
     def test_first_run_is_due_and_a_wakeup_inside_the_period_reads_nothing(self):
         self.week()
@@ -625,7 +630,7 @@ class WeeklyDriftTests(unittest.TestCase):
             self.assertEqual(result['periods'], {})
             self.assertEqual(result['skipped_channels'], [])
             self.assertEqual(result['performed_channels'], ['drift'])
-            self.assertNotIn('periods_recorded', result)
+            self.assertEqual(result['periods_recorded'], {}, 'nothing to record without a period')
 
 
 class MonitorWallClockTests(unittest.TestCase):
@@ -790,3 +795,158 @@ class MonitorStrandedThreadTests(unittest.TestCase):
         self.release()
         self.assertEqual(operation.stranded_monitors(), 0)
         self.assertEqual(operation.MONITOR_BOUND, operation.MONITOR_DEADLINE)
+
+
+class ChannelSettlementTests(DriftFixture, unittest.TestCase):
+    """Each channel closes its own period as its own work finishes.
+
+    Otherwise a later channel's failure - including a monitor binding error, which is
+    raised on purpose - would stop a check that already ran from closing its week, and
+    a standing fault would turn the weekly drift check into an hourly one.
+    """
+
+    def broken_monitor(self):
+        self.config['monitor'] = {'url': 'https://kund.example/api/health',
+                                  'candidate': 'a' * 40,
+                                  'bypass_file': str(self.home / 'saknas.secret')}
+
+    def test_a_standing_monitor_fault_does_not_make_the_drift_week_hourly(self):
+        self.week()
+        self.broken_monitor()
+        with self.assertRaises(ValueError):
+            operation.run(self.config, 'monitor-trasig')
+        # The drift check ran before the monitor was reached, so its week is closed.
+        self.assertEqual(self.period_state('drift')['run_id'], 'monitor-trasig')
+        self.assertEqual(len(self.receipts()), 1)
+        calls = self.calls
+        with self.assertRaises(ValueError):
+            operation.run(self.config, 'monitor-trasig-igen')
+        self.assertEqual(self.calls, calls, 'the site is not read again inside the week')
+        self.assertEqual(self.period_state('drift')['run_id'], 'monitor-trasig')
+        self.assertFalse((self.state / 'period-monitor.json').exists(),
+                         'the monitor still owes its own check')
+
+    def test_a_monitor_that_never_reached_the_endpoint_does_not_close_its_period(self):
+        # monitor_bound_exceeded and monitor_stranded_limit mean nothing was checked at
+        # all. That is not an unhealthy endpoint, and the check is still owed.
+        self.week()
+        for reason in ('monitor_bound_exceeded', 'monitor_stranded_limit'):
+            for path in self.state.glob('period-*.json'):
+                path.unlink()
+            self.config['monitor'] = {'url': 'https://kund.example/api/health',
+                                      'candidate': 'a' * 40}
+            with patch.object(operation, 'monitor',
+                              return_value={'healthy': False, 'observed': False,
+                                            'reason': reason, 'attempts': [],
+                                            'observed_at': operation.now(),
+                                            'candidate': 'a' * 40}):
+                result = operation.run(self.config, 'omatt-' + reason.replace('_', '-'))
+            self.assertEqual(result['performed_channels'], ['drift'])
+            self.assertNotIn('monitor', result['periods_recorded'])
+            self.assertFalse((self.state / 'period-monitor.json').exists())
+            self.assertFalse(result['completed'])
+
+    def test_a_monitor_that_did_reach_the_endpoint_closes_its_period(self):
+        self.week()
+        self.config['monitor'] = {'url': 'https://kund.example/api/health', 'candidate': 'a' * 40}
+        with patch.object(operation, 'monitor',
+                          return_value={'healthy': True, 'observed': True, 'reason': 'verified',
+                                        'attempts': [], 'observed_at': operation.now(),
+                                        'candidate': 'a' * 40}):
+            result = operation.run(self.config, 'monitor-ok')
+        self.assertEqual(result['performed_channels'], ['drift', 'monitor'])
+        self.assertEqual(self.period_state('monitor')['run_id'], 'monitor-ok')
+        self.assertTrue(result['completed'])
+
+    def test_an_interrupted_incident_run_does_not_resume_as_a_green_result(self):
+        # The receipt was lost after the period closed. This run cannot re-observe the
+        # outcome, so it reads the channel's own durable health instead of claiming one.
+        self.week()
+        self.site_status = 503
+        first = operation.run(self.config, 'incident-avbruten')
+        self.assertFalse(first['completed'])
+        self.assertFalse(first['drift']['healthy'])
+        (self.state / 'incident-avbruten/result.json').unlink()
+        resumed = operation.run(self.config, 'incident-avbruten')
+        self.assertEqual(resumed['skipped'], 'already_performed')
+        self.assertEqual(resumed['attested_by'], 'persisted_channel_state')
+        self.assertEqual(resumed['persisted_health'], {'drift': False})
+        self.assertFalse(resumed['completed'],
+                         'an interrupted incident run must not report a green business result')
+
+    def test_an_interrupted_clean_run_resumes_as_the_clean_result_it_was(self):
+        self.week()
+        operation.run(self.config, 'ren-avbruten')
+        (self.state / 'ren-avbruten/result.json').unlink()
+        resumed = operation.run(self.config, 'ren-avbruten')
+        self.assertEqual(resumed['skipped'], 'already_performed')
+        self.assertEqual(resumed['persisted_health'], {'drift': True})
+        self.assertTrue(resumed['completed'])
+
+    def test_unreadable_channel_health_is_not_read_as_green(self):
+        self.week()
+        operation.run(self.config, 'trasigt-lage')
+        (self.state / 'drift.json').write_text('{ inte json')
+        (self.state / 'trasigt-lage/result.json').unlink()
+        resumed = operation.run(self.config, 'trasigt-lage')
+        self.assertEqual(resumed['persisted_health'], {'drift': False})
+        self.assertFalse(resumed['completed'])
+
+
+class StrandedRegistryAcrossReloadsTests(unittest.TestCase):
+    """The cap must hold across the module reload Runtime does for every activity.
+
+    Runtime loads the handler afresh per activity, so a registry kept in module state
+    would reset the cap each wakeup while earlier threads were still alive.
+    """
+
+    def setUp(self):
+        self.addCleanup(self.release)
+        self.blocked = threading.Event()
+        self.opens = []
+        owner = self
+
+        class Frozen(urllib.request.HTTPHandler):
+            def http_open(self, request):
+                owner.opens.append(request.full_url)
+                owner.blocked.wait(30)
+                raise urllib.error.URLError('transport released')
+
+        self.opener = urllib.request.build_opener(Frozen())
+        self.config = {'url': 'http://127.0.0.1:9/health', 'candidate': 'a' * 40,
+                       'isolated_test': True}
+        if hasattr(sys, operation._STRANDED):
+            delattr(sys, operation._STRANDED)
+
+    def release(self):
+        self.blocked.set()
+        for _ in range(60):
+            if not operation.stranded_monitors():
+                break
+            time.sleep(0.1)
+        if hasattr(sys, operation._STRANDED):
+            delattr(sys, operation._STRANDED)
+
+    def reload(self):
+        """Exactly what Runtime's activity does: load the handler file afresh."""
+        spec = importlib.util.spec_from_file_location(
+            'reloaded_driftoperation_' + uuid.uuid4().hex, Path(operation.__file__).resolve())
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_the_cap_holds_across_reloads(self):
+        modules = [self.reload() for _ in range(3)]
+        answers = []
+        for module in modules:
+            with patch.object(module, 'MONITOR_DEADLINE', 1), \
+                 patch.object(urllib.request, 'build_opener', return_value=self.opener):
+                answers.append(module.monitor(self.config))
+        self.assertEqual([a['reason'] for a in answers],
+                         ['monitor_bound_exceeded', 'monitor_bound_exceeded',
+                          'monitor_stranded_limit'])
+        self.assertEqual(len(self.opens), 2, 'the third reload starts no network work')
+        self.assertEqual(modules[0].stranded_monitors(), 2)
+        self.assertEqual(modules[2].stranded_monitors(), 2, 'every reload sees the same registry')
+        for answer in answers:
+            self.assertFalse(answer['observed'], 'no health answer was obtained')

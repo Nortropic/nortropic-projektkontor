@@ -20,6 +20,7 @@ from pathlib import Path
 import re
 import stat
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -48,15 +49,29 @@ MONITOR_BOUND = MONITOR_DEADLINE
 # after the channel has already reported its timeout, and only this many may be alive
 # at once - beyond that the channel refuses immediately rather than adding another.
 MONITOR_STRANDED_LIMIT = 2
-_monitor_stranded = []
-_monitor_lock = threading.Lock()
+# Runtime loads this module afresh for every activity, so module-level state does NOT
+# survive between wakeups - a registry kept here would reset the cap each time while
+# earlier threads were still alive. The threads accumulate in the interpreter, so the
+# registry is anchored there instead, under one explicit name.
+_STRANDED = 'nortropic_office_drift_stranded_monitors'
 
 
-def stranded_monitors():
+def _stranded_registry():
+    registry = getattr(sys, _STRANDED, None)
+    if registry is None:
+        registry = ([], threading.Lock())
+        setattr(sys, _STRANDED, registry)
+    return registry
+
+
+def stranded_monitors(add=None):
     """How many abandoned health threads are still alive; pruned as they finish."""
-    with _monitor_lock:
-        _monitor_stranded[:] = [thread for thread in _monitor_stranded if thread.is_alive()]
-        return len(_monitor_stranded)
+    threads, lock = _stranded_registry()
+    with lock:
+        if add is not None:
+            threads.append(add)
+        threads[:] = [thread for thread in threads if thread.is_alive()]
+        return len(threads)
 TERMINATION_BOUND = 6                            # SIGTERM wait then SIGKILL wait
 BOUND_SECONDS = INTAKE_BOUND + DRIFT_BOUND + 2 * TERMINATION_BOUND + MONITOR_BOUND
 
@@ -120,7 +135,11 @@ def monitor(config):
     headers = monitor_binding(config)
     abandoned = stranded_monitors()
     def exceeded(reason):
-        return {'healthy': False, 'reason': reason, 'stranded_threads': stranded_monitors(),
+        # `observed` False says no health answer was obtained at all. That is NOT the
+        # same as an unhealthy endpoint, and it must not close the channel's period:
+        # nothing was checked, so the check is still owed.
+        return {'healthy': False, 'observed': False, 'reason': reason,
+                'stranded_threads': stranded_monitors(),
                 'attempts': [{'error': reason, 'healthy': False}],
                 'observed_at': now(), 'candidate': config['candidate']}
     if abandoned >= MONITOR_STRANDED_LIMIT:
@@ -137,12 +156,13 @@ def monitor(config):
     thread.join(MONITOR_DEADLINE)
     if failure:
         raise failure[0]
+    if not (thread.is_alive() or not answer):
+        answer['observed'] = True
     if thread.is_alive() or not answer:
         # Told to stop, so it cannot start a further attempt after this answer; it holds
         # no lock, is never waited on again, and is counted until it ends by itself.
         stop.set()
-        with _monitor_lock:
-            _monitor_stranded.append(thread)
+        stranded_monitors(add=thread)
         return exceeded('monitor_bound_exceeded')
     return answer
 
@@ -568,11 +588,29 @@ def run(config, run_id):
             observed = now()
             resumed = bool(periods) and all(
                 periods[channel]['reason'] == 'own_period_record' for channel in skipped)
-            answer = {'run_id': run_id, 'config_sha256': config_sha256, 'completed': True,
+            answer = {'run_id': run_id, 'config_sha256': config_sha256,
                       'performed': False, 'performed_channels': [],
                       'skipped': 'already_performed' if resumed else 'not_due',
                       'skipped_channels': skipped, 'periods': periods,
                       'started_at': observed, 'finished_at': observed}
+            if resumed:
+                # This run did the work and then lost its receipt. It must not simply
+                # claim success: the outcome it cannot re-observe is read back from the
+                # channels' own durable health, so an interrupted incident run stays
+                # `completed: false` instead of reporting a green business result.
+                health = {}
+                for channel in skipped:
+                    state_file = regular(home / (channel + '.json'))
+                    try:
+                        health[channel] = (load_state(state_file)['healthy']
+                                           if state_file.exists() else True)
+                    except (StateError, KeyError, TypeError):
+                        health[channel] = False
+                answer['persisted_health'] = health
+                answer['attested_by'] = 'persisted_channel_state'
+                answer['completed'] = all(health.values())
+            else:
+                answer['completed'] = True
             if output.exists():
                 write(result_file, answer)
             return answer
@@ -584,7 +622,8 @@ def run(config, run_id):
         else:
             write(binding_file, {'config_sha256': config_sha256})
         result = {'run_id': run_id, 'config_sha256': config_sha256, 'started_at': now(),
-                  'completed': True, 'periods': periods, 'skipped_channels': skipped}
+                  'completed': True, 'periods': periods, 'skipped_channels': skipped,
+                  'deliveries': {}, 'performed_channels': [], 'periods_recorded': {}}
 
         def bounded(channel, produce, failure=None):
             """One channel's own reading. With `failure` its errors are named so they
@@ -602,23 +641,44 @@ def run(config, run_id):
                 # Store only the error class, never credentials or tool output.
                 return {**failure, 'error_type': type(error).__name__}
 
+        def settle(channel, healthy, reason, performed):
+            """Deliver this channel's transition and close its period at once.
+
+            Closing here and not at the end is what keeps a later channel's failure -
+            including a monitor binding error, which is raised on purpose - from
+            preventing a check that already ran from closing its own week. Otherwise a
+            standing monitor fault would turn the weekly drift check into an hourly one.
+            """
+            delivery = transition(home, channel, observation(healthy, reason, result[channel]))
+            result['deliveries'][channel] = delivery
+            if not healthy:
+                result['completed'] = False
+            if delivery['state_error']:
+                result['completed'] = False
+                return
+            if not performed:
+                result['completed'] = False
+                return
+            result['performed_channels'].append(channel)
+            if not periods:
+                return
+            try:
+                result['periods_recorded'][channel] = record_period(
+                    home, channel, periods[channel], result['started_at'], run_id)
+            except StateError as error:
+                result['periods_recorded'][channel] = {'error_code': str(error)}
+                result['completed'] = False
+
         if 'intake' in wanted:
             result['intake'] = bounded('intake', lambda work: consume(config['intake'], work),
                                        {'completed': False, 'reason': 'consumer_failed'})
-            result['completed'] = result['intake']['completed']
+            done = result['intake']['completed']
+            settle('intake', done, 'verified' if done else 'consumer_failed', done)
         if 'drift' in wanted:
             result['drift'] = bounded('drift', lambda work: drift(config['drift'], work),
                                       {'ran': False, 'reason': 'drift_binding_failed'})
-            result['completed'] = result['completed'] and result['drift'].get('healthy') is True
-        result['deliveries'] = {}
-        if 'intake' in result:
-            intake = result['intake']
-            result['deliveries']['intake'] = transition(home, 'intake', observation(
-                intake['completed'], 'verified' if intake['completed'] else 'consumer_failed', intake))
-        if 'drift' in result:
             check = result['drift']
-            result['deliveries']['drift'] = transition(home, 'drift', observation(
-                check.get('healthy') is True, check['reason'], check))
+            settle('drift', check.get('healthy') is True, check['reason'], check['ran'])
         if 'monitor' in wanted:
             def probe(_work):
                 observed = monitor(config['monitor'])
@@ -626,38 +686,18 @@ def run(config, run_id):
                                             if config['monitor'].get('bypass_file')
                                             else 'ordinary_endpoint')
                 return observed
-            current = bounded('monitor', probe)
-            result['monitor'] = current
-            result['deliveries']['monitor'] = transition(home, 'monitor', observation(
-                current['healthy'], current['reason'], current))
-            result['completed'] = result['completed'] and current['healthy']
-        state_error = any(item['state_error'] for item in result['deliveries'].values())
-        result['completed'] = result['completed'] and not state_error
+            # Deliberately last: its binding error is raised, and by now every other
+            # channel has already delivered and closed its own period.
+            result['monitor'] = bounded('monitor', probe)
+            current = result['monitor']
+            # `observed` False means no health answer was obtained at all - a bound that
+            # ran out or a stranded-thread refusal. Nothing was checked, so the check is
+            # still owed and the period stays open.
+            settle('monitor', current['healthy'], current['reason'], current.get('observed') is True)
 
-        # `performed` per channel is the honest answer to "did this channel's reading
-        # actually run in this period". `completed` additionally requires that nothing
-        # it read was unhealthy, so an incident found by a check that ran is performed
-        # but not completed. A channel whose period was already closed is not performed
-        # here and its record is left exactly as the run that did the work wrote it.
-        done = {'intake': lambda: result['intake']['completed'],
-                'drift': lambda: result['drift']['ran'],
-                'monitor': lambda: 'monitor' in result}
-        result['performed_channels'] = sorted(
-            channel for channel in wanted
-            if done[channel]() and not (result['deliveries'].get(channel) or {}).get('state_error'))
-        result['performed'] = bool(result['performed_channels']) and not state_error
-        if periods:
-            result['periods_recorded'] = {}
-            for channel in result['performed_channels']:
-                if periods[channel]['reason'] == 'own_period_record':
-                    continue
-                try:
-                    result['periods_recorded'][channel] = record_period(
-                        home, channel, periods[channel], result['started_at'], run_id)
-                except StateError as error:
-                    result['periods_recorded'][channel] = {'error_code': str(error)}
-                    result['completed'] = False
-            if any(value['reason'] == 'invalid_period_state' for value in periods.values()):
-                result['completed'] = False
+        result['performed_channels'].sort()
+        result['performed'] = bool(result['performed_channels'])
+        if periods and any(value['reason'] == 'invalid_period_state' for value in periods.values()):
+            result['completed'] = False
         result['finished_at'] = now(); write(result_file, result)
         return result
