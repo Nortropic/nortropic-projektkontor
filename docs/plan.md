@@ -30,8 +30,8 @@ integration; dess faktiska kvitto bevaras i samma arbetslogg under integration-o
 Runtime main/aktiv är oförändrad `af783126`, aktiv config `ec6ecbd9` med fryst Office
 `df5ed5dc`. Kontorets dokument-main ska inte förväxlas med aktiv Office-kod. Inget
 nytt guardbyte, utfärdarinförande eller Runtime-aktivering hör till rättningen.
-Orelaterad restlista består: Cal/Stripe/Tally/CRM saknar teståtkomst; Kundstarts
-redovisade skyddsbegränsning och förbättringspartnern har egna spår, inga nya förkrav.
+Orelaterad restlista består: Cal/Stripe/Tally/CRM saknar teståtkomst; förbättringspartnern har
+eget spår, inga nya förkrav. Kundstarts skyddsbegränsning är passerad (KUNDSTART-DIALOG-20260928).
 
 Arbetsgrenar `kreativ/arbetskedja-20260928`, `kreativ/arbetskedja-integration-20260928`
 och `kreativ/arbetskedja-slut-20260928` är bevarade i verifierad privat Git-bundle
@@ -101,6 +101,34 @@ kandidat 1:s mellanversioner finns i en privat bundle i uppdragets mapp.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
+
+---
+
+# Parallellt gällande — Kundstart-dialogen (KUNDSTART-DIALOG-20260928)
+
+Parallellt uppdrag med eget skrivansvar. Blocken ovanför ersätter inte detta block, och detta ersätter inte dem.
+Skrivansvar: sessionen nortropic-repos-f1 (Claude Code) för Kundstart-repot, Digitalas `verktyg/kundstart.py` med
+dess prov, Kundstart-delarna av `verktyg/overfor_steg.py` och `kunskap/kundintervju.md`, detta block och postens beslut.
+
+Läge när blocket skrevs (29 september 2026, 08:37 svensk tid / 06:37 UTC): uppdraget är levererat. Kundstarts main
+`6f078cf` (PR 2) är skyddad: ändringar går via PR, och kontrollen `kontroll` måste vara grön. Produktionen kör
+main sedan 2026-09-29 06:28 UTC. Kundvyn har fått en samtalstjänsts form enligt ägarens besked 2026-09-29. Adressen nås
+utan Vercel-inloggning, och ett ärende öppnas bara med sin personliga länk. Digitalas main `c2144be` (PR 17) tar emot kundens tillval, domänkontroll och
+citerade uppgifter, och briefen kräver svar på kundens tillval. Kundstarts skyddsbegränsning (403- och planhindret),
+som daterade avsnitt längre ned nämner, är passerad sedan repona blev publika 2026-09-28.
+
+Nästa handling: ingen i detta spår; nästa bygge kräver ett eget beslut. Ägarens punkter står i posten: Claude på
+servern kräver en API-nyckel, en verklig kundinbjudan kräver ett kunduppdrag, bevarandetiden är obeslutad och
+automatisk import kräver Runtime-mandat.
+
+Arbetsgrenar: Kundstarts `dialog/uppdrag-20260928` är sammanfogad i PR 1 och `vy/samtalsvy-20260929` i PR 2.
+Digitalas `kundstart/dialog-tillval-20260928` är publicerad, och dess innehåll är integrerat i PR 17. Kontorets gren
+publiceras med denna ändring. De lokala arbetsytorna tas bort efter publiceringen. Undantaget är ägarens lokala
+provserver (127.0.0.1:3131, kod `12f1684` i testläget claude-cli). Den står kvar tills ägaren är klar med sitt prov;
+koden finns i mains historik genom PR 1.
+
+Återupptagning: `evidence/nasta-uppdrag/local/kundstart-dialog-20260928/LAGE.md` (tidsstämplade rader) och
+arbetsordern bredvid.
 
 ---
 

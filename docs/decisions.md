@@ -6891,3 +6891,217 @@ Bara spara utan modellkörning, trådlistan, panelen och att inga skriptfel upps
 **Införande.** Ändringen integreras genom den ordinarie skyddade vägen efter separat granskning, och tjänsten startas
 sedan om ur main enligt driftregeln. Standardläget efter omstart är Opus 5.5 med high tills ägaren väljer annat.
 Planen äger nästa handling.
+
+
+## KUNDSTART-DIALOG-20260928 — ägarens arbetsorder om Kundstarts AI-dialog, uppdragsöversikt och tillval registrerad och levererad: en intervjuagent, "Ditt uppdrag" och integrationstillval i produktion, tillvalen följer med till Digitalas research och brief, och kundvyn har fått en samtalstjänsts form
+
+**Status:** registrerat 2026-09-29 (06:37 UTC) av sessionen nortropic-repos-f1 (Claude Code). Sessionen utförde
+arbetsordern 2026-09-28 mellan 16:54 och 21:00 UTC och slutförde 2026-09-29 Digitala-delens integration och kundvyns
+nya form. Arbetet gick parallellt med Digitalas spår (Codex) och förbättringspartnern (sessionen nortropic-repos-9e),
+utan överlappande skrivningar.
+Ägarens följebrev, arbetsordern och ägarens besked under arbetet sparades ordagrant i
+`evidence/nasta-uppdrag/local/kundstart-dialog-20260928/` (ARBETSORDER-ORIGINAL.md, sha256 f36c030c…, och
+owner-words-20260928.md). Arbetsordern anger själv bara ett citat som ordagrant ägaruttalande: "Jag vill att alla
+integrationer ska vara tillval vid kundstart och det ska vara en ai-agent som intervjuar likt claude design." Resten är
+en sammanställd arbetsorder och behandlas som ägarens riktning med den reservationen. Följebrevet kräver en fungerande
+kundlänk med verklig AI-dialog, redigerbar uppdragsöversikt och tillval som följer med till Digitalas research och brief.
+Faktisk modellkörning, sparande, återupptagning, överföring och kostnadskontroll ska visas, och implementerat,
+integrerat, driftsatt och kvarstående externa beroenden ska hållas isär.
+
+**Ägarens besked under arbetet** (ordagrant i owner-words-20260928.md). Frågan om Vercel Marketplace, egna
+integrationer och egna MCP-servrar besvarades skriftligt; inget installerades eller köptes. Efter beskedet "domänen ska
+även integreras som tillval, det ska finnas bra smidiga för detta" blev domänen ett eget tillval med eget flöde. Om
+modellen svarade ägaren "vi kan ju bara skaffa en claude code api kod ? istället för vercel" och "Claude Opus 5", och
+därefter "det här är ju inte i kommersiellt syfte utan test så hur gör vi". Det gav ett lokalt testläge (se valen
+nedan). Frågorna om vems API som används och om ett chattfönster mot terminalen utan API besvarades, och ägaren fick se
+provservern under arbetet. Ägaren gjorde repona publika och skrev 2026-09-28 20:44 UTC "jag har gjort repon public nu så
+du vet." och 20:46 UTC "du bör kunna fixa dessa saker nu med public repo.". 2026-09-29 04:44 UTC svarade ägaren "ja" på frågan om kontorsplanens stycke om Kundstart
+skulle rättas och leveransen läggas till genom kontorets skyddade publicering. 2026-09-29 05:19 UTC skrev ägaren,
+med en skärmbild av Claudes startvy: "Nåt i still med den här vyn är det jag önskar för kundstarts vyn".
+
+**Beställningens gränser, alla registrerade.** *Uppdraget:* befintliga Kundstart och dess anslutning till Digitala
+vidareutvecklas med en naturlig AI-ledd kundintervju, en redigerbar uppdragsöversikt och begripliga integrationstillval;
+ett sammanhängande prov av den riktiga arbetsvägen slutförs, och arbetet stannar inte efter planering eller en
+fristående gränssnittsdemonstration; kundens samtal går genom en budgetbegränsad API-anslutning medan Claude Code
+utför implementationen, och leverantör, modell, budgetbelopp och nya kreditköp bestäms inte av tillägget; kunden
+berättar med egna ord, lämnar material, får relevanta följdfrågor och förstår vad Digitala rekommenderar, utan att bli
+promptingenjör, designer eller projektledare; ägaren får ett färdigt resultat att granska, inte återkommande frågor om
+brief, koncept eller normal implementation. *Avsnitt 1:* börja i aktuell ingång, plan, mandat, Kundstarts
+implementation och berörda Digitala-kandidater; skilj main, arbetsgren, separat granskad kandidat och aktiv drift;
+samordna med pågående sessioner och återanvänd redan rättad kundkontinuitet, materialhantering, research, brief,
+integrationsval och publiceringsväg; befintliga repon med tydligt skrivansvar; ingen ny generell agentplattform,
+frågemotor, kunddatabas eller kundportal vid sidan av den befintliga; ett auktoritativt hem per informationstyp och en
+begriplig ordinarie ingång; historik, privata data och fungerande arbete bevaras; bara den startanalys som behövs;
+aktuell officiell dokumentation för Claude Design, ChatGPT Sites och relevanta API- och gränssnittsfunktioner som stöd,
+där dokumenterade funktioner skiljs från slutsatser om deras interna arkitektur; inspiration innebär inte att
+produkterna, ChatKit eller ett nytt ramverk införs; befintlig teknik väljs när den räcker. *Avsnitt 2:* frågebanken är
+inget begränsande manus utan internt täckningsstöd för betydelsefulla luckor; agenten formulerar egna relevanta
+följdfrågor, förstår flera behov i ett svar och hanterar det som ingen kandidatlista förutsett; obesvarat, inte
+tillämpligt, kunden vet inte och kunden avstår hålls isär; agenten läser kända kunduppgifter och säkert behandlat
+material och använder eller beställer avgränsad research; kunden frågas inte om det som redan är känt eller som
+Digitala undersöker bättre; uttryck, bilder och referenser får diskuteras, utan generellt förbud mot designfrågor;
+kundens ord bevaras, och uttryckliga kunduppgifter, extern observation och AI-tolkning skiljs; en kunduppgift blir inte
+"okänd" för att den inte är oberoende verifierad; inga påhittade fakta och ingen rekommendation förvandlad till kundens
+val; naturligt samtal med fält, val och knappar när de förenklar; kundvänd text skild från strukturerade
+dataändringar; servern tilldelar identiteter, validerar handlingar och verkställer rättigheter, och modellen behöver
+inte begränsas till gamla fråge-id; en sammanhållen kundvänd agent med ett litet antal ändamålsenliga verktyg, ingen
+permanent agent per intervjuämne och ingen godtycklig HTML, JavaScript eller fri terminalåtkomst från modellen till
+kundytan. *Avsnitt 3:* översikten bygger vidare på befintlig sammanfattning och visar vad kunden vill uppnå, vad
+Digitala förstått om verksamheten, valda och rekommenderade tillval åtskilda, lämnat material med faktisk
+behandlingsstatus och betydelsefulla frågor som återstår eller undersöks; den ligger bredvid dialogen på större skärm
+och är lätt åtkomlig på mobil utan att tränga undan samtalet; kunden rättar både i dialogen och direkt i översikten, i
+samma kundärende; ett sent modellsvar återställer inte en ny kundrättelse; råsvar, härledd sammanfattning och aktuell
+revision sparas i befintlig proveniensmodell, utan konkurrerande kundsanning; ärliga lägen (osparat, sparat, väntar på
+AI, tillfälligt fel, material mottaget respektive behandlat, överfört respektive ännu inte bearbetat av Digitala) utan
+dekorativ aktivitet eller procentsiffror utan underlag; kunden kan pausa och fortsätta utan att svara igen på samma
+frågor; enkelheten lånas från inspirationsprodukterna, inte deras identitet; ingen ny sajtbyggare som genererar hela
+webbplatsen efter varje svar. *Avsnitt 4:* formulär och bilagor, e-postmottagning, bokning och kalender,
+betalning/deposition, kundregister/CRM, nyhetsbrev, innehållsredigering/CMS, Search Console, Google Business Profile,
+Google Ads, Meta Ads och analys-/konverteringsmätning visas med verksamhetsord, grupperade men inte dolda; "Lägg till",
+"Vi har redan ett system", "Hjälp mig välja", "Inte nu" och möjlighet att beskriva annat behov; agenten rekommenderar
+efter kundens situation, och kunden behöver inte utreda alla kanaler för att slutföra intervjun; önskat tillval,
+rekommendation, inkluderat i accepterat uppdrag, väntande åtkomst och anslutet/prövat skiljs med befintliga statusar
+där de har rätt innebörd, utan stor statusapparat; valen följer hela vägen till research, brief och befintliga
+integrationsval, och borttagning eller ändring når berörda arbetssteg; kontobrist raderar inte behovet och gör det inte
+"inte tillämpligt"; kundens önskemål ger inte tillstånd att köpa en tjänst, ändra ett skarpt konto eller aktivera
+annonser; verkliga begränsningar visas, och ett möjligt tillval presenteras som något Digitala kan utreda, inte som
+färdig anslutning när stöd saknas; pris och leverantörsfunktioner kommer från verifierade uppgifter eller anges som
+outredda; design, korrekt innehåll, användbarhet, tillgänglighet och teknisk kvalitet ingår i webbuppdraget och görs
+inte till kryssrutor. *Avsnitt 5:* Claude Code bygger tjänsten och kundens modellkörning sker genom avsedd API- eller
+molnanslutning, med befintlig tillåten anslutning när den passar; valet av Claude Code byter inte servermodellen
+automatiskt; tillgänglig åtkomst och faktisk budget kontrolleras tidigt; inga krediter köps och inget nytt belopp
+antas; konfigurerade gränser verkställs på servern, även vid samtidiga anrop och återförsök; saknas åtkomst eller
+utgiftsram preciseras beroendet samlat, oberoende delar färdigställs och mockad AI kallas inte livefunktion; vanlig kod
+sköter sparande, knappar, rättigheter och status, modellen förståelse, följdfrågor och motiverade rekommendationer;
+research och verktygsloopar begränsas, och ett modellfel startar ingen obegränsad omtagskedja och förlorar inga svar;
+intervju och sparande fungerar utan ägarens öppna terminal; molnets mottagning skiljs från intern bearbetning, och
+research eller produktion visas inte som pågående förrän den faktiskt startat; kundseparation, säker återupptagning,
+privat materiallagring och skydd mot att externa texter blir instruktioner; researchhämtning når inte interna adresser
+eller andra kunders material; inga hemligheter i klienten, chatten eller loggarna; konton ansluts genom avsedd säker
+behörighetsväg, inte med lösenord i samtalet. *Avsnitt 6:* ingen ny demo med egen sammanfattning; samtal, material och
+tillval ansluts till befintlig import, research och brief med versionsbindning, idempotens och sena rättelser;
+överföringen körs i samma kontrollerade ärende utan manuell copy-paste, hashreparation eller dold startsignal från
+ägaren; kundens inlämning, faktisk import och bearbetat underlag skiljs; kvarvarande automatisk startsamordning kopplas
+till ansvarigt befintligt arbete och blir ingen andra orkestrerare; övriga kedjerättningar och säkert införande
+fortsätter enligt gällande mandat; guard- och utfärdarspåret tas inte över, och dess gamla paket aktiveras inte;
+faktiska beroenden namnges, och allt oberoende arbete fortsätter. *Avsnitt 7:* tre etapper (integrerad dialog;
+uppdragsöversikt och tillval; sammanhängande verifiering och tillåtet införande) som inte är ägarstopp; konkreta fel
+rättas med relevanta omprov, utan nya stora rapportomgångar; kontrollerade testdialoger och ingen ny fiktiv
+webbplatsproduktion; sju provkrav: ett oväntat behov ger en egen relevant följdfråga; flera behov i ett svar och
+uttryckliga fakta når översikten korrekt, och "vet inte" förblir ärligt okänt; samma tillval kan väljas, ändras och tas
+bort via både samtal och kontroller och följer till Digitalas underlag; material läses där det är tillåtet, en
+kundrättelse vinner över äldre tolkning och en ny session kan fortsätta; nät- och modellfel, dubbelklick och samtidiga
+ändringar ger ingen förlust, dubblett eller falskt sparat; kundseparation, åtkomstgränser och kostnadsspärrar
+verkställs; en verklig modellkörning och faktisk import når research och brief genom ordinarie väg, utan provledarens
+dolda hjälp. Renderad mobil och dator, tangentbord, fokus och begriplig återkoppling bedöms; syntetiska dialoger är
+funktionsprov, inte verklig användaraccept; tillgänglig API-åtgång och svarstid mäts utan påhittad total kostnad eller
+generell kvalitetsvinst; en fungerande skyddad kundlänk levereras eller hindret namnges, och intern previewåtkomst
+skiljs från en verkligt användbar kundinbjudan; separat granskning och integration går genom befintliga tillåtna vägar,
+och en draft-PR är inte införd funktion; en kort rapport visar samtalsresa, tillvalens fortsättning, använda resurser,
+revisioner, prov, API- och driftstatus och kvarstående beroenden, mottagaren kan öppna leveransen och dess bildmaterial,
+och ingen rapportdom ersätter produktbedömning; slutkontrollen är en naturlig AI-dialog, samma kundärende, synliga
+tillval, fungerande överlämning, kontrollerad kostnad och inga nya rutinmässiga ägarstopp, där inspiration inte blivit
+obeställt plattformsbyte och ingen ny testsajt eller extra repo blivit målet.
+
+**Kedjedrivarens val (reversibla, märkta som sådana).** *Modell på servern:* `openai/gpt-5-mini` genom Vercel AI
+Gateway på fri nivå med OIDC och låg resonemangsnivå, samma väg som i KUNDSTART-20260927; inga krediter köptes.
+Claude-modeller kräver köpta Gateway-krediter på den vägen (403 på fri nivå). Ägaren valde Claude Opus 5 med en egen
+API-nyckel. Nyckeln har inte lämnats, och koden har ingen transport för den ännu, så gpt-5-mini gäller i produktionen.
+För ägarens eget test finns ett lokalt testläge, `KUNDSTART_AI=claude-cli`, som kör `claude -p` på ägarens inloggning
+med Claude Opus 5, bara på 127.0.0.1, och som vägrar starta på Vercel. Modellvalet byts med miljövariabler. *Agenten:*
+en kundvänd agent med strikt JSON-schema och fem strukturerade fält (uppgifter, behov, tillval, täckning och beställd
+research). Servern tilldelar id, registrerar ett tillval som kundens val bara när kundens ord står ordagrant i ett svar,
+låser ärendet under en tur och bokför kostnaden. Digitalas frågebank är täckningsstöd. *Tillval:* de tolv områdena och
+egen domän, alla med de fyra valen, och ett fritt behov. Domänen kontrolleras genom öppen DNS och IANA RDAP, utan
+registrar och utan köp. *Kostnad:* tre tak på servern, med reservation före varje anrop: 0,40 USD per ärende, 1,00 USD
+per dygn och 3,50 USD per månad, och högst 60 anrop per ärende. Det är standardvärdena; produktionen har inga avvikande
+värden satta. *Hemvist:* befintliga Kundstart och Digitala och Kundstarts befintliga privata Blob-lager; inga nya repon,
+databaser eller leverantörer. *Kundstarts main:* när repot blivit publikt sattes grenskydd efter ägarens besked: PR krävs,
+och kontrollen `kontroll` från GitHub Actions (lint, typkontroll, kärnprov och bygge) måste vara grön mot aktuell main.
+Skyddet gäller även administratörer och förbjuder force-push och radering; kravet på godkännare är noll, eftersom
+Nortropic har ett enda konto. Skyddet binder kontrollen till GitHub Actions, inte till arbetsflödets innehåll, så en PR
+i repot kan själv ändra vad `kontroll` prövar; det är ett uttalat villkor från granskningsrunda 4. *Digitalas införande:* genom den adopterade publiceringshållaren med en förseglad uppgift,
+samma väg som Digitalas egna publiceringar, med kandidaten samlad i en commit på main. Hållaren och dess auktoritet
+ändrades inte. *Inspirationskällorna:* arbetsloggen visar inte att den officiella dokumentationen för Claude Design
+eller ChatGPT Sites lästes, så det kravet redovisas som inte visat. Samtalsformen byggdes på befintlig Kundstart och
+arbetsorderns beskrivning. Ingen produkt, ChatKit eller nytt ramverk infördes.
+
+**Kundvyn i en samtalstjänsts form (ägarens besked 2026-09-29).** Besked och skärmbild tolkades som stilen, inte
+identiteten, i linje med arbetsorderns avsnitt 3. Stilen är en varm, bruten vit grund, en sidopanel, en hälsning i
+serif och en stor rundad skrivruta med plus för material. Under rutan står förslag. I samtalet står kundens ord i en
+ljus bubbla, och skrivrutan ligger fast längst ned. Nortropics ordmärke, en nordpil och egna färger och texter
+ersätter Claudes märke och formuleringar. Sparande, frågor, tillval, material, rättelser och inlämning fungerar som
+förut. Nytt är genvägarna i sidopanelen och förslagen under skrivrutan. Kundvyn byggdes på grenen
+`vy/samtalsvy-20260929` och sammanfogades i Kundstart PR 2 (main `6f078cf`, 2026-09-29 06:28 UTC), som driftsattes
+i produktionen samma minut. På kandidaten kördes lint, typkontroll, 39 kärnprov och bygge. Webbläsarsviten gav 26
+godkända prov mot förhandsvisningen och 26 mot produktionen, inklusive modellprovet med verklig modell på mobil och
+dator. Två separata granskningsrundor (5 och 6) godkände utan blockerande fynd. Skrivrutan ligger kvar längst ned i
+ett längre samtal, och vid 200 % zoom rullar sidan inte i sidled.
+
+**Leverans.** *Implementerat i Kundstart:* intervjuagenten; "Ditt uppdrag" bredvid samtalet på dator och som ark på
+mobil, med rättelse direkt i översikten; tillvalen med verksamhetsord och de fyra valen, där kundens val, agentens
+rekommendation och Digitalas status skiljs; domänflödet; ärliga lägen och "Sparat HH:MM" i samtalsloggen; kostnadsspärren;
+sidan /om, som säger vilken AI-leverantör som används, att domänen kontrolleras och att ett tillval inte är ett köp.
+*Implementerat i Digitala:* importen tar emot tillval, domänkontroll, citerade kunduppgifter och beställd research. Den
+vägrar en felformad export innan något skrivs och avgör en motsägelse mellan två av kundens egna besked bara ur
+exportens validerade revisioner. Intagsutdraget bär tillval, rekommendationer som hypoteser, domän och beställd
+research. Briefens överföring kräver att varje aktuellt kundtillval besvaras i INTEGRATIONSVAL.json. Kommandot
+`tillvalsstatus` skickar Digitalas status till kundens översikt. *Integrerat:* Kundstarts main `3cbe0c7` (PR 1,
+2026-09-28 20:52 UTC, en merge-commit med samma träd som granskade `01218bd`) och `6f078cf` (PR 2, kundvyn, med samma
+träd som granskade `9b924e9`), med grenskydd och grön CI. Digitalas main `c2144be` (PR 17, 2026-09-29 05:17 UTC),
+genom förseglad publicering med `runtime/tests` och `runtime/review` från App 5110369. *Driftsatt:* produktionen på
+Vercel (projektet `nortropic-kundstart`, funktioner och lager i Stockholm) kör main `6f078cf` sedan 2026-09-29 06:28
+UTC; dessförinnan körde den `522dceb` från 2026-09-28 20:45 UTC. Adressen nås utan Vercel-inloggning, ett ärende
+öppnas bara med sin personliga länk, och API utan kaka ger 401 (återläst 2026-09-29 06:41 UTC). *Kundredo:* tekniskt ja för en
+inbjuden kund med personlig länk. Ingen verklig kund är inbjuden, eftersom det kräver ett kunduppdrag. *Rapport:* den
+korta rapporten om samtalsresan, tillvalen, resurserna, revisionerna, proven, driften och beroendena, med bildmaterial,
+lämnades till ägaren som en privat sida 2026-09-28 och länkas inte här.
+
+**Prov.** Kundstart: kärnproven 39 av 39 på main. Webbläsarproven på mobil och dator kördes mot skyddade
+förhandsvisningar och mot produktionen: hela sviten med verklig modell mot produktionen på `99296d1` (26 godkända) och
+på `6f078cf` (26 godkända), och 20 godkända tillvals-, tillgänglighets- och flödesprov på förhandsvisningen av
+`522dceb` före driftsättningen. En
+tillvalsutvärdering mot verklig modell gick från 2 av 8 till 9 av 9 efter rättning, med kontroll av falska träffar.
+Helkedjan kördes med verklig modell: kundresa på mobil i produktionen, import i Digitala (kvitterad och fullständig),
+Digitalas tillvalsstatus tillbaka i kundens översikt, researchladdning och briefspärr. Digitala: helsviten 297 av 297 i
+en profil utan inloggningsuppgifter, och sju frysta beteendefall i utfärdarens sandlåda som alla stämmer på kandidaten
+och inget på föregående main. Kostnadsspärren prövades med ärendetaket 0,001 USD: inget modellanrop gjordes, och
+kunden fick en regelstyrd fråga. De syntetiska dialogerna är funktionsprov, inte användaraccept.
+
+**Resurser och kostnad.** AI Gateway på fri nivå: en agenttur kostade 0,0028–0,0055 USD enligt gatewayns egen
+kostnadsräkning. En tur tog 12–22 s i proven 2026-09-28, och i de sex modellproven 2026-09-29 väntade sidan 21–28 s
+på nästa fråga. Tjänstens reskontra för september visade 2026-09-29 06:33 UTC 59 anrop för 0,230 USD,
+varav 6 anrop för 0,027 USD den 29 september (modellproven mot förhandsvisning och produktion), utan okänd kostnad och
+utan vägrade anrop. Inget köptes och inga nya resurser skapades. Bygget och granskningarna gick ur egen kvot.
+
+**Granskning** (Runtimes läsarprofil, `claude-opus-5`, bara läsning). Kundstart: sex rundor, alla godkända utan
+blockerande fynd. Runda 1–4 gällde intervjuagenten, översikten, tillvalen, CI och grenskyddet (12, 11, 8 och 8
+restnoter), runda 5 och 6 kundvyn (12 och 10 restnoter). Hanteringen av noterna står i den privata arbetsloggen.
+Digitala: runda 1 underkände två fynd (en felformad kontroll kunde krascha importen mitt i skrivningen, och
+motsägelseregeln läste revisionen ur källtext). De rättades, och runda 2 och 3 godkände. Runda 4 godkände den exakta
+kandidaten `cb6a702` med svit, beteendefall och pinnar.
+
+**Beroenden och frågor till ägaren (samlat, inga stopp):**
+1. Claude på servern: ägaren valde en egen Anthropic API-nyckel och Claude Opus 5. Nyckeln har inte lämnats, och
+   transporten för den byggs när den finns. ÄGARENS TUR-raden om Claude på servern står kvar, men dess premiss har
+   ändrats: raden nämner köpta AI Gateway-krediter, medan ägaren valde en egen nyckel.
+2. En verklig kundinbjudan kräver ett kunduppdrag. ÄGARENS TUR-raden om kundredo står kvar. Dess premiss, att
+   förhandsvisningens inloggningsskydd måste lyftas, gäller inte längre: produktionsadressen nås utan Vercel-inloggning,
+   och varje ärende skyddas av sin personliga länk.
+3. Bevarandetid och radering för kundmaterial i Blob-lagret är fortfarande obeslutade (befintlig rad).
+4. Importen till Digitala körs i dag av en session (`kundstart.py konsumera`). Att den startar av sig själv kräver
+   Runtime-mandat för schemalagd drift, samma punkt som i HELHET-RESULTAT-20260927.
+5. Teståtkomst saknas fortfarande för Cal, Stripe, Tally och CRM. Tillvalen säger därför att Digitala utreder, inte att
+   något är anslutet.
+
+**Plan:** ett eget block "Parallellt gällande — Kundstart-dialogen (KUNDSTART-DIALOG-20260928)" efter
+förbättringspartnerns block. I planens översta block, som Digitalas spår skrev, byts bara meningen om Kundstarts
+skyddsbegränsning mot att den är passerad. ÄGARENS TUR är oförändrad. Daterade avsnitt längre ned som nämner Kundstarts
+403- eller planhinder är historik och ändras inte.
+
+**Ersätter:** ingen post. Kompletterar KUNDSTART-20260927. Premissen i dess beroende 1 har ändrats (se ovan), och
+beroende 5 är passerat, eftersom produktionen nu driftsätts. Dess beroende 4 (nycklar i ett annat projekt som visades
+i en tidigare session) berörs inte av detta arbete och står kvar där.
+
+**Avslut.** Uppdraget är fullgjort när denna post är integrerad. Nästa bygge kräver ett eget beslut. Planen äger nästa
+handling.
