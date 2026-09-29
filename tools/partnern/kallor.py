@@ -132,6 +132,75 @@ HOPPA = re.compile(r'^(\.git|node_modules|\.scratch|arbetsyta|arbetsytor|integra
                    r'worktrees?|blobs|harlett|turer|journal|tmp|partner)$')
 MEDDELANDE = re.compile(r'^## Meddelande (\d+) — (.+?) \((användare|assistent|system|verktyg)\)\s*$', re.M)
 
+# Delord (PARTNER-SOK-DELORD-20260930): indexet delar texten i hela ord, så första passet hittar ett sökord bara som
+# eget ord eller ordbörjan. Svenskan lägger det allmänna begreppet sist (omvärldsbevakning, startvakten), så ett andra
+# pass söker sökord med minst DELORD_MIN tecken inuti längre ord i samma tabell. Sökverktyget prövar högst
+# DELORD_TERMER sådana ord per fråga, så att en lång inklistrad fråga inte håller lagrets lås länge.
+DELORD_MIN = 5
+DELORD_TERMER = 10
+
+
+def delordstermer(fraga: str) -> list:
+    """Sökorden som också prövas inuti längre ord: ord utanför citattecken med minst DELORD_MIN tecken, i gemener. Ett
+    ord med bindestreck eller understreck prövas inte: indexet delar redan där, så delarna hittas av första passet."""
+    ut = []
+    for o in re.findall(r'[\w\-]+', re.sub(r'"[^"]*"', ' ', fraga), re.UNICODE):
+        o = o.lower()
+        if len(o) >= DELORD_MIN and o not in ut and re.fullmatch(r'[^\W_]+', o):
+            ut.append(o)
+    return ut
+
+
+def _inuti(text: str, term: str) -> int:
+    """Hur många gånger term (gemener) står inuti ett ord i text, alltså direkt efter en bokstav eller siffra. Övriga
+    tecken (också _ och -) skiljer ord åt, som i indexets tokenisering (unicode61), och täcks av första passet."""
+    n, i = 0, text.find(term, 1)
+    while i > 0:
+        if text[i - 1].isalnum():
+            n += 1
+        i = text.find(term, i + 1)
+    return n
+
+
+def delordsrang(termer: list, alla_ord: list, titel: str, text: str):
+    """Rangnyckel för en post som delordsträff, eller None om inget av termerna står inuti ett ord i den. Ordningen:
+    fler av sökordets ord i posten (i vilken form som helst), träff i titeln, fler förekomster inuti ord."""
+    titel, text = (titel or '').lower(), (text or '').lower()
+    i_titel = sum(_inuti(titel, t) for t in termer)
+    i_text = sum(_inuti(text, t) for t in termer)
+    if not i_titel and not i_text:
+        return None
+    tackning = sum(1 for o in alla_ord if o in titel or o in text)
+    return (-tackning, -bool(i_titel), -(i_titel + i_text))
+
+
+def delordsutdrag(text: str, termer: list, ord_: int = 28) -> str:
+    """Utdrag kring första ordet där ett sökord står inuti, med de ord som har det märkta «så» (som FTS-utdragen)."""
+    orden = list(re.finditer(r'[^\W_]+', text or ''))
+    har = lambda o: any(o.group().lower().find(t, 1) > 0 for t in termer)  # noqa: E731
+    forsta = next((i for i, o in enumerate(orden) if len(o.group()) > DELORD_MIN and har(o)), None)
+    if forsta is None:
+        return ''
+    start = max(0, min(forsta - ord_ // 2, len(orden) - ord_))
+    slut = min(len(orden), start + ord_)
+    delar, pos = [], orden[start].start()
+    for o in orden[start:slut]:
+        delar.append(text[pos:o.start()])
+        delar.append('«%s»' % o.group() if har(o) else o.group())
+        pos = o.end()
+    return (' … ' if start > 0 else '') + ''.join(delar) + (' … ' if slut < len(orden) else '')
+
+
+def fordela(helord: list, delord: list, antal: int) -> list:
+    """Helordsträffarna först i sin ordning, sedan delordsträffarna. Fyller helordsträffarna taket hålls ändå en
+    tredjedel av platserna (minst en) för delordsträffar; annars får delordsträffarna de platser som blir över. Med
+    antal 1 hålls ingen plats, eftersom den enda platsen då skulle gå till en delordsträff före en helordsträff."""
+    if len(helord) >= antal:
+        plats = min(len(delord), max(1, antal // 3) if antal >= 2 else 0)
+    else:
+        plats = min(len(delord), antal - len(helord))
+    return helord[:antal - plats] + delord[:plats]
+
 
 class Kallindex:
     def __init__(self, lager, konfig):
@@ -505,7 +574,9 @@ class Kallindex:
                 ut.append(r)
             if len(ut) >= antal:
                 break
-        ut = ut[:antal]
+        for r in ut:
+            r['traff'] = 'ord'
+        ut = fordela(ut, self._delord(fraga, villkor, args, sedda, antal), antal)
         for r in ut:
             r['kalla_klass'] = KLASSER.get(r['klass'], r['klass'])
             if r['klass'] == 'partner:forstaelse':
@@ -518,6 +589,46 @@ class Kallindex:
                 if k and json.loads(k['data']).get('ersatt_markerad'):
                     r['status'] = 'innehåller SUPERSEDED-markering'
             r.pop('rang', None)
+        return ut
+
+    def _delord(self, fraga: str, villkor: str, args: list, sedda: set, antal: int) -> list:
+        """Andra passet: poster där ett sökord (minst DELORD_MIN tecken) står inuti ett längre ord, i samma tabell och
+        med samma omfång. Poster som första passet redan gav och dolda källor räknas inte; en raderad tråd finns inte
+        i tabellen. LIKE väljer kandidaterna (viker bara versaler i A–Z); Python avgör att ordet står inuti ett ord."""
+        termer = delordstermer(fraga)[:DELORD_TERMER]
+        if not termer:
+            return []
+        monster = []
+        for t in termer:
+            m = '%' + t.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_') + '%'
+            monster += [m, m]
+        alla_ord = [f.lower() for f in re.findall(r'"([^"]+)"', fraga)] + list(dict.fromkeys(
+            o.lower() for o in re.findall(r'[\w\-]+', re.sub(r'"[^"]*"', ' ', fraga), re.UNICODE) if len(o) >= 2))
+        try:
+            rader = self.lager.fraga(
+                "select kalla_id, klass, titel, talare, datum, text from sok where (" +
+                ' or '.join(["titel like ? escape '\\' or text like ? escape '\\'"] * len(termer)) + ")" + villkor +
+                " order by rowid", monster + args)
+        except Exception:
+            return []
+        kandidater = []
+        for i, r in enumerate(rader):
+            bas = r['kalla_id'].split('~')[0]
+            if bas in sedda or self.dold(bas):
+                continue
+            rang = delordsrang(termer, alla_ord, r['titel'], r['text'])
+            if rang is not None:
+                kandidater.append((rang + (i,), bas, r))
+        ut = []
+        for _, bas, r in sorted(kandidater, key=lambda k: k[0]):
+            if bas in sedda:
+                continue
+            sedda.add(bas)
+            text = r.pop('text')
+            ut.append(dict(r, kalla_id=bas, traff='delord',
+                           utdrag=delordsutdrag(text, termer) or delordsutdrag(r['titel'], termer)))
+            if len(ut) >= antal:
+                break
         return ut
 
     # --------------------------------------------------------------- öppna
