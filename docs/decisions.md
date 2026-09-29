@@ -7930,11 +7930,19 @@ vidare till ägarens veckobesked, inte en ny rapportväg. Kanalen har eget best�
 utkorg och en engångskvittens till kontorets privata driftyta, oberoende av de andra två.
 
 **Perioden, inte väckningen.** Med `period_seconds` i indatan avgör hanteraren ur sitt eget beständiga
-`period.json` om perioden gått, i stället för att lita på att en väckning inträffar. En period som
+periodkvitto om perioden gått, i stället för att lita på att en väckning inträffar. En period som
 missats för att värddatorn sov står därför kvar som förfallen och utförs av den första väckning som blir
 möjlig; en väckning inne i perioden läser ingenting, skriver ingenting och lämnar inget körkvitto. Utan
 `period_seconds` är varje körning förfallen, vilket är D038:s oförändrade beteende. Veckan är 604800
 sekunder; 3600–2678400 godtas.
+
+**Perioden är per kanal** (`period-<kanal>.json`), och det är det som gör att beställningens båda halvor
+håller samtidigt. En kanal som fortsätter misslyckas görs om vid varje väckning, medan en kanal som redan
+gjort sin vecka står stängd hela veckan: ett trasigt intag kan alltså inte göra den veckovisa
+driftkontrollen timvis. En period stängs bara av den körning som gjorde just den kanalens arbete, med den
+körningens egen starttid, så arbete i en gammal period kan aldrig stänga en ny. En körning som avbröts
+efter att den stängt sin egen kanal känner igen sitt eget kvitto, läser ingenting igen, flyttar ingen
+sekvens och skriver bara klart sitt kvitto; det läget heter `already_performed`, inte `not_due`.
 
 **Vad kvittot betyder.** `performed` och `completed` är åtskilda. Exit 1 ur driftkontrollen är en
 kontroll som kördes och fann en incident, inte en trasig mekanism: den är `performed` men inte
@@ -7981,27 +7989,38 @@ generell schemaläggare för godtyckliga kommandon — bara de två namngivna up
 för en sajt först när en riktig kunds sajt är lanserad med lanseringsmandat; i dag finns ingen sådan
 bindning.
 
-**Granskningsrunda 1 underkände och rättades.** Tre av de fem blockerarna satt i den här filen.
-Monitorns gräns var ingen väggklocka: `urlopen(timeout=...)` begränsar en blockerande socketoperation,
-inte ett helt försök, så en server som droppar byte strax inom timeouten kunde läsa på obegränsat och
-hålla hanterarens exklusiva tillståndslås förbi workflowets egen gräns — och därmed blockera senare
-perioder. Monitorn har nu en egen påtvingad deadline och läser med `read1`, eftersom `read(n)` blockerar
-till alla n byte finns. Ett periodkvitto från framtiden tystade arbetet till det datumet, och år 9999 gav
-obehandlad `OverflowError`: ett kvitto senare än en liten klockavvikelse sätts nu i karantän som
-fördärvat och arbetet körs. En återupptagen körning stängde samma period två gånger: kvittot namnger nu
-den stängande körningen, och en körning som känner igen sitt eget kvitto skriver klart utan att flytta
-sekvensen igen. Domen ordagrant i Runtimes
-`evidence/runs/runtime-veckodrift-2/GRANSKNING-r1-DOM.md`.
+**Tre granskningsrundor underkände, och rättningarna står här.** Alla tre domarna ligger ordagrant i
+Runtimes `evidence/runs/runtime-veckodrift-4/`.
 
-**Prov.** Hanterarens svit är 35 prov, varav tjugofem nya, på Digitalas verkliga frysta
+Runda 1: monitorns gräns var ingen väggklocka; ett periodkvitto från framtiden tystade arbetet och år
+9999 gav obehandlad `OverflowError`; en återupptagen körning stängde samma period två gånger. Ett kvitto
+senare än en liten klockavvikelse sätts nu i karantän som fördärvat och arbetet körs.
+
+Runda 2: att binda kroppsläsningen räckte inte, för inget i anropet binder statusrad och headers. En
+server som droppade headerbyte strax inom socket-timeouten körde 757 s mot deklarerade 33. Försöken går
+nu i egen daemontråd och kanalen återvänder när join:en löper ut; det ÄR taket. Bindningen valideras före
+tråden, eftersom en felkonfigurerad monitor ska vägras högt och inte rapporteras som slut på tiden —
+den regressionen fälldes av D038:s eget prov.
+
+Runda 3: min rättning av dubbelarbetet var sämre än felet. En beständig kanalcache per körning lät ett
+resultat ur en period stänga en senare med den senare körningens klocka, alltså dölja precis den missade
+vecka beställningen förbjuder, samtidigt som nästa väckning inte kunde använda den. Cachen är
+tillbakadragen och ersatt av perioden per kanal ovan. Runda 3 fällde också monitorns kvarvarande trådar:
+join:en binder kanalen men inte uttaget, så övergivet nätarbete kunde samlas i den långlivade arbetaren
+och en sent frigjord transport kunde starta ett andra försök efter att kanalen redan svarat. Övergivna
+trådar får nu en stoppflagga och är högst två; därutöver vägrar kanalen direkt.
+
+**Prov.** Hanterarens svit är 42 prov, mot 10 på oförändrad main, på Digitalas verkliga frysta
 `drift_kontroll.py`-byte mot en loopback-provsajt: ren körning, saknad förväntad text, trasig sitemap,
 incident och återhämtning med oberoende privata kvitton, exitkod mot kvitto, verktygets egen räkning mot
 kvittot, omkörning inom samma sekund, kvitto utanför kundmappen, timeout/vägran/fel som skilda utfall,
 ändrade plan- eller verktygsbyte, monitorns väggklocka mot en droppande server, och periodens
-förfallologik inklusive framtida och överflödande kvitto, en annan körnings kvitto, fördärvat tillstånd
-och en körning avbruten efter att den stängt sin egen period. Kontorets helsvit är 534 prov OK, mätt mot
-509 prov OK på oförändrad main `34bcedd` med samma maskin och tolk; kvitton i Runtimes
-`evidence/runs/runtime-veckodrift-2/`, där också kvalificeringen mot den verkliga motorn ligger.
+förfallologik inklusive framtida och överflödande kvitto, en annan körnings kvitto, fördärvat tillstånd,
+en körning avbruten efter att den stängt sin egen period, en kanal som fortsätter misslyckas utan att dra
+med sig en som gjort sin vecka, monitorns väggklocka mot en droppande statusrad, och de övergivna
+trådarnas tak. Kontorets helsvit är 541 prov OK i tre körningar efter varandra, mätt mot 509 prov OK i
+tre körningar på oförändrad main `34bcedd` med samma maskin och tolk; alla sex kvitton i Runtimes
+`evidence/runs/runtime-veckodrift-4/`, där också kvalificeringen mot den verkliga motorn ligger.
 Provsajten och signalytan är loopback-provdata, aldrig en kundadress och aldrig Kundstarts produktion
 eller dess lokala provtjänst.
 

@@ -9,6 +9,8 @@ import sys
 import threading
 import time
 import unittest
+import urllib.error
+import urllib.request
 from unittest.mock import patch
 import driftoperation as operation
 
@@ -390,34 +392,53 @@ class WeeklyDriftTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             operation.run({'schema': 'office-drift/1', 'state': str(self.state)}, 'empty')
 
-    # --- dueness: a missed period is performed, never skipped ---
+    # --- dueness: per channel, a missed period performed and never skipped ---
 
     def week(self, **change):
         self.config['period_seconds'] = 604800
         self.config.update(change)
 
-    def set_period(self, ago_seconds, sequence=1, run_id='tidigare-korning'):
+    def intake_fixture(self):
+        """A frozen consumer that succeeds, so intake can be a second real channel."""
+        root = self.home / 'digitala-intake'; (root / 'verktyg').mkdir(parents=True)
+        script = root / 'verktyg/kundstart.py'
+        script.write_text("print('fixture consumer completed')\n")
+        customer = self.home / 'intake-kund'; customer.mkdir(exist_ok=True)
+        interpreter = Path(sys.executable).resolve()
+        self.config['intake'] = {
+            'digitala_root': str(root),
+            'digitala_files': {'verktyg/kundstart.py': operation.digest(script.read_bytes())},
+            'python_path': str(interpreter),
+            'python_sha256': operation.digest(interpreter.read_bytes()),
+            'base_url': self.address, 'key_file': str(self.home / 'private-key'),
+            'customer': str(customer), 'executor': 'isolated-fixture'}
+        return script
+
+    def set_period(self, channel, ago_seconds, sequence=1, run_id='tidigare-korning'):
         from datetime import datetime, timedelta, timezone
         stamp = (datetime.now(timezone.utc) - timedelta(seconds=ago_seconds)).isoformat()
         self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
-        (self.state / 'period.json').write_text(
+        (self.state / ('period-%s.json' % channel)).write_text(
             json.dumps({'completed_at': stamp, 'sequence': sequence, 'run_id': run_id}) + '\n')
+
+    def period_state(self, channel):
+        return json.loads((self.state / ('period-%s.json' % channel)).read_text())
 
     def test_first_run_is_due_and_a_wakeup_inside_the_period_reads_nothing(self):
         self.week()
         first = operation.run(self.config, 'week-one')
-        self.assertTrue(first['performed'])
-        self.assertEqual(first['period']['reason'], 'no_period_recorded')
-        self.assertEqual(first['period_recorded']['sequence'], 1)
-        self.assertEqual(first['period_recorded']['completed_at'], first['started_at'])
-        self.assertEqual(first['period_recorded']['run_id'], 'week-one')
+        self.assertEqual(first['performed_channels'], ['drift'])
+        self.assertEqual(first['periods']['drift']['reason'], 'no_period_recorded')
+        self.assertEqual(first['periods_recorded']['drift']['sequence'], 1)
+        self.assertEqual(first['periods_recorded']['drift']['completed_at'], first['started_at'])
+        self.assertEqual(first['periods_recorded']['drift']['run_id'], 'week-one')
         calls, receipts = self.calls, self.receipts()
 
         inside = operation.run(self.config, 'week-one-tick-two')
         self.assertEqual(inside['skipped'], 'not_due')
         self.assertFalse(inside['performed']); self.assertTrue(inside['completed'])
-        self.assertEqual(inside['period']['reason'], 'not_due')
-        self.assertEqual(inside['period']['overdue_seconds'], 0)
+        self.assertEqual(inside['skipped_channels'], ['drift'])
+        self.assertEqual(inside['periods']['drift']['reason'], 'not_due')
         self.assertEqual(self.calls, calls, 'a wakeup inside the period makes no request')
         self.assertEqual(self.receipts(), receipts)
         self.assertFalse((self.state / 'week-one-tick-two').exists(),
@@ -427,12 +448,12 @@ class WeeklyDriftTests(unittest.TestCase):
         self.week()
         operation.run(self.config, 'week-one')
         # Nine days without a run: the Mac slept through the weekly time.
-        self.set_period(9 * 86400)
+        self.set_period('drift', 9 * 86400)
         late = operation.run(self.config, 'after-sleep')
-        self.assertTrue(late['performed'], 'the missed period is run, not skipped')
-        self.assertEqual(late['period']['reason'], 'period_elapsed')
-        self.assertGreaterEqual(late['period']['overdue_seconds'], 2 * 86400)
-        self.assertEqual(late['period_recorded']['sequence'], 2)
+        self.assertEqual(late['performed_channels'], ['drift'], 'the missed period is run')
+        self.assertEqual(late['periods']['drift']['reason'], 'period_elapsed')
+        self.assertGreaterEqual(late['periods']['drift']['overdue_seconds'], 2 * 86400)
+        self.assertEqual(late['periods_recorded']['drift']['sequence'], 2)
         self.assertEqual(json.loads((self.customer / late['drift']['receipt'])
                                     .read_text(encoding='utf-8'))['incidenter'], 0)
 
@@ -440,66 +461,123 @@ class WeeklyDriftTests(unittest.TestCase):
         self.week()
         with patch.object(operation, 'bounded_start', self.stub(None)):
             failed = operation.run(self.config, 'broken')
-        self.assertFalse(failed['performed']); self.assertNotIn('period_recorded', failed)
-        self.assertFalse((self.state / 'period.json').exists())
+        self.assertEqual(failed['performed_channels'], [])
+        self.assertEqual(failed['periods_recorded'], {})
+        self.assertFalse((self.state / 'period-drift.json').exists())
         retried = operation.run(self.config, 'retry')
-        self.assertTrue(retried['performed'])
-        self.assertEqual(retried['period']['reason'], 'no_period_recorded')
+        self.assertEqual(retried['performed_channels'], ['drift'])
+        self.assertEqual(retried['periods']['drift']['reason'], 'no_period_recorded')
+
+    def test_a_failing_channel_does_not_make_the_other_ones_period_hourly(self):
+        # The order asks for a weekly check. A consumer that keeps failing is retried at
+        # every wakeup, but it must not drag a drift check that already did its week.
+        self.week()
+        script = self.intake_fixture()
+        script.write_text("import sys\nsys.exit(3)\n")
+        self.config['intake']['digitala_files']['verktyg/kundstart.py'] = \
+            operation.digest(script.read_bytes())
+        first = operation.run(self.config, 'both-one')
+        self.assertEqual(first['performed_channels'], ['drift'])
+        self.assertFalse(first['intake']['completed'])
+        self.assertEqual(sorted(first['periods_recorded']), ['drift'])
+        calls, receipts = self.calls, self.receipts()
+
+        second = operation.run(self.config, 'both-two')
+        self.assertEqual(second['skipped_channels'], ['drift'], 'drift keeps its week')
+        self.assertNotIn('drift', second)
+        self.assertEqual(self.receipts(), receipts, 'no second drift receipt this week')
+        self.assertFalse(second['intake']['completed'], 'the failing channel is retried')
+        self.assertEqual(second['periods_recorded'], {})
+        self.assertEqual(self.calls, calls, 'the site is not read again')
+        # When the consumer is repaired its own period closes, drift still untouched.
+        script.write_text("print('fixture consumer completed')\n")
+        self.config['intake']['digitala_files']['verktyg/kundstart.py'] = \
+            operation.digest(script.read_bytes())
+        third = operation.run(self.config, 'both-three')
+        self.assertEqual(third['performed_channels'], ['intake'])
+        self.assertEqual(sorted(third['periods_recorded']), ['intake'])
+        self.assertEqual(self.period_state('drift')['run_id'], 'both-one')
+
+    def test_a_period_is_only_ever_closed_by_the_run_that_did_the_work(self):
+        # The hazard a cached channel result created: work done in an old period must
+        # never be able to close a new one with a later run's clock.
+        self.week()
+        first = operation.run(self.config, 'gammal')
+        self.assertEqual(self.period_state('drift')['completed_at'], first['started_at'])
+        self.set_period('drift', 9 * 86400, sequence=1, run_id='gammal')
+        stale = self.period_state('drift')['completed_at']
+        calls = self.calls
+        later = operation.run(self.config, 'ny')
+        self.assertEqual(later['performed_channels'], ['drift'], 'the overdue week is read again')
+        self.assertEqual(self.period_state('drift')['completed_at'], later['started_at'])
+        self.assertNotEqual(self.period_state('drift')['completed_at'], stale)
+        # A new period means a new check: the site was actually read again, and this
+        # run has its own work directory and receipt hash. Not a file count, since a
+        # same-second receipt name is overwritten by design.
+        self.assertGreater(self.calls, calls, 'the site is read again for the new period')
+        self.assertEqual(self.period_state('drift')['run_id'], 'ny')
+        written = self.customer / later['drift']['receipt']
+        self.assertEqual(operation.digest(written.read_bytes()), later['drift']['receipt_sha256'])
+        self.assertEqual(len(list((self.state / 'ny').glob('drift-*'))), 1)
+        self.assertEqual(len(list((self.state / 'gammal').glob('drift-*'))), 1)
 
     def test_invalid_period_state_is_preserved_and_the_work_still_runs(self):
         self.week()
         operation.run(self.config, 'week-one')
-        (self.state / 'period.json').write_text(
+        (self.state / 'period-drift.json').write_text(
             json.dumps({'completed_at': 'inte en tid', 'sequence': 1, 'run_id': 'nagon'}))
         result = operation.run(self.config, 'after-corrupt-period')
-        self.assertTrue(result['performed'])
+        self.assertEqual(result['performed_channels'], ['drift'])
         self.assertFalse(result['completed'], 'the corrupt period state is reported, not hidden')
-        self.assertEqual(result['period']['reason'], 'invalid_period_state')
-        self.assertEqual(len(list((self.state).glob('period.json.invalid-*'))), 1)
-        self.assertEqual(result['period_recorded']['sequence'], 1)
+        self.assertEqual(result['periods']['drift']['reason'], 'invalid_period_state')
+        self.assertEqual(len(list(self.state.glob('period-drift.json.invalid-*'))), 1)
+        self.assertEqual(result['periods_recorded']['drift']['sequence'], 1)
 
     def test_closed_period_state_shapes_are_refused(self):
         self.week()
-        now = operation.now()
-        for value in ({'completed_at': now, 'sequence': 1},
-                      {'completed_at': now, 'run_id': 'a'},
-                      {'completed_at': now, 'sequence': 0, 'run_id': 'a'},
-                      {'completed_at': now, 'sequence': True, 'run_id': 'a'},
-                      {'completed_at': now, 'sequence': 1, 'run_id': '../escape'},
-                      {'completed_at': now, 'sequence': 1, 'run_id': 1},
-                      {'completed_at': now, 'sequence': 1, 'run_id': 'a', 'extra': 1}):
+        stamp = operation.now()
+        for value in ({'completed_at': stamp, 'sequence': 1},
+                      {'completed_at': stamp, 'run_id': 'a'},
+                      {'completed_at': stamp, 'sequence': 0, 'run_id': 'a'},
+                      {'completed_at': stamp, 'sequence': True, 'run_id': 'a'},
+                      {'completed_at': stamp, 'sequence': 1, 'run_id': '../escape'},
+                      {'completed_at': stamp, 'sequence': 1, 'run_id': 1},
+                      {'completed_at': stamp, 'sequence': 1, 'run_id': 'a', 'extra': 1}):
             self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
-            (self.state / 'period.json').write_text(json.dumps(value))
-            self.assertEqual(operation.due(self.state, self.config, 'nu')['reason'],
+            (self.state / 'period-drift.json').write_text(json.dumps(value))
+            self.assertEqual(operation.due(self.state, self.config, 'drift', 'nu')['reason'],
                              'invalid_period_state')
 
     def test_a_future_or_overflowing_period_record_cannot_silence_the_work(self):
-        # A stamp from the future would report every wakeup as a successful skip until
-        # that date arrives, and year 9999 overflows the addition. Both must be caught.
         self.week()
         def plant(stamp):
             # due() quarantines the file it rejects, so each assertion needs its own.
             self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
-            (self.state / 'period.json').write_text(
+            (self.state / 'period-drift.json').write_text(
                 json.dumps({'completed_at': stamp, 'sequence': 1, 'run_id': 'framtiden'}))
         for stamp in ('2099-01-01T00:00:00+00:00', '9999-12-31T00:00:00+00:00'):
             plant(stamp)
-            answer = operation.due(self.state, self.config, 'nu')
+            answer = operation.due(self.state, self.config, 'drift', 'nu')
             self.assertTrue(answer['due']); self.assertEqual(answer['reason'], 'invalid_period_state')
             plant(stamp)
             result = operation.run(self.config, 'efter-' + stamp[:4])
-            self.assertTrue(result['performed'], 'the work runs despite the bad record')
+            self.assertEqual(result['performed_channels'], ['drift'])
             self.assertFalse(result['completed'], 'the bad record is reported, not hidden')
-            self.assertEqual(result['period']['reason'], 'invalid_period_state')
-            for path in self.state.glob('period.json.invalid-*'):
+            for path in self.state.glob('period-drift.json.invalid-*'):
                 path.unlink()
 
     def test_a_record_is_not_due_only_a_moment_before_its_time(self):
         self.week()
-        self.set_period(604800 - 1)
-        self.assertFalse(operation.due(self.state, self.config, 'nu')['due'])
-        self.set_period(604800)
-        self.assertTrue(operation.due(self.state, self.config, 'nu')['due'])
+        self.set_period('drift', 604800 - 1)
+        self.assertFalse(operation.due(self.state, self.config, 'drift', 'nu')['due'])
+        self.set_period('drift', 604800)
+        self.assertTrue(operation.due(self.state, self.config, 'drift', 'nu')['due'])
+
+    def test_another_runs_record_does_not_make_this_run_due(self):
+        self.week()
+        self.set_period('drift', 60, sequence=4, run_id='nagon-annan')
+        answer = operation.due(self.state, self.config, 'drift', 'jag')
+        self.assertFalse(answer['due']); self.assertEqual(answer['reason'], 'not_due')
 
     def test_period_outside_its_bounds_is_refused(self):
         for period in (60, 3599, 2678401, True, '604800'):
@@ -507,53 +585,47 @@ class WeeklyDriftTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 operation.run(self.config, 'bad-period-' + str(period))
 
-    def test_a_run_interrupted_after_closing_its_period_finishes_without_redoing_it(self):
+    def test_a_run_interrupted_after_closing_a_period_finishes_without_redoing_it(self):
         # The receipt is written after the period is closed, so a crash in between
-        # leaves a record naming this run. Resuming must finish that receipt from work
-        # already done: no second sequence step, and no second read of the site.
+        # leaves a record naming this run. Resuming must finish that receipt without
+        # reading the site again, without a second sequence step, and without
+        # overwriting the receipt the first attempt already put in the customer path.
         self.week()
         first = operation.run(self.config, 'week-one')
-        self.assertEqual(first['period_recorded']['sequence'], 1)
-        self.assertEqual(first['resumed_channels'], [])
+        self.assertEqual(first['periods_recorded']['drift']['sequence'], 1)
         (self.state / 'week-one/result.json').unlink()
         calls, receipts = self.calls, self.receipts()
         resumed = operation.run(self.config, 'week-one')
-        self.assertNotIn('skipped', resumed)
-        self.assertTrue(resumed['performed'])
-        self.assertEqual(resumed['period']['reason'], 'own_period_record')
-        self.assertEqual(resumed['period_recorded']['sequence'], 1, 'one period, one sequence step')
-        self.assertEqual(json.loads((self.state / 'period.json').read_text())['run_id'], 'week-one')
-        self.assertEqual(resumed['resumed_channels'], ['drift'])
+        self.assertEqual(resumed['skipped'], 'already_performed',
+                         'not the same thing as a period that simply had not elapsed')
+        self.assertEqual(resumed['skipped_channels'], ['drift'])
+        self.assertEqual(resumed['performed_channels'], [])
+        self.assertEqual(resumed['periods']['drift']['reason'], 'own_period_record')
+        self.assertNotIn('periods_recorded', resumed)
+        self.assertEqual(self.period_state('drift'), first['periods_recorded']['drift'])
         self.assertEqual(self.calls, calls, 'the site is not read a second time')
-        self.assertEqual(self.receipts(), receipts, 'no second receipt can overwrite the first')
-        self.assertEqual(resumed['drift'], first['drift'])
+        self.assertEqual(self.receipts(), receipts, 'no second receipt overwrites the first')
+        # The interrupted run's own receipt is finished rather than left missing.
+        self.assertEqual(json.loads((self.state / 'week-one/result.json').read_text()), resumed)
         # The next period still advances normally for a different run.
-        self.set_period(604800, sequence=1, run_id='week-one')
+        self.set_period('drift', 604800, sequence=1, run_id='week-one')
         later = operation.run(self.config, 'week-two')
-        self.assertEqual(later['period_recorded']['sequence'], 2)
-        self.assertEqual(later['resumed_channels'], [])
-
-    def test_a_stored_channel_result_from_another_configuration_is_not_reused(self):
-        first = operation.run(self.config, 'bunden')
-        stored = self.state / 'bunden/drift.result.json'
-        value = json.loads(stored.read_text())
-        stored.write_text(json.dumps({**value, 'config_sha256': '0' * 64}))
-        (self.state / 'bunden/result.json').unlink()
-        again = operation.run(self.config, 'bunden')
-        self.assertEqual(again['resumed_channels'], [], 'a foreign result is not this run\'s work')
-        self.assertTrue(again['drift']['ran'])
-        self.assertEqual(len(list((self.state / 'bunden').glob('drift.result.json.invalid-*'))), 1)
-
-    def test_another_runs_record_does_not_make_this_run_due(self):
-        self.week()
-        self.set_period(60, sequence=4, run_id='nagon-annan')
-        answer = operation.due(self.state, self.config, 'jag')
-        self.assertFalse(answer['due']); self.assertEqual(answer['reason'], 'not_due')
+        self.assertEqual(later['periods_recorded']['drift']['sequence'], 2)
 
     def test_a_cached_result_is_returned_before_dueness_is_consulted(self):
         self.week()
         first = operation.run(self.config, 'week-one')
         self.assertEqual(operation.run(self.config, 'week-one'), first)
+
+    def test_without_a_period_every_wakeup_is_due(self):
+        # D038's unchanged behaviour: no period_seconds means no dueness at all.
+        first = operation.run(self.config, 'utan-period-en')
+        second = operation.run(self.config, 'utan-period-tva')
+        for result in (first, second):
+            self.assertEqual(result['periods'], {})
+            self.assertEqual(result['skipped_channels'], [])
+            self.assertEqual(result['performed_channels'], ['drift'])
+            self.assertNotIn('periods_recorded', result)
 
 
 class MonitorWallClockTests(unittest.TestCase):
@@ -648,3 +720,73 @@ class MonitorWallClockTests(unittest.TestCase):
         self.assertFalse(result['healthy'])          # a space is not the health body
         self.assertEqual(result['reason'], 'endpoint_unavailable')
         self.assertEqual(result['attempts'][0]['error'], 'invalid_health_response')
+
+
+class MonitorStrandedThreadTests(unittest.TestCase):
+    """A join bounds the channel, not the socket. So stranded work must be bounded too.
+
+    Without this, every timed-out health check would leave live network work behind in
+    the long-lived worker, and a thread whose transport freed up late could start its
+    second attempt after the channel had already reported a timeout.
+    """
+
+    def setUp(self):
+        operation.stranded_monitors()                 # prune anything from other tests
+        self.addCleanup(self.release)
+        self.blocked = threading.Event()
+        self.opens = []
+        owner = self
+
+        # Subclasses HTTPHandler so build_opener REPLACES the real one; a plain
+        # BaseHandler would sit beside it and the socket would answer instead.
+        class Frozen(urllib.request.HTTPHandler):
+            def http_open(self, request):
+                owner.opens.append(request.full_url)
+                owner.blocked.wait(30)
+                raise urllib.error.URLError('transport released')
+
+        self.opener = urllib.request.build_opener(Frozen())
+        self.config = {'url': 'http://127.0.0.1:9/health', 'candidate': 'a' * 40,
+                       'isolated_test': True}
+
+    def release(self):
+        self.blocked.set()
+        for _ in range(40):
+            if not operation.stranded_monitors():
+                return
+            time.sleep(0.1)
+
+    def call(self):
+        with patch.object(operation, 'MONITOR_DEADLINE', 1), \
+             patch.object(urllib.request, 'build_opener', return_value=self.opener):
+            return operation.monitor(self.config)
+
+    def test_stranded_work_is_counted_capped_and_told_not_to_retry(self):
+        first, second = self.call(), self.call()
+        for result in (first, second):
+            self.assertEqual(result['reason'], 'monitor_bound_exceeded')
+        self.assertEqual(operation.stranded_monitors(), 2)
+        self.assertEqual(len(self.opens), 2)
+
+        # At the cap the channel refuses at once instead of adding a third.
+        third = self.call()
+        self.assertEqual(third['reason'], 'monitor_stranded_limit')
+        self.assertEqual(third['stranded_threads'], 2)
+        self.assertEqual(len(self.opens), 2, 'no further network work is started')
+
+        # Releasing the transport must not produce late second attempts: the abandoned
+        # threads were told to stop, so they end without opening anything again.
+        self.blocked.set()
+        for _ in range(50):
+            if not operation.stranded_monitors():
+                break
+            time.sleep(0.1)
+        self.assertEqual(operation.stranded_monitors(), 0, 'abandoned threads end by themselves')
+        self.assertEqual(len(self.opens), 2, 'a released transport starts no late attempt')
+
+    def test_the_cap_clears_once_the_stranded_work_ends(self):
+        self.call()
+        self.assertEqual(operation.stranded_monitors(), 1)
+        self.release()
+        self.assertEqual(operation.stranded_monitors(), 0)
+        self.assertEqual(operation.MONITOR_BOUND, operation.MONITOR_DEADLINE)

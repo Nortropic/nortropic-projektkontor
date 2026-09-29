@@ -43,6 +43,20 @@ MONITOR_DEADLINE = 33                            # the monitor channel's wall cl
 # durable lock - the handler returns and releases its state lock on time - and ends by
 # itself as soon as its socket does. This IS the ceiling, with nothing added to it.
 MONITOR_BOUND = MONITOR_DEADLINE
+# A join bounds the channel, not the socket the OS still holds. So stranded work is
+# bounded in two further ways: it is told to stop, which prevents a late second attempt
+# after the channel has already reported its timeout, and only this many may be alive
+# at once - beyond that the channel refuses immediately rather than adding another.
+MONITOR_STRANDED_LIMIT = 2
+_monitor_stranded = []
+_monitor_lock = threading.Lock()
+
+
+def stranded_monitors():
+    """How many abandoned health threads are still alive; pruned as they finish."""
+    with _monitor_lock:
+        _monitor_stranded[:] = [thread for thread in _monitor_stranded if thread.is_alive()]
+        return len(_monitor_stranded)
 TERMINATION_BOUND = 6                            # SIGTERM wait then SIGKILL wait
 BOUND_SECONDS = INTAKE_BOUND + DRIFT_BOUND + 2 * TERMINATION_BOUND + MONITOR_BOUND
 
@@ -104,10 +118,18 @@ def monitor(config):
     refused loudly rather than reported as a bound that ran out. Only the I/O is bounded.
     """
     headers = monitor_binding(config)
-    answer, failure = {}, []
+    abandoned = stranded_monitors()
+    def exceeded(reason):
+        return {'healthy': False, 'reason': reason, 'stranded_threads': stranded_monitors(),
+                'attempts': [{'error': reason, 'healthy': False}],
+                'observed_at': now(), 'candidate': config['candidate']}
+    if abandoned >= MONITOR_STRANDED_LIMIT:
+        # Refuse rather than let abandoned network work pile up in the long-lived worker.
+        return exceeded('monitor_stranded_limit')
+    answer, failure, stop = {}, [], threading.Event()
     def work():
         try:
-            answer.update(observe_health(config, headers))
+            answer.update(observe_health(config, headers, stop))
         except BaseException as error:              # noqa: BLE001 - re-raised below
             failure.append(error)
     thread = threading.Thread(target=work, daemon=True)
@@ -116,10 +138,12 @@ def monitor(config):
     if failure:
         raise failure[0]
     if thread.is_alive() or not answer:
-        # The thread keeps no lock and is never waited on again; the channel is over.
-        return {'healthy': False, 'reason': 'monitor_bound_exceeded',
-                'attempts': [{'error': 'monitor_bound_exceeded', 'healthy': False}],
-                'observed_at': now(), 'candidate': config['candidate']}
+        # Told to stop, so it cannot start a further attempt after this answer; it holds
+        # no lock, is never waited on again, and is counted until it ends by itself.
+        stop.set()
+        with _monitor_lock:
+            _monitor_stranded.append(thread)
+        return exceeded('monitor_bound_exceeded')
     return answer
 
 
@@ -137,11 +161,15 @@ def monitor_binding(config):
     return headers
 
 
-def observe_health(config, headers):
+def observe_health(config, headers, stop):
     opener = urllib.request.build_opener(NoRedirect())
     attempts = []
     for number in range(2):
         transient = False
+        if stop.is_set():
+            # The channel already answered without this attempt; do not start one now.
+            attempts.append({'error': 'monitor_abandoned', 'healthy': False})
+            break
         try:
             with opener.open(urllib.request.Request(config['url'], headers=headers), timeout=MONITOR_TIMEOUT) as response:
                 raw = b''
@@ -169,9 +197,8 @@ def observe_health(config, headers):
             attempts.append({'error': 'transport_unavailable', 'healthy': False})
         except (ValueError, TypeError, AttributeError):
             attempts.append({'error': 'invalid_health_response', 'healthy': False})
-        if not transient or number == 1:
+        if not transient or number == 1 or stop.wait(1):
             break
-        time.sleep(1)
     return {'healthy': False, 'reason': 'endpoint_unavailable', 'attempts': attempts,
             'observed_at': now(), 'candidate': config['candidate']}
 
@@ -304,30 +331,6 @@ def drift(config, output):
                          for row in rows if row.get('incident')][:20], **base}
 
 
-def channel_result(output, channel, config_sha256, produce):
-    """Each channel's own outcome is durable the moment it is known.
-
-    A run interrupted before its receipt was written can then finish that receipt from
-    work already done, instead of reading the customer's site and Kundstart a second
-    time - which would also overwrite a same-second drift receipt in the customer path.
-    A stored result from another configuration is preserved and not reused.
-    """
-    path = regular(output / (channel + '.result.json'))
-    if path.exists():
-        try:
-            stored = load_state(path)
-            if (not isinstance(stored, dict) or set(stored) != {'config_sha256', 'result'}
-                    or stored['config_sha256'] != config_sha256
-                    or not isinstance(stored['result'], dict)):
-                raise StateError('invalid_channel_result')
-            return stored['result'], True
-        except StateError:
-            path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
-    value = produce()
-    write(path, {'config_sha256': config_sha256, 'result': value})
-    return value, False
-
-
 class StateError(ValueError):
     """Named malformed durable-state error; raw state is never used as a path."""
 
@@ -450,19 +453,28 @@ def transition(home, channel, current):
     return {'receipts': receipts, 'state_error': state_error}
 
 
-def due(home, config, run_id):
-    """Is the period's work due? Read from durable state, never from the wakeup.
+def due(home, config, channel, run_id):
+    """Is this channel's period due? Read from durable state, never from the wakeup.
 
-    A period missed because the host slept stays due, so the first wakeup after the
-    host returns performs it. Malformed period state is preserved and treated as due:
-    silence about a week is worse than one extra reading run. A record this very run
-    wrote means the run was interrupted after closing its period; it resumes as due
-    and must not close the same period a second time.
+    Each channel keeps its own period, which is what makes both halves of the order
+    hold at once. A period missed because the host slept stays due, so the first wakeup
+    after the host returns performs it. And a channel that keeps failing is retried at
+    every wakeup without dragging the others with it: a drift check that did run stays
+    closed for its whole week even while a broken intake is still being retried.
+
+    A record this very run wrote means the run was interrupted after closing this
+    channel's period. The work is done, so the channel is NOT due again: resuming
+    finishes the receipt without reading the customer's site or Kundstart a second time.
+    Nothing is ever reused across periods - a result is only ever recorded by the run
+    that produced it, in the period it was produced in.
+
+    Malformed period state is preserved and treated as due: silence about a week is
+    worse than one extra reading run.
     """
     period = config['period_seconds']
     if type(period) is not int or not PERIOD_FLOOR <= period <= PERIOD_CEILING:
         raise ValueError('Invalid bounded operation period')
-    path = regular(home / 'period.json')
+    path = regular(home / ('period-' + channel + '.json'))
     observed = datetime.now(timezone.utc)
     overdue = {'due': True, 'period_seconds': period, 'completed_at': None,
                'due_at': observed.isoformat(), 'overdue_seconds': 0, 'sequence': 0}
@@ -486,8 +498,11 @@ def due(home, config, run_id):
         path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
         return {**overdue, 'reason': 'invalid_period_state'}
     if value['run_id'] == run_id:
-        return {**overdue, 'reason': 'own_period_record', 'completed_at': value['completed_at'],
-                'sequence': value['sequence'], 'due_at': due_at.isoformat()}
+        # This run already closed this channel's period and was then interrupted. The
+        # reading is done; it must not happen again, and the record stands as written.
+        return {'due': False, 'reason': 'own_period_record', 'period_seconds': period,
+                'completed_at': value['completed_at'], 'due_at': due_at.isoformat(),
+                'overdue_seconds': 0, 'sequence': value['sequence']}
     late = observed - due_at
     return {'due': late >= timedelta(0),
             'reason': 'period_elapsed' if late >= timedelta(0) else 'not_due',
@@ -497,15 +512,13 @@ def due(home, config, run_id):
             'sequence': value['sequence']}
 
 
-def record_period(home, period, completed_at, run_id):
-    """Close the period once per run, counted from this run, after a read-back.
+def record_period(home, channel, period, completed_at, run_id):
+    """Close this channel's period, counted from the run that did the work.
 
-    An interrupted run that already closed its own period re-reads that record instead
-    of closing the period again, so resuming can never advance the sequence twice.
+    Only ever called by the run that just performed the channel, so `completed_at` is
+    always the time the reading actually happened - never a later run's clock.
     """
-    path = regular(home / 'period.json')
-    if period['reason'] == 'own_period_record':
-        return load_state(path)
+    path = regular(home / ('period-' + channel + '.json'))
     state = {'completed_at': completed_at, 'sequence': period['sequence'] + 1, 'run_id': run_id}
     write(path, state)
     if load_state(path) != state:
@@ -537,17 +550,32 @@ def run(config, run_id):
             if prior.get('config_sha256') != config_sha256:
                 raise ValueError('Run identity already belongs to another configuration')
             return prior
-        # Dueness is read after the cache, and it alone decides. A run interrupted
-        # after closing its own period is recognised by the record's run_id, so it
-        # resumes as due and re-reads rather than closing the period twice.
-        period = due(home, config, run_id) if 'period_seconds' in config else None
-        if period is not None and not period['due']:
-            # Inside the current period this wakeup reads nothing and writes nothing,
-            # so it needs no run record; the native schedule already counts the tick.
+        # Dueness is read after the cache, per channel, and it alone decides which
+        # channels this wakeup reads. A channel inside its current period is skipped
+        # entirely - no request, no receipt - and a channel still failing is retried
+        # without holding back one that already did its week's work.
+        bound = [channel for channel in CHANNELS if config.get(channel)]
+        periods = ({channel: due(home, config, channel, run_id) for channel in bound}
+                   if 'period_seconds' in config else {})
+        wanted = [channel for channel in bound if not periods or periods[channel]['due']]
+        skipped = sorted(channel for channel in bound if channel not in wanted)
+        if not wanted:
+            # Nothing is due. An ordinary tick inside the period reads nothing and
+            # writes nothing at all, so it needs no run record; the native schedule
+            # already counts it. A run whose own directory exists was interrupted after
+            # doing the work, and `already_performed` says so rather than claiming the
+            # period merely had not elapsed - that receipt is finished here.
             observed = now()
-            return {'run_id': run_id, 'config_sha256': config_sha256, 'completed': True,
-                    'performed': False, 'skipped': 'not_due', 'period': period,
-                    'started_at': observed, 'finished_at': observed}
+            resumed = bool(periods) and all(
+                periods[channel]['reason'] == 'own_period_record' for channel in skipped)
+            answer = {'run_id': run_id, 'config_sha256': config_sha256, 'completed': True,
+                      'performed': False, 'performed_channels': [],
+                      'skipped': 'already_performed' if resumed else 'not_due',
+                      'skipped_channels': skipped, 'periods': periods,
+                      'started_at': observed, 'finished_at': observed}
+            if output.exists():
+                write(result_file, answer)
+            return answer
         output.mkdir(mode=0o700, exist_ok=True)
         binding_file = output / 'binding.json'
         if binding_file.exists():
@@ -555,35 +583,30 @@ def run(config, run_id):
                 raise ValueError('Interrupted run belongs to another configuration')
         else:
             write(binding_file, {'config_sha256': config_sha256})
-        result = {'run_id': run_id, 'config_sha256': config_sha256, 'started_at': now(), 'completed': True}
-        result['resumed_channels'] = []
+        result = {'run_id': run_id, 'config_sha256': config_sha256, 'started_at': now(),
+                  'completed': True, 'periods': periods, 'skipped_channels': skipped}
 
         def bounded(channel, produce, failure=None):
-            """One durable channel. With `failure` its errors are named so they cannot
-            hide the other channels; without one they propagate, because a monitor
-            binding that is wrong is a release error for the operator, not an incident
-            to record for weeks (D038's behaviour, kept)."""
-            def attempt():
-                # A prior interrupted consumer is resumed through its ordinary
-                # idempotency journal; each attempt keeps all earlier output.
-                work = output / (channel + '-' + str(time.time_ns())); work.mkdir(mode=0o700)
-                if failure is None:
-                    return produce(work)
-                try:
-                    return produce(work)
-                except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as error:
-                    # Store only the error class, never credentials or tool output.
-                    return {**failure, 'error_type': type(error).__name__}
-            value, resumed = channel_result(output, channel, config_sha256, attempt)
-            if resumed:
-                result['resumed_channels'].append(channel)
-            return value
+            """One channel's own reading. With `failure` its errors are named so they
+            cannot hide the other channels; without one they propagate, because a
+            monitor binding that is wrong is a release error for the operator, not an
+            incident to record for weeks (D038's behaviour, kept)."""
+            # A prior interrupted consumer is resumed through its ordinary idempotency
+            # journal; each attempt keeps all earlier output.
+            work = output / (channel + '-' + str(time.time_ns())); work.mkdir(mode=0o700)
+            if failure is None:
+                return produce(work)
+            try:
+                return produce(work)
+            except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as error:
+                # Store only the error class, never credentials or tool output.
+                return {**failure, 'error_type': type(error).__name__}
 
-        if config.get('intake'):
+        if 'intake' in wanted:
             result['intake'] = bounded('intake', lambda work: consume(config['intake'], work),
                                        {'completed': False, 'reason': 'consumer_failed'})
             result['completed'] = result['intake']['completed']
-        if config.get('drift'):
+        if 'drift' in wanted:
             result['drift'] = bounded('drift', lambda work: drift(config['drift'], work),
                                       {'ran': False, 'reason': 'drift_binding_failed'})
             result['completed'] = result['completed'] and result['drift'].get('healthy') is True
@@ -596,7 +619,7 @@ def run(config, run_id):
             check = result['drift']
             result['deliveries']['drift'] = transition(home, 'drift', observation(
                 check.get('healthy') is True, check['reason'], check))
-        if config.get('monitor'):
+        if 'monitor' in wanted:
             def probe(_work):
                 observed = monitor(config['monitor'])
                 observed['access_scope'] = ('internal_protection_bypass'
@@ -610,20 +633,31 @@ def run(config, run_id):
             result['completed'] = result['completed'] and current['healthy']
         state_error = any(item['state_error'] for item in result['deliveries'].values())
         result['completed'] = result['completed'] and not state_error
-        # `performed` is the honest answer to "did the period's reading actually run".
-        # `completed` additionally requires that nothing it read was unhealthy, so an
-        # incident found by a check that ran is performed but not completed.
-        result['performed'] = (result.get('intake', {'completed': True})['completed']
-                               and result.get('drift', {'ran': True})['ran'] and not state_error)
-        if period is not None:
-            result['period'] = period
-            if result['performed']:
+
+        # `performed` per channel is the honest answer to "did this channel's reading
+        # actually run in this period". `completed` additionally requires that nothing
+        # it read was unhealthy, so an incident found by a check that ran is performed
+        # but not completed. A channel whose period was already closed is not performed
+        # here and its record is left exactly as the run that did the work wrote it.
+        done = {'intake': lambda: result['intake']['completed'],
+                'drift': lambda: result['drift']['ran'],
+                'monitor': lambda: 'monitor' in result}
+        result['performed_channels'] = sorted(
+            channel for channel in wanted
+            if done[channel]() and not (result['deliveries'].get(channel) or {}).get('state_error'))
+        result['performed'] = bool(result['performed_channels']) and not state_error
+        if periods:
+            result['periods_recorded'] = {}
+            for channel in result['performed_channels']:
+                if periods[channel]['reason'] == 'own_period_record':
+                    continue
                 try:
-                    result['period_recorded'] = record_period(home, period, result['started_at'], run_id)
+                    result['periods_recorded'][channel] = record_period(
+                        home, channel, periods[channel], result['started_at'], run_id)
                 except StateError as error:
-                    result['period_recorded'] = {'error_code': str(error)}
+                    result['periods_recorded'][channel] = {'error_code': str(error)}
                     result['completed'] = False
-            if period['reason'] == 'invalid_period_state':
+            if any(value['reason'] == 'invalid_period_state' for value in periods.values()):
                 result['completed'] = False
         result['finished_at'] = now(); write(result_file, result)
         return result
