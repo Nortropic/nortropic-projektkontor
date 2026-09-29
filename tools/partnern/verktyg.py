@@ -37,47 +37,136 @@ def _ord(t: str) -> str:
     return re.sub(r'\s+', ' ', re.sub(r'[^\w\s]', ' ', (t or '').casefold())).strip()
 
 
-SATSGRANS = re.compile(r'([.!?;:,\n\u2013\u2014]+|\s-\s)')
-NEGATION = re.compile(r'\b(inte|ej|aldrig|ingen|inga|inget|varken|nej)\b')
+SATSGRANS = re.compile(r'([.!?;:,\n–—]+|\s-\s)')
+NEGATION = re.compile(r'^(inte|ej|aldrig|ingen|inga|inget|varken|nej)$')
 SENASTE_FOR_BESTALLNING = 3
+# Beställningsord som verb (imperativ, infinitiv och presens), inte substantiv: "byggen", "körningen" och
+# "genomförandet" är inga beställningar. "inför" (prepositionen) räknas inte, bara "införa"; "rätta" efter
+# det/den/de ("det rätta valet") är ett adjektiv.
 BESTALLNINGSORD = re.compile(
-    r'\b(genomför\w*|kör|kör\w+|bygg\w*|inför\w*|implementer\w*|starta\w*|sätt igång|gör det|gör så|gör detta|'
-    r'ordna\w*|beställ\w*|fixa\w*|lägg till|ta fram|skapa\w*|åtgärda\w*|rätta\w*|uppdatera\w*|installera\w*|'
-    r'publicera\w*|integrera\w*|bered\w*|leverera\w*|verkställ\w*)\b')
+    r'\b(genomför(?:a|s)?|köra?|kör(?:s)?|bygga?|bygger|införa|implementera|starta|sätt igång|gör det|gör så|'
+    r'gör detta|ordna|beställ(?:a|er)?|fixa|lägg till|ta fram|skapa|åtgärda|(?<!\bdet )(?<!\bden )(?<!\bde )rätta|'
+    r'uppdatera|installera|publicera|integrera|bereda?|leverera|verkställ(?:a)?)\b')
 MIN_ORD = 3
+MAX_SATSER = 8
+SKAL = {
+    'tomt': 'citatet är tomt',
+    'for_kort': 'citatet är för kort: ägarens ord kräver minst tre ord',
+    'inget_bestallningsord': 'citatet saknar ett beställningsord (genomför, kör, bygg, beställ …); "ja", "precis" '
+                             'och "låter bra" är ingen beställning',
+    'negation': 'ett beställningsord är negerat i sin egen sats ("genomför inte …", "jag vill inte att du genomför …")',
+    'fraga': 'satsen med beställningsordet är en fråga',
+    'for_gammal': 'citatet finns i tråden men inte bland trådens tre senaste inspel',
+    'inte_funnen': 'citatet finns inte ordagrant som hela satser i det Johnny skrivit i den här tråden',
+}
+
+
+def _satser(text: str) -> list:
+    """[(jämförelseform, är fråga)] för varje sats i ett inspel."""
+    delar = SATSGRANS.split(text or '')
+    ut = []
+    for j in range(0, len(delar), 2):
+        t = _ord(delar[j])
+        if t:
+            ut.append((t, '?' in (delar[j + 1] if j + 1 < len(delar) else '')))
+    return ut
+
+
+def _negerad(sats: str) -> bool:
+    """Ett beställningsord i satsen är negerat: en negation före det i samma sats ("jag vill inte att du genomför")
+    eller direkt efter det ("genomför inte", "kör inte", "gör det inte"). Ett "inte" längre bort efter ordet är en
+    avgränsning ("genomför båda men inte den tredje")."""
+    ord_ = sats.split()
+    for m in BESTALLNINGSORD.finditer(sats):
+        i = len(sats[:m.start()].split())
+        n = len(m.group(0).split())
+        if any(NEGATION.match(w) for w in ord_[:i]) or any(NEGATION.match(w) for w in ord_[i + n:i + n + 2]):
+            return True
+    return False
+
+
+def _fonster(satser: list, mal: str):
+    """Första fönstret av hela satser som exakt bildar mal, som (start, slut), annars None."""
+    for start in range(len(satser)):
+        for slut in range(start + 1, min(len(satser), start + MAX_SATSER) + 1):
+            if ' '.join(t for t, _ in satser[start:slut]) == mal:
+                return start, slut
+    return None
+
+
+def _segment(inspel: list, mal: str, fran: int = 0):
+    """Citatet som en följd av fönster av hela satser ur olika inspel i tidsordning: [(inspel, satser)] eller None."""
+    for idx in range(fran, len(inspel)):
+        satser = _satser(inspel[idx]['text'])
+        for start in range(len(satser)):
+            for slut in range(start + 1, min(len(satser), start + MAX_SATSER) + 1):
+                del_ = ' '.join(t for t, _ in satser[start:slut])
+                if del_ == mal:
+                    return [(inspel[idx], satser[start:slut])]
+                if mal.startswith(del_ + ' '):
+                    resten = _segment(inspel, mal[len(del_) + 1:], idx + 1)
+                    if resten:
+                        return [(inspel[idx], satser[start:slut])] + resten
+    return None
+
+
+def prova_agarcitat(lager, trad: str, citat: str, bestallning: bool = False) -> tuple:
+    """(inspel, skäl). inspel är det inspel som bär citatet, eller None; skäl är None eller en nyckel i SKAL.
+
+    Citatet måste vara en eller flera hela satser (gränser vid skiljetecken och radbrytningar) som Johnny själv skrivit
+    i samtalsytan i samma tråd: ur ett inspel, eller ur flera av trådens tre senaste inspel i tidsordning, så att en
+    beställning och hans avgränsning i nästa meddelande kan bäras tillsammans. Text i bilagor, källor, andra trådar
+    eller svar kan aldrig bli ägarens ord. Ägarens ord i förståelse kräver minst tre ord.
+
+    En beställning (bestallning=True) ska stå bland trådens tre senaste inspel och innehålla minst en sats med ett
+    beställningsord som varken är negerat i sin sats eller står i en fråga; en kort hel sats räcker ("genomför båda",
+    "kör det"). Är något beställningsord i citatet negerat nekas hela citatet, så att "genomför inte …" aldrig blir
+    ett uppdrag. En negation som inte gäller beställningsordet ("…, inte fiktiva test byggen") är en avgränsning.
+    Det returnerade inspelet är det senaste med en giltig beställningssats; inspel['citerade'] listar alla citerade
+    inspel i tidsordning.
+    """
+    mal = _ord(citat)
+    if not mal:
+        return None, 'tomt'
+    if not bestallning and len(mal.split()) < MIN_ORD:
+        return None, 'for_kort'
+    alla = lager.fraga('select * from inspel where trad=? order by tid', (trad,))
+    senaste = alla[-SENASTE_FOR_BESTALLNING:]
+    traff = _segment(senaste, mal)
+    if not traff and not bestallning:
+        for i in reversed(alla):  # ägarens ord i förståelse: ett enskilt inspel var som helst i tråden
+            f = _fonster(_satser(i['text']), mal)
+            if f:
+                traff = [(i, _satser(i['text'])[f[0]:f[1]])]
+                break
+    if not traff:
+        if bestallning and any(_fonster(_satser(i['text']), mal) for i in alla[:-SENASTE_FOR_BESTALLNING]):
+            return None, 'for_gammal'
+        return None, 'inte_funnen'
+    barare = traff[-1][0]
+    if bestallning:
+        giltiga, negation, fraga = [], False, False
+        for i, satser in traff:
+            for text, ar_fraga in satser:
+                if not BESTALLNINGSORD.search(text):
+                    continue
+                if _negerad(text):
+                    negation = True
+                elif ar_fraga:
+                    fraga = True
+                else:
+                    giltiga.append(i)
+        if negation:
+            return None, 'negation'
+        if not giltiga:
+            return None, 'fraga' if fraga else 'inget_bestallningsord'
+        barare = giltiga[-1]
+    return dict(barare, citerade=[i['id'] for i, _ in traff]), None
 
 
 def hitta_agarcitat(lager, trad: str, citat: str, bestallning: bool = False):
-    """Inspelet där Johnny själv skrev citatet som hela satser i den här tråden, annars None.
-
-    Citatet måste vara en eller flera hela satser (gränser vid skiljetecken och radbrytningar) ur ett inspel som
-    Johnny skrivit i samtalsytan, i samma tråd, med minst tre ord. Ett bart "Precis." eller ett lösryckt ord som "och"
-    räcker därför aldrig, och text i bilagor, källor eller svar kan aldrig bli ägarens ord. För en beställning
-    (bestallning=True) måste de citerade satserna dessutom innehålla själva beställningen (genomför, kör, bygg …).
-    """
-    mal = _ord(citat)
-    if len(mal.split()) < MIN_ORD:
-        return None
-    if bestallning and (not BESTALLNINGSORD.search(mal) or NEGATION.search(mal)):
-        return None  # ingen beställning utan beställningsord, och "genomför inte …" är ingen beställning
-    inspel = lager.fraga('select * from inspel where trad=? order by tid desc', (trad,))
-    if bestallning:
-        inspel = inspel[:SENASTE_FOR_BESTALLNING]  # en gammal beställning kan inte bära ett nytt uppdrag
-    for i in inspel:
-        delar = SATSGRANS.split(i['text'] or '')
-        satser = []  # (jämförelseform, är fråga)
-        for j in range(0, len(delar), 2):
-            text = _ord(delar[j])
-            if text:
-                slutar = delar[j + 1] if j + 1 < len(delar) else ''
-                satser.append((text, '?' in slutar))
-        for start in range(len(satser)):
-            for slut in range(start + 1, min(len(satser), start + 8) + 1):
-                if ' '.join(s for s, _ in satser[start:slut]) == mal:
-                    if bestallning and satser[slut - 1][1]:
-                        return None  # en fråga ("Kan du ta fram …?") är ingen beställning
-                    return i
-    return None
+    """Inspelet som bär citatet, annars None (se prova_agarcitat)."""
+    return prova_agarcitat(lager, trad, citat, bestallning)[0]
 
 
 def _intervall(nr: set) -> str:
@@ -534,8 +623,8 @@ class Verktyg:
         return {'text': _kallblock('github:' + sokvag, tvatta(json.dumps(_trimma(data), ensure_ascii=False, indent=1)[:60000]))}
 
     # ------------------------------------------------------------------ skrivande (partnerns lager)
-    def _agarcitat(self, k, citat: str):
-        return hitta_agarcitat(self.s.lager, k.trad, citat)
+    def _agarcitat(self, k, citat: str) -> tuple:
+        return prova_agarcitat(self.s.lager, k.trad, citat)
 
     def v_forstaelse(self, k, a):
         slag = a.get('slag')
@@ -547,12 +636,12 @@ class Verktyg:
             raise Verktygsfel('Förståelsen ska vara kort (högst 4 000 tecken).')
         inspel = None
         if auktoritet == 'agarens_ord':
-            inspel = self._agarcitat(k, str(a.get('agarcitat') or ''))
+            inspel, skal = self._agarcitat(k, str(a.get('agarcitat') or ''))
             if not inspel:
-                raise Verktygsfel('agarens_ord kräver agarcitat: en eller flera hela satser (minst tre ord) som Johnny '
-                                  'själv skrivit i den här tråden, ordagrant. Text i bilagor, källor, andra trådar eller '
-                                  'gamla assistentsvar är inte ägarens ord, och ett kort "precis" räcker inte — spara som '
-                                  'modellbedomning eller okant, eller fråga Johnny.')
+                raise Verktygsfel('Nekat: %s. agarens_ord kräver agarcitat: en eller flera hela satser (minst tre ord) '
+                                  'som Johnny själv skrivit i den här tråden, ordagrant, ur ett inspel eller ur flera av '
+                                  'trådens tre senaste. Text i bilagor, källor, andra trådar eller gamla assistentsvar är '
+                                  'inte ägarens ord — spara som modellbedomning eller okant, eller fråga Johnny.' % SKAL[skal])
         if slag in ('beslut', 'rattelse') and auktoritet != 'agarens_ord':
             raise Verktygsfel('Ett beslut eller en rättelse måste bygga på Johnnys egna ord (agarens_ord med citat). '
                               'Spara annars som slutsats, observation eller oppen_fraga.')

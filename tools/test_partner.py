@@ -469,6 +469,42 @@ class AgarcitatProv(unittest.TestCase):
         self.assertIsNone(k('Genomför det: bygg en liten prototyp av statusraden.', b=True))  # för gammal beställning
         self.assertEqual(k('Genomför det: bygg en liten prototyp av statusraden.')['id'], order['id'])
 
+    def test_bestallningar_som_johnny_skriver_dem(self):
+        from partnern.verktyg import prova_agarcitat
+        p = lambda citat, b=True: prova_agarcitat(self.L, 't_c', citat, bestallning=b)
+        self.L.lagg_till('trad', trad='t_c', titel='C')
+        avgransad = self.inspel('t_c', 'beställ båda men det är till riktiga kunder, inte fiktiva test byggen.')
+        self.assertEqual(p('beställ båda men det är till riktiga kunder, inte fiktiva test byggen.')[0]['id'], avgransad['id'])
+        kort = self.inspel('t_c', 'genomför båda')
+        self.assertEqual(p('genomför båda')[0]['id'], kort['id'])                        # kort men en hel beställning
+        tva = p('beställ båda men det är till riktiga kunder, inte fiktiva test byggen. genomför båda')[0]
+        self.assertEqual((tva['id'], tva['citerade']), (kort['id'], [avgransad['id'], kort['id']]))  # två inspel
+        self.inspel('t_c', 'kör det')
+        self.assertIsNotNone(p('kör det')[0])
+        self.inspel('t_c', 'ja')
+        self.assertEqual(p('ja'), (None, 'inget_bestallningsord'))
+        self.inspel('t_c', 'genomför inte migreringen')
+        self.assertEqual(p('genomför inte migreringen'), (None, 'negation'))
+        self.inspel('t_c', 'Jag vill inte att du genomför det här nu.')
+        self.assertEqual(p('Jag vill inte att du genomför det här nu.'), (None, 'negation'))
+        self.inspel('t_c', 'Detta låter bra.')
+        self.assertEqual(p('Detta låter bra.'), (None, 'inget_bestallningsord'))
+        self.inspel('t_c', 'Kan du bygga en jämförelse av tre alternativ?')
+        self.assertEqual(p('Kan du bygga en jämförelse av tre alternativ?'), (None, 'fraga'))
+        self.assertEqual(p('genomför båda'), (None, 'for_gammal'))                    # inte bland de tre senaste
+        self.assertEqual(p('bygg allt nu'), (None, 'inte_funnen'))
+        self.assertEqual(p('Kan du bygga en', b=False), (None, 'inte_funnen'))        # satsfragment
+        self.assertEqual(p('ja', b=False), (None, 'for_kort'))
+        self.inspel('t_c', 'Det gäller bara riktiga kunder, inte fiktiva testbyggen.')
+        self.inspel('t_c', 'Genomför underhållsformen.')
+        self.assertIsNotNone(p('Det gäller bara riktiga kunder, inte fiktiva testbyggen. Genomför underhållsformen.')[0])
+        self.inspel('t_c', 'Genomför A, men kör inte B.')
+        self.assertEqual(p('Genomför A, men kör inte B.'), (None, 'negation'))          # negerat beställningsord någonstans
+        self.inspel('t_c', 'Genomför båda men inte den tredje.')
+        self.assertIsNotNone(p('Genomför båda men inte den tredje.')[0])                # avgränsning längre bort
+        self.inspel('t_c', 'Vi tar det inför mötet, det är det rätta valet.')
+        self.assertEqual(p('Vi tar det inför mötet, det är det rätta valet.'), (None, 'inget_bestallningsord'))
+
 
 class AtkomstProv(Miljo):
     def test_inloggning_vard_ursprung_och_eget_huvud(self):
@@ -1004,7 +1040,10 @@ class VerktygProv(Miljo):
         self.manus('RING bered_uppdrag ' + json.dumps(args),
                    'RING bered_uppdrag ' + json.dumps(dict(args, agarcitat='Precis.')))
         self.skicka('Ja.', trad=trad)
-        self.assertEqual(self.svar(trad, 2).count('bered_uppdrag:FEL'), 2)  # bilagans ord och ett bart "Precis." räcker inte
+        s2 = self.svar(trad, 2)
+        self.assertEqual(s2.count('bered_uppdrag:FEL'), 2)  # bilagans ord och ett bart "Precis." räcker inte
+        self.assertIn('Nekat: citatet finns inte ordagrant', s2)                  # felbeskedet säger vilken regel
+        self.assertIn('Nekat: citatet saknar ett beställningsord', s2)
         self.skicka('Genomför det: lägg till en statusrad i Aquarium som visar partnerns tjänst.', trad=trad)
         self.svar(trad, 3)
         args = {'rubrik': 'Statusrad i Aquarium', 'mal': 'Aquarium visar om partnerns tjänst kör.',

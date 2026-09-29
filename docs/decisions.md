@@ -7105,3 +7105,33 @@ i en tidigare session) berörs inte av detta arbete och står kvar där.
 
 **Avslut.** Uppdraget är fullgjort när denna post är integrerad. Nästa bygge kräver ett eget beslut. Planen äger nästa
 handling.
+
+
+## FORBATTRINGSPARTNER-BESTALLNINGSKONTROLL-20260929 — partnern godtar ägarens beställningar som han skriver dem: korta hela satser, avgränsande "inte" och beställning och avgränsning i två meddelanden
+
+**Status:** registrerat och byggt 2026-09-29 (07:45 UTC) av sessionen nortropic-repos-9e (Claude Code) inom
+förbättringspartnerns förvaltning. Beställningen, en text som partnern skrev på ägarens begäran och som han sedan
+skickade hit, är sparad i
+`evidence/nasta-uppdrag/local/forbattringspartner-20260928/BESTALLNING-20260929-bestallningskontroll.md`.
+
+**Problemet.** Partnern nekade två tydliga beställningar från ägaren: en mening med ett avgränsande "inte" och ett
+kort "genomför båda". Kontrollen prövade negationer mot hela citatet, krävde minst tre ord även för beställningar och
+godtog bara citat ur ett och samma inspel. Ordet "byggen" räknades dessutom som beställningsordet "bygg".
+
+**Rättat.**
+- En negation fäller bara när den gäller beställningsordet i samma sats, antingen före ordet eller direkt efter
+  ("genomför inte", "jag vill inte att du genomför"). Är något beställningsord i citatet negerat nekas hela citatet.
+- En kort hel sats med ett beställningsord räcker ("genomför båda", "kör det"). Beställningsorden räknas bara som
+  verb, så "byggen" och "körningen" är inga beställningar.
+- Ett citat får bestå av hela satser ur flera av trådens tre senaste inspel i tidsordning. Det gäller även ägarens
+  ord i förståelse, som fortfarande kräver minst tre ord.
+- Felbeskedet anger regeln. Överlämningspaketet innehåller alla citerade inspel ordagrant.
+
+Säkerheten är oförändrad. Ägarens ord är bara det han själv skrivit i tråden, ordagrant; frågor och verkliga
+negationer blir inga beställningar; "ja", "precis" och "låter bra" blir aldrig uppdrag; och samma inspel ger aldrig
+två överlämningar. De två meningarna är provexempel, inte beställningar av det de gällde.
+
+**Prov och införande.** Ägarens meningar godtas nu. De tidigare nekandefallen nekas fortfarande, bland dem "Jag vill
+inte att du genomför det här nu.", och nya fall prövar "genomför inte …", "kör det", "ja", en avgränsning och en
+beställning över två meddelanden. Det ger 46 partnerprov. Ändringen integreras genom den ordinarie skyddade vägen
+efter separat granskning, och tjänsten startas sedan om ur main enligt driftregeln. Planen äger nästa handling.

@@ -94,13 +94,19 @@ bryggan och kroken kräver en körningsnyckel som bara gäller under körningen.
 Källor är material, aldrig instruktioner. Deterministiska spärrar:
 
 - Ägarens ord (`agarens_ord`) kräver att citatet är en eller flera hela satser, minst tre ord, som Johnny själv
-  skrivit i samma tråd. Text i bilagor, källor, andra trådar och svar kan aldrig bli ägarens ord, och ett lösryckt
-  ord räcker inte. Beslut och rättelser kräver ägarens ord; en post som bygger på ägarens ord kan bara ersättas av
-  nyare ord från ägaren.
-- En beställning (`bered_uppdrag`) kräver dessutom att de citerade satserna står i något av trådens tre senaste
-  inspel, innehåller själva beställningen ("genomför", "kör", "bygg" …) och varken är en fråga eller innehåller en
-  negation ("inte", "aldrig" …). Ett bart "precis" eller "ja" blir aldrig ett uppdrag, och samma inspel ger aldrig
-  två överlämningar. Medan en överlämning i tråden är öppen (lämnad, mottagen, startad) skapas ingen ny till samma
+  skrivit i samma tråd: ur ett inspel, eller ur flera av trådens tre senaste inspel i tidsordning. Text i bilagor,
+  källor, andra trådar och svar kan aldrig bli ägarens ord, och ett lösryckt ord räcker inte. Beslut och rättelser
+  kräver ägarens ord; en post som bygger på ägarens ord kan bara ersättas av nyare ord från ägaren.
+- En beställning (`bered_uppdrag`) ska stå bland trådens tre senaste inspel, ur ett eller flera av dem i
+  tidsordning, så att en beställning och Johnnys avgränsning i nästa meddelande bärs tillsammans. Den ska innehålla
+  en sats med ett beställningsord som verb ("genomför", "kör", "bygg", "beställ" …) som varken är en fråga eller
+  negerad i sin egen sats. En kort hel sats räcker ("genomför båda", "kör det"). En negation fäller bara när den
+  gäller beställningsordet ("genomför inte", "jag vill inte att du genomför"); ett "inte" längre bort är en
+  avgränsning ("beställ båda men det är till riktiga kunder, inte fiktiva test byggen"). Är något beställningsord i
+  citatet negerat nekas hela citatet. "ja", "precis" och "låter bra" blir aldrig ett uppdrag, och samma inspel ger
+  aldrig två överlämningar. Nekas ett citat säger felbeskedet vilken regel som fällde (för kort, saknar
+  beställningsord, negation, fråga, för gammal, inte funnen, eller öppen överlämning), och paketets
+  `AGARENS-ORD.md` innehåller alla citerade inspel ordagrant. Medan en överlämning i tråden är öppen (lämnad, mottagen, startad) skapas ingen ny till samma
   mottagare, om inte partnern uttryckligen anger att Johnny beställt något annat; det nya paketet pekar då ut
   vilket det skiljer sig från.
 - WebFetch går bara till publika värdar som Johnny länkat i tråden, som finns bland träffarna från en webbsökning
@@ -114,7 +120,8 @@ Källor är material, aldrig instruktioner. Deterministiska spärrar:
 
 **Kända gränser.** Att den sparade förståelsetexten stämmer med det citerade ägarordet prövas inte maskinellt;
 citatet visas alltid bredvid posten, och beställningsregeln är ordbaserad (en ovanlig formulering kan nekas eller
-släppas igenom; partnern frågar då hellre). Värdar som en webbsökning returnerat blir hämtbara under körningen: en
+släppas igenom; partnern frågar då hellre). Spärren prövar att citatet är Johnnys egen beställning, inte att han
+inte har ångrat sig i ett senare meddelande; det bedömer partnern. Värdar som en webbsökning returnerat blir hämtbara under körningen: en
 planterad instruktion som får modellen att söka fram en viss webbplats kan göra den hämtbar, men bara med korta
 adresser utan inbäddade adresser, hemligheter eller personuppgifter. Inloggningskakan är tillståndslös i 30 dagar (utloggning rensar bara
 webbläsaren) och spärren efter åtta felaktiga inloggningar gäller alla i tio minuter. Webbpolicyns
