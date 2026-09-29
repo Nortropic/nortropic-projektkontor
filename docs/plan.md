@@ -1,3 +1,53 @@
+# Gällande återupptagning — Digitalas underhållsform och tak, 2026-09-29
+
+DIGITALA-UNDERHALL-20260929 är registrerad: ägaren beslutade underhållsformen för riktiga kunder och taket 20 läsande
+modellsessioner per kalendermånad 2026-09-29. Detta block äger nästa handling för underhållsformen och ersätter inte
+Digitala-blocken, förbättringspartnerns block eller Kundstart-blocket nedan; de ersätter inte detta.
+Uppdraget kom som förbättringspartnerns överlämning OVL-20260929-328e79 till kontorets kedjedrivare.
+
+Formen gäller bara riktiga kunder med en lanserad sajt. Det finns ingen riktig kund i dag, så ingen löpande förvaltning
+är startad: formen är byggd och prövad med tydligt märkt testdata. Fiktiva testbyggen (Norrglänta, Vikskär, testfall
+och kommande fiktiva fall) förvaltas inte efter leveransen.
+
+Byggt i Digitala på grenen `underhall/form-och-tak-20260929`: `verktyg/underhall.py` med arton prov, `MANDAT.md`
+§1–§3, `kunskap/drift.md`, och `ARBETSSATT.md`, `OVERSIKT.md` och `steg/steg.json` som bar det ersatta läget;
+`steg/PINNAR.sha256` omskriven för de tre ändrade professionsfilerna. Helsvit 315/315, och baslinjen 297/297 mätt på
+oförändrad main i en egen utcheckning med eget kvitto. Sexton mutationer av klassningens och takets grindar fälldes var
+och en av ett prov, också med kvitto. Ingen ändring behövdes i Kundstart:
+ärendemodellen har inget stängt läge, och länkens 30 dagar är den enda gränsen. Kontorets gren för denna
+dokumentändring är `digitala/underhall-20260929`.
+
+Faktarättelserna inom stående mandat är öppettider, telefonnummer och pris, och tolkas smalt: bara telefondelen av
+kundens kontaktvägar ryms. Det fjärde exemplet i den godtagna texten, en medarbetare som slutat, är inte infört och
+ligger som ny rad i ÄGARENS TUR; tills ägaren avgör är en personaländring ett förslag. Separat granskning: runda 1 underkände en
+första kandidat på sex fynd (listan var vidgad utöver den godtagna texten), runda 2 på två (grinden kunde kringgås med
+ett sammansatt värde, och raden till ägaren tillskrev hans text ett skäl den inte bär), runda 3 på ett (posten räknade
+fem krav men påstod sig räkna sex), runda 4 på ett (en punktlista bar kvar samma ersatta räkning) och runda 5 på två
+(baslinjen påstods mätt utan kvitto, och en grind saknade mutation). Alla tolv är åtgärdade, och runda 6 godkände
+kandidaten utan blockerande fynd. Rundorna ligger i uppdragets mapp under `granskning/`.
+
+Prövat mot den lokala Kundstart-tjänsten i testläget (127.0.0.1:3131, ärendet märkt TESTFALL) med den kod som
+levereras: sex poster lämnade genom kundens egen länk, en sjunde vägrad av Kundstart, och en åttonde lämnad efter
+överföringen till Digitala. Öppettider och ett
+nytt telefonnummer blev faktarättelser; en ändrad formulärsökväg, fri prosa i telefonledet, en ny tjänst och en
+instruktionsliknande text blev förslag utan att något utfördes. Posten efter överföringen visar att ärendet tar emot
+kundens text också då. En rättelse av `personal` gick inte att lämna alls: Kundstart svarar 404 på en nyckel som inte
+står i kundens egen bild. Körningen ligger i
+`evidence/nasta-uppdrag/local/digitala-underhall-20260929/prov/korning-slutlig/`.
+
+Nästa handling: ingen i detta spår. Formen gäller när en riktig kund finns; då hålls kundens Kundstart-ärende öppet med
+`underhall.py oppna` och veckorytmen följer `kunskap/drift.md`. Två rader i ÄGARENS TUR är stängda (underhållsformen
+och taket). Den schemalagda veckokörningen genom Runtime är ett eget uppdrag och står kvar som egen rad i ÄGARENS TUR;
+kravet att en kontroll som missades medan värden sov ska köras när värden vaknar hör till det uppdraget. Bevarandetid
+och radering i Blob-lagret är obeslutade och hänger ihop med öppna ärenden efter leverans (egen rad, KUNDSTART-20260927).
+Att vidga listan över faktarättelser är ägarens beslut, och frågan om en medarbetare som slutat står i ÄGARENS TUR.
+Nästa bygge kräver ett eget accepterat uppdrag.
+
+Återupptagning: `evidence/nasta-uppdrag/local/digitala-underhall-20260929/` (ägarens ord ordagrant, den text han
+godtog, provkörningen) och paketet i `evidence/nasta-uppdrag/local/partner-OVL-20260929-328e79`.
+
+---
+
 # Gällande återupptagning — kreativ arbetskedja, 2026-09-28 19:38 UTC
 
 Denna post ersätter äldre nästa-handlingar nedan; hela den tidigare planen är
@@ -983,13 +1033,11 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28) och KUNDSTART-TESTLAGE-20260929 (2026-09-29) är tio rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28), KUNDSTART-TESTLAGE-20260929 (2026-09-29) och DIGITALA-UNDERHALL-20260929 (2026-09-29) är nio rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. DIGITALA-UNDERHALL-20260929 stängde raderna om Digitalas underhållsform och taket för stående arbete: ägaren beslutade båda 2026-09-29, och lade till raden om en medarbetare som slutat. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
 ÄGARENS TUR
-- [beslut] Digitala: tak för stående arbete per månad, i antal läsande modellsessioner; kedjedrivarens förslag är 20, redovisade i månadsomgången (OMBYGGNAD-AGARSVAR-20260927) — sedan 2026-09-27
-- [beslut] Digitala: underhållsform för levererade sajter; du skrev "vi ska arbete fram åt slags underhåll tänker jag, ja", och tills den är beslutad är varje ändring en beställning (OMBYGGNAD-AGARSVAR-20260927) — sedan 2026-09-27
 - [beslut] Digitala: nästa fiktiva fall — välj och beställ det med dina ändringar från Norrglänta (DIGITALA-1-AGARBEDOMNING-20260927) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: kundredo kräver att förhandsvisningens inloggningsskydd lyfts för kundlänkar, en delbar länk till utomstående enligt MANDAT §2; beställ när ett kunduppdrag finns (KUNDSTART-20260927) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: bevarandetid och radering för kundmaterial i Blob-lagret är inte beslutade (KUNDSTART-20260927) — sedan 2026-09-27
@@ -998,6 +1046,7 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [operatörshandling] Codex-CLI:n i PATH (0.147.0) vägrar Runtimes modell gpt-6-astra; Runtimes pinnade codex-0.155.1 fungerar — uppdatera CLI:n eller låt det stå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [operatörshandling] Förbättringspartnern: bestående start vid inloggning — `python3 -B tools/partner.py autostart` visar LaunchAgent-filen och de två launchctl-kommandona för ditt eget Terminalfönster; utan den startas tjänsten med `python3 -B tools/partner.py start`, och startvakten startar överlämningarnas sessioner först när tjänsten kör (FORBATTRINGSPARTNER-RESULTAT-20260928, FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929) — sedan 2026-09-28
 - [beslut] Förbättringspartnern: Improvements-samtal efter 2026-09-19 finns inte i partnerns underlag; en ny fångst genom Intake kräver din ChatGPT-inloggning i en webbläsare som en session får styra — beställ eller avstå (FORBATTRINGSPARTNER-RESULTAT-20260928) — sedan 2026-09-28
+- [beslut] Digitala: hör en medarbetare som slutat till stående mandat? Den text du godtog räknar upp den som faktarättelse, men Digitalas gällande mandat lägger personuppgifter i förslagsvägen (MANDAT.md §2, sedan tidigare), en fri textrad går inte att skilja från att någon tillkommit, och Kundstart tar inte emot en sådan rättelse alls (404, prövat). Tills du avgör är en personaländring ett förslag (DIGITALA-UNDERHALL-20260929) — sedan 2026-09-29
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
