@@ -5,7 +5,7 @@
     python3 -B tools/partner.py status       visa om tjänsten kör, vilken kod och vilka data
     python3 -B tools/partner.py stopp        stoppa tjänsten (pågående arbete markeras avbrutet och återupptas)
     python3 -B tools/partner.py index        bygg om källindexet ur originalen
-    python3 -B tools/partner.py overlamningar
+    python3 -B tools/partner.py overlamningar  visa överlämningar: mottagare, status, session och startvaktens läge
     python3 -B tools/partner.py kvittera OVL-… mottagen|startad|levererad|avslagen --av "…" [--bevis "…"]
     python3 -B tools/partner.py autostart    visa hur ägaren gör tjänsten bestående (skriver ingenting)
 
@@ -138,20 +138,32 @@ def index(k, args) -> int:
 
 def overlamningar(k, args) -> int:
     from partnern.lager import Lager
+    from partnern.start import handelser, kvittenser
     lager = Lager(k.data)
     rader = lager.fraga('select id, status, tid, uppdaterad, data from overlamning order by tid desc')
     if not rader:
         print('Inga överlämningar.')
     for r in rader:
         d = json.loads(r['data'])
-        status = r['status']
-        try:  # mottagarens senaste kvittens gäller även när tjänsten inte har läst den ännu
-            sista = (Path(d.get('katalog') or '') / 'KVITTENS.jsonl').read_text('utf-8').strip().splitlines()[-1:]
-            if sista:
-                status = json.loads(sista[0]).get('status') or status
-        except (OSError, ValueError, IndexError):
-            pass
-        print('%s  %-9s  %s  → %s\n    %s' % (r['id'], status, d.get('rubrik'), d.get('mottagare'), d.get('katalog')))
+        kat = Path(d.get('katalog') or '')
+        kv = kvittenser(kat)  # mottagarens senaste kvittens gäller även när tjänsten inte har läst den ännu
+        status = (kv[-1].get('status') if kv else None) or r['status']
+        print('%s  %-9s  %s\n    mottagare: %s\n    lämnad %s%s\n    %s' % (
+            r['id'], status, d.get('rubrik'), d.get('mottagare') or 'kontorets-kedjedrivare', r['tid'][:19] + 'Z',
+            ('; senaste kvittens %s %s av %s' % (kv[-1].get('status'), str(kv[-1].get('kvitterad'))[:19] + 'Z',
+                                                 kv[-1].get('av'))) if kv else '', kat))
+        hist = handelser(kat)
+        starter = [h for h in hist if h.get('typ') == 'startad']
+        if starter:
+            s = starter[0]
+            print('    session: %s startad %s i %s (%s, %s %s)%s' % (
+                s.get('session'), s['tid'][:19] + 'Z', s.get('repo'), s.get('cli'), s.get('modell'), s.get('anstrangning'),
+                (', fortsatt %d gånger' % (len(starter) - 1)) if len(starter) > 1 else ''))
+        if hist and hist[-1].get('typ') != 'startad':
+            h = hist[-1]
+            print('    startvakten: %s %s%s' % (h['typ'], h['tid'][:19] + 'Z', (': ' + h['skal']) if h.get('skal') else ''))
+        elif not hist and status == 'lamnad':
+            print('    startvakten: ingen start ännu')
     return 0
 
 

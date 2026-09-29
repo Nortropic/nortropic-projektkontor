@@ -291,9 +291,11 @@ def specifikationer(typ: str) -> list:
                 'verkliga beslutet (agarcitat: de hela satser i den här tråden där Johnny själv beställer, med '
                 'beställningsordet, t.ex. "genomför det", "kör", "bygg"), föreslagen nästa handling och mottagare. '
                 'Servern skriver ett överlämningspaket i kontorets ordinarie beställningsväg och kör AP-06-beredningen '
-                'som utkast. Status blir "lämnat"; mottagaren kvitterar mottaget/startat/levererat. Samma beslut ger '
-                'aldrig två uppdrag, och medan en överlämning i tråden är öppen skapas ingen ny till samma mottagare '
-                'om du inte anger annan_bestallning (bara när Johnny beställer något annat än den öppna).'),
+                'som utkast. Status blir "lämnat". Startvakten startar sedan mottagarens session av sig själv (en per '
+                'överlämning, när skrivplatsen är ledig); mottagaren kvitterar mottaget/startat/levererat. Samma beslut '
+                'ger högst en överlämning per mottagare: gäller beställningen flera mottagare anropar du en gång per '
+                'mottagare. Medan en överlämning i tråden är öppen skapas ingen ny till samma mottagare om du inte '
+                'anger annan_bestallning (bara när Johnny beställer något annat än den öppna).'),
              'inputSchema': {'type': 'object', 'properties': {
                  'rubrik': {'type': 'string'}, 'mal': {'type': 'string'},
                  'underlag': {'type': 'array', 'items': {'type': 'string'}},

@@ -1,10 +1,11 @@
 """Överlämning till kontoret när Johnny tydligt beställer genomförande.
 
-Partnern bereder; den startar ingenting. Paketet skrivs i kontorets ordinarie beställningsväg
-(`evidence/nasta-uppdrag/local/partner-<id>/`) med den sammanställda arbetsordern, Johnnys exakta ord,
-hashade kopior av underlaget och ett AP-06-utkast (`tools/bered_uppdrag.py`) med sina luckor. Status går
-lämnat → mottaget → startat → levererat; bara mottagaren kvitterar de senare stegen (KVITTENS.jsonl, som
-`partner.py kvittera` skriver). Samma ägarinspel ger aldrig två överlämningar.
+Partnern bereder. Paketet skrivs i kontorets ordinarie beställningsväg (`evidence/nasta-uppdrag/local/partner-<id>/`)
+med den sammanställda arbetsordern, Johnnys exakta ord, hashade kopior av underlaget och ett AP-06-utkast
+(`tools/bered_uppdrag.py`) med sina luckor. Status går lämnat → mottaget → startat → levererat; bara mottagaren
+kvitterar de senare stegen (KVITTENS.jsonl, som `partner.py kvittera` skriver). Samma beställning ger högst en
+överlämning per mottagare, och varje överlämning får ett eget id; ett befintligt paket flyttas aldrig. Startvakten
+(start.py) startar mottagarens session när överlämningen är lämnad.
 """
 from __future__ import annotations
 
@@ -14,6 +15,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -21,13 +23,16 @@ from .lager import nu
 from .verktyg import SKAL, Verktygsfel, prova_agarcitat
 
 MOTTAGARE = {
-    'kontorets-kedjedrivare': 'Kontorets kedjedrivare: nästa interaktiva session (Claude Code eller Codex) som Johnny '
-                              'startar i nortropic-projektkontor. Den läser planen och tar emot paketet här.',
-    'digitala': 'Digitalas kedjedrivare (session i nortropic-digitala), genom kontorets beställningsväg.',
-    'runtime': 'Runtimes underhåll (session i Nortropic Runtime), genom kontorets beställningsväg.',
-    'kundstart': 'Kundstart-sessionen (nortropic-kundstart), genom kontorets beställningsväg.',
+    'kontorets-kedjedrivare': 'Kontorets kedjedrivare: en session i nortropic-projektkontor som startvakten startar när '
+                              'överlämningen är lämnad (eller som Johnny startar). Den läser planen och tar emot paketet här.',
+    'digitala': 'Digitalas kedjedrivare: en session i nortropic-digitala som startvakten startar, genom kontorets '
+                'beställningsväg.',
+    'runtime': 'Runtimes underhåll: en session i Nortropic Runtime som startvakten startar, genom kontorets beställningsväg.',
+    'kundstart': 'Kundstart: en session i nortropic-kundstart som startvakten startar, genom kontorets beställningsväg.',
 }
 STATUSAR = ('lamnad', 'mottagen', 'startad', 'levererad', 'avslagen')
+KORTNAMN = {'kontorets-kedjedrivare': 'kontoret', 'digitala': 'digitala', 'runtime': 'runtime', 'kundstart': 'kundstart'}
+OVL_ID = re.compile(r'^OVL-\d{8}-[A-Za-z0-9]{6}(-(kontoret|digitala|runtime|kundstart)\d*)?$')
 
 
 def _sha(p: Path) -> str:
@@ -37,11 +42,16 @@ def _sha(p: Path) -> str:
 class Overlamning:
     def __init__(self, server):
         self.s = server
+        self._las = threading.Lock()  # två anrop i samma svar prövas och skapas i tur och ordning
 
     def katalog(self, oid: str) -> Path:
         return paketrot(self.s.k) / ('partner-' + oid)
 
     def bered(self, korning, a: dict) -> dict:
+        with self._las:
+            return self._bered(korning, a)
+
+    def _bered(self, korning, a: dict) -> dict:
         citat = str(a.get('agarcitat') or '')
         inspel, skal = prova_agarcitat(self.s.lager, korning.trad, citat, bestallning=True)
         if not inspel:
@@ -51,26 +61,26 @@ class Overlamning:
                               'dem i tidsordning när hans avgränsning står i ett eget meddelande. Text i bilagor, källor '
                               'eller dina egna förslag räcker inte, och "ja" eller "precis" är ingen beställning — fråga '
                               'honom om han vill att uppdraget bereds.' % SKAL[skal])
-        finns = self.s.lager.en('select * from overlamning where inspel=?', (inspel['id'],))
-        if finns:
-            d = json.loads(finns['data'])
-            return {'text': 'Det finns redan en överlämning från samma beställning: %s "%s" (status %s, %s). Ingen ny '
-                            'skapades.' % (finns['id'], d.get('rubrik'), finns['status'], d.get('katalog_visning'))}
         mottagare = a.get('mottagare') if a.get('mottagare') in MOTTAGARE else 'kontorets-kedjedrivare'
+        # Samma beställning till samma mottagare ger aldrig två överlämningar; till en annan mottagare får den ge en till.
+        for finns in self.s.lager.fraga('select * from overlamning where inspel=? order by tid', (inspel['id'],)):
+            d = json.loads(finns['data'])
+            if (d.get('mottagare') or 'kontorets-kedjedrivare') == mottagare:
+                return {'text': 'Spärren "samma beställning till samma mottagare" fällde. Det finns redan en överlämning '
+                                'från samma beställning till %s: %s "%s" (status %s, %s). Ingen ny skapades.' % (
+                                    mottagare, finns['id'], d.get('rubrik'), finns['status'], d.get('katalog_visning'))}
         oppna = [o for o in self.s.lager.fraga("select * from overlamning where trad=? and status in "
                                                "('lamnad','mottagen','startad') order by tid", (korning.trad,))
                  if json.loads(o['data']).get('mottagare') == mottagare]
         if oppna and a.get('annan_bestallning') is not True:
             o = oppna[-1]
             d = json.loads(o['data'])
-            return {'text': 'Det finns redan en öppen överlämning i den här tråden till samma mottagare: %s "%s" (status '
-                            '%s, %s). Ingen ny skapades. Gäller Johnnys nya beställning något annat än den, anropa igen '
-                            'med annan_bestallning: true och skriv i målet vad som skiljer den från %s.' % (
-                                o['id'], d.get('rubrik'), o['status'], d.get('katalog_visning'), o['id'])}
-        oid = 'OVL-%s-%s' % (datetime.now(timezone.utc).strftime('%Y%m%d'), inspel['id'][-6:])
-        kat = self.katalog(oid)
-        if kat.exists():  # rest efter ett avbrott före journalföringen: bevaras vid sidan av, blockerar inte
-            kat.rename(kat.with_name(kat.name + '.avbruten-' + nu().replace(':', '').replace('.', '')))
+            return {'text': 'Spärren "öppen överlämning till samma mottagare i tråden" fällde. Det finns redan en öppen '
+                            'överlämning i den här tråden till %s: %s "%s" (status %s, %s). Ingen ny skapades. Gäller '
+                            'Johnnys nya beställning något annat än den, anropa igen med annan_bestallning: true och '
+                            'skriv i målet vad som skiljer den från %s.' % (
+                                mottagare, o['id'], d.get('rubrik'), o['status'], d.get('katalog_visning'), o['id'])}
+        oid, kat = self._nytt_id(inspel['id'], mottagare)
         kat.mkdir(parents=True, exist_ok=False, mode=0o700)
         (kat / 'underlag').mkdir(mode=0o700)
         citerade = [self.s.lager.en('select * from inspel where id=?', (x,)) for x in inspel.get('citerade') or [inspel['id']]]
@@ -95,8 +105,9 @@ class Overlamning:
                  '*Överlämning %s från Projektkontorets förbättringspartner, lämnad %s. Sammanställt av partnern ur '
                  'samtalet; bara citatet och AGARENS-ORD.md är Johnnys ordagranna ord.*' % (oid, nu()), '',
                  '## Beslutet (Johnnys ord)', '', '> %s' % citat, '',
-                 'Inspel `%s`, tråd `%s`, sparat %s. Hela inspelet: AGARENS-ORD.md.' % (inspel['id'], inspel['trad'],
-                                                                                     inspel['tid']), '',
+                 'Inspel `%s`, tråd `%s`, sparat %s. Hela %s: AGARENS-ORD.md.' % (
+                     inspel['id'], inspel['trad'], inspel['tid'],
+                     'inspelet' if len([c for c in citerade if c]) == 1 else 'inspelen'), '',
                  '## Mål', '', mal, '', '## Underlag', '']
         order += ['- `%s` → %s' % (u['id'], u['fil']) for u in underlag] or ['- (inget underlag angivet)']
         order += ['', '## Gränser', '']
@@ -122,7 +133,7 @@ class Overlamning:
         visning = (('provinstansens data: overlamningar/partner-%s/' if getattr(self.s.k, 'prov_dolj', ())
                     else 'kontoret/evidence/nasta-uppdrag/local/partner-%s/') % oid)
         self.s.lager.lagg_till('overlamning', overlamning=oid, trad=korning.trad, inspel=inspel['id'],
-                               nyckel=inspel['id'], rubrik=rubrik, mal=mal, mottagare=mottagare,
+                               nyckel='%s:%s' % (inspel['id'], mottagare), rubrik=rubrik, mal=mal, mottagare=mottagare,
                                katalog=str(kat), katalog_visning=visning, ap06=ap06, granser=granser,
                                nasta_handling=nasta, agarcitat=citat, skild_fran=[o['id'] for o in oppna])
         korning.handelse('overlamning', 'Överlämning %s lämnad till %s' % (oid, mottagare))
@@ -131,6 +142,20 @@ class Overlamning:
                          'AGARENS-ORD.md, %d underlagsfiler, AP-06-utkast: %s%s).' % (
                              oid, MOTTAGARE[mottagare], visning, len(underlag), ap06.get('status'),
                              ('; luckor: ' + ', '.join(luckor[:8])) if luckor else ''))}
+
+    def _nytt_id(self, inspel_id: str, mottagare: str) -> tuple:
+        """Ett id som ingen överlämning eller katalog har: OVL-<datum>-<inspel>, för fler mottagare ur samma inspel med
+        mottagarens kortnamn, och vid en kvarlämnad katalog med löpnummer. Ett befintligt paket flyttas eller skrivs
+        aldrig över."""
+        bas = 'OVL-%s-%s' % (datetime.now(timezone.utc).strftime('%Y%m%d'), inspel_id[-6:])
+        kort = KORTNAMN.get(mottagare, 'kontoret')
+        for n in range(1, 50):
+            oid = bas if n == 1 else ('%s-%s' % (bas, kort) if n == 2 else '%s-%s%d' % (bas, kort, n - 1))
+            kat = self.katalog(oid)
+            if not kat.exists() and not os.path.lexists(kat) and \
+                    not self.s.lager.en('select id from overlamning where id=?', (oid,)):
+                return oid, kat
+        raise Verktygsfel('Hittar inget ledigt överlämnings-id; inget skapades.')
 
     def _skriv(self, p: Path, text: str) -> None:
         fd = os.open(p, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
@@ -250,7 +275,7 @@ def kvittera(k, oid: str, status: str, av: str, bevis: str = '') -> Path:
     """k är tjänstens konfiguration (eller, som tidigare, kontorets primärutcheckning)."""
     if status not in STATUSAR[1:]:
         raise ValueError('status måste vara en av ' + ', '.join(STATUSAR[1:]))
-    if not re.match(r'^OVL-\d{8}-[A-Za-z0-9]{6}$', oid):
+    if not OVL_ID.match(oid):
         raise ValueError('okänt överlämnings-id')
     rot = paketrot(k) if hasattr(k, 'kontor_primar') else Path(k) / 'evidence/nasta-uppdrag/local'
     fil = rot / ('partner-' + oid) / 'KVITTENS.jsonl'

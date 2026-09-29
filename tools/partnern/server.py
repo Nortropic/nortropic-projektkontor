@@ -31,6 +31,7 @@ from .kallor import Kallindex, KLASSER
 from .konfig import ANSTRANGNING, MODELLER, Konfig, spara_modellval
 from .lager import Lager, nu, nytt_id
 from .overlamning import Overlamning
+from .start import Startvakt
 from .systemlage import Systemlage
 from .verktyg import Verktyg, Verktygsfel, specifikationer
 from .webbpolicy import prova
@@ -45,6 +46,7 @@ OMSTART = 'serveromstart under arbetet'
 BARA_SPARA_AVBROTT = 'Johnny avbröt och sparade utan svar'
 ATERUPPTA_INOM = 3600
 KALLVAKT_SEKUNDER = 600   # källindexet byggs om inom tio minuter när det det byggs ur har ändrats
+STARTVAKT_SEKUNDER = 60   # lämnade överlämningar prövas för start varje minut (och direkt när tjänsten startar)
 
 
 def las_hemlighet(katalog: Path, namn: str, skapa: bool = True) -> str:
@@ -71,6 +73,7 @@ class Server:
         self.agent = Agent(self)
         self.jobb = Jobb(self)
         self.overlamning = Overlamning(self)
+        self.startvakt = Startvakt(self)
         self.inloggning = las_hemlighet(Path(k.hemligheter), 'inloggning.secret')
         self.kaknyckel = las_hemlighet(Path(k.hemligheter), 'kaka.secret').encode()
         self.vardar = {'127.0.0.1:%d' % k.port, 'localhost:%d' % k.port}
@@ -386,7 +389,8 @@ class Server:
             d = json.loads(o['data'])
             poster.append({'slag': 'overlamning', 'id': o['id'], 'tid': o['tid'], 'status': o['status'],
                            'rubrik': d.get('rubrik'), 'mottagare': d.get('mottagare'), 'katalog': d.get('katalog_visning'),
-                           'ap06': d.get('ap06'), 'historik': d.get('historik') or [], 'agarcitat': d.get('agarcitat')})
+                           'ap06': d.get('ap06'), 'historik': d.get('historik') or [], 'agarcitat': d.get('agarcitat'),
+                           'start': d.get('start')})
         for kp in self.lager.fraga('select * from koppling where trad=? or till=? order by tid', (trad, trad)):
             annan = kp['till'] if kp['trad'] == trad else kp['trad']
             poster.append({'slag': 'koppling', 'id': kp['id'], 'tid': kp['tid'], 'annan': annan,
@@ -423,7 +427,8 @@ class Server:
                              'Modellen är Claude genom Johnnys egen Claude Code-inloggning; ingen annan leverantör '
                              'och inga köpta krediter.' % self.k.port),
                 'jobb': self.lager.fraga("select status, count(*) as n from jobb group by status"),
-                'overlamningar': self.lager.fraga("select status, count(*) as n from overlamning group by status")}
+                'overlamningar': self.lager.fraga("select status, count(*) as n from overlamning group by status"),
+                'startvakt': self.startvakt.lage()}
 
     def _kodrevision(self) -> dict:
         rot = Path(__file__).resolve().parents[2]
@@ -631,7 +636,7 @@ class Hanterare(BaseHTTPRequestHandler):
             rader = S.lager.fraga('select id, trad, status, tid, uppdaterad, data from overlamning order by tid desc')
             for r in rader:
                 d = json.loads(r.pop('data'))
-                r.update({k: d.get(k) for k in ('rubrik', 'mottagare', 'katalog_visning', 'ap06', 'historik')})
+                r.update({k: d.get(k) for k in ('rubrik', 'mottagare', 'katalog_visning', 'ap06', 'historik', 'start')})
             return self._svara(200, {'overlamningar': rader})
         return self._fel(404, 'finns inte')
 
@@ -862,6 +867,19 @@ def starta(k: Konfig, bygg_index: bool = True, pidfil: Path | None = None):
                 pass
     if bygg_index:
         threading.Thread(target=kallvakt, daemon=True).start()
+
+    def startvakt():  # först när porten är bunden: en andra instans når aldrig hit
+        time.sleep(5)
+        while True:
+            try:
+                S.overlamning.las_kvittenser()
+                for oid, typ in S.startvakt.granska():
+                    sys.stderr.write('%s startvakten: %s %s\n' % (nu()[:19], oid, typ))
+            except Exception as fel:
+                sys.stderr.write('%s startvakten: fel (%s)\n' % (nu()[:19], type(fel).__name__))
+            time.sleep(STARTVAKT_SEKUNDER)
+    if S.startvakt.paslagen():
+        threading.Thread(target=startvakt, name='startvakt', daemon=True).start()
     sys.stderr.write('%s partner lyssnar på %s (kod %s, data %s); återhämtat: %s\n' % (
         nu()[:19], S.url, S.kodrevision.get('head'), k.data, json.dumps(aterhamtat)))
     httpd.serve_forever()

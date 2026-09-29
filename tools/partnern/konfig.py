@@ -44,6 +44,7 @@ class Gransar:
     bilaga_max_byte: int = 40_000_000
     inspel_max_bilagor: int = 20
     inspel_max_tecken: int = 60_000
+    startvakt_per_dygn: int = 6            # nya mottagarsessioner som startvakten får starta per dygn (UTC)
 
 
 @dataclass
@@ -52,6 +53,14 @@ class Modell:
     anstrangning: str = 'high'
     utredare: str = 'sonnet'
 
+
+# Startvaktens utförare: Runtimes fastlåsta binärer med de kontrollsummor Runtime själv binder (claude_profile.py och
+# evidence/v0.1/dependencies.json). Vilken som startar, och med vilken modell, väljs i Runtimes bemanning (rollen driver).
+RUNTIME_BIN = HEM / 'nortropic-repos/Nortropic Runtime/.runtime/bin'
+STARTVAKT_BINARER = {
+    'claude': (str(RUNTIME_BIN / 'claude-2.1.257'), '64590d7d9d9c189d33fb3dfa58c5408eaf2a10fe556bd84155d95efaab46b60e'),
+    'codex': (str(RUNTIME_BIN / 'codex-0.155.1'), '8eaf1ad12fe6bf89b1710330f58900014322c7c5af677e43be116d8ac5fc0a9e'),
+}
 
 # Valbara i samtalsytan (/model), prövade med Claude Code 2.1.280 på ägarens inloggning 2026-09-29. Fable har egen kvot
 # i abonnemanget; är den slut stoppas svaret med ett besked om kvoten.
@@ -80,6 +89,9 @@ class Konfig:
     kampanj: Path = HEM / 'nortropic/intake-campaigns/improvements-preparation-2026-09'
     repon: dict = field(default_factory=dict)
     prov_dolj: tuple = ()   # bara provinstanser: källgrupper (t.ex. imp:CONV-064) som döljs så att inget facit läcker
+    startvakt: bool = False  # på bara i den ordinarie tjänsten (se ladda)
+    startvakt_binarer: dict = field(default_factory=lambda: dict(STARTVAKT_BINARER))
+    startvakt_anstrangning: str = 'high'
 
     def till_json(self) -> dict:
         d = asdict(self)
@@ -116,6 +128,10 @@ def ladda() -> Konfig:
         k.repon = {n: Path(p) for n, p in json.loads(os.environ['PARTNER_REPON']).items()}
     if os.environ.get('PARTNER_PROV_DOLJ'):
         k.prov_dolj = tuple(x.strip() for x in os.environ['PARTNER_PROV_DOLJ'].split(',') if x.strip())
+    # Startvakten startar sessioner bara ur den ordinarie tjänsten (egen data och port ej angivna), aldrig ur en prov-
+    # eller utvecklingsinstans.
+    ordinarie = not (os.environ.get('PARTNER_DATA') or os.environ.get('PARTNER_PORT') or k.prov_dolj)
+    k.startvakt = os.environ.get('PARTNER_STARTVAKT', '1' if ordinarie else '0') == '1'
     installningar = data / 'installningar.json'
     if installningar.is_file():
         try:
@@ -128,6 +144,11 @@ def ladda() -> Konfig:
         for namn, varde in (val.get('gransar') or {}).items():
             if hasattr(k.gransar, namn) and isinstance(varde, (int, float)) and not isinstance(varde, bool):
                 setattr(k.gransar, namn, type(getattr(k.gransar, namn))(varde))
+        start = val.get('startvakt') if isinstance(val.get('startvakt'), dict) else {}
+        if start.get('pa') is False:  # Johnny stänger av startvakten i installningar.json
+            k.startvakt = False
+        if start.get('anstrangning') in ANSTRANGNING:
+            k.startvakt_anstrangning = start['anstrangning']
     return k
 
 

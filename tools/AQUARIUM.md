@@ -9,8 +9,8 @@ sidan öppen som ett lokalt fönster. Runtime och kontoret behåller sina egna s
 ## Vad som läses
 
 `collect(runtime_root, office_root, ...)` läser åtta källor: `release`, `staffing`, `questions`, `service`, `engine`,
-`tasks`, `watch` och `office`. Varje del är en utbytbar läsare, så prov använder syntetiska läsare i stället för verklig
-drift.
+`tasks`, `watch` och `office`, och därtill partnerns överlämningar. Varje del är en utbytbar läsare, så prov använder
+syntetiska läsare i stället för verklig drift.
 
 - **Runtime genom en avgränsad sond.** `runtime_probe` läser pekaren `.runtime/ap10/active.json` (vanlig fil, ingen
   symlänk), tar releasekatalogen ur dess `config` och kör releasens *egen* frysta kod en gång med releasens egen
@@ -34,6 +34,16 @@ drift.
 - **Kontoret genom `git show refs/remotes/origin/main:<sökväg>`**, alltså det publicerade innehållet — aldrig
   arbetsträdet: beslutsloggens poster (id, rubrik, text), leveransbeskeden `evidence/APnn/leverans.md` och planens
   block `ÄGARENS TUR`, samt `main` och dess datum.
+- **Partnerns överlämningar genom `handoff_reader(office_root)`**, en valfri nionde läsning bredvid de åtta källorna
+  (`overlamningar` i läsningen, källan `Kontoret · överlämningar`). Paketen är privata och står bara i kontorets
+  primärutcheckning, i `evidence/nasta-uppdrag/local/partner-OVL-…/`. När `collect` får en utcheckning av kontoret,
+  även en worktree, läses därför primärutcheckningen (Gits gemensamma katalog); en annan katalog läses som den är.
+  Bara kataloger vars namn är ett överlämnings-id läses, utan att följa länkar och högst 64 stycken. Per paket öppnas
+  tre filer. Ur `OVERLAMNING.json` tas id (som måste stämma med katalogen), partnerns rubrik, mottagare och när den
+  lämnades. Ur `KVITTENS.jsonl` tas senaste status och dess tid. Ur `START.jsonl` tas startvaktens senaste läge,
+  dess tid och dess fasta orsakskod. Arbetsordern, Johnnys ord, underlaget, AP-06-utkastet och sessionens ström
+  öppnas aldrig, och startloggens fria text kopieras aldrig. Ett paket som inte går att läsa räknas som oläsligt i
+  stället för att visas.
 
 En läsare som fallerar eller lämnar trasiga data gör bara sin egen källa otillgänglig, med lästid bevarad och utan att
 någon privat text sparas. Otillgängliga källor är inget fel: projektionen säger det i stället.
@@ -70,14 +80,24 @@ som ändå skulle kunna se privat ut i en rubrik ersätts av `[dolt]` innan det 
   beskedet behåller sin egen tid och märks `older_than_a_day`. Bevakningens modell följer inte modellvalet och ger
   aldrig upphov till en modellfråga.
 - **Ägarens bord** — obesvarade beredningar med förslag (om ingen accept finns), planens ägartur, Runtimes
-  modellfrågor för fortfarande valda modeller, och bevakningens egen ägarfråga. Inget annat blir en ägarpost.
+  modellfrågor för fortfarande valda modeller, bevakningens egen ägarfråga och, när överlämningarna lästes, varje
+  överlämning vars start misslyckades eller hindras, som operatörshandling med ett fast skäl. Skälen är att sessionen
+  slutade med fel eller utan resultat tre gånger, att den inte kunde startas, att den fastlåsta binären saknas eller
+  har ändrats, eller att mottagarens repo saknas. Inget annat blir en ägarpost.
+- **Överlämningarna** (`overlamningar`, bara när läsningen har dem) — en rad per öppen överlämning (lämnad, mottagen,
+  startad) med id, rubrik, mottagare (kontoret, Digitala, Runtime eller Kundstart) och status, samt tiden för senaste
+  kvittens eller, utan kvittens, när den lämnades. Raden har också startvaktens läge i fast ordalydelse, till exempel
+  `mottagarsession startad` eller `start väntar: en annan session skriver där`. Levererade och avslagna överlämningar
+  går till Arkivet, daterade med den avslutande kvittensens datum (UTC). En läsning utan överlämningar (från
+  före dem) är fortfarande hel, och projektionen har då ingen sådan nyckel; `schema` förblir 2.
 - **Sockeln** — tjänstens verifierade identiteter (`igång`, `delvis`, `okänt`), aktiv konfiguration, den *konfigurerade*
   bemanningen och motorns räkneverk: `busy` är antalet arbetsposter, `idle_tasks` antalet parkerade uppdrag och
   `identity_records` antalet tekniska identitetsposter. Alla tre är `null` när motorn inte gick att läsa.
 
 Rubrikraden visar `pågår` (antalet arbetsposter), `väntar` och `behöver dig`. Saknas en källa blir motsvarande tal
 `null`, aldrig noll: ett okänt läge visas inte som lugnt. `lugnt` är sant bara när alla tre är noll *och* var och en av de
-åtta källorna gick att läsa. En läsning är en daterad ögonblicksbild, inte en live-vy och ingen notifiering; `read_at` och
+åtta källorna gick att läsa (och överlämningarna, när läsningen har dem). Gick överlämningarna inte att läsa är
+Ägarens bord ofullständigt, eftersom en misslyckad start då kan saknas. En läsning är en daterad ögonblicksbild, inte en live-vy och ingen notifiering; `read_at` och
 `stale_after_seconds` (300 sekunder för Runtime-källorna, inklusive `uppdragsfiler`, och 3600 för kontoret) finns med just
 för att vyn ska kunna visa hur färsk uppgiften är.
 
@@ -96,6 +116,8 @@ standardfel, utan något privat. Kommandot renderar, serverar, startar och ändr
 
 Proven i `tools/test_aquarium.py` använder bara syntetiska data och tillfälliga kataloger under repots befintliga
 `.scratch`; de läser aldrig verkliga källor, kör aldrig sonden och anropar aldrig git mot ett verkligt repo.
+Överlämningsläsaren prövas på en egen tillfällig kontorskatalog (inget git-repo) med paket vars arbetsorder och
+ägarord innehåller text som aldrig får synas i läsningen, med länkade, felaktiga och trasiga paket.
 
 ## Datum
 
@@ -122,7 +144,10 @@ platshållare och listrader med text som HTML-flyktas.
   de senaste starterna, senaste rapporten och datumet för det senast granskade beskedet.
 - **Ägarens bord** — kuvert och en märkning bara när något verkligen väntar på dig.
 - **Maskinrummet** — tjänsten, den konfigurerade bemanningen och de tekniska identitetsposterna, medvetet nedtonat.
-- **Det frostade rummet** — interaktivt arbete, som inte observeras.
+- **Det frostade rummet** — interaktivt arbete, som inte observeras. Dörrskylten räknar de öppna överlämningarna
+  (`1 öppen överlämning`), och rummets panel har en lugn rad per öppen överlämning med den status som mottagaren
+  själv har kvitterat. Själva arbetet i sessionen observeras fortfarande inte. Har projektionen inga överlämningar
+  ser rummet ut som förut.
 
 En figur ritas bara där motorns läsning belägger arbetet: bänkarnas och granskningens figurer följer klassen `aq-figur`
 och bevakningens figur klassen `aq-kor`. En utförare som motorns läsning inte belägger skrivs ut som `ej belagd` i
@@ -200,7 +225,8 @@ de två läsningarna märks uppdraget `nytt läge`: en märkning på den plats s
 eller ett kort på tavlan — och en rad i fördjupningen som säger vilken tid den förra läsningen har och vilket läge den
 visade. Raden säger bara att läget skiljer sig från förra läsningen. Den säger ingenting om när, hur, via vilken väg
 eller av vem det ändrades, och den beskriver ingen **överlämning** mellan två utförare: källorna belägger ingen sådan,
-och då påstår fönstret ingen. Den tid som står i raden är en lästid, inte en händelsetid.
+och då påstår fönstret ingen. (Raderna för partnerns öppna överlämningar i det frostade rummet är något annat: de
+visar paket och mottagarens egna kvittenser, inte en observerad övergång mellan utförare.) Den tid som står i raden är en lästid, inte en händelsetid.
 
 Finns ingen jämförelse säger fördjupningen vilken: `första läsningen sedan fönstret startade` vid den första läsningen
 och efter en omstart, och `underlaget räcker inte för en jämförelse` när underlaget inte räcker — när motorn inte gick

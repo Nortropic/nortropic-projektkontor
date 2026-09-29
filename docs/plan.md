@@ -81,24 +81,32 @@ Cal/Stripe/Tally/CRM-teståtkomst saknas enligt ägaren; faktiska livscykler och
 Parallellt uppdrag med eget skrivansvar. Blocken om Digitala ovanför (och ett senare sådant block överst)
 ersätter inte detta block, och detta ersätter inte dem; Digitalas block 19:38 UTC anger själv att
 förbättringspartnern har egna spår. Skrivansvar: sessionen nortropic-repos-9e (Claude Code) för `tools/partner.py`, `tools/partnern/`,
-`tools/test_partner.py`, `tools/PARTNER.md`, detta block och partnerns beslutsposter. Inga ändringar i Digitala,
-Kundstart eller Runtime ingår; samordning med Kundstart-dialogen (nortropic-repos-f1) är bekräftad 18:14Z.
+`tools/test_partner.py`, `tools/PARTNER.md`, detta block och partnerns beslutsposter, och för
+FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929 även `tools/aquarium.py`, `tools/aquarium_vy.py`, deras prov och
+`tools/AQUARIUM.md`. Inga ändringar i Digitala, Kundstart eller Runtime ingår; samordning med Kundstart-dialogen
+(nortropic-repos-f1) är bekräftad 18:14Z och före denna ändring 2026-09-29 09:05Z (PR 123 först, denna ändring på den).
 
-Läge när detta block skrevs (29 september 2026, 09:45 svensk tid / 07:45 UTC): partnern är driftsatt och i bruk. Tjänsten
-körs ur primärutcheckningen på main (127.0.0.1:4760), sedan 2026-09-29 05:37 UTC med PR 120 (main `f24cb15`).
-Uppdraget FORBATTRINGSPARTNER-20260928 är fullgjort; resultatet står i FORBATTRINGSPARTNER-RESULTAT-20260928
-med tillägget FORBATTRINGSPARTNER-RESULTAT-TILLAGG-20260928 och i `evidence/partner/leverans.md`. Ägaren har därefter
-beställt en yta i Claude-appens form med val av modell och ansträngning i inmatningsrutan
-(FORBATTRINGSPARTNER-MODELLVAL-20260929, PR 120) och en rättning av hur partnern läser hans beställningar
-(FORBATTRINGSPARTNER-BESTALLNINGSKONTROLL-20260929). Rättningen integreras med denna ändring.
+Läge när detta block skrevs (29 september 2026, 11:15 svensk tid / 09:15 UTC): partnern är driftsatt och i bruk. Tjänsten
+körs ur primärutcheckningen (127.0.0.1:4760), sedan 2026-09-29 08:04 UTC med PR 122 (`3df10b3`); PR 123 ändrade inte
+partnern. Uppdraget FORBATTRINGSPARTNER-20260928 är fullgjort; resultatet står i FORBATTRINGSPARTNER-RESULTAT-20260928
+med tillägget FORBATTRINGSPARTNER-RESULTAT-TILLAGG-20260928 och i `evidence/partner/leverans.md`. Därefter har ägaren
+beställt ytan i Claude-appens form (FORBATTRINGSPARTNER-MODELLVAL-20260929, PR 120) och rättningen av hur partnern läser
+hans beställningar (FORBATTRINGSPARTNER-BESTALLNINGSKONTROLL-20260929, PR 122). Nu har han också beställt att en
+beställning ska kunna ge en överlämning per mottagare, att en lämnad överlämning startar mottagarens session av sig
+själv, att överlämningarna syns i Aquarium och att svaren kan kopieras (FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929).
+Den ändringen integreras med detta block.
 
 Nästa handling: efter integrationen snabbspolas primärutcheckningen, och tjänsten startas om ur main med
 `python3 -B tools/partner.py stopp` och sedan `start`. `partner.py status` ska då visa samma kod som origin/main. Det
-är driftregeln efter varje integration av partnern. Därefter finns inget öppet i partnerns spår; nästa bygge kräver
-ett eget beslut. Ägarens två rader står i ÄGARENS TUR: bestående start vid inloggning och en ny fångst av
-Improvements efter 19 september. Arbetsgrenen `partner/forbattringspartner-bestallningskontroll-20260929` publiceras med
-denna ändring och tas sedan bort lokalt. De tidigare arbetsgrenarna är publicerade i PR 117–120 och borttagna lokalt;
-kandidat 1:s mellanversioner finns i en privat bundle i uppdragets mapp.
+är driftregeln efter varje integration av partnern. Med den nya koden plockar startvakten upp den öppna överlämningen
+OVL-20260929-328e79 ("Digitala: underhållsform och tak för riktiga kunder") och startar kontorets kedjedrivare för den,
+eller väntar synligt så länge någon annan skriver i kontoret; `python3 -B tools/partner.py overlamningar` visar läget.
+Veckokörningen till Runtime, som nekades 2026-09-29, lämnas på nytt först när ägaren beställer den i partnern; denna
+ändring beställer inte det arbetet. Därefter finns inget öppet i partnerns spår; nästa bygge kräver ett eget beslut.
+Ägarens två rader står i ÄGARENS TUR: bestående start vid inloggning och en ny fångst av Improvements efter 19
+september. Arbetsgrenen `partner/forbattringspartner-overlamning-autostart-20260929` publiceras med denna ändring och
+tas sedan bort lokalt. De tidigare arbetsgrenarna är publicerade i PR 117–122 och borttagna lokalt; kandidat 1:s
+mellanversioner finns i en privat bundle i uppdragets mapp.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
@@ -988,7 +996,7 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [beslut] Digitala: schemalagd driftkontroll (drift_kontroll.py) genom Runtime kräver ett eget Runtime-mandat med release och övergång (AP-10:s schema är hårdkodat till bedömningen; inga generella schemalagda kommandon) — beställ eller avstå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [beslut] Digitala: externa aktiveringar bara vid verklig kund — Google Cloud-projekt med OAuth eller tjänstekonto för Search Console, Google Ads-utvecklartoken, Meta-token, företagsprofil genom behörig människa; inget av det ingår i uppdraget (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [operatörshandling] Codex-CLI:n i PATH (0.147.0) vägrar Runtimes modell gpt-6-astra; Runtimes pinnade codex-0.155.1 fungerar — uppdatera CLI:n eller låt det stå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
-- [operatörshandling] Förbättringspartnern: bestående start vid inloggning — `python3 -B tools/partner.py autostart` visar LaunchAgent-filen och de två launchctl-kommandona för ditt eget Terminalfönster; utan den startas tjänsten med `python3 -B tools/partner.py start` (FORBATTRINGSPARTNER-RESULTAT-20260928) — sedan 2026-09-28
+- [operatörshandling] Förbättringspartnern: bestående start vid inloggning — `python3 -B tools/partner.py autostart` visar LaunchAgent-filen och de två launchctl-kommandona för ditt eget Terminalfönster; utan den startas tjänsten med `python3 -B tools/partner.py start`, och startvakten startar överlämningarnas sessioner först när tjänsten kör (FORBATTRINGSPARTNER-RESULTAT-20260928, FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929) — sedan 2026-09-28
 - [beslut] Förbättringspartnern: Improvements-samtal efter 2026-09-19 finns inte i partnerns underlag; en ny fångst genom Intake kräver din ChatGPT-inloggning i en webbläsare som en session får styra — beställ eller avstå (FORBATTRINGSPARTNER-RESULTAT-20260928) — sedan 2026-09-28
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
