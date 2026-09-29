@@ -9,10 +9,10 @@ Kontorets del är byggd på grenen `veckodrift/kontor-20260929`: `tools/driftope
 kanal `drift`, som startar Digitalas frysta `verktyg/drift_kontroll.py` och skriver kontrollens
 `DRIFT-<tid>.json` i kundens egen mapp — samma fil `underhall.py besked` läser — plus en periodbunden
 körning, med en egen period per kanal som varje kanal stänger när dess eget arbete är klart. Kontorets
-helsvit är 563 prov OK i tre körningar mot 509 OK i tre på oförändrad main `34bcedd`; hanterarens egen
-provfil ger 64 provkörningar på 52 olika metodnamn, mot 10 på oförändrad main. Runtimes del ligger på
+helsvit är 584 prov OK i tre körningar mot 509 OK i tre på oförändrad main `34bcedd`; hanterarens egen
+provfil ger 85 provkörningar på 61 olika metodnamn, mot 10 på oförändrad main. Runtimes del ligger på
 `veckodrift/digitala-20260929` med D040, en ny `--operations`-bindning i `scripts/install_ap10.py` och
-kvalificeringen i Runtimes `evidence/runs/runtime-veckodrift-6/`: fyra verkliga schemalagda väckningar på
+kvalificeringen i Runtimes `evidence/runs/runtime-veckodrift-7/`: fyra verkliga schemalagda väckningar på
 den befintliga motorn, en ren kontroll, en väckning inne i perioden som inte gjorde ett enda anrop, och en
 förfallen period som utfördes som incident med kundkvitto och en privat kvittens — där bara driftkanalens
 kvitto flyttats bakåt, så intaget stod kvar inne i sin egen period.
@@ -24,7 +24,10 @@ missad vecka, och den är tillbakadragen och ersatt av en period per kanal. Rund
 trådtaket gällde inte mellan Runtime-aktiviteter, ett bestående monitorfel kunde göra veckan timvis, en
 monitor som aldrig nådde ändpunkten stängde ändå sin period, och återupptagning kunde redovisa en
 avbruten incidentkörning som grön. Alla fyra domarna ordagrant i
-`evidence/runs/runtime-veckodrift-6/` i Runtime. Runda 5 fällde fyra fel till — `observed` sattes när
+`evidence/runs/runtime-veckodrift-7/` i Runtime. Runda 6 fällde tre fel till — ett avbrott efter
+periodstängningen kunde ändå svara grönt, ett mottaget HTTP-svar kastades när kroppen sedan hängde, och
+dubbelläsningsluckan hade flyttats; de två första är rättade och den tredje är en uttalad avvägning som
+posten beskriver. Runda 5 fällde fyra fel till — `observed` sattes när
 monitortråden slutförts i stället för när ändpunkten svarat, en återupptagning blev grön när någon kanal
 bara var `not_due`, attesteringen godtog saknat och feltypat hälsoläge, och ett avbrott före
 periodskrivningen gav dubbel driftkontroll — och alla fyra är rättade med settle-then-commit.

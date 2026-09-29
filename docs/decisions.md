@@ -7949,8 +7949,10 @@ hälsokontroll som aldrig nådde ändpunkten (`monitor_bound_exceeded`, `monitor
 `observed: false` och lämnar sin period öppen, eftersom ingenting kontrollerades.
 
 **Utfall och period är två faser.** När en kanal är klar skrivs först `settled-<kanal>.json` med vad den
-fann, och först därefter stängs perioden. Posten namnger den enda period den stänger, så den kan aldrig
-attestera en senare. Ett avbrott mellan faserna lämnar arbetet hittbart: nästa väckning, med vilket
+fann, och först därefter stängs perioden. Posten beskriver exakt en period — antingen den som ska stängas
+eller den som är stängd — så den kan aldrig attestera en annan. En körning som tappat sitt slutkvitto
+skriver det ur sitt eget utfall, och bara sitt eget: en vanlig väckning senare i veckan ärver inte
+förra periodens incident. Ett avbrott mellan faserna lämnar arbetet hittbart: nästa väckning, med vilket
 kör-id som helst, slutför commit:en ur det som observerades i stället för att läsa kundens sajt igen inom
 samma vecka, och kvittot bär den hälsa som faktiskt uppmättes. Det läget heter `already_performed` med
 `attested_by: settled_outcome`, och en avbruten incidentkörning förblir därför `completed: false`. Ett
@@ -7959,7 +7961,15 @@ stängd period är passerad, och en trasig bevaras för diagnos utan att atteste
 
 En kanal räknas dessutom som utförd bara när dess ändpunkt faktiskt svarade. Ett statussvar eller en läst
 kropp är en observation av sajten och stänger veckan; transportfel, DNS-fel och timeout är det inte, så
-perioden står kvar som skyldig. Annars kunde ett tillfälligt nätfel skjuta upp en skyldig kontroll en
+perioden står kvar som skyldig. Observationen bokförs i samma stund `open()` återvänder, alltså före
+kroppsläsningen, så ett svar som redan kommit inte kan raderas av att kroppen droppar eller att den yttre
+gränsen löper ut.
+
+**Dör en körning innan utfallet bokförts** är det okänt om kontrollen hann klart. Då läses den om, en
+gång, och det syns: en `attempt-<kanal>.json` skrivs innan läsningen får någon verkan, och nästa väckning
+redovisar `retried_after_interruption`. Alternativet — att stänga en period vars resultat aldrig setts —
+skulle dölja veckan, vilket är det beställningen förbjuder. Det är en avvägning, inte en lucka: ingen post
+kan känna utfallet av arbete som inte är gjort. Annars kunde ett tillfälligt nätfel skjuta upp en skyldig kontroll en
 hel vecka.
 
 **Vad kvittot betyder.** `performed` och `completed` är åtskilda. Exit 1 ur driftkontrollen är en
@@ -8020,6 +8030,10 @@ nu i egen daemontråd och kanalen återvänder när join:en löper ut; det ÄR t
 tråden, eftersom en felkonfigurerad monitor ska vägras högt och inte rapporteras som slut på tiden —
 den regressionen fälldes av D038:s eget prov.
 
+Runda 6: tre fel till — ett avbrott efter periodstängningen kunde ändå svara grönt, ett mottaget
+HTTP-svar kastades när kroppen eller den yttre gränsen sedan löpte ut, och dubbelläsningsluckan hade
+flyttats i stället för stängts. De två första är rättade; den tredje är avvägningen ovan.
+
 Runda 5: fyra fel till, alla mina, och tre med samma rot — ett kvitto eller ett hälsoläge som
 attesterade något det inte visste. `observed` sattes när monitortråden slutförts i stället för när
 ändpunkten svarat; en återupptagning blev grön när någon kanal bara var `not_due`; attesteringen godtog
@@ -8042,8 +8056,8 @@ join:en binder kanalen men inte uttaget, så övergivet nätarbete kunde samlas 
 och en sent frigjord transport kunde starta ett andra försök efter att kanalen redan svarat. Övergivna
 trådar får nu en stoppflagga och är högst två; därutöver vägrar kanalen direkt.
 
-**Prov.** Hanterarens svit ger 64 provkörningar, mot 10 på oförändrad main, fördelade på 52 olika
-metodnamn eftersom tolv `test_`-metoder ligger i en delad fixtur som ärvs av två testklasser
+**Prov.** Hanterarens svit ger 85 provkörningar, mot 10 på oförändrad main, fördelade på 61 olika
+metodnamn eftersom tolv `test_`-metoder ligger i en delad fixtur som ärvs av tre testklasser
 (granskningsrunda 5 fann att en tidigare formulering dolde det). Proven kör Digitalas verkliga frysta
 `drift_kontroll.py`-byte mot en loopback-provsajt: ren körning, saknad förväntad text, trasig sitemap,
 incident och återhämtning med oberoende privata kvitton, exitkod mot kvitto, verktygets egen räkning mot
@@ -8055,9 +8069,10 @@ med sig en som gjort sin vecka, ett bestående monitorfel som inte får göra ve
 aldrig nådde ändpunkten, en avbruten incidentkörning som inte får bli grön, monitorns väggklocka mot en
 droppande statusrad, ett avbrott på exakt punkten mellan de två faserna, ett utfallskvitto som inte får
 attestera en senare period, ett saknat, trasigt eller feltypat kvitto, och de övergivna trådarnas tak över
-modulomladdningar. Kontorets helsvit är 563 prov
+modulomladdningar, varje gräns en körning kan dö vid, och att en senare vanlig väckning inte ärver förra
+periodens incident. Kontorets helsvit är 584 prov
 OK i tre körningar efter varandra, mätt mot 509 prov OK i tre körningar på oförändrad main `34bcedd` med
-samma maskin och tolk; alla sex kvitton i Runtimes `evidence/runs/runtime-veckodrift-6/`, där också
+samma maskin och tolk; alla sex kvitton i Runtimes `evidence/runs/runtime-veckodrift-7/`, där också
 kvalificeringen mot den verkliga motorn ligger.
 Provsajten och signalytan är loopback-provdata, aldrig en kundadress och aldrig Kundstarts produktion
 eller dess lokala provtjänst.

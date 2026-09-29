@@ -134,21 +134,25 @@ def monitor(config):
     """
     headers = monitor_binding(config)
     abandoned = stranded_monitors()
-    def exceeded(reason):
+    def exceeded(reason, answered=False):
         # `observed` False says no health answer was obtained at all. That is NOT the
         # same as an unhealthy endpoint, and it must not close the channel's period:
-        # nothing was checked, so the check is still owed.
-        return {'healthy': False, 'observed': False, 'reason': reason,
+        # nothing was checked, so the check is still owed. But an answer that DID
+        # arrive before the bound ran out is still an observation of the site.
+        return {'healthy': False, 'observed': bool(answered), 'reason': reason,
                 'stranded_threads': stranded_monitors(),
                 'attempts': [{'error': reason, 'healthy': False}],
                 'observed_at': now(), 'candidate': config['candidate']}
     if abandoned >= MONITOR_STRANDED_LIMIT:
         # Refuse rather than let abandoned network work pile up in the long-lived worker.
         return exceeded('monitor_stranded_limit')
+    # The thread records an answer as soon as one arrives, so a body read that then
+    # times out - or the outer deadline - cannot erase an observation already made.
+    progress = {'answered': False}
     answer, failure, stop = {}, [], threading.Event()
     def work():
         try:
-            answer.update(observe_health(config, headers, stop))
+            answer.update(observe_health(config, headers, stop, progress))
         except BaseException as error:              # noqa: BLE001 - re-raised below
             failure.append(error)
     thread = threading.Thread(target=work, daemon=True)
@@ -161,7 +165,7 @@ def monitor(config):
         # no lock, is never waited on again, and is counted until it ends by itself.
         stop.set()
         stranded_monitors(add=thread)
-        return exceeded('monitor_bound_exceeded')
+        return exceeded('monitor_bound_exceeded', progress['answered'])
     return answer
 
 
@@ -179,7 +183,7 @@ def monitor_binding(config):
     return headers
 
 
-def observe_health(config, headers, stop):
+def observe_health(config, headers, stop, progress):
     """`observed` says whether the endpoint actually answered, not whether we tried.
 
     A status code or a body read is an answer about the site, healthy or not, and the
@@ -197,6 +201,9 @@ def observe_health(config, headers, stop):
             break
         try:
             with opener.open(urllib.request.Request(config['url'], headers=headers), timeout=MONITOR_TIMEOUT) as response:
+                # The endpoint answered. Record it before reading the body, so a read
+                # that times out cannot turn a received status into "never answered".
+                answered = True; progress['answered'] = True
                 raw = b''
                 while len(raw) <= 65536:
                     # read1, not read: read(n) blocks until it has all n bytes, so one
@@ -218,7 +225,7 @@ def observe_health(config, headers, stop):
         except urllib.error.HTTPError as error:
             # The server answered. That is an observation of the site, and an unhealthy one.
             transient = error.code in (429, 502, 503, 504)
-            answered = True
+            answered = True; progress['answered'] = True
             attempts.append({'http': error.code, 'healthy': False})
         except (urllib.error.URLError, TimeoutError, OSError):
             # Nothing was learned about the site at all.
@@ -226,7 +233,7 @@ def observe_health(config, headers, stop):
             attempts.append({'error': 'transport_unavailable', 'healthy': False})
         except (ValueError, TypeError, AttributeError):
             # Read, but unreadable as a health answer: an observation, and unhealthy.
-            answered = True
+            answered = True; progress['answered'] = True
             attempts.append({'error': 'invalid_health_response', 'healthy': False})
         if not transient or number == 1 or stop.wait(1):
             break
@@ -485,12 +492,17 @@ def transition(home, channel, current):
     return {'receipts': receipts, 'state_error': state_error}
 
 
-def validate_settled(value, sequence):
-    """A settled outcome is only ever valid for the one period it says it closes."""
+def validate_settled(value, sequence, closed=False):
+    """A settled outcome is only ever valid for the one period it describes.
+
+    `closed` False asks for the period not yet closed (`sequence + 1`), which is a
+    commit still owed. `closed` True asks for the period already closed (`sequence`),
+    whose outcome is what an interrupted run's own receipt must be written from.
+    """
     if (not isinstance(value, dict)
             or set(value) != {'closes_sequence', 'healthy', 'reason', 'run_id', 'observed_at'}
             or type(value['closes_sequence']) is not int
-            or value['closes_sequence'] != sequence + 1
+            or value['closes_sequence'] != (sequence if closed else sequence + 1)
             or type(value['healthy']) is not bool
             or not isinstance(value['reason'], str) or not re.fullmatch('[a-z_]{1,80}', value['reason'])
             or not isinstance(value['run_id'], str)
@@ -521,24 +533,59 @@ def settle_outcome(home, channel, sequence, healthy, reason, run_id):
     return state
 
 
-def settled(home, channel, sequence):
-    """This channel's already-recorded outcome for the period about to be closed."""
+def settled(home, channel, sequence, closed=False):
+    """This channel's already-recorded outcome for one exact period."""
     path = regular(home / ('settled-' + channel + '.json'))
     if not path.exists():
         return None
     try:
-        return validate_settled(load_state(path), sequence)
+        return validate_settled(load_state(path), sequence, closed)
     except StateError:
-        # A record for another period is simply superseded, not a fault. One that is
-        # malformed is preserved for diagnosis. Neither may attest anything.
-        value = None
+        pass
+    # Not the record asked for. A WELL-FORMED record for the other of the two periods
+    # is simply not the one wanted, and is left alone. Anything else is malformed and is
+    # preserved for diagnosis. Neither may attest anything.
+    for other in (not closed, closed):
         try:
-            value = load_state(path)
+            validate_settled(load_state(path), sequence, other)
+            return None
         except StateError:
-            pass
-        if not (isinstance(value, dict) and type(value.get('closes_sequence')) is int
-                and value['closes_sequence'] <= sequence):
-            path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
+            continue
+    path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
+    return None
+
+
+def note_attempt(home, channel, sequence, run_id):
+    """Mark that this channel's reading is about to start, before it has any effect.
+
+    A crash after this and before the outcome is recorded means we genuinely do not know
+    whether the check completed. The honest answer is then to read again - closing a
+    period whose result was never seen would hide the week - so the next wakeup redoes it
+    exactly once and says so in its receipt (`retried_after_interruption`). This marker
+    exists to make that duplicate visible and counted, not to prevent it: nothing can
+    know the outcome of work before it is done.
+    """
+    write(regular(home / ('attempt-' + channel + '.json')),
+          {'starts_sequence': sequence + 1, 'run_id': run_id, 'started_at': now()})
+
+
+def interrupted_attempt(home, channel, sequence):
+    """Was a reading started for the period now due, without its outcome recorded?"""
+    path = regular(home / ('attempt-' + channel + '.json'))
+    if not path.exists():
+        return None
+    try:
+        value = load_state(path)
+        if (not isinstance(value, dict) or set(value) != {'starts_sequence', 'run_id', 'started_at'}
+                or type(value['starts_sequence']) is not int
+                or value['starts_sequence'] != sequence + 1
+                or not isinstance(value['run_id'], str)
+                or not re.fullmatch('[a-zA-Z0-9-]{1,100}', value['run_id'])):
+            raise StateError('invalid_attempt_marker')
+        timestamp(value['started_at'])
+        return value
+    except StateError:
+        path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
         return None
 
 
@@ -571,7 +618,8 @@ def due(home, config, channel, run_id):
         done = settled(home, channel, 0)
         if done is not None:
             return {**overdue, 'due': False, 'reason': 'already_performed', 'settled': done}
-        return {**overdue, 'reason': 'no_period_recorded'}
+        return {**overdue, 'reason': 'no_period_recorded',
+                'interrupted_attempt': interrupted_attempt(home, channel, 0)}
     try:
         value = load_state(path)
         if (not isinstance(value, dict) or set(value) != {'completed_at', 'sequence', 'run_id'}
@@ -597,12 +645,19 @@ def due(home, config, channel, run_id):
                 'completed_at': value['completed_at'], 'due_at': due_at.isoformat(),
                 'overdue_seconds': 0, 'sequence': value['sequence'], 'settled': done}
     late = observed - due_at
-    return {'due': late >= timedelta(0),
-            'reason': 'period_elapsed' if late >= timedelta(0) else 'not_due',
-            'period_seconds': period, 'completed_at': value['completed_at'],
-            'due_at': due_at.isoformat(),
-            'overdue_seconds': max(0, int(late.total_seconds())),
-            'sequence': value['sequence']}
+    answer = {'due': late >= timedelta(0),
+              'reason': 'period_elapsed' if late >= timedelta(0) else 'not_due',
+              'period_seconds': period, 'completed_at': value['completed_at'],
+              'due_at': due_at.isoformat(),
+              'overdue_seconds': max(0, int(late.total_seconds())),
+              'sequence': value['sequence']}
+    if answer['due']:
+        answer['interrupted_attempt'] = interrupted_attempt(home, channel, value['sequence'])
+    else:
+        # The outcome of the period that IS closed. A run that lost its own receipt
+        # writes it from this instead of claiming success it cannot re-observe.
+        answer['outcome'] = settled(home, channel, value['sequence'], closed=True)
+    return answer
 
 
 def record_period(home, channel, period, completed_at, run_id):
@@ -682,21 +737,30 @@ def run(config, run_id):
             # doing the work, and `already_performed` says so rather than claiming the
             # period merely had not elapsed - that receipt is finished here.
             observed = now()
-            resumed = any(periods[channel].get('settled') for channel in skipped)
+            commit_owed = any(periods[channel].get('settled') for channel in skipped)
+            # This run's OWN outcome for a period already closed: it did the work and
+            # then lost its receipt. Only its own - a later ordinary tick must not
+            # inherit last week's incident.
+            mine = {channel: periods[channel]['outcome'] for channel in skipped
+                    if (periods[channel].get('outcome') or {}).get('run_id') == run_id}
             answer = {'run_id': run_id, 'config_sha256': config_sha256, 'completed': True,
                       'performed': False, 'performed_channels': [],
-                      'skipped': 'already_performed' if resumed else 'not_due',
+                      'skipped': 'already_performed' if (commit_owed or mine) else 'not_due',
                       'skipped_channels': skipped, 'periods': periods,
                       'periods_recorded': {}, 'settled_channels': {},
                       'started_at': observed, 'finished_at': observed}
-            if resumed:
+            if commit_owed:
                 # Work was recorded but its period was never closed. Finish that commit
-                # and report the health that was actually observed then: an interrupted
-                # incident run must not come back as a green business result. This holds
+                # and report the health that was actually observed then. This holds
                 # however the other channels answered, not only when all of them did.
                 commit_settled(home, answer, periods, run_id)
+            for channel, outcome in sorted(mine.items()):
+                answer['settled_channels'][channel] = outcome
+                if not outcome['healthy']:
+                    answer['completed'] = False
+            if commit_owed or mine:
                 answer['attested_by'] = 'settled_outcome'
-            if output.exists() or resumed:
+            if output.exists() or commit_owed or mine:
                 output.mkdir(mode=0o700, exist_ok=True)
                 write(result_file, answer)
             return answer
@@ -720,6 +784,8 @@ def run(config, run_id):
             incident to record for weeks (D038's behaviour, kept)."""
             # A prior interrupted consumer is resumed through its ordinary idempotency
             # journal; each attempt keeps all earlier output.
+            if periods:
+                note_attempt(home, channel, periods[channel]['sequence'], run_id)
             work = output / (channel + '-' + str(time.time_ns())); work.mkdir(mode=0o700)
             if failure is None:
                 return produce(work)
@@ -789,6 +855,14 @@ def run(config, run_id):
 
         result['performed_channels'].sort()
         result['performed'] = bool(result['performed_channels'])
+        retried = sorted(channel for channel in wanted
+                         if (periods.get(channel) or {}).get('interrupted_attempt'))
+        if retried:
+            # An earlier run started these readings and never recorded their outcome, so
+            # whether they completed is unknown. Reading again is the honest answer -
+            # closing a period whose result was never seen would hide the week - and it
+            # happens exactly once, because this run does record its outcome.
+            result['retried_after_interruption'] = retried
         if periods and any(value['reason'] == 'invalid_period_state' for value in periods.values()):
             result['completed'] = False
         result['finished_at'] = now(); write(result_file, result)

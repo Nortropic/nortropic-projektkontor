@@ -601,8 +601,11 @@ class WeeklyDriftTests(DriftFixture, unittest.TestCase):
         (self.state / 'week-one/result.json').unlink()
         calls, receipts = self.calls, self.receipts()
         resumed = operation.run(self.config, 'week-one')
-        self.assertEqual(resumed['skipped'], 'not_due',
-                         'the period was committed, so nothing is owed this week')
+        # The period was committed, so nothing is owed - but this run lost its own
+        # receipt, so it is written from the outcome this run itself recorded.
+        self.assertEqual(resumed['skipped'], 'already_performed')
+        self.assertEqual(resumed['attested_by'], 'settled_outcome')
+        self.assertTrue(resumed['settled_channels']['drift']['healthy'])
         self.assertEqual(resumed['skipped_channels'], ['drift'])
         self.assertEqual(resumed['performed_channels'], [])
         self.assertEqual(resumed['periods']['drift']['reason'], 'not_due')
@@ -1017,3 +1020,178 @@ class StrandedRegistryAcrossReloadsTests(unittest.TestCase):
         self.assertEqual(modules[2].stranded_monitors(), 2, 'every reload sees the same registry')
         for answer in answers:
             self.assertFalse(answer['observed'], 'no health answer was obtained')
+
+
+class InterruptionBoundaryTests(DriftFixture, unittest.TestCase):
+    """Every boundary a run can die at, and what the next wakeup must then do.
+
+    A run has four durable effects in order: the attempt marker, the incident delivery,
+    the settled outcome, the period record, and finally its own receipt. Round 6 showed
+    the first version only covered one of those gaps.
+    """
+
+    def die_at(self, name, run_id):
+        def boom(*args, **kwargs):
+            raise KeyboardInterrupt('avbrott vid ' + name)
+        with patch.object(operation, name, boom):
+            with self.assertRaises(KeyboardInterrupt):
+                operation.run(self.config, run_id)
+
+    def test_an_interrupted_incident_receipt_is_written_from_its_own_outcome(self):
+        # Round 6's blocker 1: dying AFTER the period closed, before the receipt. The
+        # outcome describes the period that IS closed, so the receipt must come from it.
+        self.week(); self.site_status = 503
+        first = operation.run(self.config, 'incident-en')
+        self.assertFalse(first['completed'])
+        self.assertEqual(self.period_state('drift')['sequence'], 1)
+        (self.state / 'incident-en/result.json').unlink()
+        calls = self.calls
+        resumed = operation.run(self.config, 'incident-en')
+        self.assertEqual(resumed['skipped'], 'already_performed')
+        self.assertEqual(resumed['attested_by'], 'settled_outcome')
+        self.assertFalse(resumed['settled_channels']['drift']['healthy'])
+        self.assertFalse(resumed['completed'],
+                         'an interrupted incident run must never come back green')
+        self.assertEqual(self.calls, calls, 'and it must not read the site again')
+
+    def test_a_later_ordinary_tick_does_not_inherit_last_periods_incident(self):
+        # The other half of the same rule: only the run that did the work attests from
+        # its outcome. A routine wakeup inside the period is not that run.
+        self.week(); self.site_status = 503
+        operation.run(self.config, 'incident-en')
+        later = operation.run(self.config, 'vanlig-tick')
+        self.assertEqual(later['skipped'], 'not_due')
+        self.assertEqual(later['settled_channels'], {})
+        self.assertNotIn('attested_by', later)
+        self.assertTrue(later['completed'], 'this tick owed nothing and observed nothing')
+
+    def test_dying_before_the_outcome_is_recorded_reads_again_exactly_once(self):
+        # Round 6's blocker 2. Whether the check completed is genuinely unknown here, so
+        # reading again is the honest answer: closing a period whose result was never
+        # seen would hide the week. It must happen once, and be visible in the receipt.
+        self.week()
+        self.die_at('settle_outcome', 'avbruten-fore-utfall')
+        self.assertTrue((self.state / 'attempt-drift.json').exists())
+        self.assertFalse((self.state / 'settled-drift.json').exists())
+        self.assertFalse((self.state / 'period-drift.json').exists())
+        calls = self.calls
+        again = operation.run(self.config, 'nasta-vackning')
+        self.assertEqual(again['retried_after_interruption'], ['drift'],
+                         'the duplicate read is reported, not silent')
+        self.assertEqual(again['performed_channels'], ['drift'])
+        self.assertGreater(self.calls, calls)
+        self.assertEqual(self.period_state('drift')['sequence'], 1)
+        # And exactly once: the period is now closed, so the week is done.
+        calls = self.calls
+        third = operation.run(self.config, 'tredje')
+        self.assertEqual(third['skipped'], 'not_due')
+        self.assertNotIn('retried_after_interruption', third)
+        self.assertEqual(self.calls, calls)
+
+    def test_dying_between_the_outcome_and_the_period_does_not_read_again(self):
+        self.week()
+        self.die_at('record_period', 'avbruten-fore-period')
+        calls = self.calls
+        committed = operation.run(self.config, 'commit-vackning')
+        self.assertEqual(committed['skipped'], 'already_performed')
+        self.assertEqual(committed['performed_channels'], [])
+        self.assertEqual(self.calls, calls, 'the recorded outcome is committed, not redone')
+        self.assertEqual(self.period_state('drift')['sequence'], 1)
+        self.assertNotIn('retried_after_interruption', committed)
+
+    def test_a_stale_attempt_marker_from_an_older_period_is_ignored(self):
+        self.week()
+        operation.run(self.config, 'forsta')
+        self.assertEqual(self.period_state('drift')['sequence'], 1)
+        # The marker names the period that is now closed, so it is not an interruption.
+        self.set_period('drift', 9 * 86400, sequence=1, run_id='forsta')
+        later = operation.run(self.config, 'senare')
+        self.assertEqual(later['performed_channels'], ['drift'])
+        self.assertNotIn('retried_after_interruption', later)
+
+    def test_a_malformed_attempt_marker_is_preserved_and_ignored(self):
+        self.week()
+        self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
+        for value in ('{ inte json', json.dumps({'starts_sequence': 1}),
+                      json.dumps({'starts_sequence': 1, 'run_id': '../x',
+                                  'started_at': operation.now()}),
+                      json.dumps({'starts_sequence': 1, 'run_id': 'a', 'started_at': 'fel'})):
+            (self.state / 'attempt-drift.json').write_text(value)
+            self.assertIsNone(operation.interrupted_attempt(self.state, 'drift', 0))
+            self.assertEqual(len(list(self.state.glob('attempt-drift.json.invalid-*'))), 1)
+            for path in self.state.glob('attempt-drift.json.invalid-*'):
+                path.unlink()
+
+
+class MonitorObservationTests(unittest.TestCase):
+    """A status that arrived is an observation, whatever happens to the body after it."""
+
+    def setUp(self):
+        self.status, self.hang_body = 200, True
+        owner = self
+
+        class Answering(urllib.request.HTTPHandler):
+            def http_open(self, request):
+                import email, io
+                class Body(io.RawIOBase):
+                    def readable(self): return True
+                    def readinto(self, _buffer):
+                        if owner.hang_body:
+                            raise TimeoutError('kroppen droppar')
+                        return 0
+                response = urllib.request.addinfourl(
+                    io.BufferedReader(Body()), email.message_from_string(''),
+                    request.full_url, owner.status)
+                if owner.status >= 400:
+                    raise urllib.error.HTTPError(request.full_url, owner.status, 'fel',
+                                                 email.message_from_string(''), None)
+                return response
+
+        self.opener = urllib.request.build_opener(Answering())
+        self.config = {'url': 'http://127.0.0.1:9/health', 'candidate': 'a' * 40,
+                       'isolated_test': True}
+        operation.stranded_monitors()
+        self.addCleanup(self.drain)
+
+    def drain(self):
+        """Release the hanging body and let abandoned threads end.
+
+        The stranded-thread cap is process-wide on purpose, so a test that leaves one
+        behind would make a later monitor call answer monitor_stranded_limit.
+        """
+        self.hang_body = False
+        for _ in range(60):
+            if not operation.stranded_monitors():
+                return
+            time.sleep(0.1)
+        if hasattr(sys, operation._STRANDED):
+            delattr(sys, operation._STRANDED)
+
+    def observe(self, deadline=5):
+        with patch.object(operation, 'MONITOR_DEADLINE', deadline), \
+             patch.object(urllib.request, 'build_opener', return_value=self.opener):
+            return operation.monitor(self.config)
+
+    def test_a_status_that_arrived_counts_even_when_the_body_then_times_out(self):
+        # Round 6's blocker 3: the endpoint DID answer. Treating that as "never
+        # answered" would leave the period open and make the check recur every wakeup.
+        result = self.observe()
+        self.assertTrue(result['observed'], result)
+        self.assertFalse(result['healthy'])
+        self.assertEqual(result['reason'], 'endpoint_unhealthy')
+
+    def test_an_error_status_counts_as_an_observation(self):
+        self.status = 503
+        result = self.observe()
+        self.assertTrue(result['observed'])
+        self.assertFalse(result['healthy'])
+
+    def test_a_status_before_the_bound_ran_out_is_not_erased_by_the_bound(self):
+        # The outer deadline must not turn a received status into "never answered".
+        result = self.observe(deadline=1)
+        self.assertFalse(result['healthy'])
+        if result['reason'] == 'monitor_bound_exceeded':
+            self.assertTrue(result['observed'],
+                            'the status had already arrived when the bound ran out')
+        else:
+            self.assertTrue(result['observed'])
