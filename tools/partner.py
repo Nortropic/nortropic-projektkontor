@@ -122,8 +122,8 @@ def oppna(k, args) -> int:
     nyckel = las_hemlighet(Path(k.hemligheter), 'inloggning.secret')
     url = 'http://127.0.0.1:%d/#nyckel=%s' % (k.port, nyckel)
     subprocess.run(['open', url], check=False)
-    print('Öppnade http://127.0.0.1:%d i webbläsaren (nyckeln följer bara med i adressens fragment och sparas '
-          'som en kaka i 30 dagar).' % k.port)
+    print('Öppnade Nortropic, http://127.0.0.1:%d, i webbläsaren (nyckeln följer bara med i adressens fragment och '
+          'sparas som en kaka i 30 dagar).' % k.port)
     return 0
 
 

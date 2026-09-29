@@ -26,6 +26,7 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 from . import VERSION
 from . import bilagor as bil
 from .agent import Agent, Korning
+from .arbetsplats import Arbetsplats
 from .jobb import Jobb
 from .kallor import Kallindex, KLASSER
 from .konfig import ANSTRANGNING, MODELLER, Konfig, spara_modellval
@@ -74,6 +75,7 @@ class Server:
         self.jobb = Jobb(self)
         self.overlamning = Overlamning(self)
         self.startvakt = Startvakt(self)
+        self.arbetsplats = Arbetsplats(self)
         self.inloggning = las_hemlighet(Path(k.hemligheter), 'inloggning.secret')
         self.kaknyckel = las_hemlighet(Path(k.hemligheter), 'kaka.secret').encode()
         self.vardar = {'127.0.0.1:%d' % k.port, 'localhost:%d' % k.port}
@@ -179,7 +181,8 @@ class Server:
                              titel_av=av if titel.strip() else 'ingen')
         return self.lager.trad(tid)
 
-    def spara_inspel(self, trad: str, klient_id: str, text: str, blobbar: list, lage: str | None) -> tuple:
+    def spara_inspel(self, trad: str, klient_id: str, text: str, blobbar: list, lage: str | None,
+                     kontext=None) -> tuple:
         g = self.k.gransar
         if not re.match(r'^[A-Za-z0-9_-]{8,80}$', klient_id or ''):
             raise ValueError('klient_id saknas')
@@ -189,6 +192,9 @@ class Server:
             raise ValueError('För många bilagor (högst %d).' % g.inspel_max_bilagor)
         if not (text or '').strip() and not blobbar:
             raise ValueError('Tomt inspel.')
+        # Arbetsplatsens hänvisningar ("Resonera om det här"): bara befintliga objekt, sparade vid sidan av texten så att
+        # de aldrig blir Johnnys ord.
+        hanvisningar = self.arbetsplats.prova_kontext(kontext)
         with self._las:
             finns = self.lager.inspel_for_klient(klient_id)
             if finns:
@@ -215,8 +221,9 @@ class Server:
                                 'klass': meta['klass'], 'storlek': meta['storlek']})
             if lage not in ('svara', 'bara_spara'):
                 lage = 'bara_spara' if (text and (BARA_SPARA.match(text) or BARA_SPARA_START.match(text))) else 'svara'
+            extra = {'kontext': hanvisningar} if hanvisningar else {}
             ev = self.lager.lagg_till('inspel', trad=trad, klient_id=klient_id, text=text or '', lage=lage,
-                                      bilagor=bilagor)
+                                      bilagor=bilagor, **extra)
         return self.lager.en('select * from inspel where id=?', (ev['id'],)), False
 
     def ohanterade(self, trad: str) -> list:
@@ -371,7 +378,7 @@ class Server:
         poster = []
         for i in self.lager.fraga('select * from inspel where trad=? order by tid', (trad,)):
             poster.append({'slag': 'inspel', 'id': i['id'], 'tid': i['tid'], 'text': i['text'], 'lage': i['lage'],
-                           'bilagor': json.loads(i['bilagor'] or '[]')})
+                           'bilagor': json.loads(i['bilagor'] or '[]'), 'kontext': self.lager.inspel_kontext(i['id'])})
         for u in self.lager.fraga('select * from tur where trad=? order by startad', (trad,)):
             d = json.loads(u['data'] or '{}')
             klar = d.get('klar') or {}
@@ -497,9 +504,15 @@ def _epoch(tid: str) -> float:
 
 
 CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self'; "
-       "font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'")
+       "font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; frame-src 'self'")
 STATISKA = {'/': ('index.html', 'text/html; charset=utf-8'), '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
-            '/app.css': ('app.css', 'text/css; charset=utf-8'), '/favicon.svg': ('favicon.svg', 'image/svg+xml')}
+            '/app.css': ('app.css', 'text/css; charset=utf-8'), '/favicon.svg': ('favicon.svg', 'image/svg+xml'),
+            '/arbetsplats.js': ('arbetsplats.js', 'text/javascript; charset=utf-8')}
+# Arbetsplatsens egna adresser ger samma sida; ytan väljer del ur adressen (direktlänk, omladdning, bakåt/framåt).
+SKAL = re.compile(r'^/(?:kontoret(?:/presentation|/objekt/[A-Za-z0-9:_%.-]{1,200})?|kundstart|forbattringar(?:/ny|/t_[A-Za-z0-9]+)?)$')
+# Bara Aquarium-sidan får ramas in, och bara av samma ursprung: sidans egen meta-CSP fäster dess skript.
+AQUARIUM_HUVUD = {'Content-Security-Policy': "frame-ancestors 'self'", 'X-Frame-Options': 'SAMEORIGIN',
+                  'Content-Type': 'text/html; charset=utf-8'}
 VISNINGSBARA = {'image/png', 'image/jpeg', 'image/gif', 'image/webp'}
 
 
@@ -518,12 +531,19 @@ class Hanterare(BaseHTTPRequestHandler):
         if kropp is None:
             kropp = json.dumps(data if data is not None else {}, ensure_ascii=False).encode('utf-8')
         self.send_response(kod)
-        self.send_header('Content-Type', typ)
+        if self.command == 'POST' and not getattr(self, '_kropp_last', False):
+            # En nekad skrivning vars kropp aldrig lästes: kroppen får inte bli början på nästa begäran på samma
+            # anslutning, så anslutningen stängs.
+            self.send_header('Connection', 'close')
+            self.close_connection = True
+        if 'Content-Type' not in (huvud or {}):
+            self.send_header('Content-Type', typ)
         self.send_header('Content-Length', str(len(kropp)))
         self.send_header('Cache-Control', 'no-store')
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Referrer-Policy', 'no-referrer')
-        self.send_header('X-Frame-Options', 'DENY')
+        if 'X-Frame-Options' not in (huvud or {}):
+            self.send_header('X-Frame-Options', 'DENY')
         if 'Content-Security-Policy' not in (huvud or {}):
             self.send_header('Content-Security-Policy', CSP)
         for k, v in (huvud or {}).items():
@@ -557,8 +577,9 @@ class Hanterare(BaseHTTPRequestHandler):
     def _json(self, max_byte: int = 2_000_000):
         langd = int(self.headers.get('Content-Length') or 0)
         if langd > max_byte:
-            raise ValueError('för stor begäran')
+            raise ValueError('för stor begäran')  # kroppen läses inte; svaret stänger anslutningen
         data = self.rfile.read(langd) if langd else b'{}'
+        self._kropp_last = True
         return json.loads(data.decode('utf-8') or '{}')
 
     # ------------------------------------------------------------- GET
@@ -568,9 +589,11 @@ class Hanterare(BaseHTTPRequestHandler):
         u = urlparse(self.path)
         p = u.path
         q = {k: v[0] for k, v in parse_qs(u.query).items()}
-        if p in STATISKA:
-            namn, typ = STATISKA[p]
+        if p in STATISKA or SKAL.match(p):
+            namn, typ = STATISKA.get(p, STATISKA['/'])
             return self._svara(200, typ=typ, kropp=(UI / namn).read_bytes())
+        if p in ('/kontoret/aquarium', '/lasning.json'):
+            return self._aquarium(p)
         if p == '/halsa':
             return self._svara(200, {'ok': True, 'version': VERSION, 'startad': self.S.startad})
         if p == '/intern/verktyg':
@@ -631,6 +654,8 @@ class Hanterare(BaseHTTPRequestHandler):
         m = re.match(r'^/api/bilaga/([0-9a-f]{64})$', p)
         if m:
             return self._bilaga(m.group(1), q)
+        if p.startswith('/api/arbetsplats/'):
+            return self._arbetsplats(p, q)
         if p == '/api/overlamningar':
             S.overlamning.las_kvittenser()
             rader = S.lager.fraga('select id, trad, status, tid, uppdaterad, data from overlamning order by tid desc')
@@ -638,6 +663,34 @@ class Hanterare(BaseHTTPRequestHandler):
                 d = json.loads(r.pop('data'))
                 r.update({k: d.get(k) for k in ('rubrik', 'mottagare', 'katalog_visning', 'ap06', 'historik', 'start')})
             return self._svara(200, {'overlamningar': rader})
+        return self._fel(404, 'finns inte')
+
+    def _aquarium(self, p):
+        """Aquarium på samma ursprung: fönstrets sida och dess lästid, bakom inloggningen."""
+        if not self._inloggad():
+            return self._svara(401, typ='text/plain; charset=utf-8', kropp='Logga in i Nortropic.\n'.encode('utf-8'))
+        A = self.S.arbetsplats
+        if p == '/lasning.json':
+            return self._svara(200, A.aquarium_lasning())
+        sida = A.aquarium_sida()
+        if sida is None:
+            return self._svara(503, typ='text/plain; charset=utf-8', huvud={'Retry-After': '10'},
+                               kropp='Ingen läsning av Aquarium ännu.\n'.encode('utf-8'))
+        return self._svara(200, huvud=AQUARIUM_HUVUD, kropp=sida.encode('utf-8'))
+
+    def _arbetsplats(self, p, q):
+        A = self.S.arbetsplats
+        if p == '/api/arbetsplats/hem':
+            return self._svara(200, A.hem())
+        if p == '/api/arbetsplats/kontoret':
+            a = A.aquarium()
+            a['overlamningar'] = A.overlamningar()
+            return self._svara(200, a)
+        if p == '/api/arbetsplats/kundstart':
+            return self._svara(200, A.kundstart())
+        if p == '/api/arbetsplats/objekt':
+            o = A.objekt(q.get('ref', ''))
+            return self._svara(200, o) if o else self._fel(404, 'objektet finns inte (eller är inte läst just nu)')
         return self._fel(404, 'finns inte')
 
     def _kalltext(self, kid: str):
@@ -672,6 +725,7 @@ class Hanterare(BaseHTTPRequestHandler):
 
     # ------------------------------------------------------------- POST
     def do_POST(self):
+        self._kropp_last = False
         if not self._host_ok():
             return self._fel(421, 'fel värd')
         p = urlparse(self.path).path
@@ -706,6 +760,7 @@ class Hanterare(BaseHTTPRequestHandler):
         S = self.S
         langd = int(self.headers.get('Content-Length') or 0)
         if langd <= 0:
+            self._kropp_last = True
             raise ValueError('tom fil')
         if langd > S.k.gransar.bilaga_max_byte:
             raise ValueError('Filen är för stor (högst %d MB).' % (S.k.gransar.bilaga_max_byte // 1_000_000))
@@ -723,6 +778,7 @@ class Hanterare(BaseHTTPRequestHandler):
                     huvud += bit[:4096 - len(huvud)]
                 f.write(bit)
                 kvar -= len(bit)
+        self._kropp_last = not kvar
         if kvar:
             tmp.unlink()
             raise ValueError('uppladdningen avbröts')
@@ -752,7 +808,7 @@ class Hanterare(BaseHTTPRequestHandler):
         if p == '/api/inspel':
             inspel, dubblett = S.spara_inspel(str(d.get('trad') or 'ny'), str(d.get('klient_id') or ''),
                                               str(d.get('text') or ''), [str(x) for x in d.get('bilagor') or []],
-                                              d.get('lage'))
+                                              d.get('lage'), d.get('kontext'))
             tur = None
             if not dubblett and inspel['lage'] != 'bara_spara':  # att spara anropar aldrig en modell
                 tur = S.starta_tur_om_behov(inspel['trad'], avbryt_pagaende=bool(d.get('avbryt_pagaende')))

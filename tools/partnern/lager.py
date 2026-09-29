@@ -203,6 +203,14 @@ class Lager:
             self._indexera(ev)
             return ev
 
+    def inspel_kontext(self, inspel_id: str) -> list:
+        """Arbetsplatsens hänvisningar som följde med ett inspel, ur journalens händelse (tom för äldre inspel)."""
+        rad = self.en("select data from handelse where id=? and typ='inspel'", (inspel_id,))
+        try:
+            return list(json.loads(rad['data']).get('kontext') or []) if rad else []
+        except ValueError:
+            return []
+
     # --------------------------------------------------------------- indexera
     def _fts(self, kalla_id: str, klass: str, titel: str, talare: str, datum: str, text: str) -> None:
         self._db.execute('delete from sok where kalla_id=?', (kalla_id,))

@@ -150,10 +150,10 @@ function markdown(text) {
 }
 
 // ------------------------------------------------------------------ inloggning
-function visaInloggning() { $('app').hidden = true; $('inloggning').hidden = false; $('nyckel').focus(); }
+function visaInloggning() { $('skal').hidden = true; $('inloggning').hidden = false; $('nyckel').focus(); }
 async function loggaIn(nyckel) {
   await api('POST', '/api/logga-in', { nyckel });
-  $('inloggning').hidden = true; await starta();
+  $('inloggning').hidden = true; await startaArbetsplatsen();
 }
 $('inloggningsformular').addEventListener('submit', async (e) => {
   e.preventDefault(); $('inloggningsfel').textContent = '';
@@ -167,18 +167,20 @@ async function laddaTradar() {
 function ritaTradar() {
   const lista = $('tradlista'); lista.replaceChildren();
   for (const t of tillstand.tradar) {
-    lista.append(el('button', { class: 'trad' + (t.id === tillstand.trad ? ' vald' : ''), onclick: () => oppnaTrad(t.id),
+    lista.append(el('button', { class: 'trad' + (t.id === tillstand.trad ? ' vald' : ''), onclick: () => { stangTradmeny(); oppnaTrad(t.id, 'lagg'); }, 'aria-current': t.id === tillstand.trad ? 'true' : null,
       title: t.titel + ' · ' + tid(t.senast) + ' · ' + t.inspel + ' inspel' },
       el('span', { class: t.aktiv ? 'aktiv' : 'punkt', title: t.aktiv ? 'Arbetar' : null }), el('span', { class: 't', text: t.titel })));
   }
 }
-async function oppnaTrad(id) {
+async function oppnaTrad(id, adress) {  // adress: 'lagg' (ny historikpost), 'ersatt' eller 'ingen' (routern har redan satt den)
   if (tillstand.trad) sparaUtkast();  // spara den tråd som lämnas, aldrig en tom ruta innan utkastet laddats
   tillstand.trad = id; tillstand.vy = null; tillstand.vyNyckel = null;
-  if (id !== 'ny') { history.replaceState(null, '', '#' + id); skriv('senasteTrad', id); } else history.replaceState(null, '', '#ny');
+  if (id !== 'ny') skriv('senasteTrad', id);
+  if (adress !== 'ingen') satAdress('/forbattringar/' + id, adress === 'ersatt');
   ritaTradar(); laddaUtkast(); ritaTrad(); await hamtaTrad();
 }
 async function hamtaTrad() {
+  if (!forbattringarSyns()) return;  // ingen läsning eller polling medan samtalet inte syns
   if (!tillstand.trad || tillstand.trad === 'ny') { tillstand.vy = null; ritaTrad(); planera(8000); return; }
   try {
     const ny = await api('GET', '/api/trad/' + tillstand.trad); const nyckel = JSON.stringify(ny);
@@ -188,9 +190,9 @@ async function hamtaTrad() {
   const arbetar = tillstand.vy && (tillstand.vy.aktiv || Object.keys(tillstand.vy.jobb_aktiva || {}).length);
   planera(arbetar ? 1200 : 8000);
 }
-function planera(ms) { clearTimeout(tillstand.pollTimer); tillstand.pollTimer = setTimeout(async () => { await hamtaTrad(); if (Math.random() < 0.3) laddaTradar().catch(() => {}); }, ms); }
+function planera(ms) { clearTimeout(tillstand.pollTimer); if (!forbattringarSyns()) return; tillstand.pollTimer = setTimeout(async () => { await hamtaTrad(); if (forbattringarSyns() && Math.random() < 0.3) laddaTradar().catch(() => {}); }, ms); }
 
-$('nytrad').addEventListener('click', () => oppnaTrad('ny'));
+$('nytrad').addEventListener('click', () => { stangTradmeny(); oppnaTrad('ny', 'lagg'); });
 $('tradtitel').addEventListener('click', async () => {
   if (!tillstand.trad || tillstand.trad === 'ny') return;
   const ny = prompt('Trådens namn', $('tradtitel').textContent);
@@ -222,7 +224,7 @@ function ritaTrad() {
       else if (p.slag === 'jobb') flode.append(ritaJobb(p, vy));
       else if (p.slag === 'overlamning') flode.append(ritaOverlamning(p));
       else if (p.slag === 'koppling') flode.append(el('div', { class: 'notis' }, p.riktning === 'ut' ? 'Kopplat till tråden ' : 'Kopplat hit från tråden ',
-        el('button', { class: 'kalla-lank', onclick: () => oppnaTrad(p.annan) }, '«' + (p.annan_titel || p.annan) + '»'), p.skal ? ' — ' + p.skal : ''));
+        el('button', { class: 'kalla-lank', onclick: () => oppnaTrad(p.annan, 'lagg') }, '«' + (p.annan_titel || p.annan) + '»'), p.skal ? ' — ' + p.skal : ''));
       else if (p.slag === 'forstaelse') flode.append(el('div', { class: 'notis' }, 'Sparat som ', el('button', { class: 'kalla-lank', onclick: () => visaKalla('F-' + p.nr) }, 'F-' + p.nr),
         ' (' + p.typ + ', ' + p.auktoritet.replace('_', ' ') + ')' + (p.ersatt ? ' — senare ersatt' : '') + ': ' + p.text.slice(0, 220)));
     }
@@ -258,7 +260,9 @@ function ritaInspel(p, tur) {
   return el('div', { class: 'post johnny' },
     el('div', { class: 'rubrikrad' }, el('span', { class: 'vem', text: 'Du' }), ...chips),
     el('div', { class: 'bubbla' }, p.text ? el('div', { class: 'svar' }, ...(p.text.split('\n').map((r, n) => [n ? el('br') : null, ...inline(r)]).flat())) : null,
-      p.bilagor && p.bilagor.length ? el('div', { class: 'bilagor' }, p.bilagor.map(bilagechip)) : null));
+      p.bilagor && p.bilagor.length ? el('div', { class: 'bilagor' }, p.bilagor.map(bilagechip)) : null),
+    p.kontext && p.kontext.length ? el('div', { class: 'sammanhang' }, el('span', { class: 'kl', text: 'Sammanhang från arbetsplatsen (underlag, inte dina ord):' }),
+      p.kontext.map((k) => el('a', { class: 'chip lank-chip', href: '/kontoret/objekt/' + encodeURIComponent(k.ref), 'data-nav': true }, (OBJEKTSLAG[k.typ] || k.typ) + ' · ' + k.titel))) : null);
 }
 function ritaArbete(steg, kallor, forb, modell) {
   const detaljer = el('details', { class: 'arbete' });
@@ -339,7 +343,8 @@ function ritaOverlamning(p) {
     p.agarcitat ? el('blockquote', { class: 'svar' }, '”' + p.agarcitat + '”') : null,
     el('div', { class: 'tidslinje' }, OVLSTATUS.map((s) => el('span', { class: 'chip ' + (nar[s] ? 'ok' : ''), text: OVLTEXT[s] + (nar[s] ? ' ' + tid(nar[s]) : '') }))),
     start ? el('div', { class: 'pagar', text: start }) : null,
-    el('div', { class: 'pagar', text: p.id + ' · mottagare: ' + p.mottagare + ' · paket: ' + p.katalog + (p.ap06 ? ' · AP-06: ' + p.ap06.status : '') }));
+    el('div', { class: 'pagar', text: p.id + ' · mottagare: ' + p.mottagare + ' · paket: ' + p.katalog + (p.ap06 ? ' · AP-06: ' + p.ap06.status : '') }),
+    el('div', { class: 'atgarder' }, el('a', { class: 'knapplank', href: '/kontoret/objekt/' + encodeURIComponent(p.id), 'data-nav': true }, 'Visa i Kontoret')));
 }
 function ritaVantande(u) {
   return el('div', { class: 'post johnny' },
@@ -348,18 +353,30 @@ function ritaVantande(u) {
 }
 
 // ------------------------------------------------------------------ komponera: utkast, bilagor, utkorg
-const utkast = { text: '', bilagor: [] };
+const utkast = { text: '', bilagor: [], kontext: [] };
 function utkastNyckel() { return 'utkast:' + (tillstand.trad || 'ny'); }
 function sparaUtkast() {
   utkast.text = $('text').value;
-  if (utkast.text || utkast.bilagor.length) skriv(utkastNyckel(), { text: utkast.text, bilagor: utkast.bilagor.filter((b) => b.sha) });
+  const kvar = utkast.text || utkast.bilagor.length || utkast.kontext.length;
+  if (kvar) skriv(utkastNyckel(), { text: utkast.text, bilagor: utkast.bilagor.filter((b) => b.sha), kontext: utkast.kontext });
   else { try { localStorage.removeItem(utkastNyckel()); } catch { /* */ } }
-  $('utkaststatus').textContent = utkast.text || utkast.bilagor.length ? 'Utkast — inte skickat (finns bara i den här webbläsaren)' : '';
+  $('utkaststatus').textContent = kvar ? 'Utkast — inte skickat (finns bara i den här webbläsaren)' : '';
 }
 function laddaUtkast() {
   const u = las(utkastNyckel(), { text: '', bilagor: [] });
-  utkast.text = u.text || ''; utkast.bilagor = u.bilagor || [];
-  $('text').value = utkast.text; ritaBilagor(); sparaUtkast(); anpassaHojd();
+  utkast.text = u.text || ''; utkast.bilagor = u.bilagor || []; utkast.kontext = Array.isArray(u.kontext) ? u.kontext : [];
+  $('text').value = utkast.text; ritaBilagor(); ritaKontext(); sparaUtkast(); anpassaHojd();
+}
+const OBJEKTSLAG = { overlamning: 'Överlämning', beslut: 'Beslut', uppdrag: 'Runtime-uppdrag' };
+function ritaKontext() {  // "Resonera om det här": vilka objekt och källor som följer med nästa inspel; inget skickas förrän du skickar
+  const k = $('kontextkort');
+  k.hidden = !utkast.kontext.length;
+  k.replaceChildren(el('div', { class: 'kl', text: 'Följer med när du skickar — som underlag, inte som dina ord:' }),
+    ...utkast.kontext.map((x, n) => el('span', { class: 'chip kontextchip' },
+      el('a', { href: '/kontoret/objekt/' + encodeURIComponent(x.ref), 'data-nav': true }, (OBJEKTSLAG[x.typ] || x.typ) + ' · ' + x.titel),
+      x.kalla ? el('span', { class: 'kl', title: x.kalla, text: ' · källa: ' + (/^t_/.test(x.kalla) ? 'tråden där den beställdes' : /^kontor:beslut:/.test(x.kalla) ? 'beslutsloggen på main' : x.kalla) }) : null,
+      el('button', { type: 'button', title: 'Ta bort ur sammanhanget', 'aria-label': 'Ta bort ' + x.titel + ' ur sammanhanget',
+        onclick: () => { utkast.kontext.splice(n, 1); ritaKontext(); sparaUtkast(); } }, '×'))));
 }
 function ritaBilagor() {
   const l = $('bilagelista'); l.replaceChildren();
@@ -401,9 +418,9 @@ async function skicka(avbryt) {
   if (utkast.bilagor.some((b) => !b.sha && !b.fel)) { $('utkaststatus').textContent = 'Väntar på att bilagorna laddas upp…'; return; }
   const bilagor = utkast.bilagor.filter((b) => b.sha);
   if (!utkast.text.trim() && !bilagor.length) return;
-  const post = { klient_id: uuid(), trad: tillstand.trad || 'ny', text: utkast.text, bilagor, lage: $('baraspara').checked ? 'bara_spara' : null, avbryt_pagaende: !!avbryt, skapad: new Date().toISOString() };
+  const post = { klient_id: uuid(), trad: tillstand.trad || 'ny', text: utkast.text, bilagor, kontext: utkast.kontext.map((x) => x.ref), lage: $('baraspara').checked ? 'bara_spara' : null, avbryt_pagaende: !!avbryt, skapad: new Date().toISOString() };
   const utkorg = las('utkorg', []); utkorg.push(post); skriv('utkorg', utkorg);
-  $('text').value = ''; utkast.text = ''; utkast.bilagor = []; sattLage(false); ritaBilagor(); sparaUtkast(); anpassaHojd();
+  $('text').value = ''; utkast.text = ''; utkast.bilagor = []; utkast.kontext = []; sattLage(false); ritaBilagor(); ritaKontext(); sparaUtkast(); anpassaHojd();
   ritaTrad(); await tomUtkorg();
 }
 async function tomUtkorg() {
@@ -411,24 +428,32 @@ async function tomUtkorg() {
   let utkorg = las('utkorg', []);
   for (const u of [...utkorg]) {
     try {
-      const d = await api('POST', '/api/inspel', { klient_id: u.klient_id, trad: u.trad, text: u.text, bilagor: u.bilagor.map((b) => b.sha), lage: u.lage, avbryt_pagaende: u.avbryt_pagaende });
+      const d = await api('POST', '/api/inspel', { klient_id: u.klient_id, trad: u.trad, text: u.text, bilagor: u.bilagor.map((b) => b.sha), kontext: u.kontext || [], lage: u.lage, avbryt_pagaende: u.avbryt_pagaende });
       utkorg = las('utkorg', []).filter((x) => x.klient_id !== u.klient_id); skriv('utkorg', utkorg);
       if (u.trad === 'ny' && tillstand.trad === 'ny') {
         try { localStorage.removeItem('utkast:ny'); } catch { /* */ }
-        tillstand.trad = d.inspel.trad; history.replaceState(null, '', '#' + d.inspel.trad); skriv('senasteTrad', d.inspel.trad);
+        tillstand.trad = d.inspel.trad; skriv('senasteTrad', d.inspel.trad);
+        if (forbattringarSyns()) satAdress('/forbattringar/' + d.inspel.trad, true);
       }
     } catch (f) {
       if (/inte inloggad/.test(f.message)) return;
       u.fel = f.message; skriv('utkorg', las('utkorg', []).map((x) => (x.klient_id === u.klient_id ? u : x)));
-      if (/^(Tomt|Texten|För många|Okänd bilaga|klient_id)/.test(f.message)) { // går inte att rätta genom nya försök
+      if (/^(Tomt|Texten|För många|Okänd bilaga|klient_id|Okänd hänvisning|Sammanhanget)/.test(f.message)) { // går inte att rätta genom nya försök
         skriv('utkorg', las('utkorg', []).filter((x) => x.klient_id !== u.klient_id));
-        alert('Inspelet kunde inte sparas: ' + f.message);
+        if (/^(Okänd hänvisning|Sammanhanget)/.test(f.message)) {  // texten går aldrig förlorad: tillbaka som utkast, utan sammanhanget
+          const nyckel = 'utkast:' + u.trad; const fore = las(nyckel, null);
+          const ledig = !fore || !(fore.text || '').trim();
+          if (ledig) skriv(nyckel, { text: u.text, bilagor: u.bilagor || [], kontext: [] });
+          if (tillstand.trad === u.trad) laddaUtkast();
+          alert('Inspelet skickades inte: ' + f.message + (ledig ? '. Texten ligger kvar som utkast, utan sammanhanget.'
+            : '. Tråden har redan ett annat utkast, så texten står här för att kopieras:\n\n' + u.text));
+        } else alert('Inspelet kunde inte sparas: ' + f.message);
       }
     }
   }
   $('utkorg').textContent = las('utkorg', []).length ? 'Ett eller flera inspel är inte sparade på servern ännu; nytt försök om några sekunder.' : '';
   if (las('utkorg', []).length) tillstand.utkorgTimer = setTimeout(tomUtkorg, 5000);
-  await laddaTradar().catch(() => {}); await hamtaTrad();
+  if (forbattringarSyns()) { await laddaTradar().catch(() => {}); await hamtaTrad(); }
 }
 function anpassaHojd() { const t = $('text'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight + 2, window.innerHeight * 0.4) + 'px'; }
 
@@ -547,7 +572,7 @@ window.addEventListener('storage', (e) => { if (e.key === 'utkorg') ritaTrad(); 
 window.addEventListener('hashchange', () => {
   const h = location.hash.slice(1);
   if (h.startsWith('nyckel=')) { loggaInMedFragment(h); return; }  // partner.py oppna i en redan öppen flik
-  if ((/^t_/.test(h) || h === 'ny') && h !== tillstand.trad) oppnaTrad(h);
+  if (/^t_[A-Za-z0-9]+$/.test(h) || h === 'ny') navigera('/forbattringar/' + h, true);  // gamla länkar #t_…
 });
 
 // ------------------------------------------------------------------ paneler
@@ -612,26 +637,25 @@ $('visalage').addEventListener('click', async () => {
 });
 
 // ------------------------------------------------------------------ start
-async function starta() {
-  $('app').hidden = false; $('inloggning').hidden = true;
-  laddaModellval().catch(() => {});
-  await laddaTradar();
-  const hash = location.hash.slice(1);
+let forbattringarStartad = false;
+async function visaForbattringar(trad) {  // trad: id ur adressen, 'ny', eller null (senaste tråden)
+  if (!forbattringarStartad) { forbattringarStartad = true; laddaModellval().catch(() => {}); }
+  await laddaTradar().catch(() => {});
   const senaste = las('senasteTrad', null);
   const nyttUtkast = las('utkast:ny', null);
-  const valt = /^t_/.test(hash) ? hash : (hash === 'ny' || (nyttUtkast && (nyttUtkast.text || (nyttUtkast.bilagor || []).length))) ? 'ny'
-    : (senaste && tillstand.tradar.some((t) => t.id === senaste) ? senaste : 'ny');
-  await oppnaTrad(valt);
+  const valt = trad || ((nyttUtkast && (nyttUtkast.text || (nyttUtkast.bilagor || []).length || (nyttUtkast.kontext || []).length)) ? 'ny'
+    : (senaste && tillstand.tradar.some((t) => t.id === senaste) ? senaste : 'ny'));
+  if (valt !== tillstand.trad || !trad) await oppnaTrad(valt, trad ? 'ingen' : 'ersatt');
+  else { laddaUtkast(); await hamtaTrad(); }
   if (las('utkorg', []).length) tomUtkorg();
 }
+function lamnaForbattringar() { if (tillstand.trad) sparaUtkast(); clearTimeout(tillstand.pollTimer); stangTradmeny(); }
+function stangTradmeny() { $('app').classList.remove('tradmeny'); $('visatradar').setAttribute('aria-expanded', 'false'); }
+$('visatradar').addEventListener('click', () => {
+  const oppen = $('app').classList.toggle('tradmeny'); $('visatradar').setAttribute('aria-expanded', String(oppen));
+  if (oppen) $('nytrad').focus();
+});
 async function loggaInMedFragment(hash) {
   history.replaceState(null, '', location.pathname);
   try { await loggaIn(decodeURIComponent(hash.slice(7))); } catch (f) { visaInloggning(); $('inloggningsfel').textContent = f.message; }
 }
-(async () => {
-  const hash = location.hash.slice(1);
-  if (hash.startsWith('nyckel=')) { await loggaInMedFragment(hash); return; }
-  let session = null;
-  try { session = await api('GET', '/api/session'); } catch { /* tjänsten svarar inte; inloggningen visas */ }
-  if (session && session.inloggad) await starta(); else visaInloggning();
-})();

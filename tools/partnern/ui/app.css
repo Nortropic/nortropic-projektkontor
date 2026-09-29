@@ -46,7 +46,7 @@ code, pre { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: .
   -webkit-mask: url("/favicon.svg") center / contain no-repeat; mask: url("/favicon.svg") center / contain no-repeat; }
 .dold { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-.app { display: grid; grid-template-columns: 272px 1fr; height: 100%; overflow: hidden; }
+.app { display: grid; grid-template-columns: 272px 1fr; height: 100%; overflow: hidden; position: relative; }
 .app.med-panel { grid-template-columns: 272px 1fr minmax(340px, 34%); }
 .sida { background: var(--sida); border-right: 1px solid var(--linje); display: flex; flex-direction: column; min-height: 0; }
 .sida-huvud { padding: 20px 20px 14px; }
@@ -204,6 +204,140 @@ pre.fritext { white-space: pre-wrap; font-family: inherit; font-size: 14px; }
 @media (max-width: 900px) {
   .app, .app.med-panel { grid-template-columns: 1fr; }
   .sida { display: none; }
+  .app.tradmeny .sida { display: flex; position: absolute; inset: 0 auto 0 0; width: min(320px, 88vw); z-index: 6; box-shadow: var(--skugga); }
+  .visatradar { display: inline-block; }
   .panel { position: fixed; inset: 0; z-index: 5; }
   .huvud { --kant: 16px; }
 }
+
+/* ------------------------------------------------------------------ Nortropics arbetsplats */
+.hoppa { position: absolute; left: 12px; top: -48px; z-index: 20; background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 8px; text-decoration: none; }
+.hoppa:focus { top: 8px; }
+.skal { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
+.toppfalt { display: flex; align-items: center; gap: 28px; padding: 0 20px; min-height: 52px; background: var(--sida); border-bottom: 1px solid var(--linje); flex: none; }
+.marke { display: inline-flex; align-items: center; gap: 8px; font: 400 20px/1 var(--serif); color: var(--text); text-decoration: none; letter-spacing: -.01em; }
+.huvudnav { display: flex; gap: 4px; align-self: stretch; }
+.huvudnav a { display: flex; align-items: center; padding: 0 12px; color: var(--dampad); text-decoration: none; font-size: 14.5px; border-bottom: 2px solid transparent; margin-bottom: -1px; min-height: 44px; }
+.huvudnav a:hover { color: var(--text); }
+.huvudnav a[aria-current="page"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 560; }
+a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.innehall { flex: 1; min-height: 0; overflow: auto; outline: none; }
+.innehall > .app { height: 100%; }
+.del { max-width: 1240px; margin: 0 auto; padding: 28px 28px 64px; }
+.del-huvud { margin-bottom: 20px; }
+.del-huvud h1 { font: 400 30px/1.2 var(--serif); margin: 0 0 6px; letter-spacing: -.01em; outline: none; }
+.del-huvud p { margin: 0; }
+.dampad { color: var(--dampad); }
+.liten, .kl { font-size: 12.5px; }
+.lank { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+a { color: var(--accent); text-underline-offset: 2px; }
+.status { margin: 6px 0; }
+.status.varning { color: var(--text); background: var(--accent-ljus); border-left: 3px solid var(--varm); padding: 8px 12px; border-radius: 0 8px 8px 0; }
+.status.fel { color: var(--fel); }
+.knapprad { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.knapp, .knapplank { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 14px; border: 1px solid var(--linje); border-radius: 10px; background: var(--yta); color: var(--text); text-decoration: none; font-size: 14px; }
+.knapp:hover, .knapplank:hover { background: var(--yta2); }
+.knapp.primar { background: var(--text); color: var(--bg); border-color: var(--text); }
+.etikett { display: inline-block; min-width: 108px; font-size: 12.5px; color: var(--dampad); }
+.lista { list-style: none; margin: 0; padding: 0; }
+.lista > li { padding: 9px 0; border-top: 1px solid var(--linje); overflow-wrap: anywhere; }
+.lista > li:first-child { border-top: 0; }
+.block { background: var(--yta); border: 1px solid var(--linje); border-radius: var(--radie); padding: 18px 20px; margin-bottom: 18px; }
+.block h2 { font: 500 17px/1.3 var(--serif); margin: 0 0 10px; }
+h3.grupp { font-size: 13px; font-weight: 600; margin: 14px 0 2px; color: var(--dampad); text-transform: none; }
+h3.grupp.stoppat { color: var(--fel); }
+
+.hem-rutnat { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.hem-spalt { min-width: 0; }
+.fortsatt-rad { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.fortsatt-rad > a { font-weight: 550; }
+.bordrad > span:first-child { display: block; }
+.tidslinje-lista { list-style: none; margin: 8px 0; padding: 0; }
+.tidslinje-lista li { padding: 8px 0 8px 12px; border-left: 2px solid var(--linje); overflow-wrap: anywhere; }
+.tidslinje-lista li.ny { border-left-color: var(--varm); }
+.tidslinje-lista time { font-size: 12.5px; color: var(--dampad); margin-right: 8px; }
+.tidslinje-lista .etikett { min-width: 0; margin-right: 8px; }
+.lugn { font-size: 15.5px; }
+.sokform { display: flex; gap: 8px; }
+.sokform input { flex: 1; min-width: 0; padding: 8px 12px; border: 1px solid var(--linje); border-radius: 10px; background: var(--bg); }
+.sokresultat .utdrag { font-size: 13.5px; color: var(--dampad); }
+details.arkiv summary { cursor: pointer; color: var(--dampad); font-size: 13.5px; margin-top: 8px; }
+
+.del.kontoret { max-width: none; padding: 0; height: 100%; }
+.kontor { display: grid; grid-template-columns: minmax(0, 1fr) 400px; height: 100%; min-height: 0; }
+.kontor-vanster { display: flex; flex-direction: column; min-height: 0; padding: 18px 20px 20px; gap: 12px; }
+.kontor-huvud { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin: 0; }
+.kontor-huvud h1 { margin: 0; }
+.kontor-huvud .knapprad { margin: 0 0 0 auto; }
+.kontor-scen { flex: none; width: 100%; aspect-ratio: 16 / 9; max-height: calc(100dvh - 190px); border-radius: var(--radie); overflow: hidden; background: #17211f; box-shadow: var(--skugga); }
+.del.kontoret.lista-dold .kontor { grid-template-columns: minmax(0, 1fr); }
+.del.kontoret.lista-dold .kontor-hoger { display: none; }
+.mobil-helskarm { display: none; align-self: flex-start; }
+.kontor-scen iframe { width: 100%; height: 100%; border: 0; display: block; }
+.kontor-hoger { border-left: 1px solid var(--linje); background: var(--sida); overflow: auto; min-height: 0; }
+.kontor-lista { padding: 18px 18px 40px; }
+.lista-huvud h2 { font: 500 17px/1.3 var(--serif); margin: 0; }
+.flikar { display: flex; flex-wrap: wrap; gap: 4px; margin: 14px 0 8px; }
+.flik { border: 1px solid var(--linje); background: var(--yta); color: var(--text); border-radius: 999px; padding: 4px 11px; font-size: 13px; min-height: 32px; }
+.flik[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.objekt { background: var(--yta); border: 1px solid var(--linje); border-radius: var(--radie); padding: 14px 16px; margin: 14px 0; box-shadow: var(--skugga); }
+.objekt h2 { font: 500 18px/1.3 var(--serif); margin: 4px 0 8px; outline: none; }
+.objekt-huvud { display: flex; justify-content: space-between; align-items: center; }
+.objekt .kalltext pre { max-height: 50vh; overflow: auto; background: var(--bg); border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
+.bevis { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 12.5px; overflow-wrap: anywhere; }
+
+body.presentation .innehall { overflow: hidden; }
+body.presentation .del.kontoret { height: 100dvh; }
+body.presentation .kontor-scen { position: fixed; inset: 0; border-radius: 0; min-height: 0; box-shadow: none; }
+body.presentation { background: #17211f; }
+body.presentation .kontor-scen { aspect-ratio: auto; max-height: none; }
+.presentationsverktyg { position: fixed; bottom: 12px; right: 12px; display: flex; gap: 8px; opacity: .75; transition: opacity .2s; z-index: 10; }
+.presentationsverktyg:hover, .presentationsverktyg:focus-within { opacity: 1; }
+
+.kundstart-rutnat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.kundstart-rutnat .block { margin: 0; }
+.chip.provlage { font: 600 12px/1 -apple-system, system-ui, sans-serif; vertical-align: middle; background: var(--accent-ljus); color: var(--accent); border: 1px solid var(--varm); padding: 5px 9px; border-radius: 999px; }
+.kommandon li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.kommando { display: inline-flex; align-items: center; gap: 6px; }
+.kommando code { background: var(--yta2); padding: 3px 7px; border-radius: 6px; }
+
+.kontextkort { background: var(--accent-ljus); border: 1px solid var(--linje); border-radius: 12px; padding: 8px 10px; margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.kontextkort > .kl { flex-basis: 100%; }
+.kontextchip { display: inline-flex; align-items: center; gap: 4px; background: var(--yta); max-width: 100%; }
+.kontextchip a { overflow-wrap: anywhere; }
+.kontextchip button { border: 0; background: none; color: var(--dampad); font-size: 16px; line-height: 1; min-width: 28px; min-height: 28px; }
+.sammanhang { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 0; justify-content: flex-end; }
+.sammanhang .kl { color: var(--dampad); }
+.lank-chip { text-decoration: none; }
+.visatradar { display: none; border: 1px solid var(--linje); background: var(--yta); border-radius: 8px; padding: 4px 10px; margin-right: 8px; min-height: 32px; }
+
+@media (max-width: 900px) {
+  .visatradar { display: inline-block; }
+  .huvud.tom .tradhuvud { display: flex; }
+  .huvud.tom #tradtitel, .huvud.tom #tradstatus { visibility: hidden; }
+}
+@media (max-width: 1100px) {
+  .kontor { grid-template-columns: 1fr; height: auto; }
+  .kontor-scen { max-height: none; }
+  .listvaxel { display: none; }
+  .kontor-hoger { border-left: 0; border-top: 1px solid var(--linje); }
+}
+@media (max-width: 760px) {
+  .toppfalt { flex-wrap: wrap; gap: 0; padding: 8px 12px 0; }
+  .marke { padding: 4px 4px 6px; }
+  .huvudnav { flex-basis: 100%; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .huvudnav a { justify-content: center; padding: 0 4px; font-size: 14px; }
+  .del { padding: 18px 16px 48px; }
+  .hem-rutnat { grid-template-columns: 1fr; gap: 0; }  /* samma ordning som i sidan: synlig ordning = fokusordning */
+  .kundstart-rutnat { grid-template-columns: 1fr; }
+  .mobil-helskarm { display: inline-flex; }
+  .presentationsverktyg { left: 12px; right: 12px; justify-content: center; opacity: 1; }
+  .kontor-vanster { padding: 12px; }
+  .etikett { min-width: 0; }
+  .fortsatt-rad { display: block; }
+  .fortsatt-rad .etikett { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+details.fler summary { cursor: pointer; color: var(--dampad); font-size: 13px; margin: 6px 0; }

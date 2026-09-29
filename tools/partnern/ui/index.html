@@ -4,16 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Förbättringspartner · Projektkontoret</title>
+<title>Nortropic</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/app.css">
 <script src="/app.js" defer></script>
+<script src="/arbetsplats.js" defer></script>
 </head>
 <body>
+<a class="hoppa" href="#innehall">Hoppa till innehållet</a>
 <div id="inloggning" class="inloggning" hidden>
   <form id="inloggningsformular" class="inloggningsruta">
-    <h1><span class="gnista" aria-hidden="true"></span>Förbättringspartnern</h1>
-    <p>Projektkontorets interna samtalsyta. Logga in med nyckeln från <code>tools/partner.py oppna</code>.</p>
+    <h1><span class="gnista" aria-hidden="true"></span>Nortropic</h1>
+    <p>Den interna arbetsplatsen: Kontoret, Kundstart och förbättringspartnern. Logga in med nyckeln från <code>tools/partner.py oppna</code>.</p>
     <label for="nyckel">Nyckel</label>
     <input id="nyckel" type="password" autocomplete="current-password" required>
     <button type="submit">Logga in</button>
@@ -21,10 +23,25 @@
   </form>
 </div>
 
+<div id="skal" class="skal" hidden>
+<header id="toppfalt" class="toppfalt">
+  <a class="marke" href="/" data-nav><span class="gnista" aria-hidden="true"></span>Nortropic</a>
+  <nav class="huvudnav" aria-label="Huvudnavigering">
+    <a href="/" data-nav data-del="hem">Hem</a>
+    <a href="/kontoret" data-nav data-del="kontoret">Kontoret</a>
+    <a href="/kundstart" data-nav data-del="kundstart">Kundstart</a>
+    <a href="/forbattringar" data-nav data-del="forbattringar">Förbättringar</a>
+  </nav>
+</header>
+<div id="innehall" class="innehall" tabindex="-1">
+<main id="del-hem" class="del hem" hidden aria-labelledby="hem-rubrik"></main>
+<main id="del-kontoret" class="del kontoret" hidden aria-labelledby="kontor-rubrik"></main>
+<main id="del-kundstart" class="del kundstart" hidden aria-labelledby="kundstart-rubrik"></main>
 <div id="app" class="app" hidden>
-  <aside class="sida" aria-label="Trådar">
+  <aside id="sidomeny" class="sida" aria-label="Trådar och verktyg">
     <div class="sida-huvud">
-      <span class="namn">Förbättringspartnern</span>
+      <span class="namn">Förbättringar</span>
+      <span class="dampad liten">Förbättringspartnern</span>
     </div>
     <nav class="sidnav" aria-label="Meny">
       <button id="nytrad" class="navrad nytrad" type="button">
@@ -50,6 +67,7 @@
 
   <main id="huvud" class="huvud">
     <header class="tradhuvud">
+      <button id="visatradar" class="visatradar" type="button" aria-expanded="false" aria-controls="sidomeny">Trådar</button>
       <h2 id="tradtitel" class="tradtitel" tabindex="0" title="Klicka för att byta namn">Ny tråd</h2>
       <div id="tradstatus" class="tradstatus" aria-live="polite"></div>
     </header>
@@ -58,6 +76,7 @@
 
     <form id="komponera" class="komponera">
       <div id="utkorg" class="utkorg" aria-live="polite"></div>
+      <div id="kontextkort" class="kontextkort" hidden aria-live="polite"></div>
       <div class="ruta">
         <div id="modellval" class="modellval" hidden tabindex="0" role="dialog" aria-label="Välj modell och ansträngning"></div>
         <div id="bilagelista" class="bilagelista"></div>
@@ -84,6 +103,8 @@
     <div class="panel-huvud"><h3 id="paneltitel">Källa</h3><button id="stangpanel" class="lank" aria-label="Stäng panelen">Stäng</button></div>
     <div id="panelinnehall" class="panel-innehall"></div>
   </aside>
+</div>
+</div>
 </div>
 <div id="slapp" class="slapp" hidden>Släpp filerna för att bifoga dem</div>
 </body>
