@@ -4,7 +4,7 @@
 // med textContent (el() i app.js). Adressen bär bara del och objekt-id, aldrig privata texter eller nycklar; i
 // webbläsaren sparas bara senaste adress per del och om Kontorets lista är dold (samtalsytans nycklar: se app.js).
 
-const DELAR = { hem: 'Hem', kontoret: 'Kontoret', kundstart: 'Kundstart', forbattringar: 'Förbättringar' };
+const DELAR = { hem: 'Hem', kontoret: 'Kontoret', kundstart: 'Kundstart', forbattringar: 'Förbättringar', flodet: 'Flödet' };
 const as = { del: null, vag: null, forsta: true, kontorTimer: null, kontorData: null, kontorGrupp: null, kundstart: null };
 const KUNDSTART_PROV = 'http://127.0.0.1:3131';
 
@@ -68,6 +68,7 @@ function tolka(vag) {
   if (vag === '/kontoret/presentation') return { del: 'kontoret', presentation: true };
   if ((m = vag.match(/^\/kontoret\/objekt\/([^/]+)$/))) return { del: 'kontoret', objekt: decodeURIComponent(m[1]) };
   if (vag === '/kundstart') return { del: 'kundstart' };
+  if (vag === '/flodet') return { del: 'flodet' };
   if (vag === '/forbattringar') return { del: 'forbattringar', trad: null };
   if ((m = vag.match(/^\/forbattringar\/(ny|t_[A-Za-z0-9]+)$/))) return { del: 'forbattringar', trad: m[1] };
   return { del: 'hem', okand: vag };
@@ -106,7 +107,7 @@ async function visa() {
   document.body.dataset.del = ny;
   document.body.classList.toggle('presentation', !!r.presentation);
   $('toppfalt').hidden = !!r.presentation;  // presentationen tonar bort navigationen helt
-  for (const d of ['hem', 'kontoret', 'kundstart']) $('del-' + d).hidden = d !== ny;
+  for (const d of ['hem', 'kontoret', 'kundstart', 'flodet']) $('del-' + d).hidden = d !== ny;
   $('app').hidden = ny !== 'forbattringar';
   for (const a of document.querySelectorAll('.huvudnav a')) {
     if (a.dataset.del === ny) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
@@ -118,6 +119,7 @@ async function visa() {
   if (ny === 'hem') await visaHem(r);
   else if (ny === 'kontoret') await visaKontoret(r);
   else if (ny === 'kundstart') await visaKundstart();
+  else if (ny === 'flodet') await visaFlodet();
   else await visaForbattringar(r.trad);
   if (flyttaFokus) {  // efter navigering: fokus till delens rubrik (eller samtalsrutan), så att läsaren vet var den är
     const mal = ny === 'forbattringar' ? $('tradtitel') : document.querySelector('#del-' + ny + ' h1');

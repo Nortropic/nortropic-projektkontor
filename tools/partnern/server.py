@@ -32,6 +32,8 @@ from .jobb import Jobb
 from .kallor import Kallindex, KLASSER
 from .konfig import ANSTRANGNING, MODELLER, Konfig, spara_modellval
 from .lager import Lager, nu, nytt_id
+from .modellkarta import RuntimeLasning, bevisad, erbjud, karta, spara as spara_kartval
+from .modellmatning import las as mm_las
 from .overlamning import Overlamning
 from .start import Startvakt
 from .systemlage import Systemlage
@@ -82,6 +84,7 @@ class Server:
         self.overlamning = Overlamning(self)
         self.startvakt = Startvakt(self)
         self.arbetsplats = Arbetsplats(self)
+        self.runtime_val = RuntimeLasning(k)
         self.inloggning = las_hemlighet(Path(k.hemligheter), 'inloggning.secret')
         self.kaknyckel = las_hemlighet(Path(k.hemligheter), 'kaka.secret').encode()
         self.vardar = {'127.0.0.1:%d' % k.port, 'localhost:%d' % k.port}
@@ -447,9 +450,11 @@ class Server:
                 'seq': self.lager.en("select varde from meta where nyckel='journal_seq'")['varde']}
 
     def modellval(self) -> dict:
-        # En modell till allt: valet gäller svaret, utredaren och de registrerade utredningarna.
+        # En modell till allt: valet gäller svaret, utredaren och de registrerade utredningarna. Finns en mätning erbjuds
+        # bara modellerna som fungerade i Johnnys Claude Code (MODELLKARTA-20260929), samma som i Flödet.
+        matt = {m['id'] for m in erbjud(self.k, 'claude_egen')} if mm_las(self.k.data) else None
         return {'huvud': self.k.modell.huvud, 'anstrangning': self.k.modell.anstrangning, 'galler': GALLER,
-                'modeller': list(MODELLER), 'nivaer': list(ANSTRANGNING)}
+                'modeller': [m for m in MODELLER if matt is None or m['id'] in matt], 'nivaer': list(ANSTRANGNING)}
 
     def lagevy(self) -> dict:
         with self._las:
@@ -536,9 +541,10 @@ CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' 
        "font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; frame-src 'self'")
 STATISKA = {'/': ('index.html', 'text/html; charset=utf-8'), '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
             '/app.css': ('app.css', 'text/css; charset=utf-8'), '/favicon.svg': ('favicon.svg', 'image/svg+xml'),
-            '/arbetsplats.js': ('arbetsplats.js', 'text/javascript; charset=utf-8')}
+            '/arbetsplats.js': ('arbetsplats.js', 'text/javascript; charset=utf-8'),
+            '/karta.js': ('karta.js', 'text/javascript; charset=utf-8'), '/karta.css': ('karta.css', 'text/css; charset=utf-8')}
 # Arbetsplatsens egna adresser ger samma sida; ytan väljer del ur adressen (direktlänk, omladdning, bakåt/framåt).
-SKAL = re.compile(r'^/(?:kontoret(?:/presentation|/objekt/[A-Za-z0-9:_%.-]{1,200})?|kundstart|forbattringar(?:/ny|/t_[A-Za-z0-9]+)?)$')
+SKAL = re.compile(r'^/(?:kontoret(?:/presentation|/objekt/[A-Za-z0-9:_%.-]{1,200})?|kundstart|flodet|forbattringar(?:/ny|/t_[A-Za-z0-9]+)?)$')
 # Bara Aquarium-sidan får ramas in, och bara av samma ursprung: sidans egen meta-CSP fäster dess skript.
 AQUARIUM_HUVUD = {'Content-Security-Policy': "frame-ancestors 'self'", 'X-Frame-Options': 'SAMEORIGIN',
                   'Content-Type': 'text/html; charset=utf-8'}
@@ -720,6 +726,8 @@ class Hanterare(BaseHTTPRequestHandler):
             return self._svara(200, a)
         if p == '/api/arbetsplats/kundstart':
             return self._svara(200, A.kundstart())
+        if p == '/api/arbetsplats/karta':  # Flödet: de fem modellvalen, var och en ur sin källa (bara läsning)
+            return self._svara(200, karta(self.S))
         if p == '/api/arbetsplats/objekt':
             o = A.objekt(q.get('ref', ''))
             return self._svara(200, o) if o else self._fel(404, 'objektet finns inte (eller är inte läst just nu)')
@@ -833,10 +841,21 @@ class Hanterare(BaseHTTPRequestHandler):
             return self._svara(200, S.ny_trad(str(d.get('titel') or '')))
         if p == '/api/installningar':
             fore = {'huvud': S.k.modell.huvud, 'anstrangning': S.k.modell.anstrangning}
-            ny = spara_modellval(S.k, str(d.get('huvud') or fore['huvud']), str(d.get('anstrangning') or fore['anstrangning']))
+            huvud, niva = str(d.get('huvud') or fore['huvud']), str(d.get('anstrangning') or fore['anstrangning'])
+            if mm_las(S.k.data) and not bevisad(S.k, 'claude_egen', huvud, niva):  # samma prövning som i Flödet
+                raise ValueError('%s med ansträngningen %s har inte fungerat i senaste mätningen.' % (huvud, niva))
+            ny = spara_modellval(S.k, huvud, niva)
             if ny != fore:
                 S.lager.lagg_till('installning', fore=fore, **ny)
             return self._svara(200, S.modellval())
+        if p == '/api/arbetsplats/karta':  # Johnnys val på kartan: gäller direkt och bokförs i journalen
+            val = str(d.get('val') or '')
+            modell = d.get('modell') if isinstance(d.get('modell'), str) or d.get('modell') is None else ''
+            anstrangning = d.get('anstrangning') if isinstance(d.get('anstrangning'), str) else None
+            fore, efter = spara_kartval(S, val, modell, anstrangning)
+            if fore != efter:
+                S.lager.lagg_till('modellval', val=val, fore=fore, efter=efter)
+            return self._svara(200, karta(S))
         if p == '/api/inspel':
             inspel, dubblett = S.spara_inspel(str(d.get('trad') or 'ny'), str(d.get('klient_id') or ''),
                                               str(d.get('text') or ''), [str(x) for x in d.get('bilagor') or []],

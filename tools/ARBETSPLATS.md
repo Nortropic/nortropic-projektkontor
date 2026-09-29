@@ -1,7 +1,7 @@
 # Nortropic — den gemensamma interna arbetsplatsen
 
 Nortropic samlar de tre befintliga användarytorna på en adress: **Hem**, **Kontoret** (Aquarium), **Kundstart** och
-**Förbättringar** (förbättringspartnern). Arbetsplatsen är förbättringspartnerns tjänst på `127.0.0.1:4760`, med samma
+**Förbättringar** (förbättringspartnern), och **Flödet**: kartan över hela flödet med alla modellval. Arbetsplatsen är förbättringspartnerns tjänst på `127.0.0.1:4760`, med samma
 process, inloggning och Host-/Origin-skydd. Ingen ny process, inget nytt ramverk, inget nytt repo. Uppdraget och
 gränserna står i beslutet ARBETSPLATS-20260929; planen äger nästa handling.
 
@@ -26,6 +26,7 @@ bara en app som det själv skapat; `--mal` väljer en annan plats och `--utan-ik
 | `/kontoret/objekt/<ref>` | samma, med ett objekt öppet: `OVL-…` (överlämning), `beslut:<ID>`, `uppdrag:<namn>` |
 | `/kontoret/presentation` | bara Aquarium, helskärm möjlig, ingen navigation eller lista i sidan; Esc tillbaka |
 | `/kundstart` | **Kundstart**: provläget, ditt provärende, kopplingar och det som är öppet enligt planens ägartur |
+| `/flodet` | **Flödet**: Nortropics flöde som en karta med fyra linjer, och de fem modellvalen (se nedan) |
 | `/forbattringar`, `/forbattringar/ny`, `/forbattringar/t_…` | **Förbättringar**: partnerns samtalsyta. Sidomenyn har Ny tråd, Överlämningar och trådarna; Sök i tidigare resonemang, Bestående förståelse och Tjänst och källor togs bort ur menyn på ägarens besked (HEM-RUTOR-20260929), medan `/api/sok`, `/api/forstaelse` och `/api/lage` finns kvar oförändrade |
 
 Direktlänkar, omladdning och bakåt/framåt fungerar för alla adresser. Gamla ingångar består: `/#t_…` och `/#ny` leds
@@ -77,10 +78,50 @@ visas och högst var 15:e minut; Hem hämtar den aldrig. Saknas nyckeln, svarar 
 lista. Ärenden öppnas inte härifrån, och arbetsplatsen skapar inga ärenden. En rad här är inget bevis för att en import
 har körts.
 
+## Flödet
+
+Ägarens beställning MODELLKARTA-20260929: alla modell- och ansträngningsval samlade i en enkel karta över hela flödet.
+Fyra linjer (Idé till main, Kund till leverans, Motorn och Bevakning) visar vid varje hållplats modellen och
+ansträngningen som arbetar där. Varje hållplats följer ett av fem val, och färgen säger vilket. Kartans hållplatser står i
+`ui/karta.js`; värdena läses av servern (`partnern/modellkarta.py`, `GET /api/arbetsplats/karta`) ur den källa som
+faktiskt styr dem:
+
+| Val | Källa | Valbart här |
+| --- | --- | --- |
+| Partnern | arbetsplatsens `installningar.json` (samma som samtalsytans /model) | ja, gäller från nästa svar; bara Claude tills partnerns Codex-drivare finns |
+| Dina sessioner | Claude Codes `~/.claude/settings.json` och Codex `~/.codex/config.toml` | ja, i båda programmen (ägarens besked 2026-09-29) |
+| Runtime | den aktiva releasen, läst med releasens egen kod (samma avgränsade väg som Aquarium) | inte än: steg 2 |
+| Läsarna | arbetsplatsens `installningar.json` (`lasare`); utan val väljer sessionen | ja; ansträngningen följer Runtimes läsarprofil |
+| Bevakningen | Runtimes Codex-profil i den aktiva releasen | inte än: steg 2 |
+
+Startvakten visas vid Arbetssession: Runtimes drivande roll (utförare och modell) och startvaktens egen ansträngning.
+
+**Bara det som bevisligen fungerar erbjuds.** `python3 -B tools/partner.py matmodeller` prövar varje modell och nivå med
+ett kort anrop ("Svara bara med ordet ok.", inga verktyg, inga MCP-servrar) i programmet som kör hållplatsen: Johnnys
+Claude Code och Codex, och Runtimes fastlåsta Claude Code och Codex. Codex modellista läses per program, eftersom varje
+Codex-version skriver sin egen lista. Ett fel som kan vara tillfälligt prövas om ett i taget; ett tydligt nej gör det
+inte. Kvittot är `modellmatning.json` i datakatalogen, och kartan visar vilken mätning och vilka versioner den bygger på.
+Samma prövning görs när ett val sparas, och samtalsytans modellväljare erbjuder och godtar också bara det som fungerade.
+
+**Så skrivs ett val.** Ett val sparas först när Johnny trycker Spara, aldrig av en ändrad meny. I Claude Codes fil
+ändras bara `model`, `effortLevel` och `modelSettings[<modell>].effortLevel`, där Claude Code läser ansträngningen för
+modellen. Ett valt långt fönster (`[1m]`) behålls, utom för Haiku 4.5, som inte har det på abonnemanget. I Codex fil ändras
+bara raderna `model` och `model_reasoning_effort` överst, och de läggs först om de saknas. Står en av dem i en form
+arbetsplatsen inte känner igen, står en sträng eller tabell över flera rader överst i Codex fil, eller har Claude Codes
+fil en annan form än den som skrivs tillbaka (json med två blanksteg), skrivs ingenting; ägaren väljer då i programmet.
+En lista över flera rader, som `notify`, följs rad för rad och räknas aldrig som en tabellrubrik. Den nya Codex-filen
+prövas innan den skrivs: exakt en rad per nyckel överst och allt från första tabellen oförändrat. Filerna skrivs atomärt,
+med samma rättigheter, i en länkad fils mål och bara om de inte ändrats sedan de lästes, eftersom Claude Codes /effort
+skriver samma fil. Annars prövas det om, högst tre gånger. Ett litet fönster mellan jämförelsen och namnbytet går inte
+att stänga, eftersom programmen inte låser sina filer. Varje val bokförs
+i partnerns journal (`modellval`, före och efter). En prov- eller utvecklingsinstans, med egen datakatalog eller port,
+skriver bara kopior i sin datakatalog och rör aldrig de riktiga filerna.
+
 ## Vad arbetsplatsen inte gör
 
 Den anropar ingen modell vid navigering, statusläsning eller sökning, skriver ingenting i partnerns journal eller i något
-annat system vid läsning och startar eller återupptar inga uppdrag. Egna UI-uppgifter ligger bara i webbläsaren:
+annat system vid läsning och startar eller återupptar inga uppdrag. Det enda som skriver utanför webbläsaren är Flödets
+Spara: Johnnys val, i den fil som styr det (se Flödet). Egna UI-uppgifter ligger bara i webbläsaren:
 senaste adress per del (`arbetsplats:senast:*`), om Kontorets lista är dold (`arbetsplats:lista-dold`), senaste tråden
 (`senasteTrad`), utkasten per tråd (`utkast:*`) och inspel som väntar på att skickas (`utkorg`). Okänt är aldrig noll:
 en källa som inte gick att läsa visas som okänd,
@@ -96,3 +137,7 @@ läsningstakten, otillgänglig och långsam läsning, okänt i stället för nol
 nekade referenser, sammanhanget i inspel och i modellens meddelande, att hänvisningar aldrig blir ägarens ord, dubbletter,
 att läsning varken anropar modellen eller skriver i journalen, och att en nekad skrivning inte förstör nästa begäran på
 samma anslutning. Användarresorna provas i Chromium mot en provinstans (se beslutet).
+`python3 -B -m unittest tools.test_modellkarta` prövar Flödet: varje val ur sin källa, att bara det uppmätta erbjuds och
+godtas, exakt vilka rader som skrivs i Claude Codes och Codex filer, att en okänd form och en samtidig skrivning inte
+skriver något, läsarna, partnern, adresserna, att en provinstans aldrig rör de riktiga filerna, och mätverktyget mot falska
+program.

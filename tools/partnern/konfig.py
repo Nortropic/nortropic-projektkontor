@@ -91,6 +91,10 @@ class Konfig:
     startvakt: bool = False  # på bara i den ordinarie tjänsten (se ladda)
     startvakt_binarer: dict = field(default_factory=lambda: dict(STARTVAKT_BINARER))
     startvakt_anstrangning: str = 'high'
+    # Claude Codes och Codex inställningsfiler, som Johnnys val för sina sessioner skrivs i (ägarens besked 2026-09-29).
+    # En prov- eller utvecklingsinstans får egna filer i sin datakatalog och rör aldrig de riktiga (se ladda).
+    claude_installningar: Path = field(default_factory=lambda: Path.home() / '.claude/settings.json')
+    codex_installningar: Path = field(default_factory=lambda: Path.home() / '.codex/config.toml')
 
     def till_json(self) -> dict:
         d = asdict(self)
@@ -131,6 +135,14 @@ def ladda() -> Konfig:
     # eller utvecklingsinstans.
     ordinarie = not (os.environ.get('PARTNER_DATA') or os.environ.get('PARTNER_PORT') or k.prov_dolj)
     k.startvakt = os.environ.get('PARTNER_STARTVAKT', '1' if ordinarie else '0') == '1'
+    if os.environ.get('PARTNER_CLAUDE_INSTALLNINGAR'):
+        k.claude_installningar = Path(os.environ['PARTNER_CLAUDE_INSTALLNINGAR'])
+    elif not ordinarie:
+        k.claude_installningar = data / 'claude-code-installningar.json'
+    if os.environ.get('PARTNER_CODEX_INSTALLNINGAR'):
+        k.codex_installningar = Path(os.environ['PARTNER_CODEX_INSTALLNINGAR'])
+    elif not ordinarie:
+        k.codex_installningar = data / 'codex-installningar.toml'
     installningar = data / 'installningar.json'
     if installningar.is_file():
         try:
