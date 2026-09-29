@@ -1622,6 +1622,124 @@ class GransProv(Miljo):
             self.assertNotIn('--max-budget-usd', anrop['argv'])
 
 
+class RaderaTradProv(Miljo):
+    """RADERA-TRAD-20260929: ägaren raderar en tråd för gott; förståelse och överlämningar ur tråden ligger kvar."""
+
+    def sessionsfil(self, session):
+        return srv._session_fil(self.S.agent.arbetsyta, session)
+
+    def test_traden_raderas_for_gott_och_resten_ligger_kvar(self):
+        self.logga_in()
+        delad = self.ladda_upp('delad.png', PNG)['sha']
+        egen = self.ladda_upp('bara-i-a.txt', 'RADERAS-BILAGA'.encode())['sha']
+        a = self.skicka('RADERASORD i tråden\nTVÅBLOCK', bilagor=[delad, egen])['inspel']['trad']
+        vy_a = self.vanta(a, lambda v: self.turer(v, 'svarad'))
+        b = self.skicka('KVARORD i en annan tråd', bilagor=[delad])['inspel']['trad']
+        self.vanta(b, lambda v: self.turer(v, 'svarad'))
+        tur_a = self.turer(vy_a, 'svarad')[0]['id']
+        sess_a = self.S.lager.trad(a)['session']
+        sess_b = self.S.lager.trad(b)['session']
+        self.assertTrue(self.sessionsfil(sess_a).exists() and self.sessionsfil(sess_b).exists())
+        self.assertTrue((self.S.lager.turer / tur_a).is_dir())
+        (self.S.lager.harlett / egen).mkdir(parents=True, exist_ok=True)  # härledda filer för bilagan (tjänsten gör dem i bakgrunden)
+        self.S.lager.lagg_till('forstaelse', trad=a, tur=tur_a, slag='beslut', text='FORSTAELSE ur tråden', auktoritet='agarens_ord')
+        self.S.lager.lagg_till('overlamning', overlamning='OVL-20260929-aaaaaa', trad=a, inspel='ev_x', nyckel='OVL-20260929-aaaaaa',
+                               rubrik='Överlämning ur tråden', mottagare='kontorets-kedjedrivare', katalog_visning='x')
+        self.S.lager.lagg_till('koppling', trad=b, till=a, inspel=None, skal='KOPPLINGSSKAL från B')
+        self.S.lager.lagg_till('koppling', trad=a, till=b, inspel=None, skal='KOPPLINGSSKAL från A')
+        seq_fore = max(json.loads(r)['seq'] for r in self.S.lager.journal.read_text().splitlines())
+
+        self.assertEqual(self.json('POST', '/api/trad/%s/radera' % a, {})[0], 400)  # utan bekräftelse raderas inget
+        kod, ut = self.json('POST', '/api/trad/%s/radera' % a, {'bekraftat': True})
+        self.assertEqual(kod, 200, ut)
+        self.assertEqual((ut['raderad'], ut['bilagor'], ut['turer'], ut['sessioner']), (True, 1, 1, 1))
+
+        journal = self.S.lager.journal.read_text()
+        self.assertNotIn('RADERASORD', journal)
+        self.assertNotIn('bara-i-a.txt', journal)
+        self.assertNotIn(sess_a, journal)
+        rader = [json.loads(r) for r in journal.splitlines()]
+        self.assertEqual({r['typ'] for r in rader if r.get('trad') == a},
+                         {'forstaelse', 'overlamning', 'trad_raderad'})
+        self.assertEqual(rader[-1]['typ'], 'trad_raderad')
+        self.assertEqual(rader[-1]['seq'], seq_fore + 1)
+        self.assertEqual(self.json('GET', '/api/trad/' + a)[0], 404)
+        self.assertEqual([t['id'] for t in self.json('GET', '/api/tradar')[1]['tradar']], [b])
+        self.assertEqual(self.json('GET', '/api/sok?q=RADERASORD')[1]['traffar'], [])
+        self.assertTrue(self.json('GET', '/api/sok?q=KVARORD')[1]['traffar'])
+        self.assertIn('FORSTAELSE ur tråden', [f['text'] for f in self.json('GET', '/api/forstaelse')[1]['poster']])
+        self.assertEqual(self.S.lager.en('select trad from overlamning')['trad'], a)
+        self.assertEqual(self.S.arbetsplats.objekt('OVL-20260929-aaaaaa')['typ'], 'overlamning')  # tål en raderad tråd
+        self.assertNotIn('KOPPLINGSSKAL', journal)  # kopplingar till och från tråden
+        self.assertEqual([p['slag'] for p in self.json('GET', '/api/trad/' + b)[1]['poster'] if p['slag'] == 'koppling'], [])
+        self.assertFalse(self.sessionsfil(sess_a).exists())
+        self.assertTrue(self.sessionsfil(sess_b).exists())
+        self.assertFalse((self.S.lager.turer / tur_a).exists())
+        self.assertFalse(self.S.lager.blob_sokvag(egen).exists())
+        self.assertFalse((self.S.lager.harlett / egen).exists())
+        self.assertTrue(self.S.lager.blob_sokvag(delad).exists(), 'en bilaga som en annan tråd använder ligger kvar')
+
+        nytt = self.skicka('efter raderingen', trad=b, lage='bara_spara')['inspel']
+        self.assertEqual(json.loads(self.S.lager.journal.read_text().splitlines()[-1])['seq'], seq_fore + 2)
+        self.assertEqual(nytt['trad'], b)
+        ombyggt = Lager(self.k.data)
+        ombyggt.bygg_om_index()  # ett index byggt ur journalen på nytt vet inget om tråden
+        self.assertEqual((ombyggt.trad(a), ombyggt.trad(b)['id']), (None, b))
+        self.assertEqual(self.json('POST', '/api/trad/%s/radera' % a, {'bekraftat': True})[0], 404)
+
+    def test_en_krasch_mitt_i_raderingen_lamnar_ingen_trad_efter_sig(self):
+        self.logga_in()
+        a = self.skicka('KRASCHORD', lage='bara_spara')['inspel']['trad']
+        b = self.skicka('kvar', lage='bara_spara')['inspel']['trad']
+        with open(self.S.lager.journal, 'ab') as f:  # en avbruten sista rad som råkar vara en hel händelse i tråden
+            f.write(json.dumps({'seq': 9999, 'id': 'ev_svans', 'typ': 'inspel', 'tid': 'x', 'trad': a,
+                                'text': 'SVANSORD', 'bilagor': []}).encode())
+        riktig = self.S.lager.bygg_om_index
+        self.S.lager.bygg_om_index = lambda: (_ for _ in ()).throw(OSError('krasch före ombyggnaden'))
+        with self.assertRaises(OSError):
+            self.S.radera_trad(a)
+        self.S.lager.bygg_om_index = riktig
+        text = self.S.lager.journal.read_text()
+        self.assertNotIn('KRASCHORD', text)
+        self.assertNotIn('SVANSORD', text)
+        self.assertEqual(json.loads(text.splitlines()[-1])['seq'], 10000, 'seq efter också den avbrutna radens')
+        omstart = Lager(self.k.data)  # indexet står på seq före raderingen och läses ikapp
+        self.assertIsNone(omstart.trad(a))
+        self.assertEqual(omstart.trad(b)['id'], b)
+        self.assertEqual(omstart.fraga("select kalla_id from sok where sok match 'KRASCHORD'"), [])
+
+    def test_radering_vagras_medan_partnern_arbetar_i_traden(self):
+        self.logga_in()
+        a = self.skicka('SOV 30')['inspel']['trad']
+        self.vanta(a, lambda v: v['aktiv'])
+        kod, d = self.json('POST', '/api/trad/%s/radera' % a, {'bekraftat': True})
+        self.assertEqual(kod, 409, d)
+        self.assertIn('arbetar', d['fel'])
+        self.assertTrue(self.S.lager.trad(a))
+        self.assertTrue(any(json.loads(r).get('trad') == a and json.loads(r)['typ'] == 'inspel'
+                            for r in self.S.lager.journal.read_text().splitlines()))
+
+    def test_utredningens_katalog_och_session_raderas_med_traden(self):
+        self.logga_in()
+        a = self.skicka('RING utred {"rubrik": "Radera mig", "uppdrag": "kort"}')['inspel']['trad']
+        vy = self.vanta(a, lambda v: any(p['slag'] == 'jobb' and p['status'] == 'klart' for p in v['poster']), 45)
+        self.vanta(a, lambda v: not v['aktiv'] and not v['jobb_aktiva'])
+        jobb = [p for p in vy['poster'] if p['slag'] == 'jobb'][0]
+        sess = json.loads(self.S.lager.en('select data from jobb where id=?', (jobb['id'],))['data'])['session']
+        kataloger = [k for k in self.S.lager.turer.glob('jobbk_*') if sess.encode() in (k / 'strom.jsonl').read_bytes()]
+        self.assertEqual(len(kataloger), 1)
+        pagar = [json.loads(r) for r in self.S.lager.journal.read_text().splitlines()
+                 if '"jobb_status"' in r and '"pagar"' in r]
+        self.assertEqual(pagar[-1]['korning'], kataloger[0].name)  # katalogen står i journalen
+        (kataloger[0] / 'strom.jsonl').unlink()  # som om utredningen kraschat innan strömmen skrevs
+        kod, ut = self.json('POST', '/api/trad/%s/radera' % a, {'bekraftat': True})
+        self.assertEqual(kod, 200, ut)
+        self.assertFalse(kataloger[0].exists())
+        self.assertFalse(self.sessionsfil(sess).exists())
+        self.assertNotIn('Radera mig', self.S.lager.journal.read_text())
+        self.assertEqual(self.S.lager.fraga('select id from jobb'), [])
+
+
 MOTTAGARE = r"""#!/usr/bin/env python3
 import json, os, re, subprocess, sys, time
 from pathlib import Path

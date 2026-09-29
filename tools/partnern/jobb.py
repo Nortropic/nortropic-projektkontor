@@ -92,24 +92,26 @@ class Jobb:
                                        orsak='internt fel: %s' % type(fel).__name__)
 
     def _kor(self, jid: str) -> None:
-        j = self.s.lager.en('select * from jobb where id=?', (jid,))
-        if not j or j['status'] not in ('registrerat', 'avbrutet'):
-            return
-        data = json.loads(j['data'])
-        historik = data.get('historik') or []
-        if historik and historik[-1].get('status') == 'avbrutet' and 'Johnny' in (historik[-1].get('orsak') or ''):
-            return
-        ater = bool(data.get('session'))
-        if not data.get('session'):
-            import uuid
-            data['session'] = str(uuid.uuid4())  # journalförs före starten så att en krasch inte tappar sessionen
-        self.s.lager.lagg_till('jobb_status', jobb=jid, trad=j['trad'], status='pagar', session=data['session'])
-        korning = Korning(self.s, 'jobb', j['trad'], [], jobb=dict(data, jobb=jid),
-                          ateruppta=jid if ater else None)
-        korning.fortsatt_avbruten = ater
-        with self._las:
-            self._aktiva[jid] = korning
-        self.s.registrera_korning(korning)
+        with self.s._las:  # samma lås som en radering av tråden håller: utredningen startar före den eller inte alls
+            j = self.s.lager.en('select * from jobb where id=?', (jid,))
+            if not j or j['status'] not in ('registrerat', 'avbrutet'):
+                return
+            data = json.loads(j['data'])
+            historik = data.get('historik') or []
+            if historik and historik[-1].get('status') == 'avbrutet' and 'Johnny' in (historik[-1].get('orsak') or ''):
+                return
+            ater = bool(data.get('session'))
+            if not data.get('session'):
+                import uuid
+                data['session'] = str(uuid.uuid4())  # journalförs före starten så att en krasch inte tappar sessionen
+            korning = Korning(self.s, 'jobb', j['trad'], [], jobb=dict(data, jobb=jid),
+                              ateruppta=jid if ater else None)
+            korning.fortsatt_avbruten = ater
+            self.s.lager.lagg_till('jobb_status', jobb=jid, trad=j['trad'], status='pagar', session=data['session'],
+                                   korning=korning.id)  # katalogen i turer/ journalförs, så att en radering hittar den
+            with self._las:
+                self._aktiva[jid] = korning
+            self.s.registrera_korning(korning)
         try:
             try:
                 res = self.s.agent.kor(korning, data.get('session'))

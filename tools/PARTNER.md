@@ -64,7 +64,7 @@ ska bära framåt och håller trådens läge aktuellt.
 
 | Del | Fil | Status |
 | --- | --- | --- |
-| Lager: journal (original, append-only, fsync), innehållsadresserade bilagor, härlett index | `partnern/lager.py` | Indexet byggs om ur journalen |
+| Lager: journal (original, append-only utom när ägaren raderar en tråd, fsync), innehållsadresserade bilagor, härlett index | `partnern/lager.py` | Indexet byggs om ur journalen |
 | Bilagor: typ ur innehållet, textlager (pdftotext, textutil, zip-XML), sidbilder (pdftoppm), modellbild (sips) | `partnern/bilagor.py` | Ljud, video och okänt sparas men märks olästa |
 | Källindex: Improvements-korpusen, ägarens sparade ord och beställningar, kontorets beslut/plan, andra repons dokument, förberedelsens syntes | `partnern/kallor.py` | Byggs om vid start och inom tio minuter när repons lokala origin/main, de sparade ägarorden eller korpusens manifest ändras (`partner.py index` gör det direkt); privata filer tvättas från hemligheter |
 | Systemläge: git (origin/main, primärutcheckning), planen på main, Runtimes drift genom Aquariums läsning, öppna PR | `partnern/systemlage.py` | Alltid med lästid och ålder |
@@ -110,6 +110,19 @@ Sparande, sökning och öppning av källor anropar aldrig en modell.
 Claude Code sparar modellens egen sessionsfil under `~/.claude/projects/<arbetsyta>/`; den är en cache för
 trådens modellkontext. Partnerns journal är originalet: saknas sessionen startar en ny med trådens historik ur
 journalen.
+
+En tråd raderas för gott med papperskorgen på dess rad i listan och "Radera" i rutan som frågar
+(RADERA-TRAD-20260929). Då försvinner trådens inspel, turer, resonemang och utredningar ur journalen, och
+kopplingar till och från tråden. Journalen skrivs om atomärt, och indexet byggs om. Med dem försvinner också:
+- turernas och utredningarnas kataloger under `turer/`;
+- bilagor som ingen annan rad nämner, med sina härledda filer;
+- Claude Codes sessionsfiler för trådens sessioner, om ingen kvarvarande rad nämner sessionen.
+
+Filerna tas bort före journalen. En krasch mitt i raderingen lämnar därför antingen tråden kvar, så att den kan
+raderas igen, eller en journal utan tråden, som indexet följer vid nästa start. Sparad förståelse ur tråden och
+överlämningar som redan lämnats ligger kvar, och en rad `trad_raderad` utan innehåll visar att tråden fanns. Medan
+partnern arbetar i tråden vägras raderingen, och en köad utredning startar antingen före raderingen eller inte alls.
+Säkerhetskopior utanför tjänsten, till exempel Time Machine, rör den inte.
 
 ## Data och säkerhet
 
@@ -325,7 +338,12 @@ eller märks), regeln att "beställ" inte räcker för genomförande, dubblettre
 avslag bara på Johnnys ord med id (ord utanför tråden, negerat, utan id och med ett annat id nekas), ett släpp som
 lämnar paketet orört och bokför övergången, ett beslut samma sekund som ett annat som nekas läsbart utan att något
 skrivs, kvittenser och rader utan hans ord som aldrig väcker en vilande beställning
-och en backlog som inte kan läsas och därför är okänd. GitHub prövas med en fejkad `gh`: hela trädet märkt per slag,
+och en backlog som inte kan läsas och därför är okänd. Radering av en tråd prövas med bilagor, turer, en
+utredning och sessionsfiler: tråden och dess filer försvinner för gott, också kopplingar till och från den och en
+utredningskatalog utan ström. En bilaga som en annan tråd använder, sparad förståelse och överlämningar ligger kvar,
+och överlämningens vy tål att tråden saknas. Journalens seq fortsätter uppåt, också förbi en avbruten sista rad. En
+krasch mellan journalbytet och indexet lämnar ingen tråd efter sig vid nästa start, och raderingen vägras medan
+partnern arbetar i tråden. GitHub prövas med en fejkad `gh`: hela trädet märkt per slag,
 ett kapat träd, en fil över 1 MB läst i delar till sista raden och hämtad en gång, säkerhetsmeddelanden, en kapad lista
 och en otillåten sökväg. Modellvalet prövas så att utredaren får samma modell och ansträngning och kroken nekar andra
 agenttyper och modeller.
