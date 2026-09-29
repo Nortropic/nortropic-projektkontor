@@ -28,7 +28,7 @@ from . import bilagor as bil
 from .agent import Agent, Korning
 from .jobb import Jobb
 from .kallor import Kallindex, KLASSER
-from .konfig import Konfig
+from .konfig import ANSTRANGNING, MODELLER, Konfig, spara_modellval
 from .lager import Lager, nu, nytt_id
 from .overlamning import Overlamning
 from .systemlage import Systemlage
@@ -265,7 +265,8 @@ class Server:
         if not session:
             session = str(uuid.uuid4())  # journalförs före starten så att en krasch inte tappar sessionen
         self.lager.lagg_till('tur_start', tur=korning.id, trad=trad, inspel=[i['id'] for i in inspel],
-                             session=session, modell=self.k.modell.huvud, ateruppta=ateruppta)
+                             session=session, modell=self.k.modell.huvud, anstrangning=self.k.modell.anstrangning,
+                             ateruppta=ateruppta)
         if sparr:
             self.lager.lagg_till('tur_klar', tur=korning.id, trad=trad, status='begransad',
                                  svar='Jag har sparat ditt inspel, men %s Det räknas om vid midnatt (UTC), eller '
@@ -405,6 +406,10 @@ class Server:
         return {'trad': t, 'resonemang': self.lager.resonemang_senast(trad), 'poster': poster,
                 'aktiv': aktiv.lage() if aktiv else None, 'jobb_aktiva': jobb_aktiva,
                 'seq': self.lager.en("select varde from meta where nyckel='journal_seq'")['varde']}
+
+    def modellval(self) -> dict:
+        return {'huvud': self.k.modell.huvud, 'anstrangning': self.k.modell.anstrangning,
+                'utredare': self.k.modell.utredare, 'modeller': list(MODELLER), 'nivaer': list(ANSTRANGNING)}
 
     def lagevy(self) -> dict:
         with self._las:
@@ -581,6 +586,8 @@ class Hanterare(BaseHTTPRequestHandler):
 
     def _get_api(self, p, q):
         S = self.S
+        if p == '/api/installningar':
+            return self._svara(200, S.modellval())
         if p == '/api/lage':
             S.overlamning.las_kvittenser()
             return self._svara(200, S.lagevy())
@@ -731,6 +738,12 @@ class Hanterare(BaseHTTPRequestHandler):
             return self._svara(200, {'ok': True}, huvud={'Set-Cookie': '%s=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0' % KAKA})
         if p == '/api/tradar':
             return self._svara(200, S.ny_trad(str(d.get('titel') or '')))
+        if p == '/api/installningar':
+            fore = {'huvud': S.k.modell.huvud, 'anstrangning': S.k.modell.anstrangning}
+            ny = spara_modellval(S.k, str(d.get('huvud') or fore['huvud']), str(d.get('anstrangning') or fore['anstrangning']))
+            if ny != fore:
+                S.lager.lagg_till('installning', fore=fore, **ny)
+            return self._svara(200, S.modellval())
         if p == '/api/inspel':
             inspel, dubblett = S.spara_inspel(str(d.get('trad') or 'ny'), str(d.get('klient_id') or ''),
                                               str(d.get('text') or ''), [str(x) for x in d.get('bilagor') or []],

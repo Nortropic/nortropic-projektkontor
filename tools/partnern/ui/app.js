@@ -121,9 +121,9 @@ async function laddaTradar() {
 function ritaTradar() {
   const lista = $('tradlista'); lista.replaceChildren();
   for (const t of tillstand.tradar) {
-    lista.append(el('button', { class: 'trad' + (t.id === tillstand.trad ? ' vald' : ''), onclick: () => oppnaTrad(t.id) },
-      el('span', { class: 't' }, t.aktiv ? el('span', { class: 'aktiv', title: 'Arbetar' }) : null, t.titel),
-      el('span', { class: 'm', text: tid(t.senast) + ' · ' + t.inspel + ' inspel' })));
+    lista.append(el('button', { class: 'trad' + (t.id === tillstand.trad ? ' vald' : ''), onclick: () => oppnaTrad(t.id),
+      title: t.titel + ' · ' + tid(t.senast) + ' · ' + t.inspel + ' inspel' },
+      el('span', { class: t.aktiv ? 'aktiv' : 'punkt', title: t.aktiv ? 'Arbetar' : null }), el('span', { class: 't', text: t.titel })));
   }
 }
 async function oppnaTrad(id) {
@@ -157,9 +157,14 @@ function ritaTrad() {
   const nere = flode.scrollHeight - flode.scrollTop - flode.clientHeight < 80;
   flode.replaceChildren();
   ritaDar(vy && vy.resonemang);
-  if (!vy) {
-    flode.append(el('div', { class: 'notis' }, 'Lämna en tanke, en bild, en fil eller en länk. Partnern vet vad Nortropic är och tar reda på resten själv. Skriv "bara spara" om du bara vill spara något.'));
-  } else {
+  const vantande = las('utkorg', []).filter((x) => x.trad === tillstand.trad);
+  const tom = !vy && !vantande.length;
+  $('huvud').classList.toggle('tom', tom);
+  $('forslag').hidden = !tom;
+  if (tom) {
+    flode.append(el('div', { class: 'halsning' }, el('h1', null, el('span', { class: 'gnista', 'aria-hidden': 'true' }), halsning()),
+      el('div', { class: 'notis' }, 'Lämna en tanke, en bild, en fil eller en länk. Partnern vet vad Nortropic är och tar reda på resten själv. Välj "Bara spara" (eller skriv "bara spara") om du bara vill spara något.')));
+  } else if (vy) {
     const turFor = {};
     for (const p of vy.poster) if (p.slag === 'tur') for (const i of p.inspel) turFor[i] = p;
     for (const p of vy.poster) {
@@ -177,7 +182,7 @@ function ritaTrad() {
   const status = vy && vy.aktiv ? 'Partnern ' + (vy.aktiv.status_text || 'arbetar') + ' · ' + vy.aktiv.sekunder + ' s' : '';
   $('tradstatus').textContent = status;
   $('skickaavbryt').hidden = !(vy && vy.aktiv);
-  $('skicka').textContent = vy && vy.aktiv ? 'Skicka (efter svaret)' : 'Skicka';
+  $('skicka').title = vy && vy.aktiv ? 'Skicka – partnern svarar när det pågående arbetet är klart' : 'Skicka (Enter)';
   if (nere) flode.scrollTop = flode.scrollHeight;
 }
 function ritaDar(r) {
@@ -210,7 +215,7 @@ function ritaArbete(steg, kallor, forb, modell) {
   const detaljer = el('details', { class: 'arbete' });
   const delar = [];
   if (forb && forb.sekunder) delar.push(Math.round(forb.sekunder) + ' s');
-  if (modell) delar.push(modell);
+  if (modell) delar.push(modell + (forb && forb.anstrangning ? ' · ' + forb.anstrangning : ''));
   if (forb && forb.tokens_in) delar.push(Math.round(forb.tokens_in / 1000) + 'k in / ' + Math.round((forb.tokens_ut || 0) / 1000 * 10) / 10 + 'k ut');
   if (forb && forb.omforsok) delar.push(forb.omforsok + ' omförsök');
   detaljer.append(el('summary', null, 'Källor och arbete' + (delar.length ? ' · ' + delar.join(' · ') : '')));
@@ -320,12 +325,18 @@ function laggTillFiler(filer) {
 }
 async function skicka(avbryt) {
   sparaUtkast();
+  if (!utkast.bilagor.length && KOMMANDO.test(utkast.text)) { // /model och /effort hanteras här och skickas aldrig
+    const text = utkast.text;
+    $('text').value = ''; utkast.text = ''; sparaUtkast(); anpassaHojd();
+    try { await kommando(text); } catch (f) { $('utkaststatus').textContent = 'Kunde inte byta: ' + f.message; }
+    return;
+  }
   if (utkast.bilagor.some((b) => !b.sha && !b.fel)) { $('utkaststatus').textContent = 'Väntar på att bilagorna laddas upp…'; return; }
   const bilagor = utkast.bilagor.filter((b) => b.sha);
   if (!utkast.text.trim() && !bilagor.length) return;
   const post = { klient_id: uuid(), trad: tillstand.trad || 'ny', text: utkast.text, bilagor, lage: $('baraspara').checked ? 'bara_spara' : null, avbryt_pagaende: !!avbryt, skapad: new Date().toISOString() };
   const utkorg = las('utkorg', []); utkorg.push(post); skriv('utkorg', utkorg);
-  $('text').value = ''; utkast.text = ''; utkast.bilagor = []; $('baraspara').checked = false; ritaBilagor(); sparaUtkast(); anpassaHojd();
+  $('text').value = ''; utkast.text = ''; utkast.bilagor = []; sattLage(false); ritaBilagor(); sparaUtkast(); anpassaHojd();
   ritaTrad(); await tomUtkorg();
 }
 async function tomUtkorg() {
@@ -356,8 +367,105 @@ function anpassaHojd() { const t = $('text'); t.style.height = 'auto'; t.style.h
 
 $('komponera').addEventListener('submit', (e) => { e.preventDefault(); skicka(false); });
 $('skickaavbryt').addEventListener('click', () => skicka(true));
-$('text').addEventListener('input', () => { sparaUtkast(); anpassaHojd(); });
-$('text').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); skicka(false); } });
+$('text').addEventListener('input', () => {
+  sparaUtkast(); anpassaHojd();
+  if (/^\//.test($('text').value)) $('utkaststatus').textContent = '/model väljer modell och ansträngning · /model sonnet · /effort max';
+  else if (/^\/model|^\/effort/.test($('utkaststatus').textContent)) $('utkaststatus').textContent = '';
+});
+$('text').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); skicka(false); }
+});
+function halsning() {
+  const h = new Date().getHours();
+  return h >= 5 && h < 10 ? 'God morgon, Johnny' : h >= 10 && h < 17 ? 'Hej, Johnny' : h >= 17 && h < 23 ? 'God kväll, Johnny' : 'Hej, nattuggla';
+}
+function sattLage(spara) {
+  $('baraspara').checked = spara;
+  $('lage-svara').classList.toggle('vald', !spara); $('lage-svara').setAttribute('aria-pressed', String(!spara));
+  $('lage-spara').classList.toggle('vald', spara); $('lage-spara').setAttribute('aria-pressed', String(spara));
+}
+$('lage-svara').addEventListener('click', () => sattLage(false));
+$('lage-spara').addEventListener('click', () => sattLage(true));
+const FORSLAG = [['Vad väntar på mig?', 'Vad väntar på mig just nu?'], ['Fortsätt där vi var', 'Fortsätt där vi var.'],
+  ['Vad har vi bestämt om …', 'Vad har vi bestämt om '], ['Titta på en länk', 'Titta på den här länken: ']];
+function ritaForslag() {
+  $('forslag').replaceChildren(...FORSLAG.map(([etikett, text]) => el('button', { type: 'button', onclick: () => {
+    $('text').value = text; sparaUtkast(); anpassaHojd(); $('text').focus(); $('text').setSelectionRange(text.length, text.length); } }, etikett)));
+}
+ritaForslag();
+
+// ------------------------------------------------------------------ modell och ansträngning (som /model i Claude Code)
+const KOMMANDO = /^\s*\/(model|modell|effort)(\s+\S+)?\s*$/i;
+const ALIAS = { opus: 'claude-opus-5-5', 'opus-5-5': 'claude-opus-5-5', fable: 'claude-fable-5-1', sonnet: 'claude-sonnet-5',
+  'opus-5': 'claude-opus-5', haiku: 'claude-haiku-4-5-20251001' };
+const mv = { data: null, modell: 0, niva: 2 };
+function modellnamn(id) { const m = mv.data && mv.data.modeller.find((x) => x.id === id); return m ? m.namn : id; }
+function ritaModellrad() { if (mv.data) $('modellrad').textContent = modellnamn(mv.data.huvud) + ' · ' + mv.data.anstrangning + ' ⌄'; }
+async function laddaModellval() { mv.data = await api('GET', '/api/installningar'); ritaModellrad(); return mv.data; }
+async function sparaModellval(huvud, anstrangning) {
+  mv.data = await api('POST', '/api/installningar', { huvud, anstrangning });
+  ritaModellrad();
+  $('utkaststatus').textContent = modellnamn(mv.data.huvud) + ' · ' + mv.data.anstrangning + ' gäller från nästa svar.';
+}
+async function oppnaModellval() {
+  const d = mv.data || await laddaModellval();
+  mv.modell = Math.max(0, d.modeller.findIndex((m) => m.id === d.huvud));
+  mv.niva = Math.max(0, d.nivaer.indexOf(d.anstrangning));
+  ritaModellval(); $('modellval').hidden = false; $('modellrad').setAttribute('aria-expanded', 'true');
+  placeraModellval(); $('modellval').focus();
+}
+function placeraModellval() {  // öppnas åt det håll där menyn får plats: nedåt när rutan står mitt på en tom sida
+  const m = $('modellval'); const r = m.parentElement.getBoundingClientRect();
+  m.style.maxHeight = ''; m.classList.remove('nedat');
+  const under = window.innerHeight - r.bottom - 16, over = r.top - 16;
+  const nedat = under >= m.offsetHeight || under > over;
+  m.classList.toggle('nedat', nedat);
+  m.style.maxHeight = Math.max(160, nedat ? under : over) + 'px';
+}
+function stangModellval() { $('modellval').hidden = true; $('modellrad').setAttribute('aria-expanded', 'false'); $('text').focus(); }
+function ritaModellval() {
+  const d = mv.data;
+  $('modellval').replaceChildren(el('div', { class: 'mv-rubrik', text: 'Modell' }),
+    ...d.modeller.map((m, i) => el('button', { type: 'button', class: 'mv-modell' + (i === mv.modell ? ' vald' : ''), onclick: () => { mv.modell = i; valjModell(); } },
+      el('span', { class: 'mv-namn', text: m.namn }), el('span', { class: 'mv-om', text: m.om }), m.id === d.huvud ? el('span', { class: 'mv-nu', text: '✓' }) : null)),
+    el('div', { class: 'mv-niva' }, el('span', { class: 'etikett', text: 'Ansträngning' }),
+      el('div', { class: 'mv-nivaer', role: 'group', 'aria-label': 'Ansträngning' }, ...d.nivaer.map((n, i) => el('button', {
+        type: 'button', class: 'mv-n' + (i === mv.niva ? ' vald' : ''), onclick: async () => { mv.niva = i; ritaModellval(); $('modellval').focus();
+          try { await sparaModellval(d.huvud, d.nivaer[i]); ritaModellval(); } catch (f) { $('utkaststatus').textContent = 'Kunde inte byta: ' + f.message; } } }, n)))),
+    el('div', { class: 'mv-fot', text: '↑↓ modell · ←→ ansträngning · Enter · Esc · /model, /effort' }));
+}
+async function valjModell() {
+  const d = mv.data; stangModellval();
+  try { await sparaModellval(d.modeller[mv.modell].id, d.nivaer[mv.niva]); } catch (f) { $('utkaststatus').textContent = 'Kunde inte byta: ' + f.message; }
+}
+$('modellval').addEventListener('keydown', (e) => {
+  const d = mv.data; if (!d) return;
+  if (e.key === 'ArrowDown') mv.modell = (mv.modell + 1) % d.modeller.length;
+  else if (e.key === 'ArrowUp') mv.modell = (mv.modell - 1 + d.modeller.length) % d.modeller.length;
+  else if (e.key === 'ArrowRight') mv.niva = Math.min(d.nivaer.length - 1, mv.niva + 1);
+  else if (e.key === 'ArrowLeft') mv.niva = Math.max(0, mv.niva - 1);
+  else if (e.key === 'Enter') { e.preventDefault(); valjModell(); return; }
+  else if (e.key === 'Escape') { e.preventDefault(); stangModellval(); return; }
+  else return;
+  e.preventDefault(); ritaModellval();
+});
+document.addEventListener('mousedown', (e) => {
+  if (!$('modellval').hidden && !$('modellval').contains(e.target) && !$('modellrad').contains(e.target)) stangModellval();
+});
+$('modellrad').addEventListener('click', () => ($('modellval').hidden ? oppnaModellval() : stangModellval()));
+async function kommando(text) {
+  const m = text.trim().match(/^\/(model|modell|effort)(?:\s+(\S+))?$/i);
+  const d = mv.data || await laddaModellval();
+  const arg = ((m && m[2]) || '').toLowerCase();
+  if (!arg) { await oppnaModellval(); return; }
+  if (m[1].toLowerCase() === 'effort') {
+    if (!d.nivaer.includes(arg)) { $('utkaststatus').textContent = 'Nivåerna är ' + d.nivaer.join(', ') + '.'; return; }
+    await sparaModellval(d.huvud, arg); return;
+  }
+  const id = ALIAS[arg] || (d.modeller.some((x) => x.id === arg) ? arg : null);
+  if (!id) { $('utkaststatus').textContent = 'Okänd modell: ' + arg + '. Välj med /model.'; return; }
+  await sparaModellval(id, d.anstrangning);
+}
 $('filval').addEventListener('change', (e) => { laggTillFiler([...e.target.files]); e.target.value = ''; });
 document.addEventListener('paste', (e) => {
   const filer = [...(e.clipboardData ? e.clipboardData.files : [])];
@@ -437,6 +545,7 @@ $('visalage').addEventListener('click', async () => {
 // ------------------------------------------------------------------ start
 async function starta() {
   $('app').hidden = false; $('inloggning').hidden = true;
+  laddaModellval().catch(() => {});
   await laddaTradar();
   const hash = location.hash.slice(1);
   const senaste = las('senasteTrad', null);

@@ -17,8 +17,15 @@ python3 -B tools/partner.py autostart # visar hur ägaren gör tjänsten beståe
 
 Python 3.9 eller senare räcker (macOS egen `python3` fungerar).
 
-I ytan: skriv, klistra in bilder (⌘V), släpp flera filer eller bifoga. "Bara spara" (eller att skriva "bara spara")
-sparar utan analys. Medan partnern arbetar kan ett nytt inspel skickas efter svaret eller "Skicka och avbryt
+Ytan har ungefär Claude-appens form: sidomeny med "Ny tråd", sökning, trådarna och dina verktyg; en tom tråd visar
+en hälsning med inmatningsrutan i mitten och förslag under; i en tråd står svaren i en kolumn och rutan längst ned.
+Modell och ansträngning väljer du i rutan: klicka på "Opus 5.5 · high" (↑↓ modell, ←→ ansträngning, Enter, Esc)
+eller skriv `/model`, `/model sonnet` eller `/effort max`. Valet sparas i `data/installningar.json` och gäller från
+nästa svar i alla trådar; en pågående körning påverkas inte, och kommandona skickas aldrig till partnern. Varje svar
+visar vilken modell och ansträngning det kördes med.
+
+I rutan: skriv, klistra in bilder (⌘V), släpp flera filer eller bifoga med "+". Enter skickar, Skift+Enter ger ny
+rad. Växeln "Bara spara" (eller att skriva "bara spara") sparar utan analys. Medan partnern arbetar kan ett nytt inspel skickas efter svaret eller "Skicka och avbryt
 pågående" (en sen rättelse). Sökfältet hittar tidigare resonemang och underlag utan modellanrop. "Bestående
 förståelse" visar vad som sparats, vad som ersatts och av vad. "Tjänst och källor" visar kod, modell, förbrukning
 och källtäckning.
@@ -60,8 +67,10 @@ Agentloopen är Claude Code i headless-läge på Johnnys befintliga Claude Code-
 samma väg som Runtime redan använder. Ingen ny leverantör, API-nyckel eller köpta krediter. Varje tur körs som en
 egen process i `data/arbetsyta/` med `--restricted`, `--strict-mcp-config`, utan auto-minne och CLAUDE.md, med
 verktygen WebFetch, WebSearch, en underagent ("utredare") och partnerns egna verktyg; inga fil-, skal- eller
-skrivverktyg. Huvudmodell `claude-opus-5-5` (hög ansträngning), utredaren `sonnet`; ändras i
-`data/installningar.json` (`{"modell": {"huvud": "…"}}`).
+skrivverktyg. Standard är huvudmodellen `claude-opus-5-5` med ansträngningen `high` och utredaren `sonnet`. Johnny byter
+huvudmodell och ansträngning i ytan (`/model`); valbara är Opus 5.5, Fable 5.1 (egen kvot), Sonnet 5, Opus 5 och Haiku
+4.5, med ansträngningen low, medium, high, xhigh eller max. Valet och utredarens modell står i
+`data/installningar.json` (`{"modell": {"huvud": "…", "anstrangning": "…"}}`).
 
 Verkställda gränser (samma fil, `gransar`): två samtidiga modellkörningar, 15 min och 40 verktygssteg per tur,
 30 min och 150 verktygssteg per bakgrundsutredning, 8 USD listprisvärde per körning (`--max-budget-usd`), 150
