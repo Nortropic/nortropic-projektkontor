@@ -6,6 +6,9 @@ sessioner och bereder ett uppdrag till kontoret först när Johnny tydligt best�
 överlämning startar mottagarens session av sig själv (startvakten, se Överlämning). Uppdraget och gränserna står i
 besluten FORBATTRINGSPARTNER-20260928 och FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929; planen äger nästa handling.
 
+Tjänsten är också Nortropics gemensamma arbetsplats: samtalsytan är delen **Förbättringar** bredvid Hem, Kontoret
+(Aquarium) och Kundstart, och `partner.py oppna` öppnar Hem. Se `tools/ARBETSPLATS.md` och beslutet ARBETSPLATS-20260929.
+
 ## Använda
 
 ```sh

@@ -131,7 +131,8 @@ Cal/Stripe/Tally/CRM-teståtkomst saknas enligt ägaren; faktiska livscykler och
 Parallellt uppdrag med eget skrivansvar. Blocken om Digitala ovanför (och ett senare sådant block överst)
 ersätter inte detta block, och detta ersätter inte dem; Digitalas block 19:38 UTC anger själv att
 förbättringspartnern har egna spår. Skrivansvar: sessionen nortropic-repos-9e (Claude Code) för `tools/partner.py`, `tools/partnern/`,
-`tools/test_partner.py`, `tools/PARTNER.md`, detta block och partnerns beslutsposter, och för
+`tools/test_partner.py`, `tools/PARTNER.md`, detta block och partnerns beslutsposter (sedan 2026-09-29 bär sessionen
+nortropic-repos-04 skrivansvaret för partnerns filer under ARBETSPLATS-20260929, se blocket om arbetsplatsen), och för
 FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929 även `tools/aquarium.py`, `tools/aquarium_vy.py`, deras prov och
 `tools/AQUARIUM.md`. Inga ändringar i Digitala, Kundstart eller Runtime ingår; samordning med Kundstart-dialogen
 (nortropic-repos-f1) är bekräftad 18:14Z och före denna ändring 2026-09-29 09:05Z (PR 123 först, denna ändring på den).
@@ -189,6 +190,29 @@ publiceras med denna ändring. De lokala arbetsytorna tas bort efter publicering
 
 Återupptagning: `evidence/nasta-uppdrag/local/kundstart-dialog-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid.
+
+---
+
+# Parallellt gällande — Nortropics arbetsplats (ARBETSPLATS-20260929)
+
+Parallellt uppdrag med eget skrivansvar. Blocken ovanför ersätter inte detta block, och detta ersätter inte dem.
+Skrivansvar: sessionen nortropic-repos-04 (Claude Code) för `tools/partner.py`, `tools/partnern/`, `tools/test_partner.py`,
+`tools/test_arbetsplats.py`, `tools/PARTNER.md`, `tools/ARBETSPLATS.md`, stycket om arbetsplatsen i `tools/AQUARIUM.md`,
+detta block och postens beslut. nortropic-repos-9e lämnade över partnerns filer 2026-09-29 och bekräftade att inget var
+opublicerat. Inga ändringar i Kundstart, Digitala eller Runtime ingår.
+
+Läge när blocket skrevs (29 september 2026, 11:31 UTC): arbetsplatsen är byggd och prövad i en egen arbetsyta och
+integreras med detta block (ARBETSPLATS-20260929). Tjänsten på 127.0.0.1:4760 kör fortfarande partnerns kod från PR 124
+tills den startas om ur main.
+
+Nästa handling: efter integrationen snabbspolas primärutcheckningen. Sedan kontrolleras att inga partnerturer pågår
+(`/api/lage`, `aktiva`), och tjänsten startas om ur main enligt partnerns driftregel (`partner.py stopp`, sedan `start`).
+`/api/lage` ska visa samma kodrevision som origin/main. Därefter görs integrationsprovet mot den verkliga tjänsten: bara
+läsande resor och inga skickade inspel. Resultatet redovisas i en resultatpost med ändring av detta block. Bestående start
+vid inloggning är partnerns befintliga rad i ÄGARENS TUR och gäller hela arbetsplatsen. Nästa bygge kräver ett eget beslut.
+
+Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md` (tidsstämplade rader), beställningen och
+utformningen bredvid. Arbetsgrenen `arbetsplats/nortropic-20260929` publiceras med denna ändring och tas sedan bort lokalt.
 
 ---
 

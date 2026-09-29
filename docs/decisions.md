@@ -7517,3 +7517,213 @@ Granskningens kvitton, prompter och lästa arbetsytor ligger i
 `evidence/nasta-uppdrag/local/digitala-underhall-20260929/granskning/` (r1–r6).
 
 **Ersätter:** ingen post. Delvis ersätter OMBYGGNAD-AGARSVAR-20260927 i fråga om underhållsformen och taket.
+
+
+## ARBETSPLATS-20260929 — Nortropics gemensamma arbetsplats: Hem, Kontoret, Kundstart och Förbättringar på en adress, i förbättringspartnerns tjänst
+
+**Status:** registrerat och byggt 2026-09-29 av sessionen nortropic-repos-04 (Claude Code). Ägarens beställning
+"Bygg Nortropics gemensamma arbetsplats" är sparad ordagrant i
+`evidence/nasta-uppdrag/local/arbetsplats-20260929/owner-words-arbetsplats-20260929.md`. Utformningen, lägesloggen,
+proven och före- och efterbilderna ligger i samma mapp. Denna post och koden integreras tillsammans. Driftsättning ur
+main och prov på den införda tjänsten redovisas i en egen resultatpost. Planen äger nästa handling.
+
+**Beställningens gränser, alla registrerade.**
+
+- *Avsnitt 1:* en sammanhängande arbetsplats som förenar förbättringspartnern, Aquarium/Kontoret och Kundstart, så att
+  det går att förstå läget, återuppta sitt sammanhang och navigera utan att manuellt hålla ihop trådar, kundstarter,
+  överlämningar, uppdrag och resultat. Beställningen är ett genomförande utan rutinmässiga godkännandestopp. En sida med
+  tre länkar räcker inte, och en omskrivning av de tre systemen är inte uppdraget. Helheten heter Nortropic, med
+  huvudnavigationen Hem, Kontoret, Kundstart och Förbättringar, som en intern arbetsupplevelse och inte en ny
+  produktfamilj.
+- *Avsnitt 2:*
+  - Börja i ingång, uppdrag, plan och beslut, och kontrollera skrivansvar, arbetsytor, revisioner och pågående arbete.
+  - Dokumentkontrollens uppgifter är daterade källuppgifter, inte en verifiering.
+  - Gränserna består om de inte uttryckligen har ändrats: Kundstart bara för prov, språkmodell bara lokalt på ägarens
+    inloggning, egna mandatgränser för kundinbjudningar och automatisk import. Ett menyval, en kodändring eller en
+    rekommendation ändrar inget mandat.
+  - Beställning, beslut, observerad kod och drift samt egna förslag hålls isär. Bootstrap, Kernel, Improvements-svep och
+    Organization OS är inga förkrav, och ingen ny fullständig källsweep görs.
+  - Bevaras: repon, ansvarsgränser, privata original och journaler, accepterade uppdrag, granskning och publicering,
+    skillnaden mellan main, kandidat och drift, samt andra sessioners arbete och öppna överlämningar.
+  - Ingår inte: ny Runtime, orkestrator, behörighetsmodell, generell agentplattform, CRM, central sanningsdatabas,
+    större minnesarkitektur eller ombyggd kundintervju. Inte heller leverantörer, abonnemang, krediter,
+    kundinbjudningar, automatisk import eller ny publik exponering.
+  - En smal koppling får byggas om den inte utökar vad systemen får läsa eller utföra. Ett större beroende redovisas som
+    förslag.
+- *Avsnitt 3:*
+  - Befintlig godkänd Runtime-väg och separat granskning. Samordningssessionen kringgår dem inte genom att bygga eller
+    publicera direkt.
+  - En återupptagningspunkt i planen, utan en konkurrerande apparat. Avbrott bevaras. Upprepat fel ger diagnos, inte
+    blinda försök.
+  - Fyra etapper som arbetsordning, inte grindar: nuläge och utformning med en första rendering, navigationsram,
+    sammanhang och kontinuitet, användarprov och införande. En extern begränsning avgränsar bara den berörda delen.
+- *Avsnitt 4:*
+  - Hem: återupptagande, viktiga förändringar, det som behöver uppmärksamhet och en väg in i Aquarium. "Sedan sist"
+    bara med jämförbart underlag. Händelsens tid skiljs från lästiden. Ett första besök hittar inte på historik. Inte
+    dominerat av tekniska detaljer. Information, uppmärksamhet och blockering hålls isär, och inga ägargodkännanden
+    skapas där källan bara beskriver väntan.
+  - Kontoret: Aquarium som rumslig arbetsvärld. Belagda objekt leder till detaljer och underlag, och en tillgänglig
+    alternativ väg når samma information. Presentationsläget ger Aquarium utrymme och tonar bort navigationen, med
+    helskärm men utan castingtjänst. Ingen ny läsare kringgår Aquariums avgränsning. Inga figurer skapas ur antaganden.
+    Okänt och inaktuellt syns, och en ny läsning gör inte en gammal händelse ny.
+  - Förbättringar: partnerns hela yta består. "Resonera om det här" öppnar rätt tråd eller ett avgränsat nytt
+    sammanhang, visar vad som följer med och skickar inget och skapar ingen arbetsorder. Befintliga identiteter och
+    källreferenser används, och åtkomst kontrolleras när kontext hämtas. Inga andra kunder och inte hela korpusen.
+    Ägarens ord, partnerns bedömning och observerad drift hålls isär, och underlag är inte instruktioner.
+  - Kundstart: lätt att nå och återuppta, med tydligt provläge och ärenden enligt befintlig behörighet. Inget nytt
+    provärende per menyval. Kundens ord, rättelser, tillval och material bevaras. Den interna ramen följer inte med ut.
+    Ingen produktionsmodell, inbjudan eller import. Belagda kopplingar visas, annars en ärlig lucka.
+- *Avsnitt 5:*
+  - En konsekvent huvudnavigation, och lokala verktyg stannar i sin del. Direktlänkar, bakåt och framåt, omladdning och
+    återkomst fungerar. Utkast skiljs per tråd och skickas aldrig av navigering. Sparstatus visas.
+  - Minsta möjliga UI-lagring, och inga privata underlag eller nycklar i cache eller i nya URL-parametrar. Ingen gemensam
+    process krävs.
+  - Sökningen återanvänds, visar sitt omfång och skiljer "inga träffar" från "källan är otillgänglig".
+  - Ingen modell, inga uppdrag och inga operativa bevis vid läsning. Statuskontrakten återges utan en ny livscykel.
+    Saknat är inte noll, avslutat är inte godkänt och en granskning utan underlag är inte grön.
+  - Lokala fel medan resten fungerar. Senast kända läge visas med ålder. Omförsöken är begränsade och pollingen går inte
+    dubbelt. Inga "kör allt"-knappar.
+- *Avsnitt 6:*
+  - WCAG 2.2, OWASP, Carbons UI-shell och Playwrights metod som stöd, inte som bibliotek.
+  - Åtkomst prövas på servern per resurs, även direkt och med andra id:n. Inbäddningsskydd sänks inte, och ingen
+    generell proxy byggs.
+  - Rendering och kopiering är säkra. Presentationsläget bygger på visningssäkra data, och inget hemligt hamnar i
+    commits, artefakter eller loggar.
+  - Målet är WCAG 2.2 AA, men en automatisk kontroll är inget påstående om överensstämmelse.
+  - Lugnt och konsekvent uttryck, inga KPI-rutor. Provat på mobil och dator med reducerad rörelse. Aquarium belastar
+    inte en dold vy. Före- och efterbilder tas privat.
+- *Avsnitt 7:*
+  - Proven A–L är knutna till implementationen, med isolerade webbläsarprov och ett lokalt integrationsprov mot de
+    befintliga tjänsterna. Testdata hålls skild från drift.
+  - Inget skarpt kundarbete startas för att skapa bevis. Både kedjan och upplevelsen granskas.
+  - Chromium och WebKit provas när miljön medger det, och det som inte prövats märks oprövat.
+- *Avsnitt 8:*
+  - Separata arbetsytor och skyddad publicering med separat granskning av exakt kandidat.
+  - Privata data, pågående arbete och gamla ingångar bevaras. Automatisk deployment av Kundstart beaktas, och
+    arbetsplatsen publiceras inte på kundtjänsten.
+  - En gemensam lokal ingång, men ingen processövervakare eller autostartmotor.
+  - Den aktiva revisionen återläses. Integrerad kod, startad tjänst och autostart hålls isär. Återgång dokumenteras.
+  - Slutrapporten jämförs med beställningen, och inget nytt bygge startar därefter.
+
+**Återläst före skrivning.** AGENTS.md, `docs/uppdrag.md`, DEFINITION.md, planens aktuella block,
+FORBATTRINGSPARTNER-20260928 med resultat- och tilläggsposter, AQUARIUM-V0-ACCEPT-, -UPPDRAGSGREN- och
+-SLUTGRANSKNING-20260924, KUNDSTART-DIALOG-20260928 och KUNDSTART-TESTLAGE-20260929, `tools/PARTNER.md` och
+`tools/AQUARIUM.md`, Kundstarts README, KUNDSTART-KONTRAKT.md och DRIFT.md (AI-läge, testläge), samt Runtimes D038 och
+D039. Gränserna i Kundstart-besluten består oförändrade.
+
+**Pågående arbete.** 9e bekräftade att inget var opublicerat i partnerns filer och lämnade över skrivansvaret för dem.
+Mottagarsessionen för OVL-20260929-328e79 skrev i kontoret i en egen arbetsyta och informerades. f1 har inget på väg i
+Kundstart. Kundstart-repot ändras inte.
+
+**Valet av hemvist (reversibelt).** Arbetsplatsen byggs i förbättringspartnerns tjänst på 127.0.0.1:4760, med samma
+process, inloggning, Host-/Origin-skydd och vanilla-JS-yta.
+
+- *Avfärdat: nytt skal som ramar in de tre ytorna.* Partnern och Aquarium-fönstret sätter `frame-ancestors 'none'`.
+  Att sänka det är förbjudet, och tre ursprung ger tre inloggningar.
+- *Avfärdat: omvänd proxy.* Den blir en generell proxy och blandar kundens kakor med den interna ytan.
+- *Förslag, inte byggt: Kundstarts ärendelista genom den interna Bearer-nyckeln.* Partnerns process skulle då kunna läsa
+  alla kundärenden i det delade Blob-lagret, även produktionens. Det är en utökning av vad systemet får läsa.
+
+Aquarium serveras av samma tjänst genom fönstrets egen `Fonster`. Partnern läser redan Aquarium för sitt systemläge,
+så ingenting nytt läses. Det som ändras är hur ofta: läsningen görs nu när någon tittar på Hem, Kontoret eller Kundstart,
+högst en gång varannan minut, i stället för bara när fönstret startats för hand.
+
+**Byggväg.** Kontorets kod har sedan 2026-09-28 byggts och publicerats genom Runtimes konstruktionsväg (D038). PR
+117–124 gick den vägen:
+1. Kandidaten byggs i en egen arbetsyta.
+2. Runtimes holder mäter hela sviten utan inloggningsuppgifter.
+3. Utfärdarens beteendefall körs i dess sandlåda.
+4. Kandidaten granskas separat genom Runtimes läsarprofil.
+5. Runtimes Publisher publicerar, med App-kontroller och grenskydd.
+
+Kontorsvägen AP04 användes inte. Den kräver att ingången står på en uppdragsgren och att main fryses under körningen.
+Undantaget för det, AQUARIUM-V0-UPPDRAGSGREN-20260924, gällde bara Aquarium v0, och andra sessioner skriver i kontorets
+main i dag.
+
+Kandidaten byggdes av denna session i en egen arbetsyta, som i PR 117–124. Ingenting publiceras direkt. Kandidaten når
+main bara genom Runtimes Publisher, efter holderns mätning, utfärdarens fall och separat granskning. Ägaren kan kräva
+kontorsvägen i stället, och i så fall behövs ett nytt undantag för uppdragsgren och fryst main.
+
+**Byggt.**
+- **Skalet:** en rad överst med Nortropic och Hem, Kontoret, Kundstart och Förbättringar, med en hoppa-länk och
+  `aria-current`. Adresserna är `/`, `/kontoret`, `/kontoret/objekt/<ref>`, `/kontoret/presentation`, `/kundstart` och
+  `/forbattringar[/ny|/t_…]`. Direktlänkar, omladdning och bakåt/framåt fungerar. Gamla `#t_…` leds om, och `#nyckel=`
+  och `partner.py oppna` fungerar som förut. Fokus flyttas till delens rubrik vid byte. Partnerns trådlista stannar i
+  Förbättringar och öppnas på mobil med en egen knapp.
+- **Hem:**
+  - Fortsätt där du var: senaste tråd, öppna överlämningar och ditt provärende.
+  - Levererat och ändrat: sammanfogningar i de fyra repona med commitens egen tid och när de hämtades. "Sedan ditt
+    förra besök" visas bara med en besöksmarkör i webbläsaren; första besöket säger att jämförelse saknas.
+  - Behöver dig: ägarens bord ur Aquarium, uppdelat efter källans slag: stoppat, planens beslut, planens handlingar,
+    förslag och övrigt. Egen rad
+    för det som väntar på något annat än ägaren. Okänt när läsningen saknas.
+  - Kontoret just nu och sökning med sitt omfång.
+- **Kontoret:**
+  - Aquarium-sidan på `/kontoret/aquarium`, samma läsning, takt, renderare och fästa skript som fönstret. Bara den sidan
+    får ramas in, och bara av samma ursprung. Den tas bort när Kontoret inte syns, och byte av objekt laddar inte om den.
+  - Listan bredvid visar samma visningssäkra projektion i platsernas grupper, och ett klick på en plats öppnar samma
+    grupp.
+  - Objekt:
+    - en överlämning visar kvittenser, leveransbevis, paketet och tråden där den beställdes;
+    - ett beslut visar sin post på main;
+    - ett Runtime-uppdrag visar sin rubrik och sitt läge.
+  - Scenen har Aquariums egna proportioner (16:9), och listan kan döljas så att scenen får hela bredden.
+  - Presentationsläget bygger ingen navigation och ingen lista, har helskärm och lämnas med Esc.
+- **Förbättringar:** "Resonera om det här" lägger objektet i ett synligt kontextkort för nästa inspel, och inget
+  skickas. Hänvisningarna prövas på servern (befintliga objekt, högst sex, titel och källa ur källan) och sparas vid
+  sidan av texten i journalens händelse. Modellen får dem märkta som underlag, inte som Johnnys ord eller
+  instruktioner. `agarens_ord` och beställningsspärren läser bara texten. Tråden visar sina hänvisningar som länkar
+  till objekten, och objektet visar trådarna. En överlämning i tråden har "Visa i Kontoret".
+- **Kundstart:**
+  - Provläget, testserverns svar (ett GET utan kakor), repots revision och vad testservern byggdes från.
+  - Kundstarts beslut och planens öppna rader om Kundstart ur källorna, Digitalas `verktyg/kundstart.py` på main och
+    överlämningar till Kundstart.
+  - "Öppna ditt provärende" (`127.0.0.1:3131/samtal`, med webbläsarens befintliga Kundstart-inloggning) och
+    kopierbara kommandon.
+  - Arbetsplatsen skapar inga ärenden, rör inga länknycklar och läser inga kundärenden. Det står i ytan.
+- **Rättat under proven:**
+  - En nekad POST lämnade sin oläst kropp på keep-alive-anslutningen, och nästa begäran blev trasig. Felet fanns i
+    partnern sedan tidigare. Nu stänger en sådan skrivning anslutningen.
+  - En otillgänglig motor och ett ofullständigt bord gav 0 eller en tom lista. Nu blir de okända.
+  - Hem väntade på en ny Aquarium-läsning. Nu läses den i bakgrunden, och bara Aquarium-sidan väntar på den allra
+    första.
+  - Sorteringen av tider med `Z` var fel i Python 3.9.
+
+**Säkerhet.** Varje ny väg kräver inloggningen, och `/api/arbetsplats/*`, `/kontoret/aquarium`, `/lasning.json` och
+kontexten nekas utan den. Objekt och hänvisningar prövas mot sina källor, och okända eller felformade id:n ger 404 eller
+400. Skalets policy fick `frame-src 'self'`. Aquarium-sidan fick `frame-ancestors 'self'` och `SAMEORIGIN` i stället för
+`'none'`/`DENY`; allt annat är oförändrat. En annan lokal tjänst på 127.0.0.1 kan därför inte rama in sidan, fast kakan
+är SameSite=Strict och skickas mellan portar. Allt innehåll ritas som text.
+
+**Prov.**
+- `tools/test_arbetsplats.py`: 21 nya prov.
+- Partnerns och Aquariums befintliga prov är oförändrade och gröna, även på Python 3.9.6 (privat kvitto
+  `inforande/p1/delsvit-py39.txt`).
+- Kontorets hela svit: 503 prov gröna på Python 3.12, som kontorets mätning använder, i den kredentialfria profilen
+  (holderns svitkvitto). På Python 3.9.6 ger redan PR 124 (samma träd som main 6177462) 4 fel och 197 avbrott i andra
+  verktyg (privat kvitto `inforande/p1/baslinje-py39-pr124.txt`); de berörs inte av denna ändring.
+- Webbläsarprov i Chromium mot en provinstans med fejkad `claude` och egen data: 61 kontroller över A–L med en verklig
+  kedja från tråd till överlämning, kvittens, leverans och tillbaka. Kontrollerna omfattar:
+  - noll modellanrop och ingen journalskrivning vid navigering, statusläsning, sökning och kontextväg;
+  - dubbelklick;
+  - obehöriga anrop och inramning från en annan lokal tjänst;
+  - att texten ligger kvar som utkast när en hänvisning nekas;
+  - Esc i presentationsläget;
+  - tangentbord, 390 px, 200 % zoom och reducerad rörelse;
+  - kopiering och säker text.
+- En fristående UX-kritik av de renderade vyerna (en separat läsande session mot beställningens avsnitt 4–6) fann
+  fem blockerande brister och sju förbättringar, bland annat en dold trådknapp på mobil, fel prioritet på Hem, för
+  lite utrymme för Aquarium och tekniska id:n och tider utan datum. De är rättade och prövade igen före den
+  formella granskningen.
+
+**Oprövat och luckor.**
+- WebKit: Playwrights WebKit finns inte i miljön, och det installeras inte här.
+- Riktig telefon: oprövat.
+- Integrationsprov mot den verkliga tjänsten: först efter driftsättningen.
+- "Sedan sist" gäller sammanfogningar, inte trådar.
+- Kundstarts ärenden visas inte, se förslaget ovan.
+- Ett Runtime-uppdrag visar bara rubrik och läge, som Aquarium.
+- Bestående start vid inloggning är ägarens befintliga rad i ÄGARENS TUR, och den gäller hela arbetsplatsen.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main. Journalen behåller
+eventuella `kontext`-fält, och äldre kod ignorerar dem. Webbläsarens nycklar `arbetsplats:*` är ofarliga.

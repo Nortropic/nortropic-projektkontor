@@ -246,6 +246,10 @@ för 127.0.0.1. Allt annat får en fast rad: 405 för andra metoder, 403 för an
 andra sökvägar. Innan den första läsningen finns svarar `/` med 503. Svaren cachas inte, sidan får inte bäddas in i en
 annan sida, och fönstret för ingen logg över vad som efterfrågats.
 
+**I arbetsplatsen.** Nortropics arbetsplats (`tools/ARBETSPLATS.md`) visar samma sida i Kontoret genom samma
+`Fonster`, i förbättringspartnerns tjänst och bakom dess inloggning, med samma läsning, takt och fästa skript. Där får
+sidan ramas in av samma ursprung och ingen annan. Fönstret ovan är oförändrat.
+
 Proven i `tools/test_aquarium_fonster.py` använder bara syntetiska projektioner, egna läsare och en egen klocka. De
 binder aldrig en socket: svaren efterfrågas direkt, hanteraren körs mot en koppling i minnet, och servern och läsningen
 byts ut när kommandot prövas. De läser aldrig verkliga källor, använder aldrig nätet och skriver ingen fil.
