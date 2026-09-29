@@ -32,14 +32,13 @@ def kontorets_primar(rot: Path = KONTOR) -> Path:
 
 @dataclass
 class Gransar:
-    """Verkställda gränser för modellarbete. Ägaren ändrar dem i installningar.json."""
+    """Ägaren har bestämt att förbättringspartnern inte ska ha någon användningsgräns (2026-09-29): inget dygnstak,
+    inget stegtak, ingen kostnadsspärr. tur_max_sekunder/jobb_max_sekunder är alltså inte en användningsgräns utan
+    en ren hangvakt (se agent.py _vakt): den fångar bara en process som blivit hängande, satt långt bortom vad ett
+    verkligt, aktivt arbete tar. Ägaren ändrar allt i installningar.json."""
     samtidiga_korningar: int = 2
-    tur_max_sekunder: int = 900
-    tur_max_steg: int = 40
-    tur_max_listpris_usd: float = 8.0      # Claude Codes egen uppskattning (listpris), inte en faktura
-    dygn_max_korningar: int = 150
-    jobb_max_sekunder: int = 1800
-    jobb_max_steg: int = 150
+    tur_max_sekunder: int = 14_400          # 4 h — hangvakt, inte en användningsgräns
+    jobb_max_sekunder: int = 43_200         # 12 h — hangvakt, inte en användningsgräns
     bilaga_max_byte: int = 40_000_000
     inspel_max_bilagor: int = 20
     inspel_max_tecken: int = 60_000

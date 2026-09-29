@@ -100,10 +100,6 @@ class Jobb:
         historik = data.get('historik') or []
         if historik and historik[-1].get('status') == 'avbrutet' and 'Johnny' in (historik[-1].get('orsak') or ''):
             return
-        sparr = self.s.agent.sparrad()
-        if sparr:
-            self.s.lager.lagg_till('jobb_status', jobb=jid, trad=j['trad'], status='begransat', orsak=sparr)
-            return
         ater = bool(data.get('session'))
         if not data.get('session'):
             import uuid

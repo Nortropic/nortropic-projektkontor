@@ -163,18 +163,12 @@ class Agent:
                     tokens_in += int(h.get('tokens_in') or 0)
                     tokens_ut += int(h.get('tokens_ut') or 0)
         return {'dag': idag, 'korningar': antal, 'listpris_usd': round(pris, 4), 'tokens_in': tokens_in,
-                'tokens_ut': tokens_ut, 'max_korningar': self.k.gransar.dygn_max_korningar}
+                'tokens_ut': tokens_ut}
 
-    def sparrad(self) -> str | None:
-        # listpris_usd redovisas i dygnsforbrukning() bara som information (Claude Codes egen
-        # listprisuppskattning för körda tokens); vi har abonnemang, ingen faktura, så den spärrar
-        # inte arbetet. Det som faktiskt kan ta slut är abonnemangets egen kvot, vilket Claude Code
-        # själv då svarar på i turen (jfr _avsluta(..., 'begransad', 'Modellkvoten eller en
-        # hastighetsgräns nåddes: ...')). Dygnstaket här är antalet körningar, inte deras listpris.
-        f = self.dygnsforbrukning()
-        if f['korningar'] >= f['max_korningar']:
-            return 'Dagens gräns för modellkörningar (%d) är nådd.' % f['max_korningar']
-        return None
+    # Ägarbeslut 2026-09-29: förbättringspartnern har ingen användningsgräns (inget dygnstak, inget stegtak, ingen
+    # kostnadsspärr). dygnsforbrukning() ovan redovisas bara som information i tjänstvyn. Det som faktiskt kan ta
+    # slut är abonnemangets egen kvot, vilket Claude Code själv då svarar på i turen (se _slutstatus nedan:
+    # "Modellkvoten eller en hastighetsgräns nåddes: …").
 
     # ---------------------------------------------------------------- kontext
     def systemprompt(self, korning: Korning) -> str:
@@ -436,15 +430,11 @@ class Agent:
                 '--restricted', '--strict-mcp-config', '--mcp-config', json.dumps(mcp),
                 '--tools', verktyg, '--allowedTools', 'mcp__partner', 'WebFetch', 'WebSearch', 'Agent',
                 '--permission-mode', 'dontAsk', '--permission-prompts', 'none', '--no-chrome',
-                '--disable-slash-commands', '--settings', json.dumps(installningar), '--agents', json.dumps(agenter),
-                '--max-turns', str(self.maxsteg(korning)), '--max-budget-usd', str(g.tur_max_listpris_usd)]
+                '--disable-slash-commands', '--settings', json.dumps(installningar), '--agents', json.dumps(agenter)]
+        # Inget --max-turns, inget --max-budget-usd: ägarbeslut 2026-09-29, ingen användningsgräns (se Gransar).
         argv += (['--session-id', session] if ny else ['--resume', session])
         korning.maxtid = maxtid
         return argv
-
-    def maxsteg(self, korning: Korning) -> int:
-        g = self.k.gransar
-        return g.tur_max_steg if korning.typ == 'tur' else g.jobb_max_steg
 
     def miljo(self, korning: Korning, ateruppta: bool) -> dict:
         env = {k: os.environ[k] for k in ('HOME', 'USER', 'LOGNAME', 'TMPDIR') if k in os.environ}
@@ -633,11 +623,6 @@ class Agent:
                                  forbrukning=forbrukning, start=start)
         if resultat and resultat.get('subtype') == 'success' and not resultat.get('is_error') and svar.strip():
             return self._avsluta(korning, 'svarad', svar=svar, forbrukning=forbrukning, start=start)
-        if resultat and resultat.get('subtype') in ('error_max_turns', 'error_max_budget_usd'):
-            skal = ('stegtaket (%d verktygssteg)' % self.maxsteg(korning) if resultat['subtype'] == 'error_max_turns'
-                    else 'kostnadstaket per körning')
-            return self._avsluta(korning, 'begransad', orsak='Arbetet stoppades av %s.' % skal, delsvar=delsvar,
-                                 forbrukning=forbrukning, start=start)
         text = (svar or '') + ' ' + (resultat or {}).get('subtype', '')
         if re.search(r'(?i)usage limit|rate limit|limit reached|reached your .* limit|quota', text):
             return self._avsluta(korning, 'begransad', orsak='Modellkvoten eller en hastighetsgräns nåddes: %s' % svar[:300],

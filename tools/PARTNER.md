@@ -82,14 +82,17 @@ huvudmodell och ansträngning i ytan (`/model`); valbara är Opus 5.5, Fable 5.1
 4.5, med ansträngningen low, medium, high, xhigh eller max. Valet och utredarens modell står i
 `data/installningar.json` (`{"modell": {"huvud": "…", "anstrangning": "…"}}`).
 
-Verkställda gränser (samma fil, `gransar`): två samtidiga modellkörningar, 15 min och 40 verktygssteg per tur,
-30 min och 150 verktygssteg per bakgrundsutredning, 8 USD listprisvärde per körning (`--max-budget-usd`, en
-körväktare mot en enskild skenande tur) och 150 körningar per dygn. Dygnstaket räknas i antal körningar, inte i
-listprisvärde: vi har abonnemang, inget per-token-pris, så ett dygnstak i USD vore ett tak mot ingenting. Listpris-
-värdet (per tur och summerat per dygn i ytan) är bara Claude Codes egen uppskattning, inte en faktura, och spärrar
-inget; förbrukningen som faktiskt kan ta slut är abonnemangets egen kvot, vilket i så fall syns som ett vanligt
-"begränsat"-svar från körningen själv. Varje tur journalför tokens, tid, omförsök och modell. Sparande, sökning
-och öppning av källor anropar aldrig en modell.
+Ägarbeslut 2026-09-29: förbättringspartnern har ingen användningsgräns. Inget dygnstak på antal körningar, inget
+stegtak per tur eller bakgrundsutredning, ingen kostnadsspärr (`--max-turns` och `--max-budget-usd` skickas inte
+längre till Claude Code). Vi har abonnemang, inget per-token-pris, så ett tak i USD eller i "listprisvärde" vore ett
+tak mot ingenting — listprisvärdet (per tur och summerat per dygn i ytan) är bara Claude Codes egen uppskattning,
+inte en faktura, och redovisas rent informativt. Förbrukningen som faktiskt kan ta slut är abonnemangets egen kvot,
+vilket i så fall syns som ett vanligt "begränsat"-svar från körningen själv.
+
+Kvar i `gransar`: två samtidiga modellkörningar (`samtidiga_korningar`, kö istället för fler), och en hangvakt på
+4 h per tur / 12 h per bakgrundsutredning (`tur_max_sekunder`/`jobb_max_sekunder`) som bara fångar en process som
+blivit hängande — satt långt bortom vad ett verkligt, aktivt arbete tar, ingen användningsgräns. Varje tur
+journalför tokens, tid, omförsök och modell. Sparande, sökning och öppning av källor anropar aldrig en modell.
 
 Claude Code sparar modellens egen sessionsfil under `~/.claude/projects/<arbetsyta>/`; den är en cache för
 trådens modellkontext. Partnerns journal är originalet: saknas sessionen startar en ny med trådens historik ur
