@@ -7799,3 +7799,34 @@ Aquarium har sitt rum, med en lista bredvid som alternativ väg. Partnerns yta �
 - *Rekommendationer blev inte ägarbeslut:* förslagen ovan är förslag.
 
 Uppdraget är fullgjort. Nästa bygge kräver ett eget beslut.
+
+
+## ARBETSPLATS-APP-20260929 — tillägg till ARBETSPLATS-20260929: Nortropic.app, en klickbar ingång på ägarens Mac
+
+**Status:** registrerat och byggt 2026-09-29 av sessionen nortropic-repos-04 (Claude Code). Ägarens ord är sparade
+ordagrant i `evidence/nasta-uppdrag/local/arbetsplats-20260929/owner-words-app-20260929.md`: "kan man göra det till en
+klickbar ikon/program" och, på sessionens förslag, "Ja, kör på det". Förslaget står för sig i samma mapp
+(`forslag-app-20260929.md`) och är inte ägarens ord.
+
+**Beställningens gränser.** En klickbar ikon eller ett program på datorn i stället för att öppna arbetsplatsen genom en
+adress. Förslaget som godtogs: ett klick startar tjänsten om den inte kör och öppnar Nortropic inloggad, det ersätter
+inte bestående start vid inloggning, och nyckeln stannar i hemlighetsmappen. Ingen åtkomst utifrån ingår; frågan om att
+nå arbetsplatsen från telefonen är obesvarad och inte beställd.
+
+**Byggt.** `python3 -B tools/partner.py app` (ny modul `tools/partnern/macapp.py`) skapar `~/Applications/Nortropic.app`:
+- ett programpaket vars enda program är ett skalskript med fasta sökvägar till kontorets primärutcheckning och den
+  Python som skapade det; skriptet sätter en fast PATH, rensar provinstansernas miljövariabler och kör `partner.py start`
+  och sedan `partner.py oppna`; misslyckas öppningen visas ett besked om `partner.py status`;
+- Nortropics ikon ritad med macOS egna verktyg (qlmanage, sips, iconutil); misslyckas det blir appen utan egen ikon men
+  fungerar;
+- ingen nyckel i paketet, ingen start vid inloggning, inga systeminställningar; kommandot ersätter bara en app det själv
+  skapat (markörfil) och rör aldrig ett främmande paket.
+
+**Prov.** Två nya prov i `tools/test_arbetsplats.py`, gröna på Python 3.9.6 och 3.12: paketets form, att skriptet anropar
+exakt `start` och sedan `oppna` i kontorets katalog med fast PATH och utan provinstansens miljö (med en fejkad Python som
+bokför anropen), att ingen nyckel finns i paketet, att ett främmande paket lämnas orört och att den egna appen ersätts utan
+rester. Ett nytt beteendefall i utfärdarens sandlåda. Hela sviten och granskningen redovisas i integrationen.
+
+**Oprövat här.** Ett verkligt klick i Finder eller Dock prövas efter integrationen, på ägarens Mac.
+
+**Återgång.** Ta bort `~/Applications/Nortropic.app` och återställ integrationscommiten med `git revert`.
