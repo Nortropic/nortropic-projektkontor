@@ -7727,3 +7727,75 @@ kontexten nekas utan den. Objekt och hänvisningar prövas mot sina källor, och
 
 **Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main. Journalen behåller
 eventuella `kontext`-fält, och äldre kod ignorerar dem. Webbläsarens nycklar `arbetsplats:*` är ofarliga.
+
+
+## ARBETSPLATS-RESULTAT-20260929 — slutrapport för ARBETSPLATS-20260929: Nortropics arbetsplats är integrerad, driftsatt och prövad mot den verkliga tjänsten; kvar för ägaren är bara den befintliga raden om bestående start vid inloggning
+
+**Status:** registrerat 2026-09-29 av sessionen nortropic-repos-04 (Claude Code). Här hålls integrerat, driftsatt,
+prövat och oprövat isär. Lägesloggen och alla bevis ligger privat i `evidence/nasta-uppdrag/local/arbetsplats-20260929/`.
+
+**Var Nortropic öppnas.** `python3 -B tools/partner.py oppna` öppnar http://127.0.0.1:4760/ inloggad. Där finns Hem,
+Kontoret, Kundstart och Förbättringar. Tjänsten startas med `python3 -B tools/partner.py start`, som förut.
+
+**Integrerat.** PR 126, main `efdb640`, med samma träd (`375c84c5`) som den kandidat (`ebceade`) som granskades.
+Kontrollerna `runtime/tests` och `runtime/review` kom från App 5110369, och begränsningsnoten publicerades på PR:en.
+Granskningen gjordes genom Runtimes läsarprofil med `claude-opus-5`, bara läsning, i tre rundor:
+- runda 1 godkände kandidat 2 på den tidigare main;
+- runda 2 godkände kandidat 4, byggd om på main `0e2c46d` efter PR 125;
+- runda 3 godkände kandidat 5 med två rättade restnoter.
+
+Ingen runda hade blockerande fynd. Före den formella granskningen gick en fristående UX-kritik igenom de renderade
+vyerna, och dess fynd rättades.
+
+**Driftsatt.** Primärutcheckningen är snabbspolad, och ingången är ren. Inga partnerturer pågick, och tjänsten startades
+om ur main 2026-09-29 12:24:56Z. `/api/lage` visar kodrevisionen `efdb640` lika med origin/main, och startvakten är på.
+
+**Prövat mot den verkliga tjänsten** (bara läsning, inga skickade inspel), 13 av 14 kontroller:
+- Hem med verkliga trådar, sammanfogningar och ägarens bord.
+- Aquarium ur verklig läsning i Kontoret och i presentationsläget.
+- Den verkliga kedjan: tråden → OVL-20260929-328e79 → mottagen, startad och levererad med beviset "Kontoret PR 125,
+  Digitala PR 18" → tillbaka till tråden. Tråden har "Visa i Kontoret".
+- Den nya beslutsposten öppnad ur main, och "Resonera om det här" med kontextkort utan att något skickades.
+- Kundstart i provläge, den gamla länkformen `#t_…` och mobil utan sidledes överflöd.
+- Dagens modellkörningar var 15 före och 15 efter.
+
+Den fjortonde kontrollen, inga konsolfel, föll bara på provets egen avsiktligt obefintliga tråd (`/api/trad/t_finnsinte`
+404).
+
+**Kundstart.** Kundstart-repot står oförändrat på `48dceca`, och ingen deployment har gjorts. Produktionens språkmodell,
+kundinbjudningar och automatisk import har inte rörts. Den interna navigationen följer inte med in i kundens vy, som
+öppnas separat i samma flik.
+
+**Oprövat.**
+- WebKit: finns inte i miljön och har inte installerats.
+- Riktig telefon.
+- Helskärmsknappen, eftersom proven kör huvudlöst.
+- Zoom i en riktig webbläsare: 200 % prövades som motsvarande fönsterstorlek.
+
+**Kända gränser ur granskningen.**
+- En text vars hänvisning nekas läggs tillbaka som utkast bara om tråden saknar annat utkast. Annars visas texten i
+  beskedet, och bilagereferenserna följer då inte med.
+- En ny kvittens syns i Kontorets lista efter tjänstens kvittensvakt, som går var 30:e sekund. Läsningen skriver inget.
+- "Sedan ditt förra besök" gäller per flik.
+- Ett Runtime-uppdrag visar bara rubrik och läge, som Aquarium.
+
+**Ägarens tur.** Oförändrad. Bestående start vid inloggning är partnerns befintliga rad och gäller nu hela
+arbetsplatsen. `python3 -B tools/partner.py autostart` skriver ut LaunchAgent-filen och de två `launchctl`-kommandona
+för ägarens eget Terminalfönster, eftersom hanterad policy nekar sessioner `launchctl`. Utan den startas tjänsten för
+hand.
+
+**Förslag, inte beslut.**
+- En ärendelista för Kundstart i arbetsplatsen kräver den interna nyckeln i partnerns process, och då kan processen läsa
+  alla kundärenden. Det kräver en egen beställning.
+- WebKit för proven kräver att Playwrights WebKit installeras.
+
+**Jämförelse med beställningen.** De tre ytorna är nu en arbetsplats med en adress, en inloggning och en
+huvudnavigation. Delarna hänvisar till varandra genom befintliga identiteter: tråd, överlämning, beslut och uppdrag.
+Aquarium har sitt rum, med en lista bredvid som alternativ väg. Partnerns yta är oförändrad i sak.
+- *Inspiration blev inte teknikadoption:* WCAG, OWASP, Carbon och Playwright användes som metod, och inget nytt bibliotek
+  eller ramverk tillkom.
+- *Observation blev inte styrning:* Hem och Kontoret visar källornas egna rader och slag och lägger inte till några.
+- *Kundstart blev inte skarp kunddrift:* se ovan.
+- *Rekommendationer blev inte ägarbeslut:* förslagen ovan är förslag.
+
+Uppdraget är fullgjort. Nästa bygge kräver ett eget beslut.

@@ -201,18 +201,17 @@ Skrivansvar: sessionen nortropic-repos-04 (Claude Code) för `tools/partner.py`,
 detta block och postens beslut. nortropic-repos-9e lämnade över partnerns filer 2026-09-29 och bekräftade att inget var
 opublicerat. Inga ändringar i Kundstart, Digitala eller Runtime ingår.
 
-Läge när blocket skrevs (29 september 2026, 11:31 UTC): arbetsplatsen är byggd och prövad i en egen arbetsyta och
-integreras med detta block (ARBETSPLATS-20260929). Tjänsten på 127.0.0.1:4760 kör fortfarande partnerns kod från PR 124
-tills den startas om ur main.
+Läge (29 september 2026, 12:28 UTC): uppdraget är fullgjort. Arbetsplatsen är integrerad (PR 126, main `efdb640`) och
+driftsatt: tjänsten på 127.0.0.1:4760 kör main sedan 12:24:56Z. Den är prövad mot den verkliga tjänsten
+(ARBETSPLATS-RESULTAT-20260929). Nortropic öppnas med `python3 -B tools/partner.py oppna`.
 
-Nästa handling: efter integrationen snabbspolas primärutcheckningen. Sedan kontrolleras att inga partnerturer pågår
-(`/api/lage`, `aktiva`), och tjänsten startas om ur main enligt partnerns driftregel (`partner.py stopp`, sedan `start`).
-`/api/lage` ska visa samma kodrevision som origin/main. Därefter görs integrationsprovet mot den verkliga tjänsten: bara
-läsande resor och inga skickade inspel. Resultatet redovisas i en resultatpost med ändring av detta block. Bestående start
-vid inloggning är partnerns befintliga rad i ÄGARENS TUR och gäller hela arbetsplatsen. Nästa bygge kräver ett eget beslut.
+Nästa handling: ingen i detta spår. Driftregeln är partnerns: tjänsten startas om ur main efter varje integration av
+`tools/partnern/`. Bestående start vid inloggning är partnerns befintliga rad i ÄGARENS TUR och gäller hela
+arbetsplatsen. Nästa bygge kräver ett eget beslut.
 
-Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md` (tidsstämplade rader), beställningen och
-utformningen bredvid. Arbetsgrenen `arbetsplats/nortropic-20260929` publiceras med denna ändring och tas sedan bort lokalt.
+Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md`. Arbetsgrenarna är publicerade eller
+arkiverade i `arbetsgrenar.bundle` där och borttagna lokalt; grenen `arbetsplats/resultat-20260929` publiceras med
+resultatposten och tas sedan bort.
 
 ---
 
