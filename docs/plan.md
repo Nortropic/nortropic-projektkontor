@@ -185,7 +185,25 @@ bana typ"), med Digitalas flöden och inte bara Runtime ("det får bara inte bli
 vackra"), och "jag vill att aktiveringarna sker per automatik utifrån modell och effort nivåer jag väljer i
 arbetsplatsen". Den blir ett eget uppdrag med egna beslut i kontoret och Runtime efter denna integration: i Runtime
 blir ansträngning och rollernas utförare val i releasen som modellen, och arbetsplatsen aktiverar ägarens val själv
-när Runtime är ledig.
+när Runtime är ledig. Beställningen är nu MODELLKARTA-20260929; läget står i tillägget 22:18 UTC nedan.
+
+Tillägg 2026-09-29 (22:18 UTC): ägarens beställning om modellvalen är MODELLKARTA-20260929. Hans ord, svar och tillägg
+står ordagrant i `evidence/nasta-uppdrag/local/modellkarta-20260929/`. Steg 1a är levererat med denna ändring:
+arbetsplatsen har delen Flödet (`/flodet`), en karta med fyra linjer där varje hållplats följer ett av fem val.
+Partnern, dina sessioner (Claude Code och Codex) och läsarna väljs där. Bara modeller och nivåer som fungerade i
+mätningen (`python3 -B tools/partner.py matmodeller`) erbjuds. Runtimes och bevakningens val visas och görs i steg 2.
+Återstående steg, i ordning:
+1b. partnern på Codex: en Codex-drivare bredvid Claude Code-drivaren;
+2. Runtime: ansträngning och utförare som val i releasen, bevakningen med Claude eller Codex, arbetsplatsens
+   automatiska aktivering när Runtime är ledig och startvakten som följer Runtimes val; ägaren aktiverar den releasen
+   en gång;
+3. Digitalas kritik och provare och kontorets granskning hämtar läsarnas val;
+4. automatiska uppdateringar av Claude Code och Codex, ägarens beställning samma kväll (ordagrant i samma mapp), som
+   återanvänder steg 2:s aktivering.
+Startvakten är avstängd tills ägaren säger annat. Mätningen visade att Runtimes fastlåsta Claude Code 2.1.257 inte kan
+köra Opus 5.5 och att Runtimes Codex 0.155.1 saknar gpt-6.1-sol. Därför erbjuds de inte för läsarna; steg 4 är vägen
+dit. Efter integrationen startas tjänsten om ur main enligt driftregeln. Återupptagning:
+`evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
@@ -250,6 +268,9 @@ Tillägg 2026-09-29 (19:15 UTC): ägaren har bantat arbetsplatsen (HEM-RUTOR-202
 driftregeln. Därefter följer två egna ändringar:
 - Överlämningar blir backlog, byggt av nortropic-repos-d7 (gjort i FORBATTRINGSPARTNER-BACKLOG-20260929).
 - Trådar kan raderas för gott, byggt av 6d efter d7:s publicering (gjort i RADERA-TRAD-20260929).
+
+Tillägg 2026-09-29 (22:18 UTC): arbetsplatsen har fått delen Flödet (MODELLKARTA-20260929), byggd av nortropic-repos-d7.
+Läget och nästa handling står i partnerblockets tillägg med samma tid.
 
 Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md`. Arbetsgrenarna publiceras eller arkiveras
 i bundles där och tas bort lokalt.
@@ -1173,6 +1194,14 @@ Användningsprovets två grenar, `aquarium/uppdrag-arkivdatum-r1` och `aquarium/
 grenar i v0. `kontor/digitala-vilande-20260929` (worktreen `nortropic-kontor-digitala-vilande-20260929`, utan egna commits)
 bär en ocommittad registreringspost som Digitala-mottagaren för OVL-20260929-20e7b1-digitala lämnade innan
 överlämningen avslogs; den står orörd på ägarens ord "Skriv inte över något" (FORBATTRINGSPARTNER-BACKLOG-20260929).
+`kontor/en-kalla-20260929` (worktreen `nortropic-kontor-en-kalla-20260929`, utan egna commits) bär ocommittade utkast från
+OVL-20260929-b4cecc:s mottagare. nortropic-repos-d7 stoppade den sessionen 21:14:33Z på ägarens ord "låt den vila";
+beställningen är inte avslagen, och utkastet står orört (MODELLKARTA-20260929).
+`kontor/postkontroll-20260929` (commit `424f767`, POSTKONTROLL-20260929) är arbetet för OVL-20260929-05dd15, som avslogs
+20:43Z på ägarens ord "stoppa den". Det står bevarat opublicerat med hela publiceringsvägen i
+`evidence/nasta-uppdrag/local/postkontroll-20260929/LAGE.md`.
+`veckodrift/kontor-20260929` (commit `29fcc97`) är arbetet för OVL-20260929-4f194f. Det är pausat tills en riktig kund är
+på väg, och grenens sista commit bär ägarens ord.
 
 
 ARBETSFORM FÖR V0:S RUNTIME-UPPDRAG (AQUARIUM-V0-UPPDRAGSGREN-20260924), ett avgränsat undantag från rutinen ovan för

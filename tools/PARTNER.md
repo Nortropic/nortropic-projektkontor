@@ -30,7 +30,8 @@ en hälsning med inmatningsrutan i mitten och förslag under; i en tråd står s
 Modell och ansträngning väljer du i rutan: klicka på "Opus 5.5 · high" (↑↓ modell, ←→ ansträngning, Enter, Esc)
 eller skriv `/model`, `/model sonnet` eller `/effort max`. Valet sparas i `data/installningar.json` och gäller från
 nästa svar i alla trådar; en pågående körning påverkas inte, och kommandona skickas aldrig till partnern. Varje svar
-visar vilken modell och ansträngning det kördes med.
+visar vilken modell och ansträngning det kördes med. Samma val finns i arbetsplatsens Flödet (`/flodet`, se
+`tools/ARBETSPLATS.md`), tillsammans med Nortropics övriga modellval.
 
 I rutan: skriv, klistra in bilder (⌘V), släpp flera filer eller bifoga med "+". Enter skickar, Skift+Enter ger ny
 rad. Varje kodblock i ett svar har en knapp "Kopiera" som kopierar blockets text exakt (utan språkmarkör), och under
@@ -86,8 +87,10 @@ skrivverktyg. En modell och en ansträngning gäller allt (Johnnys besked 2026-0
 registrerade utredningarna kör det Johnny har valt. Standard är `claude-opus-5-5` med ansträngningen `high`. Utredaren
 får samma modell och ansträngning i sin definition (`--agents`), och kroken nekar ett anrop som väljer en annan
 agenttyp (till exempel en inbyggd agent med egen standardmodell) eller en annan modell. Johnny byter modell och
-ansträngning i ytan (`/model`); valbara är Opus 5.5, Fable 5.1 (egen kvot), Sonnet 5, Opus 5 och Haiku 4.5, med
-ansträngningen low, medium, high, xhigh eller max. Valet står i `data/installningar.json`
+ansträngning i ytan (`/model`) eller i Flödet; valbara är Opus 5.5, Fable 5.1 (egen kvot), Sonnet 5, Opus 5 och Haiku
+4.5, med ansträngningen low, medium, high, xhigh eller max. Finns en mätning (`python3 -B tools/partner.py matmodeller`,
+kvittot `data/modellmatning.json`) erbjuds bara modellerna som fungerade i Johnnys Claude Code. Valet står i
+`data/installningar.json`
 (`{"modell": {"huvud": "…", "anstrangning": "…"}}`); en äldre egen utredarmodell där läses inte. Startvaktens
 mottagarsessioner i andra repon kör Runtimes bemanning (rollen driver), se Startvakten.
 

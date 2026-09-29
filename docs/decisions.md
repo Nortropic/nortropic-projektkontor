@@ -8308,3 +8308,90 @@ raderats kommer inte tillbaka.
 
 **Avslut.** Ändringen är klar när den är integrerad och tjänsten har startats om ur main enligt driftregeln. Nästa
 bygge i detta spår kräver ett eget beslut.
+
+**Rättelse (2026-09-29):** OVL-20260929-b4cecc kraschade inte. nortropic-repos-d7 stoppade sessionen 21:14:33Z på ägarens ord "låt den vila". Beställningen är inte avslagen, och utkastet ligger orört i worktreen nortropic-kontor-en-kalla-20260929. Resten av posten gäller.
+
+## MODELLKARTA-20260929 — ägarens beställning: alla modell- och ansträngningsval samlade i arbetsplatsen som en karta över hela flödet, med Claude och Codex överallt; steg 1a (kartan, dina sessioner, läsarna och mätningen) är levererat
+
+**Status:** registrerat 2026-09-29 (22:18 UTC) av sessionen nortropic-repos-d7 (Claude Code) på ägarens beställning.
+Hans ord står ordagrant i `evidence/nasta-uppdrag/local/partner-backlog-20260929/owner-words-modellval-i-dashboarden-20260929.md`
+(beställningen) och i `evidence/nasta-uppdrag/local/modellkarta-20260929/` (svaret på skissen, tillägget om Codex och
+beställningen om automatiska uppdateringar).
+
+**Ägarens ord** (urval, ordagrant): "jag vill kunna välja modeller för dessa saker smidigare, är det möjligt att ha i
+dashboarden alla modellval?", "jag vill att aktiveringarna sker per automatik utifrån modell och effort nivåer jag
+väljer i arbetsplatsen", "Tänk dig en tåg bana typ" och "det får bara inte bli en sörja, i det enkla bor det vackra."
+Om skissen: "ja på båda, kartan känns bra", alltså att arbetsplatsen får skriva Claude Codes inställningar och att
+läsarna har ett gemensamt val. Tillägget: "Arbetsmodellen ska aldrig spela roll. Både Claude och Codex ska kunna driva
+allt." och "Erbjud bara modeller och nivåer som bevisligen fungerar på mitt abonnemang."
+
+**Problemet.** Modellvalen låg utspridda: partnerns inställning, Claude Codes och Codex egna filer, Runtimes
+release (modellen) och kod (ansträngningen), Runtimes Codex-profil (bevakningen) och sessionens val vid varje körning
+(kontorets granskning, Digitalas kritik och provare). Ingenstans syntes hela flödet med modellerna, och ingenting sade
+vilka modeller som faktiskt fungerar i programmen som kör dem.
+
+**Genomfört (steg 1a).** Arbetsplatsen har en femte del, **Flödet** (`/flodet`): fyra linjer (Idé till main, Kund till
+leverans, Motorn och Bevakning), där varje hållplats visar modellen och ansträngningen som arbetar där och följer ett av
+fem val. Servern läser varje val ur sin källa (`tools/partnern/modellkarta.py`, `GET /api/arbetsplats/karta`). Runtimes
+val läses med den aktiva releasens egen kod, genom samma avgränsade väg som Aquarium. Okänt visas som okänt.
+- Valbart här: partnern (gäller direkt, som samtalsytans /model), dina sessioner i båda programmen och läsarna (sparas
+  i `installningar.json`; ansträngningen följer Runtimes läsarprofil). Runtimes och bevakningens val visas och görs i
+  steg 2.
+- Ett val sparas först när ägaren trycker Spara, aldrig av en ändrad meny. I Claude Codes fil ändras bara `model`,
+  `effortLevel` och `modelSettings[<modell>].effortLevel`. I Codex fil ändras bara raderna `model` och
+  `model_reasoning_effort` överst. Filerna skrivs atomärt, med samma rättigheter, i en länkad fils mål och bara om de
+  inte ändrats sedan de lästes. Står en av Codex rader i en form arbetsplatsen inte känner igen, står en sträng eller
+  tabell över flera rader överst i Codex fil, eller har Claude Codes fil en annan form än den som skrivs tillbaka, skrivs
+  ingenting. En lista över flera rader överst, som ägarens `notify`, följs rad för rad. En prov-
+  eller utvecklingsinstans skriver bara kopior i sin egen datakatalog. Varje val bokförs i journalen (`modellval`).
+- `python3 -B tools/partner.py matmodeller` (`tools/partnern/modellmatning.py`) prövar varje modell och nivå med ett
+  kort anrop i programmet som kör hållplatsen: ägarens Claude Code och Codex, och Runtimes fastlåsta Claude Code och
+  Codex. Codex modellista läses per program, eftersom varje Codex-version skriver sin egen lista. Ett fel som kan vara
+  tillfälligt prövas om, ett i taget; ett tydligt nej gör det inte. Kartan och samtalsytans modellväljare erbjuder och
+  godtar bara det som fungerade.
+- Prov: `tools/test_modellkarta.py`, och ett webbläsarprov i Chromium och WebKit mot en provinstans med kvitton i
+  mappen ovan.
+
+**Vad mätningen visade** (kvitto `evidence/nasta-uppdrag/local/modellkarta-20260929/modellmatning-3.json`, mätt
+2026-09-29 22:02–22:04 UTC): 135 av 140 kombinationer fungerade. De fem som föll var Opus 5.5 i Runtimes Claude Code
+2.1.257 ("version 2.1.280 or newer is required"). Runtimes Codex 0.155.1 listar inte gpt-6.1-sol, som ägarens Codex
+0.159.0 kör. Claude Codes kortnamn "opus" betyder Opus 5.5 i ägarens Claude Code men Opus 5 i Runtimes. Haiku 4.5 har
+inget långt fönster på abonnemanget (`KVITTO-langt-fonster.txt`), så `[1m]` skrivs aldrig för Haiku. I den första
+mätningen föll fyra kombinationer med ett tillfälligt 403 och fungerade vid nästa mätning (`matning-1.log` och
+`matning-2.log`); därav omprövningen. Läsarna och Runtime erbjuds alltså inte Opus 5.5 eller gpt-6.1-sol förrän
+Runtimes program är uppdaterade (steg 4).
+
+**Återstår, i ordning** (planens partnerblock bär läget):
+1b. Partnern på Codex: en Codex-drivare bredvid Claude Code-drivaren. Partnern på Claude får inte läsa lokala filer och
+    går genom en krok för webbanrop och underagenter. Codex har alltid ett skalverktyg och saknar sådana krokar, så
+    drivaren byggs med egna gränser och egen granskning. Det som inte kan byggas redovisas med exakt vad det kräver.
+2. Runtime: ansträngning och utförare som val i releasen, där modellen avgör utföraren; bevakningen med Claude eller
+   Codex; arbetsplatsens automatiska aktivering när Runtime är ledig, med `model_choice.py`:s väg tillbaka; och
+   startvakten som följer Runtimes val. Ägaren aktiverar den releasen en gång.
+3. Digitalas kritik och provare och kontorets granskning hämtar läsarnas val.
+4. Automatiska uppdateringar av Claude Code och Codex, ägarens beställning samma kväll (ordagrant i mappen ovan), som
+   återanvänder steg 2:s aktivering.
+
+**Oförändrat och gränser.** Startvakten är avstängd tills ägaren säger annat. Partnern kör på Claude. Runtime, AP-10 och
+Digitala ändras inte i steg 1a. Mätningen körs bara när någon ger kommandot; ett varv var 140 korta anrop på ägarens
+abonnemang (kvittot ovan). Inga installationer och inga nya konton, kostnader eller behörigheter.
+
+**Samordning.** Arbetet gjordes i worktreen `nortropic-kontor-modellkarta-20260929` på nortropic-repos-6d:s main
+(`ba1d616`). På 6d:s begäran står en rättelse sist i RADERA-TRAD-20260929. Planen namnger de lokala grenarna
+`kontor/en-kalla-20260929`, `kontor/postkontroll-20260929` och `veckodrift/kontor-20260929`.
+
+**Granskning.** Den första separata granskningen (claude-opus-5, läsarprofil) godkände kandidaten utan blockerande fynd.
+Fem av dess anteckningar var verkliga luckor och är rättade: en rad som börjar med `[` inne i en lista över flera rader
+överst i Codex fil kunde tas för en tabellrubrik och ge en dubblerad nyckel (hakparenteserna följs nu genom toppen), en länkad `settings.json` hade ersatts med en vanlig fil, en annan formatering av Claude Codes fil
+hade ändrat bytes utanför de tre nycklarna, en mätning utan lyckade anrop gav samtalsytan hela listan, och läsarnas
+värde visades som obevisat när Runtime inte gick att läsa. Mätkommandots `--bara` är borttaget, eftersom det skrev över
+den andra halvan av mätningen, och "is not available" räknas inte längre som ett tydligt nej. Runtime-läsningen prövas nu
+också mot en falsk release. Rättelserna prövas i en andra runda.
+
+**Ersätter:** ingen post.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main. Ett val som redan skrivits
+i Claude Codes eller Codex fil står kvar; ägaren ändrar det i programmet.
+
+**Avslut.** Steg 1a är klart när ändringen är på main, tjänsten kör den nya koden och mätningen finns i tjänstens
+datakatalog. Steg 1b, 2, 3 och 4 följer i denna ordning under samma beställning, med egen granskning för varje.

@@ -10,6 +10,7 @@
     python3 -B tools/partner.py kvittera OVL-… mottagen|startad|levererad|avslagen --av "…" [--bevis "…"]
     python3 -B tools/partner.py autostart    visa hur ägaren gör tjänsten bestående (skriver ingenting)
     python3 -B tools/partner.py app          skapa Nortropic.app i ~/Applications: ett klick startar och öppnar arbetsplatsen
+    python3 -B tools/partner.py matmodeller  mät vilka modeller och nivåer som fungerar (Flödet erbjuder bara dem)
 
 Se tools/PARTNER.md.
 """
@@ -235,6 +236,17 @@ def app(k, args) -> int:
     return 0
 
 
+def matmodeller(k, args) -> int:
+    """Mäter vilka modeller och nivåer som fungerar på Johnnys abonnemang, i de program som kör dem. Flödet (kartan)
+    erbjuder bara det som fungerade. Kvittot skrivs i datakatalogen (modellmatning.json)."""
+    from partnern import modellmatning as mm
+    kvitto = mm.mat(Path(k.data), k.claude, logg=print)
+    ok = sum(1 for r in kvitto['resultat'] if r['ok'])
+    print('Mätt %s–%s: %d av %d kombinationer fungerade. Kvittot: %s'
+          % (kvitto['matt'], kvitto['klar'], ok, len(kvitto['resultat']), Path(k.data) / 'modellmatning.json'))
+    return 0
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog='partner.py', description='Projektkontorets förbättringspartner')
     sub = p.add_subparsers(dest='kommando', required=True)
@@ -245,6 +257,7 @@ def main(argv=None) -> int:
     ap.add_argument('--utan-ikon', action='store_true')
     bl = sub.add_parser('backlog')
     bl.add_argument('--alla', action='store_true', help='visa också släppta och avslagna beställningar ur backloggen')
+    sub.add_parser('matmodeller')
     kv = sub.add_parser('kvittera')
     kv.add_argument('id')
     kv.add_argument('status', choices=['mottagen', 'startad', 'levererad', 'avslagen'])
@@ -254,7 +267,7 @@ def main(argv=None) -> int:
     k = kf.ladda()
     return {'start': start, 'kor': kor, 'stopp': stopp, 'status': status, 'oppna': oppna, 'index': index,
             'overlamningar': overlamningar, 'backlog': backlog, 'kvittera': kvittera, 'autostart': autostart,
-            'app': app}[args.kommando](k, args)
+            'app': app, 'matmodeller': matmodeller}[args.kommando](k, args)
 
 
 if __name__ == '__main__':
