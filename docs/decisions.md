@@ -8113,3 +8113,182 @@ sidomeny, och markeringen står sist i den posten.
 
 **Avslut.** Ändringen är klar när den är integrerad och tjänsten har startats om ur main enligt driftregeln. Nästa
 bygge i detta spår är raderingen av trådar, med eget beslut.
+
+## POSTKONTROLL-20260929 — modellfri kontroll av tal och kvarstående lägestext i en kontorspost före granskning
+
+**Status:** registrerat 2026-09-29 (17:46 UTC) av sessionen som tog emot förbättringspartnerns överlämning
+OVL-20260929-05dd15. Ägarens ord ordagrant: "du kan bereda det så går vi vidare, vad ska jag säga till en session när
+jag vill jobba med dessa saker senare?" (inspel `ev_1a0ee29138f3105dd15`, 2026-09-29T17:14:24Z, bevarat i
+`evidence/nasta-uppdrag/local/partner-OVL-20260929-05dd15/AGARENS-ORD.md`). Uppgiftens innehåll är partnerns
+sammanställning ur samtalet och denna posts formulering, inte ägarens ord. Svaret på hans andra fråga står sist.
+
+**Varför.** Kontorets egen mätning i FORVALTNINGAR-LOPANDE-UTVECKLING-20260926 fann 20 underkända granskningsrundor
+2026-09-24–26; av de 19 med angivet skäl gällde 10 kvarstående text från ett tidigare läge och 5 felaktiga tal eller
+obelagda påståenden. DIGITALA-UNDERHALL-20260929 behövde sex rundor, och rundorna 3–5 gällde räkningar i posten. Det
+är granskningstid som går åt till redovisningen i stället för till arbetet.
+
+**Genomgången.** Alla blockerande fynd i kontorets och Digitalas bevarade granskningsdomar 2026-09-24–29 lästes i
+original: 191 domar, 62 underkända, 123 blockerande fynd, räknat av `underlag/samla_fynd.py` med kvitto i
+`underlag/samla-fynd-utdata.txt`. Skriptet räknar inte detta uppdrags egna granskningsrundor; utan den avgränsningen
+flyttar sig talen varje gång det körs. Varje fynd klassades efter yta och efter om det går att avgöra modellfritt
+(`underlag/klassning.tsv`, summan i `underlag/klassning-summa.txt`, fyndens texter i `underlag/fynd-alla.txt`). 65
+fynd gäller text i en kontorspost eller planändring, 58 andra ytor (Digitalas repo, kod, privata dokument). Av de 65:
+11 fångas helt av en modellfri regel, 3 delvis, och 51 kräver bedömning. Den dominerande klassen bland de 51 är en
+gräns eller ett påstående som måste prövas mot ett underlag — den är granskningens arbete och blir det.
+
+**Byggt.** `tools/postkontroll.py` med `tools/test_postkontroll.py` (41 prov) och `tools/POSTKONTROLL.md`. Åtta
+regler, var och en vald för en klass som faktiskt fällde en runda: `SUMMA` (delarna efter "varav" blir inte helheten),
+`TALSPRIDNING` (samma storhet bär olika tal på olika ställen), `PARENTES` (stycke som stänger en parentes som aldrig
+öppnades), `TURRADER` (prosans antal öppna rader mot blockets), `TURFORM` (turrad utan `— sedan ÅÅÅÅ-MM-DD`, eller
+utanför blocket), `PLANBLOCK` (dubblerad rubrik), `PLANFALL` (stycke i basens plan utan motsvarighet i kandidatens)
+och `TURBORT` (rad som ändringen tar bort ur ÄGARENS TUR). Kontrollen läser bara de filer den får, skriver inga filer
+och når inget nät.
+
+Två saker avgjorde formen. Posterna och planen är hårdbrutna vid omkring 120 tecken, så varje regel läser stycken och
+inte rader; den första versionen läste rader och var därför blind för `26 rundor …,\nvarav 17 … och 8 …`, som är exakt
+den form fynden har. Och tre regler byggdes och togs bort igen under arbetet, var och en sedan den prövats mot
+kandidaterna: en för motstridiga statusetiketter (olika spårs "etapp 3" är inte samma etapp), en som följde postnamn i
+stället för stycken vid planbortfall, och storheten "fynd" i `TALSPRIDNING` (tre nya falsklarm, ingen ny träff).
+Varje regel vilar på en klass som fällde en verklig
+runda; `PLANBLOCK` är den enda vars fynd (F047) är klassat men inte uppmätt, och den saknar därför en rad i
+mätningen. De borttagna regelversionerna finns bara i arbetets historik, inte som eget
+kvitto; att de fanns är denna posts uppgift och inte något underlaget visar.
+
+**Mätt bakåt.** Kontrollen kördes mot elva bevarade kandidater som en runda underkände, med fjorton namngivna fynd
+(`matning/matning.py`, utfallet i `matning/matning-utdata.txt`). Åtta fynd fångades helt och namnger samma ställe som
+granskaren: F088 (`SUMMA`, 17 + 8 blir 25 inte 26), F089, F032 och F121 (`TURRADER`), F090 (`PLANFALL`, det raderade
+KUNDSTART-blocket), F116 och F117 (`TALSPRIDNING`, fem mot sex krav) och F027 (`TURFORM`, raden som tappade sitt
+datum). Tre fångades delvis: F008 och F009, där `TURBORT` pekar ut de borttagna raderna och frågar om prosan bär dem
+kvar men inte namnger de två felaktiga prosaraderna, och F118, där `PARENTES` fångar den halva omskrivningen men inte
+huvudfyndet om baslinjen. Tre fångades inte: F030 (ordningstal mot rundräkning), F031 (rubrikens status mot
+planblockets) och F033 (ett tal mot postens egna uppgifter, utan uppdelning att räkna).
+
+Elva av de fjorton kontorspostfynden med modellfri klass prövades så här, och alla elva föll ut som klassningen sa.
+Tre är klassade men inte uppmätta: F003, F028 och F047. De tre ofångade fynden är alla klassade som bedömningsfynd, så
+mätningen motsäger inte klassningen på någon punkt.
+
+Granskningen fällde två felklassningar här, båda rättade och båda i den fil varje tal ovan vilar på. F017 ("beskedet
+granskades i en runda" mot postens egen "två rundor") var klassad som fångad, men `TALSPRIDNING` kan inte nå den —
+"en" är utesluten som räkneord och storheten står i singular. F091 ("tio rundor på de fyra, fem underkända") var
+klassad likadant, men satsen har inget "varav" och nian står inte i texten, så ingen regel når den heller. Båda är
+omklassade till bedömningsfynd; talen ovan är de rättade, och F091:s omklassning flyttar ett fynd från M till B på yta
+O utan att röra 65/58/123 eller 11/3/51. Att felen inte syntes i mätningen är just för att båda låg utanför de elva
+prövade fynden.
+
+**Falsklarm, mätt.** De elva fällda kandidaterna gav 20 fynd, varav 11 motsvarar ett fynd granskningen fällde och 9
+inte gör det. Sex av de 9 är `TALSPRIDNING` — en post som redovisar en tidigare rundas felaktiga tal bär med
+rätta två tal för samma storhet — och `SUMMA` när "varav A och B" inte är en uttömmande uppdelning. De tre övriga är
+två `TURBORT` på rader som togs bort avsiktligt och en `PLANFALL` på ett stycke som skrevs om i stället för att
+falla bort. Kontrollen kördes också mot
+tre kandidater som en runda godkände utan blockerande fynd; där gav den sammanlagt ett fynd, en `TALSPRIDNING` på att
+en post som redovisar en tidigare rundas felaktiga tal med rätta bär två tal för samma storhet. Det falsklarmet står
+kvar: att sluta läsa "en" och "ett" som talet 1 gjorde de kvarvarande fynden läsbara men stängde inte
+falsklarmskällan. Det är signalkvaliteten i normalfallet: en post som håller ger nära noll, en post som inte håller
+ger några fynd att bemöta varav ungefär hälften pekar på något verkligt.
+
+**Prov och svit.** `tools/test_postkontroll.py` har 41 prov, ett som fäller varje regel och ett som visar att den
+tiger när texten är hel; fixturerna bär den hårdbrutna form posterna har. Sjutton mutationer av reglernas grindar
+fälldes var och en av minst ett prov, och kvittot i `matning/mutationsprov.txt` namnger provet
+som fällde var och en. Två av proven skrevs sedan
+mutationerna visat att grindarna var otäckta — det är denna posts uppgift och syns inte i kvittot, som bara visar
+det slutliga utfallet. Kontorets hela svit kördes på kandidaten och
+på oförändrad `origin/main` `47025c9` i en egen utcheckning: baslinjen 513 prov med 4 underkända och 197 fel,
+kandidaten 554 prov (41 nya) med samma 4 och samma 197, och ingen enda felrad finns bara i kandidaten. De 201
+befintliga felen är alltså inte denna ändrings, och den rör dem inte; ett av dem är ett tidsberoende prov i `agarbild`
+som numera avvisar sin egen fixtur. Kvittona ligger i `matning/svit-baslinje-47025c9.txt` och
+`matning/svit-kandidat.txt`.
+
+**Kontrollen på sig själv.** Denna post och planblocket kördes genom `postkontroll.py` med `--plan docs/plan.md`
+och `--bas` på planen från `origin/main`, före varje granskningsrunda (`matning/egen-kontroll.txt`, med kommandot
+sist i filen). Den ger ett fynd: `TALSPRIDNING` på att storheten "rundor" bär sex, fem, två och tio. Bemött — de sex är
+underhållsformens rundor, de fem är denna posts egna granskningsrundor, de två är beskedets rundor i förklaringen av
+fyndet F017 och de tio är fyndet F091:s tal, båda citerade ur genomgången. Fyra skilda räkningar, alltså ett
+falsklarm, och av precis den typ mätningen redovisar; svaret på den tar en mening. Ett femte tal, de 26 rundorna i
+exemplet på hur ett `SUMMA`-fynd ser ut, föll bort när kodcitat började maskeras även i `TALSPRIDNING` efter runda 3. `TURRADER` tiger: prosan säger nio öppna rader och blocket har nio efter
+denna ändrings rad. `PLANFALL` och `TURBORT` tiger: ändringen tar varken bort ett planstycke eller en rad ur
+ÄGARENS TUR.
+
+**Vad kontrollen inte gör.** Den avgör ingenting om sak. Om ett tal stämmer mot ett underlag den inte fått, om en
+gräns ur beställningen är tappad i registret, om ett påstående om en körning är belagt, om en attribution till ägarens
+ord håller — inget av det. Den ersätter eller försvagar inte den separata granskningen, och ingen post integreras utan
+godkänd granskning. En post som passerar kontrollen är inte granskad.
+
+**Gränser som hållits.** Superpowers installerades inte och ingen del av det; filerna lästes som metodunderlag, och
+uppslaget att det som går att avgöra med validering ska avgöras med validering kommer därifrån. Ingen ändring i
+Digitala, Kundstart eller Runtimes aktiva drift. Inga nya kostnader, konton eller behörigheter. Privat material ligger
+kvar i `evidence/nasta-uppdrag/local/postkontroll-20260929/`.
+
+**Beslutspunkt till ägaren: ett tak på antalet granskningsrundor.** Uppslaget att en post som underkänts N gånger ska
+avgöras skriftligt i stället för att granskas igen infördes inte, och det ligger som en rad i ÄGARENS TUR. För:
+DIGITALA-UNDERHALL-20260929 kostade sex rundor, och rundorna 3 och 4 gällde räkningar som denna kontroll tar. Runda 5
+tar den inte: av dess två fynd fångas det ena bara delvis och det andra inte alls, så runda 5 hade fällt posten ändå.
+Emot: ett tak rör principen om separat granskning före integration, och underhållsformens runda 2 fann en grind som
+gick att kringgå — den hade en skriftlig avgörandeväg kunnat släppa igenom. Postkontrollen minskar behovet av ett tak
+utan att avgöra frågan.
+
+**Granskning.** Fem rundor genom Runtimes läsarprofil (claude-opus-5, läs-bara, `granskning/r1/`–`r5/`), alla
+underkände; tretton fynd sammanlagt, alla åtgärdade. Ett första försök med Fable stoppades av modellkvoten och är bevarat
+i `granskning/r1-avbruten-fable-kvot/`; kvoten är modellspecifik, så granskaren byttes.
+
+Runda 1 fällde fem: F017 var felklassad som fångad fast regeln inte kan nå den, och talen som vilade på den var ett
+för höga; beslutspunktens för-argument sade att kontrollen tar rundorna 3–5 när mätningen bara bär 3 och 4; verktygets
+docstring namngav en regel `TURPROSA` som inte finns och lade bortfallsdelen på fel regel; talen 191 och 62 saknade
+kvitto i underlaget; och dokumentationen påstod att en/ett-rättelsen stängde falsklarmskällan mot godkända poster,
+vilket mätningen motsäger.
+
+Runda 2 fällde tre: rättelsen av rundorna 3–5 gjordes i posten men inte i raden i ÄGARENS TUR, som bar kvar `varav tre
+gällde räkningar` — alltså i just den text ägaren läser — posten påstod samtidigt att alla fem fynd var åtgärdade, och
+provet för `LIKHET`-tröskeln var grönt av fel skäl: fixturens ersättning krympte inte, så antalsgrinden hoppade över
+paret innan tröskeln nåddes.
+
+Runda 3 fällde två: smalningen av `TALSPRIDNING`:s ordlista — runda 2:s egen åtgärd — hade gått genom koden, posten
+och mätningen men inte genom `tools/POSTKONTROLL.md`, som ännu utlovade två storheter verktyget inte prövar; och
+fyndet F091 stod klassat som fångat fast ingen byggd regel når det, samma felklassning som runda 1 fällde för F017.
+F091 är omklassat, vilket flyttar ett fynd från M till B på yta O och lämnar postens och planblockets tal orörda.
+
+Runda 4 fällde två: detta stycke redovisade bara runda 1 och 2, så runda 3:s båda fynd saknades i det bestående
+protokollet och posten talade om en felklassning när granskningen fällt två; och provet som skulle låsa kommagrinden i
+`SUMMA` var grönt oavsett om grinden fanns, alltså samma "grönt av fel skäl" som runda 2 fällde `LIKHET`-provet på.
+Provet har nu en fixtur som skiljer lägena, och mutationen M16 fäller det.
+
+Runda 5 fällde ett: detta stycke sade att rundorna lämnat tolv restnoter, varav åtta åtgärdade — ett tal som var
+rundorna 1 och 2:s eget och som inte följt med när rundorna 3 och 4 lämnade sina. Talet är ersatt med det räknade, med
+kvitto.
+
+Fem av de tretton fynden var att en tidigare rundas rättelse gjorts på ett ställe men inte på ett annat: i posten men
+inte i planraden, i koden men inte i dokumentationen, i sak men inte i redovisningen, och ett tal som inte följt med
+när underlaget växte. Rundorna lämnade dessutom restnoter — 39 i de fem domarna sammanlagt, många av dem samma not
+upprepad runda efter runda (`underlag/restnoter.txt` räknar dem per runda). En del är åtgärdade i texten, i koden
+eller i dokumentationen; resten står kvar medvetet och finns i sin helhet i domarna. Hur många skilda noter de 39
+motsvarar har jag inte räknat, och posten påstår inget om det.
+
+Mellan rundorna fann kontrollen tre fel i sina egna regler, när den kördes på denna post: `SUMMA` tog ett tidigare tal
+som helhet när ett komma stod efter det rätta, och läste uppräkningen vidare förbi satsens slut; `PARENTES` räknade
+parentestecken som citerades som kod. Båda är rättade, med prov och mutation. Det är verktygets avsedda bruk och inte
+en tillfällighet: posten om kontrollen är den första text kontrollen lästes på.
+
+Att granskningen fällde två felklassningar som mätningen inte kunde visa — båda i den fil varje tal i posten vilar på
+— och därefter fyra gånger fällde en rättelse som inte gått genom hela leveransen, är uppdragets egen lärdom om sig
+självt: kontrollen fångar det som är räknebart, och den separata granskningen fångar resten. Den ersätter den inte.
+
+**Ersätter:** ingen post.
+
+**Ägarens andra fråga: "vad ska jag säga till en session när jag vill jobba med dessa saker senare?"** Kort svar: säg
+vad du vill ha gjort, och nämn postens namn. En session som startas i repots rot läser `AGENTS.md`, sedan
+`docs/uppdrag.md`, `DEFINITION.md` och `docs/plan.md`, och planens block ovan pekar på allt underlag. Tre exempel som
+räcker som hela beskeden:
+
+- *"Kör postkontrollen på den här posten innan du lämnar den till granskning."* Sessionen hittar kommandot i planens
+  block och i `tools/POSTKONTROLL.md`.
+- *"Läs POSTKONTROLL-20260929 och lägg till en regel för <det du sett gå fel>."* Genomgången och mätningen ligger
+  kvar, så sessionen kan klassa det nya fallet på samma sätt och mäta bakåt mot samma kandidater.
+- *"Jag har bestämt mig om taket på granskningsrundor: <ditt beslut>."* Raden i ÄGARENS TUR bär för- och nackdelarna,
+  och den stängs då med en egen post.
+
+Du behöver inte namnge filer, verktyg eller grenar. Vill du att en session ska ta det utan att du startar den, säg det
+till förbättringspartnern i stället — den lämnar en överlämning och startvakten startar sessionen, vilket är vägen
+detta uppdrag självt kom.
+
+**Avslut.** Klart när ändringen är integrerad genom den vanliga vägen med separat granskning. Kontrollen är ett
+verktyg att köra, inte en grind som något hindras av; att göra den obligatorisk före varje kontorspost är ett eget
+beslut och är inte fattat här. Nästa bygge kräver ett eget accepterat uppdrag.

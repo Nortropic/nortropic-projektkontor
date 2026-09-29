@@ -1,3 +1,37 @@
+# Gällande återupptagning — modellfri postkontroll före granskning, 2026-09-29
+
+POSTKONTROLL-20260929 är registrerad: `tools/postkontroll.py` läser en kontorspost och planändringen innan de lämnas
+till den separata granskningen och rapporterar det som går att avgöra mekaniskt ur texterna. Detta block äger nästa
+handling för postkontrollen och ersätter inte blocken nedan; de ersätter inte detta. Uppdraget kom som
+förbättringspartnerns överlämning OVL-20260929-05dd15 till kontorets kedjedrivare.
+
+Kontrollen kompletterar granskningen och ersätter den inte: ingen post integreras utan godkänd granskning, och en
+post som passerar kontrollen är inte granskad. Att köra den är inte obligatoriskt; att göra den till en grind är ett
+eget beslut och är inte fattat.
+
+Åtta regler, valda ur en genomgång av alla 123 blockerande fynd i de bevarade granskningsdomarna 2026-09-24–29:
+`SUMMA`, `TALSPRIDNING`, `PARENTES`, `TURRADER`, `TURFORM`, `PLANBLOCK`, `PLANFALL` och `TURBORT`. Av de 65 fynden
+som gäller text i en kontorspost eller planändring fångas 11 helt av en regel, 3 delvis och 51 kräver bedömning;
+elva av de fjorton är uppmätta, tre bara klassade.
+Mätt bakåt mot elva bevarade underkända kandidater med fjorton namngivna fynd: åtta fångades helt, tre delvis, tre
+inte. Samma elva kandidater gav 20 fynd sammanlagt, så 9 av fynden motsvarar inget som granskningen fällde. Mot
+tre kandidater som en runda godkände gav kontrollen ett fynd. Kontorets svit: 554 prov på kandidaten mot 513 på
+oförändrad `origin/main` `47025c9`, med samma fyra underkända och samma 197 fel i båda och ingen felrad bara i
+kandidaten. 41 prov är nya, och sjutton mutationer av reglernas grindar fälldes var och en av minst ett prov. Separat
+granskning underkände fem kandidater, på fem, tre, två, två respektive ett fynd; alla tretton är åtgärdade. Fem
+av fynden var att en tidigare rundas rättelse inte gått genom hela leveransen.
+
+Nästa handling: ingen i detta spår. Kontrollen körs med `python3 -B tools/postkontroll.py POST.md PLANBLOCK.md
+--plan PLAN-HELA.md --bas docs/plan.md` av den som bereder en kontorspost, och `tools/POSTKONTROLL.md` beskriver vad
+varje regel säger och vad den inte gör. Frågan om ett tak på antalet granskningsrundor infördes inte och står som en
+rad i ÄGARENS TUR. Nästa bygge kräver ett eget accepterat uppdrag.
+
+Återupptagning: `evidence/nasta-uppdrag/local/postkontroll-20260929/` (ägarens ord, genomgången av de 123 fynden i
+`underlag/`, mätningen bakåt och svitkvittona i `matning/`) och paketet i
+`evidence/nasta-uppdrag/local/partner-OVL-20260929-05dd15`.
+
+---
+
 # Gällande återupptagning — Digitalas underhållsform och tak, 2026-09-29
 
 DIGITALA-UNDERHALL-20260929 är registrerad: ägaren beslutade underhållsformen för riktiga kunder och taket 20 läsande
@@ -1081,7 +1115,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28), KUNDSTART-TESTLAGE-20260929 (2026-09-29), DIGITALA-UNDERHALL-20260929 (2026-09-29) och FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 (2026-09-29) är åtta rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. DIGITALA-UNDERHALL-20260929 stängde raderna om Digitalas underhållsform och taket för stående arbete: ägaren beslutade båda 2026-09-29, och lade till raden om en medarbetare som slutat. FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 stängde raden om Codex-CLI:n: den är uppdaterad. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28), KUNDSTART-TESTLAGE-20260929 (2026-09-29), DIGITALA-UNDERHALL-20260929 (2026-09-29), FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 (2026-09-29) och POSTKONTROLL-20260929 (2026-09-29) är nio rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. DIGITALA-UNDERHALL-20260929 stängde raderna om Digitalas underhållsform och taket för stående arbete: ägaren beslutade båda 2026-09-29, och lade till raden om en medarbetare som slutat. FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 stängde raden om Codex-CLI:n: den är uppdaterad. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
@@ -1094,6 +1128,7 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [operatörshandling] Förbättringspartnern: bestående start vid inloggning — `python3 -B tools/partner.py autostart` visar LaunchAgent-filen och de två launchctl-kommandona för ditt eget Terminalfönster; utan den startas tjänsten med `python3 -B tools/partner.py start`, och startvakten startar överlämningarnas sessioner först när tjänsten kör (FORBATTRINGSPARTNER-RESULTAT-20260928, FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929) — sedan 2026-09-28
 - [beslut] Förbättringspartnern: Improvements-samtal efter 2026-09-19 finns inte i partnerns underlag; en ny fångst genom Intake kräver din ChatGPT-inloggning i en webbläsare som en session får styra — beställ eller avstå (FORBATTRINGSPARTNER-RESULTAT-20260928) — sedan 2026-09-28
 - [beslut] Digitala: hör en medarbetare som slutat till stående mandat? Den text du godtog räknar upp den som faktarättelse, men Digitalas gällande mandat lägger personuppgifter i förslagsvägen (MANDAT.md §2, sedan tidigare), en fri textrad går inte att skilja från att någon tillkommit, och Kundstart tar inte emot en sådan rättelse alls (404, prövat). Tills du avgör är en personaländring ett förslag (DIGITALA-UNDERHALL-20260929) — sedan 2026-09-29
+- [beslut] Kontoret: ska en kontorspost som underkänts ett bestämt antal gånger avgöras skriftligt i stället för att granskas igen? För: DIGITALA-UNDERHALL-20260929 kostade sex rundor, och rundorna 3 och 4 gällde räkningar som postkontrollen tar; runda 5 tar den inte, så den rundan hade fällt posten ändå. Emot: ett tak rör principen om separat granskning före integration, och underhållsformens runda 2 fann en grind som gick att kringgå — den hade en skriftlig avgörandeväg kunnat släppa igenom. Infört är inget (POSTKONTROLL-20260929) — sedan 2026-09-29
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
