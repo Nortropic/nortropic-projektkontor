@@ -199,25 +199,20 @@ Parallellt uppdrag med eget skrivansvar. Blocken ovanför ersätter inte detta b
 Skrivansvar: sessionen nortropic-repos-04 (Claude Code) för `tools/partner.py`, `tools/partnern/`, `tools/test_partner.py`,
 `tools/test_arbetsplats.py`, `tools/PARTNER.md`, `tools/ARBETSPLATS.md`, stycket om arbetsplatsen i `tools/AQUARIUM.md`,
 detta block och postens beslut. nortropic-repos-9e lämnade över partnerns filer 2026-09-29 och bekräftade att inget var
-opublicerat. Inga ändringar i Kundstart, Digitala eller Runtime ingår.
+opublicerat. Kundstart-repot ändras bara genom Kundstarts egen väg och i samordning med nortropic-repos-f1.
 
-Läge (29 september 2026, 12:28 UTC): uppdraget är fullgjort. Arbetsplatsen är integrerad (PR 126, main `efdb640`) och
-driftsatt: tjänsten på 127.0.0.1:4760 kör main sedan 12:24:56Z. Den är prövad mot den verkliga tjänsten
-(ARBETSPLATS-RESULTAT-20260929). Nortropic öppnas med `python3 -B tools/partner.py oppna`.
+Läge (29 september 2026, 14:21 UTC): arbetsplatsen är integrerad och driftsatt (PR 126–129, ARBETSPLATS-RESULTAT-20260929)
+och öppnas med Nortropic.app i `~/Applications` eller `python3 -B tools/partner.py oppna`. Ägarens tre förslag är
+genomförda (ARBETSPLATS-KUNDSTART-ARENDEN-20260929): planens rättelse (PR 129), resorna även i WebKit, och Kundstarts
+ärenden som metadata — Kundstarts PR 4 (`287ec0c`) med testservern omstartad ur main, och arbetsplatsens del integreras
+med detta stycke. Kundstarts produktion är inte driftsatt i detta arbete.
 
-Tillägg (ARBETSPLATS-APP-20260929, PR 128): `python3 -B tools/partner.py app` skapar Nortropic.app, en klickbar ingång
-som startar tjänsten om den inte kör och öppnar Nortropic inloggad. Appen är skapad i `~/Applications` och prövad
-2026-09-29 13:34Z: ett klick startade den stoppade tjänsten ur main och öppnade Nortropic.
+Nästa handling: efter integrationen startas partnerns tjänst om ur main (driftregeln), och listan prövas i den verkliga
+tjänsten. Därefter finns inget öppet i detta spår; nästa bygge kräver ett eget beslut. Bestående start vid inloggning är
+partnerns befintliga rad i ÄGARENS TUR.
 
-Nästa handling: ägaren har sagt ja till två förslag till (privat i `owner-words-forslag-20260929.md`): arbetsplatsens
-resor prövas också i WebKit, och Kundstart-delen får en lista över ärendenas metadata genom en ny intern läsväg i
-Kundstart. Den andra kräver en ändring i Kundstart-repot, samordnad med dess skrivare, och en egen beslutspost. Driftregeln
-är partnerns: tjänsten startas om ur main efter varje integration av `tools/partnern/`. Bestående start vid inloggning är partnerns befintliga rad i ÄGARENS TUR och gäller hela
-arbetsplatsen. Nästa bygge kräver ett eget beslut.
-
-Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md`. Arbetsgrenarna är publicerade eller
-arkiverade i `arbetsgrenar.bundle` där och borttagna lokalt; grenen `arbetsplats/resultat-20260929` publiceras med
-resultatposten och tas sedan bort.
+Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md`. Arbetsgrenarna publiceras eller arkiveras
+i bundles där och tas bort lokalt.
 
 ---
 

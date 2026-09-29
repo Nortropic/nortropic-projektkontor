@@ -7830,3 +7830,54 @@ rester. Ett nytt beteendefall i utfärdarens sandlåda. Hela sviten och granskni
 **Oprövat här.** Ett verkligt klick i Finder eller Dock prövas efter integrationen, på ägarens Mac.
 
 **Återgång.** Ta bort `~/Applications/Nortropic.app` och återställ integrationscommiten med `git revert`.
+
+
+## ARBETSPLATS-KUNDSTART-ARENDEN-20260929 — ägarens beslut: arbetsplatsens Kundstart-del visar ärendenas metadata; dessutom WebKit i proven och planens rättelse
+
+**Status:** registrerat och byggt 2026-09-29 av sessionen nortropic-repos-04 (Claude Code). Ägarens ord är sparade
+ordagrant i `evidence/nasta-uppdrag/local/arbetsplats-20260929/owner-words-forslag-20260929.md`: "Gör förslaget, validera
+mig"; på frågan vilka förslag: "Rätta planens mening, Safari/WebKit i proven, Kundstart-ärenden i arbetsplatsen"; på
+frågan vad "validera" betydde: "Det du gör nu, bekräftar till mig vad du skall göra"; och på sessionens besked om hur det
+skulle göras: "Ja". Beskedet står för sig i `forslag-genomforande-20260929.md` och är inte ägarens ord.
+
+**Beslutet.** Ägaren godtar att förbättringspartnerns tjänst läser en lista över alla Kundstart-ärendens metadata. Det
+utökar vad tjänsten får läsa, vilket ARBETSPLATS-20260929 uttryckligen lämnade som ett eget beslut. Beskedet han sa ja
+till angav att även riktiga kunders ärenden syns som metadata, att ingen kundtext, inga svar, inget material och inga
+länkar visas, att nyckeln inte sparas, inte visas i webbläsaren och aldrig ges till partnerns modell, och att ärenden
+inte kan öppnas från listan.
+
+**Kundstart** (Kundstarts egen väg, samordnad med nortropic-repos-f1): PR 4, main `287ec0c`, sammanfogad 14:12Z med
+kontrollen `kontroll` grön. Ny intern läsväg `GET /api/intern/arenden` bakom den befintliga interna nyckeln: per ärende
+bara id, kundens namn, provmärkning, skapad, uppdaterad, revision, antal svar och material, senaste inlämning och om det
+ändrats efter den; ett oläsbart dokument räknas i `olasbara` i stället för att fälla listan. Den skriver ingenting.
+Separat granskning genom Runtimes läsarprofil i två rundor, godkänd utan blockerande fynd; lint, typecheck, 44 kärnprov
+och bygge gröna. Beskedet till ägaren sa att ändringen når produktionen genom automatisk driftsättning; det stämde inte:
+Kundstarts Vercel-projekt har ingen git-koppling, och produktionen har **inte** driftsatts i detta arbete. Den lokala
+testservern kör `287ec0c` sedan den startades om ur main.
+
+**Arbetsplatsen.** Kundstart-delen visar listan: kundens namn, provmärkning, senast ändrad, skapad, antal svar och
+material och inlämning. Partnerns tjänst läser nyckeln ur Kundstart-repots `.env.local` vid varje hämtning, bara den
+raden, och skickar den bara till testservern på 127.0.0.1 utan att följa omdirigeringar, så att nyckeln aldrig förs
+vidare till en annan adress; svaret filtreras till de godkända fälten och typerna, högst 2000 rader. En hämtning läser
+varje ärende i Kundstarts lagring — vid införandet 930 ärenden, alla provärenden, på tio sidor och ungefär 70 sekunder,
+omkring 940 läsningar i Blob-lagringen — så den görs i bakgrunden, bara när Kundstart-delen visas och högst var 15:e
+minut (efter ett misslyckat försök en minut); Hem hämtar den aldrig. Saknas nyckeln, svarar testservern inte eller saknar den listan visas det i stället för en
+tom lista. Ersätter meningen i ARBETSPLATS-20260929 om att arbetsplatsen inte läser kundärenden.
+
+**WebKit.** Playwrights WebKit 26.6 är installerad i webbläsarcachen. Arbetsplatsens resor gav 60 av 60 i WebKit
+(kopieringsprovet kräver urklippsbehörighet och körs bara i Chromium) och 61 av 61 i Chromium. Första WebKit-varvet gav
+57: Safari låter Tab bara gå mellan formulärfält, så länkar nås med Alt+Tab (prövat: hoppa-länken, navigeringen och
+fokus på delens rubrik), och Playwrights skärmbild lägger in en egen stilmall som sidans CSP stoppar. Inget fel i
+arbetsplatsen hittades.
+
+**Planen.** Meningen om Nortropic.app rättades i PR 129.
+
+**Prov.** Fyra nya prov för listan i `tools/test_arbetsplats.py` (atrapp av testservern: nyckeln, sidorna, godkända
+fält och typer, att nyckeln och andra hemligheter aldrig syns, en hämtning per kvart, utan nyckel, utan lista och nekad,
+och att en omdirigering aldrig följs så att nyckeln aldrig lämnar 127.0.0.1 — det provet faller utan rättelsen), gröna på
+Python 3.9.6 och 3.12. Den första granskningen underkände kandidaten just för att en omdirigering kunde föra nyckeln
+vidare; det är rättat. Ett nytt beteendefall i utfärdarens sandlåda, och fallet `ap-kundstart` ändrat eftersom svaret nu
+har en ärendedel. Listan prövad i webbläsare mot den verkliga testservern: 930 ärenden efter 71 sekunder, inga konsolfel.
+
+**Återgång.** Återställ integrationscommiten i kontoret och Kundstarts PR 4 med `git revert`; starta om partnerns tjänst
+och testservern ur main.
