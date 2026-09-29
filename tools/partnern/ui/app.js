@@ -58,6 +58,48 @@ function inline(text) {
   if (sist < text.length) ut.push(document.createTextNode(text.slice(sist)));
   return ut;
 }
+// Kopiering som i Claudes chatt, tecken för tecken: webbläsarens urklipp, annars den äldre kopieringen ur en dold
+// textruta med exakt samma text; går inget av dem markeras texten synligt för att kopieras för hand.
+function kopieraKnapp(etikett, text, markera) {
+  const knapp = el('button', { type: 'button', class: 'kopiera', 'aria-label': etikett, title: etikett }, 'Kopiera');
+  knapp.addEventListener('click', async () => {
+    const t = text();
+    try {
+      if (!navigator.clipboard || !window.isSecureContext) throw new Error('urklipp saknas');
+      await navigator.clipboard.writeText(t);
+      return kvittoKopiera(knapp, 'Kopierat', 'Kopierat till urklipp.');
+    } catch { /* nästa väg */ }
+    if (kopieraGammalt(t, knapp)) return kvittoKopiera(knapp, 'Kopierat', 'Kopierat till urklipp.');
+    const mal = markera(knapp, t);
+    if (mal && mal.select) { mal.focus(); mal.select(); }
+    else if (mal) { const s = window.getSelection(); s.removeAllRanges(); const r = document.createRange(); r.selectNodeContents(mal); s.addRange(r); }
+    kvittoKopiera(knapp, mal ? 'Markerat' : 'Gick inte', mal ? 'Urklipp gick inte att använda; texten är markerad, tryck ⌘C.' : 'Kunde inte kopiera.');
+  });
+  return knapp;
+}
+function kopieraGammalt(t, knapp) {
+  const ruta = el('textarea', { class: 'urklipp', readonly: '', 'aria-hidden': 'true', tabindex: '-1' });
+  ruta.value = t; document.body.append(ruta); ruta.focus(); ruta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch { ok = false; }
+  ruta.remove(); knapp.focus();
+  return ok;
+}
+// Hela svarets markdown-källa i en synlig, skrivskyddad ruta, när den måste markeras för hand.
+function kallruta(knapp, t) {
+  const verktyg = knapp.closest('.svarsverktyg');
+  let ruta = verktyg.parentElement.querySelector('textarea.kallruta');
+  if (!ruta) {
+    ruta = el('textarea', { class: 'kallruta', readonly: '', 'aria-label': 'Svarets markdown-källa' });
+    verktyg.after(ruta);
+  }
+  ruta.value = t;
+  return ruta;
+}
+function kvittoKopiera(knapp, kort, lang) {
+  knapp.textContent = kort; $('utkaststatus').textContent = lang;
+  clearTimeout(knapp.aterstall); knapp.aterstall = setTimeout(() => { knapp.textContent = 'Kopiera'; }, 1800);
+}
 function markdown(text) {
   const rot = el('div', { class: 'svar' });
   const rader = (text || '').replace(/\r/g, '').split('\n');
@@ -67,7 +109,11 @@ function markdown(text) {
     if (/^```/.test(r)) {
       const kod = []; i++;
       while (i < rader.length && !/^```/.test(rader[i])) kod.push(rader[i++]);
-      i++; rot.append(el('pre', null, el('code', { text: kod.join('\n') }))); continue;
+      i++;
+      const kodtext = kod.join('\n');
+      rot.append(el('div', { class: 'kodblock' }, el('pre', null, el('code', { text: kodtext })),
+        kopieraKnapp('Kopiera kodblocket', () => kodtext, (k) => k.parentElement.querySelector('code'))));
+      continue;
     }
     const h = /^(#{1,6})\s+(.*)$/.exec(r);
     if (h) { rot.append(el('h' + Math.min(4, h[1].length + 1), null, ...inline(h[2]))); i++; continue; }
@@ -128,13 +174,16 @@ function ritaTradar() {
 }
 async function oppnaTrad(id) {
   if (tillstand.trad) sparaUtkast();  // spara den tråd som lämnas, aldrig en tom ruta innan utkastet laddats
-  tillstand.trad = id; tillstand.vy = null;
+  tillstand.trad = id; tillstand.vy = null; tillstand.vyNyckel = null;
   if (id !== 'ny') { history.replaceState(null, '', '#' + id); skriv('senasteTrad', id); } else history.replaceState(null, '', '#ny');
   ritaTradar(); laddaUtkast(); ritaTrad(); await hamtaTrad();
 }
 async function hamtaTrad() {
   if (!tillstand.trad || tillstand.trad === 'ny') { tillstand.vy = null; ritaTrad(); planera(8000); return; }
-  try { tillstand.vy = await api('GET', '/api/trad/' + tillstand.trad); ritaTrad(); }
+  try {
+    const ny = await api('GET', '/api/trad/' + tillstand.trad); const nyckel = JSON.stringify(ny);
+    if (nyckel !== tillstand.vyNyckel || !tillstand.vy) { tillstand.vy = ny; tillstand.vyNyckel = nyckel; ritaTrad(); }
+  }
   catch (f) { $('tradstatus').textContent = 'Kunde inte läsa tråden: ' + f.message; }
   const arbetar = tillstand.vy && (tillstand.vy.aktiv || Object.keys(tillstand.vy.jobb_aktiva || {}).length);
   planera(arbetar ? 1200 : 8000);
@@ -231,7 +280,12 @@ function ritaTur(p, vy) {
   const chip = el('span', { class: 'chip ' + ({ svarad: 'ok', undersoker: 'varm', fel: 'fel', avbruten: 'fel', begransad: 'varm' }[p.status] || ''), text: STATUS[p.status] || p.status });
   kort.append(el('div', { class: 'rubrikrad' }, el('span', { class: 'vem', text: 'Partnern' }), chip, p.klar ? el('span', { text: tid(p.klar) }) : null, p.ateruppta ? el('span', { text: 'fortsättning' }) : null));
   const bubbla = el('div', { class: 'bubbla' });
-  if (p.status === 'svarad') { bubbla.append(markdown(p.svar)); bubbla.append(ritaArbete(p.steg, p.kallor, p.forbrukning, p.modell)); }
+  if (p.status === 'svarad') {
+    bubbla.append(markdown(p.svar));
+    bubbla.append(el('div', { class: 'svarsverktyg' }, kopieraKnapp('Kopiera hela svaret som markdown', () => p.svar,
+      kallruta)));
+    bubbla.append(ritaArbete(p.steg, p.kallor, p.forbrukning, p.modell));
+  }
   else if (p.status === 'undersoker') {
     const a = aktiv || { sekunder: '', steg: [], delsvar: '' };
     bubbla.append(el('div', { class: 'pagar' }, 'Undersöker' + (a.sekunder !== '' ? ' · ' + a.sekunder + ' s' : '') + '…',
@@ -267,12 +321,25 @@ function ritaJobb(p, vy) {
 }
 const OVLSTATUS = ['lamnad', 'mottagen', 'startad', 'levererad'];
 const OVLTEXT = { lamnad: 'lämnad', mottagen: 'mottagen', startad: 'startad', levererad: 'levererad', avslagen: 'avslagen' };
+const MOTTAGARNAMN = { 'kontorets-kedjedrivare': 'kontoret', digitala: 'Digitala', runtime: 'Runtime', kundstart: 'Kundstart' };
+function starttext(s, status) {
+  if (!s) return status === 'lamnad' ? 'Startvakten har inte startat någon session ännu.' : '';
+  const skal = s.skal ? ': ' + s.skal : '';
+  return ({
+    startad: 'Session ' + (s.fortsatt ? 'fortsatt ' : 'startad ') + tid(s.tid) + ' i ' + s.repo + ' (' + s.cli + ', ' + s.modell + ' ' + s.anstrangning + ')',
+    vantar: 'Startvakten väntar' + skal, hindrad: 'Starten hindras' + skal, avbruten: 'Sessionen avbröts ' + tid(s.tid) + skal,
+    klar: 'Sessionen avslutades ' + tid(s.tid) + ' efter leverans', avslutad: 'Sessionen avslutades ' + tid(s.tid) + skal,
+    misslyckad: 'Starten misslyckades ' + tid(s.tid) + skal,
+  })[s.typ] || s.typ;
+}
 function ritaOverlamning(p) {
   const nar = {}; nar.lamnad = p.tid; for (const h of p.historik || []) nar[h.status] = h.tid;
-  return el('div', { class: 'kort' }, el('h4', null, 'Överlämning till kontoret: ' + p.rubrik),
+  const start = starttext(p.start, p.status);
+  return el('div', { class: 'kort' }, el('h4', null, 'Överlämning till ' + (MOTTAGARNAMN[p.mottagare] || p.mottagare) + ': ' + p.rubrik),
     p.agarcitat ? el('blockquote', { class: 'svar' }, '”' + p.agarcitat + '”') : null,
     el('div', { class: 'tidslinje' }, OVLSTATUS.map((s) => el('span', { class: 'chip ' + (nar[s] ? 'ok' : ''), text: OVLTEXT[s] + (nar[s] ? ' ' + tid(nar[s]) : '') }))),
-    el('div', { class: 'pagar', text: 'Mottagare: ' + p.mottagare + ' · paket: ' + p.katalog + (p.ap06 ? ' · AP-06: ' + p.ap06.status : '') }));
+    start ? el('div', { class: 'pagar', text: start }) : null,
+    el('div', { class: 'pagar', text: p.id + ' · mottagare: ' + p.mottagare + ' · paket: ' + p.katalog + (p.ap06 ? ' · AP-06: ' + p.ap06.status : '') }));
 }
 function ritaVantande(u) {
   return el('div', { class: 'post johnny' },
@@ -527,7 +594,8 @@ $('visaforstaelse').addEventListener('click', async () => {
 $('visaoverlamningar').addEventListener('click', async () => {
   const d = await api('GET', '/api/overlamningar');
   oppnaPanel('Överlämningar', d.overlamningar.length ? d.overlamningar.map((o) => el('div', { class: 'traff' }, el('div', { class: 'kl', text: o.id + ' · ' + (OVLTEXT[o.status] || o.status) + ' · ' + tid(o.uppdaterad) }),
-    el('div', { text: o.rubrik }), el('div', { class: 'kl', text: 'Mottagare: ' + o.mottagare + ' · ' + o.katalog_visning }))) : el('div', { class: 'meta', text: 'Inga överlämningar ännu.' }));
+    el('div', { text: o.rubrik }), el('div', { class: 'kl', text: 'Mottagare: ' + o.mottagare + ' · ' + o.katalog_visning }),
+    starttext(o.start, o.status) ? el('div', { class: 'kl', text: starttext(o.start, o.status) }) : null)) : el('div', { class: 'meta', text: 'Inga överlämningar ännu.' }));
 });
 $('visalage').addEventListener('click', async () => {
   const d = await api('GET', '/api/lage');
@@ -539,6 +607,7 @@ $('visalage').addEventListener('click', async () => {
     el('p', { text: 'I dag: ' + f.korningar + ' av ' + f.max_korningar + ' modellkörningar · ' + Math.round(f.tokens_in / 1000) + 'k tokens in, ' + Math.round(f.tokens_ut / 1000) + 'k ut · listprisvärde ' + f.listpris_usd.toFixed(2) + ' USD av tak ' + f.max_listpris_usd + ' (inte en kostnad; abonnemangets kvot förbrukas).' }),
     el('p', { text: 'Källtäckning: ' + d.tackning }),
     el('p', { text: 'Pågår nu: ' + (d.aktiva.length ? d.aktiva.map((a) => a.typ + ' ' + a.sekunder + ' s').join(', ') : 'inget') }),
+    d.startvakt ? el('p', { text: 'Startvakten: ' + (d.startvakt.pa ? 'på' : 'av (bara den ordinarie tjänsten startar sessioner)') + ' · ' + d.startvakt.i_dag + ' av ' + d.startvakt.tak + ' nya starter i dag · utföraren ur ' + d.startvakt.utforare_ur + ' · ansträngning ' + d.startvakt.anstrangning + '.' }) : null,
   ]);
 });
 

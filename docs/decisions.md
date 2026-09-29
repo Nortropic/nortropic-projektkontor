@@ -7242,3 +7242,72 @@ val av modell på servern (OpenAI-familjen på AI Gateways fria nivå). Den andr
 
 **Avslut.** Ägarens besked är genomfört när denna post är integrerad. Nästa bygge kräver ett eget beslut. Planen äger
 nästa handling.
+
+
+## FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929 — en beställning kan ge en överlämning per mottagare, en lämnad överlämning startar mottagarens session av sig själv, Aquarium visar överlämningarna och partnerns svar kan kopieras
+
+**Status:** registrerat och byggt 2026-09-29 (09:15 UTC) av sessionen nortropic-repos-9e (Claude Code) inom
+förbättringspartnerns förvaltning. Ägarens arbetsorder är sparad ordagrant i
+`evidence/nasta-uppdrag/local/forbattringspartner-20260928/BESTALLNING-20260929-overlamning-autostart.md`. Den
+rättar verktygen och beställer inte det arbete som överlämningarna gäller.
+
+**Problemet.** Ägarens "nu ska det fungera, kör på beställningen" gällde två mottagare: underhållsformen till
+kontorets kedjedrivare och veckokörningen till Runtime. Den första blev OVL-20260929-328e79. Den andra nekades,
+eftersom dubblettspärren gällde inspelet oavsett mottagare. Id:t byggdes av datum och inspel, så en andra
+överlämning hade fått samma katalog, och koden flyttade i så fall undan den befintliga. En lämnad överlämning startade
+inte heller något: den väntade på nästa session som ägaren själv startade, och OVL-20260929-328e79 har fortfarande
+ingen mottagare. Partnerns svar gick inte att kopiera.
+
+**Byggt.**
+- Samma beställning ger en överlämning per mottagare, men aldrig två till samma mottagare. En andra mottagare ur
+  samma inspel får mottagarens kortnamn i id:t (`OVL-…-runtime`), och finns katalogen redan tas nästa lediga id. Ett
+  befintligt paket byter aldrig namn och flyttas aldrig; OVL-20260929-328e79 är orört. Spärren mot en ny överlämning
+  medan en öppen finns i tråden gäller som förut. När en spärr fäller står det vilken spärr det var och vilken
+  överlämning den pekar på.
+- Startvakten i partnertjänsten startar mottagarens session när en överlämning är lämnad. Det gäller också
+  överlämningar som redan är lämnade utan session. Den ger högst en session per överlämning och en skrivande session
+  per repo, har ett dygnstak, väntar synligt och har ingen reservväg; detaljerna står i `tools/PARTNER.md`.
+- `partner.py overlamningar`, tråden och panelen "Överlämningar" visar mottagare, status, senaste kvittens och
+  vilken session som startade och när.
+- Aquarium visar en rad per öppen överlämning. Levererade och avslagna läggs i Arkivet, och en start som misslyckats
+  eller hindras läggs på Ägarens bord med ett fast skäl. Inget ur arbetsordern eller ägarens ord läses.
+- Kodblock och hela svar kan kopieras i samtalsytan: tecken för tecken, med tangentbordet och med ett kort kvitto.
+  Reservvägen misslyckas aldrig tyst.
+
+**Valet av mekanism.** Arbetsordern bad att Runtimes väg för avgränsade mål (AP-11) och AP-10:s schemaläggning prövades
+först. Ingen av dem bär starten utan en ny Runtime-release och ägarens aktivering:
+- AP-11 är stängt, och dess interaktiva roll kräver en terminal.
+- Runtimes utförare skriver bara i kandidatkloner.
+- AP-10:s schema är låst till bevakningen.
+- Den generiska schemaläggaren (D038) kör bara kontorets driftoperation och kräver en aktiverad nyckel som saknas.
+
+Den enklaste väg som uppfyller kraven är därför en startvakt i den partnertjänst som redan lämnar paketen. Den gör en
+sak med ett fast kommando och en fast instruktion: startar mottagarsessioner. Den återanvänder Runtimes fastlåsta
+binärer med deras kontrollsummor, Runtimes bemanning för rollen `driver` och Aquariums sond för att läsa den. Den är
+ingen allmän schemaläggare.
+
+**Utföraren väljs som i dag.** Startvakten följer Runtimes bemanning för rollen `driver`, det val ägaren gör i Runtimes
+modellval (D028–D030). I dag anger den Claude med `claude-opus-5`. Anger den Codex körs den fastlåsta Codex-binären,
+med `--approve-for-me` som motsvarighet till Claudes auto-läge. Båda utförarna kör på ägarens abonnemang, i en miljö
+utan API-nycklar. Går bemanningen inte att läsa, eller saknas kvot eller åtkomst, blir det en synlig väntan. Något byte
+av utförare, modell eller leverantör sker inte, och en session som fortsätter gör det med den utförare den startade med.
+
+**Förslag: dygnstaket.** Sex nya automatiska starter per dygn (UTC). Hittills har en till två överlämningar lämnats per
+dag, och ett meddelande ger högst fyra, en per mottagare. Sex ger alltså marginal, men ett fel kan inte starta sessioner
+i en slinga. En fortsättning av samma session räknas inte. Värdet ändras i `data/installningar.json`
+(`gransar.startvakt_per_dygn`), och startvakten stängs av där med `{"startvakt": {"pa": false}}`.
+
+**Gränser.** Det som kräver ägaren gör det fortfarande: nya kostnader, konton, aktivering av övergångar och publika
+lanseringar skriver sessionen i ÄGARENS TUR i stället för att göra dem. Startvakten ser andra sessioner genom deras
+processer, Git och worktrees. En session vars arbetskatalog ligger ovanför repot syns bara genom sina ändringar, så
+mottagarsessionen kontrollerar också sina grannar själv. Avslutas en session utan leverans står överlämningen kvar som
+öppen, med planen som återupptagningspunkt, och startvakten startar ingen ny. Codex-vägen är prövad med en fejkad
+`codex` och mot den fastlåsta binärens händelseformat, men har inte körts på riktigt, eftersom bemanningen anger Claude.
+
+**Prov och införande.**
+- Partnerns prov: tolv nya, elva för startvakten och ett för flera mottagare.
+- Aquarium: elva nya prov, och de 150 tidigare går igenom oförändrade.
+- Webbläsarprov av kopieringen med 23 kontroller, och av överlämningskortet.
+
+Ändringen integreras genom den skyddade vägen efter separat granskning. Tjänsten startas sedan om ur main, och
+startvakten plockar då upp OVL-20260929-328e79 och startar kontorets kedjedrivare för den. Planen äger nästa handling.

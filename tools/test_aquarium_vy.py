@@ -537,6 +537,59 @@ class Safety(unittest.TestCase):
         self.assertNotIn('3', str(caught.exception))
 
 
+class Overlamningar(unittest.TestCase):
+    def rows(self, items=(), status='ok', unreadable=0):
+        return {'title': 'Kontoret · överlämningar', 'status': status, 'read_at': READ_AT,
+                'stale_after_seconds': 300, 'items': list(items), 'unreadable': unreadable}
+
+    @staticmethod
+    def item(identity='OVL-20260929-abc123', status='startad', title='Underhållsform',
+             since='2026-09-24T12:40:00+00:00', basis='kvittens', session='mottagarsession startad'):
+        return {'id': identity, 'title': title, 'receiver': 'kontoret', 'status': status, 'since': since,
+                'since_basis': basis, 'session': session}
+
+    def test_one_calm_row_per_open_handoff_and_a_sign_on_the_door(self):
+        result = page(overlamningar=self.rows([
+            self.item(),
+            self.item('OVL-20260929-def456-runtime', 'lämnad', '<b>Rubrik</b> & "citat"', '2026-09-24T10:00:00+00:00',
+                      'lämnad', None)]))
+        self.assertIn('2 öppna överlämningar', result)
+        self.assertIn('<li><span class="aq-etikett">startad · kvittens 24 sep 14:40</span>OVL-20260929-abc123 · '
+                      'Underhållsform · till kontoret · mottagarsession startad</li>', result)
+        self.assertIn('lämnad · lämnad 24 sep 12:00</span>OVL-20260929-def456-runtime · '
+                      '&lt;b&gt;Rubrik&lt;/b&gt; &amp; &quot;citat&quot; · till kontoret</li>', result)
+        self.assertNotIn('<b>Rubrik</b>', result)
+        self.assertIn('Kontoret · överlämningar</span>läst 24 sep 14:52', result)
+        self.assertIn('data-stale-after="300"', result)
+
+    def test_none_open_unread_and_absent(self):
+        empty = page(overlamningar=self.rows())
+        self.assertIn('Inga öppna överlämningar', empty)
+        self.assertIn('syns inte här · observeras inte', empty)
+        unread = page(overlamningar=self.rows(status='otillgänglig'))
+        self.assertIn('Överlämningarna kunde inte läsas; inget visas som tomt', unread)
+        self.assertIn('överlämningarna kunde inte läsas', unread)
+        self.assertNotIn('Inga öppna överlämningar', unread)
+        some = page(overlamningar=self.rows([self.item()], unreadable=1))
+        self.assertIn('1 paket kunde inte läsas', some)
+        self.assertIn('1 öppen överlämning', some)
+        absent = page()                                         # a projection made before handoffs existed
+        self.assertNotIn('överlämn', absent.lower())
+        self.assertIn('syns inte här · observeras inte', absent)
+
+    def test_a_broken_handoff_section_is_refused(self):
+        for broken in (dict(self.rows(), extra=1), dict(self.rows(), status='unavailable'),
+                       self.rows([dict(self.item(), status='levererad')]),
+                       self.rows([dict(self.item(), since='2026-09-24T12:40:00')]),
+                       self.rows([dict(self.item(), agarcitat='x')]), 'text'):
+            with self.assertRaises(ValueError):
+                aquarium_vy.render(projection(overlamningar=broken))
+        extra = projection()
+        extra['annat'] = {}
+        with self.assertRaises(ValueError):
+            aquarium_vy.render(extra)
+
+
 class Command(unittest.TestCase):
     def setUp(self):
         self.assertTrue(SCRATCH.is_dir(), 'the repository keeps an existing .scratch')

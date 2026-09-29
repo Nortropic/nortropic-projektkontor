@@ -42,6 +42,29 @@ PROBE_TIMEOUT = 30
 GIT_TIMEOUT = 30
 PROPOSAL_WINDOW = 600
 
+# The partner's handoffs: an optional reading beside the eight sources (an earlier reading without it is still whole).
+HANDOFF_TITLE = 'Kontoret · överlämningar'
+STALE_HANDOFFS = 300
+HANDOFF_LIMIT = 64
+HANDOFF_BYTES = 262144
+HANDOFF_ID = re.compile(r'OVL-\d{8}-[A-Za-z0-9]{6}(?:-(?:kontoret|digitala|runtime|kundstart)\d*)?')
+RECEIVERS = {'kontorets-kedjedrivare': 'kontoret', 'digitala': 'Digitala', 'runtime': 'Runtime',
+             'kundstart': 'Kundstart'}
+HANDOFF_STATUSES = ('lamnad', 'mottagen', 'startad', 'levererad', 'avslagen')
+HANDOFF_OPEN = {'lamnad': 'lämnad', 'mottagen': 'mottagen', 'startad': 'startad'}
+HANDOFF_CLOSED = {'levererad': 'levererad', 'avslagen': 'avslagen'}
+START_STATES = {'startad': 'mottagarsession startad', 'vantar': 'start väntar', 'avbruten': 'session avbruten, fortsätts',
+                'klar': 'session klar', 'avslutad': 'session avslutad utan leverans',
+                'misslyckad': 'start misslyckad', 'hindrad': 'start hindrad'}
+START_CODES = ('tak', 'upptaget', 'kvot', 'bemanning', 'binar', 'repo', 'start', 'fel', 'utan_resultat', 'utan_leverans')
+WAITING_FOR = {'tak': 'dagens tak för automatiska starter', 'upptaget': 'en annan session skriver där',
+               'kvot': 'kvot eller åtkomst saknas', 'bemanning': 'Runtimes bemanning kunde inte läsas'}
+FAILED_START = {'fel': 'mottagarsessionen slutade med fel',
+                'utan_resultat': 'mottagarsessionen slutade utan resultat tre gånger',
+                'start': 'mottagarsessionen kunde inte startas',
+                'binar': 'den fastlåsta utförarbinären saknas eller har ändrats',
+                'repo': 'mottagarens repo finns inte på datorn'}
+
 PROBE = """import asyncio, json
 from pathlib import Path
 out = {}
@@ -328,6 +351,32 @@ def _office_value(value):
             'entries': entries, 'notes': notes, 'plan_owner_turn': turns}
 
 
+def _handoffs_value(value):
+    """Per package only its id, the partner's title, the receiver, times and fixed codes; nothing else is kept."""
+    value = _dict(value)
+    items = []
+    for item in _list(value.get('items'))[:HANDOFF_LIMIT]:
+        item = _dict(item)
+        identity = _string(item.get('id'))
+        if HANDOFF_ID.fullmatch(identity) is None or item.get('status') not in HANDOFF_STATUSES:
+            _fail()
+        start = item.get('start')
+        if start is not None:
+            start = _dict(start)
+            if start.get('state') not in START_STATES or (start.get('code') is not None
+                                                          and start.get('code') not in START_CODES):
+                _fail()
+            start = {'state': start['state'], 'code': start.get('code'), 'at': _optional_iso(start.get('at'))}
+        items.append({'id': identity, 'title': _string(item.get('title'))[:TITLE_LIMIT],
+                      'receiver': _string(item.get('receiver')), 'status': item['status'],
+                      'left_at': _optional_iso(item.get('left_at')),
+                      'receipt_at': _optional_iso(item.get('receipt_at')), 'start': start})
+    unreadable = value.get('unreadable', 0)
+    if type(unreadable) is not int or unreadable < 0:
+        _fail()
+    return {'items': items, 'unreadable': unreadable}
+
+
 VALUES = {'release': _release_value, 'staffing': _staffing_value, 'questions': _questions_value,
           'service': _service_value, 'engine': _engine_value, 'tasks': _tasks_value,
           'watch': _watch_value, 'office': _office_value}
@@ -360,8 +409,17 @@ def _validated(readings, now):
             _iso(read_at)
         value = VALUES[name](source['value']) if source['status'] == 'ok' else None
         result[name] = {'status': source['status'], 'read_at': read_at, 'value': value}
+    handoffs = None
+    if 'overlamningar' in readings:  # optional: a reading made before the handoffs existed is still whole
+        source = _dict(readings['overlamningar'])
+        if source.get('status') not in ('ok', 'unavailable') or 'read_at' not in source or 'value' not in source:
+            _fail()
+        if source['read_at'] is not None:
+            _iso(source['read_at'])
+        handoffs = {'status': source['status'], 'read_at': source['read_at'],
+                    'value': _handoffs_value(source['value']) if source['status'] == 'ok' else None}
     return {'schema': SCHEMA, 'provdata': readings['provdata'],
-            'read_started_at': readings['read_started_at'], 'sources': result}
+            'read_started_at': readings['read_started_at'], 'sources': result, 'handoffs': handoffs}
 
 
 # --- the places -------------------------------------------------------------------
@@ -623,6 +681,62 @@ def _sockeln(available, values, work, parked):
             'idle_tasks': idle, 'identity_records': identities, 'busy': busy}
 
 
+def _receiver(key):
+    return RECEIVERS.get(key, 'okänd mottagare')
+
+
+def _open_handoffs(handoffs):
+    """One calm row per open handoff: title, receiver, status and the time of the latest receipt."""
+    status = 'ok' if handoffs['status'] == 'ok' else 'otillgänglig'
+    items, unreadable = [], 0
+    if status == 'ok':
+        unreadable = handoffs['value']['unreadable']
+        for item in handoffs['value']['items']:
+            if item['status'] not in HANDOFF_OPEN:
+                continue
+            start = item['start']
+            session = None
+            if start is not None:
+                session = START_STATES[start['state']]
+                if start['state'] == 'vantar' and start['code'] in WAITING_FOR:
+                    session += ': ' + WAITING_FOR[start['code']]
+            items.append({'id': item['id'], 'title': item['title'], 'receiver': _receiver(item['receiver']),
+                          'status': HANDOFF_OPEN[item['status']],
+                          'since': item['receipt_at'] or item['left_at'],
+                          'since_basis': 'kvittens' if item['receipt_at'] else 'lämnad', 'session': session})
+    return {'title': HANDOFF_TITLE, 'status': status, 'read_at': handoffs['read_at'],
+            'stale_after_seconds': STALE_HANDOFFS, 'items': items, 'unreadable': unreadable}
+
+
+def _with_closed_handoffs(arkivet, value):
+    """Delivered and declined handoffs join the archive, dated by their closing receipt."""
+    items = list(arkivet['items'])
+    for item in value['items']:
+        if item['status'] not in HANDOFF_CLOSED:
+            continue
+        date = item['receipt_at'][:10] if item['receipt_at'] else None
+        items.append({'key': item['id'], 'title': item['title'] + ' · till ' + _receiver(item['receiver']),
+                      'date': _date_in(date) if date else None,
+                      'basis': 'överlämningens kvittens ' + HANDOFF_CLOSED[item['status']]})
+    dated = sorted([item for item in items if item['date']], key=lambda item: item['date'], reverse=True)
+    return {'status': arkivet['status'], 'items': dated + [item for item in items if not item['date']]}
+
+
+def _failed_starts(value):
+    """A start that failed or cannot happen waits for the owner, with its fixed reason."""
+    items = []
+    for item in value['items']:
+        start = item['start']
+        if item['status'] in HANDOFF_CLOSED or start is None or start['state'] not in ('misslyckad', 'hindrad'):
+            continue
+        reason = FAILED_START.get(start['code'], 'orsaken är okänd')
+        items.append({'kind': 'operatörshandling',
+                      'text': 'Överlämningen ' + item['id'] + ' till ' + _receiver(item['receiver'])
+                              + ' startade inte: ' + reason,
+                      'since': start['at'], 'basis': 'överlämningens startlogg'})
+    return items
+
+
 def project(readings, now):
     """Pure projection of one reading. No file, clock, process or network access."""
     data = _validated(readings, now)
@@ -640,6 +754,10 @@ def project(readings, now):
         'config': values['release']['config_sha256'][:8] if available['release'] else None}
 
     arkivet = _arkivet(available['office'], values['office'])
+    handoffs = data['handoffs']
+    handoffs_ok = handoffs is None or handoffs['status'] == 'ok'
+    if handoffs is not None and handoffs['status'] == 'ok' and arkivet['status'] == 'ok':
+        arkivet = _with_closed_handoffs(arkivet, handoffs['value'])
     work, parked = (_work_and_parked(values['engine'], available['tasks'], values['tasks'])
                     if available['engine'] else ([], []))
     verkstaden = {'status': 'ok' if available['engine'] else 'otillgänglig', 'items': work,
@@ -647,8 +765,10 @@ def project(readings, now):
     utkiken = _utkiken(available['watch'], values['watch'], available['staffing'],
                        values['staffing'], now)
     owner, questions = _owner_items(available, values)
+    if handoffs is not None and handoffs['status'] == 'ok':
+        owner = owner + _failed_starts(handoffs['value'])
     agarens_bord = {'status': 'ok' if all(available[name] for name in ('office', 'questions', 'watch'))
-                    else 'otillgänglig', 'items': owner}
+                    and handoffs_ok else 'otillgänglig', 'items': owner}
 
     # An unknown count is never shown as zero work.
     pagar = len(work) if available['engine'] else None
@@ -657,14 +777,17 @@ def project(readings, now):
     behover_dig = len(owner) if agarens_bord['status'] == 'ok' else None
     headline = {'pagar': pagar, 'vantar': vantar, 'behover_dig': behover_dig,
                 'lugnt': pagar == 0 and vantar == 0 and behover_dig == 0
-                         and all(available[name] for name in SOURCES)}
+                         and all(available[name] for name in SOURCES) and handoffs_ok}
 
-    return _display_safe({'schema': SCHEMA, 'provdata': data['provdata'],
-                          'read_at': data['read_started_at'], 'sources': sources,
-                          'revisions': revisions, 'headline': headline, 'arkivet': arkivet,
-                          'verkstaden': verkstaden, 'utkiken': utkiken,
-                          'agarens_bord': agarens_bord,
-                          'sockeln': _sockeln(available, values, work, parked)})
+    result = {'schema': SCHEMA, 'provdata': data['provdata'],
+              'read_at': data['read_started_at'], 'sources': sources,
+              'revisions': revisions, 'headline': headline, 'arkivet': arkivet,
+              'verkstaden': verkstaden, 'utkiken': utkiken,
+              'agarens_bord': agarens_bord,
+              'sockeln': _sockeln(available, values, work, parked)}
+    if handoffs is not None:
+        result['overlamningar'] = _open_handoffs(handoffs)
+    return _display_safe(result)
 
 
 # --- bounded real reading ---------------------------------------------------------
@@ -869,13 +992,104 @@ def office_reader(office_root):
             'entries': entries, 'notes': notes, 'plan_owner_turn': turns}
 
 
+def _utc(value):
+    """The partner's times (`...Z`) as aware ISO times; anything else is no time."""
+    if type(value) is not str:
+        return None
+    text = value[:-1] + '+00:00' if value.endswith('Z') else value
+    return text if _moment(text) is not None else None
+
+
+def _json_lines(path):
+    try:
+        raw = _read_file(path)
+    except FileNotFoundError:
+        return []
+    lines = []
+    for line in raw[:HANDOFF_BYTES * 4].decode('utf-8', errors='replace').splitlines():
+        try:
+            item = json.loads(line)
+        except ValueError:
+            continue
+        if type(item) is dict:
+            lines.append(item)
+    return lines
+
+
+def _primary_office(office_root):
+    """The office's primary checkout, where the handoff packages live, when `office_root` is a checkout of it (also a
+    worktree); any other directory is taken as given."""
+    given = Path(office_root)
+    try:
+        found = subprocess.run(['git', '-C', str(given), 'rev-parse', '--path-format=absolute', '--show-toplevel',
+                                '--git-common-dir'], shell=False, capture_output=True, text=True,
+                               timeout=GIT_TIMEOUT, env=_environment(GIT_TERMINAL_PROMPT='0'))
+        lines = found.stdout.splitlines()
+        if found.returncode != 0 or len(lines) != 2 or Path(lines[0]).resolve() != given.resolve():
+            return given
+    except (OSError, subprocess.SubprocessError):
+        return given
+    return Path(lines[1][:-len('/.git')]) if lines[1].endswith('/.git') else given
+
+
+def handoff_reader(office_root):
+    """The partner's handoff packages (`evidence/nasta-uppdrag/local/partner-OVL-*`), read without following links.
+
+    Per package only OVERLAMNING.json (id, the partner's title, receiver, when it was left), the receipts in
+    KVITTENS.jsonl (latest status and its time) and the start log START.jsonl (latest state, its time and its fixed
+    code) are opened. The work order, the owner's words and the underlying material are never opened.
+    """
+    office = Path(office_root)
+    if not office.is_dir():
+        _fail()
+    root = office / 'evidence' / 'nasta-uppdrag' / 'local'
+    try:
+        names = sorted(os.listdir(str(root)))
+    except FileNotFoundError:
+        return {'items': [], 'unreadable': 0}
+    items, unreadable = [], 0
+    for name in names:
+        identity = name[len('partner-'):]
+        if not name.startswith('partner-') or HANDOFF_ID.fullmatch(identity) is None:
+            continue
+        place = root / name
+        if not stat.S_ISDIR(os.lstat(str(place)).st_mode):
+            continue
+        if len(items) >= HANDOFF_LIMIT:
+            unreadable += 1
+            continue
+        try:
+            package = json.loads(_read_file(place / 'OVERLAMNING.json')[:HANDOFF_BYTES].decode('utf-8'))
+            if type(package) is not dict or package.get('id') != identity:
+                _fail()
+            receipts = [line for line in _json_lines(place / 'KVITTENS.jsonl')
+                        if line.get('status') in HANDOFF_STATUSES[1:]]
+            starts = [line for line in _json_lines(place / 'START.jsonl') if line.get('typ') in START_STATES]
+        except FAILURES:
+            unreadable += 1
+            continue
+        latest = receipts[-1] if receipts else None
+        start = starts[-1] if starts else None
+        items.append({'id': identity, 'title': str(package.get('rubrik') or '')[:TITLE_LIMIT],
+                      'receiver': str(package.get('mottagare') or ''),
+                      'status': latest['status'] if latest else 'lamnad',
+                      'left_at': _utc(package.get('lamnad')),
+                      'receipt_at': _utc(latest.get('kvitterad')) if latest else None,
+                      'start': None if start is None else {
+                          'state': start['typ'],
+                          'code': start.get('kod') if start.get('kod') in START_CODES else None,
+                          'at': _utc(start.get('tid'))}})
+    return {'items': items, 'unreadable': unreadable}
+
+
 def collect(runtime_root, office_root, runtime_probe=None, watch_reader=None, office_reader=None,
-            task_reader=None):
+            task_reader=None, handoff_reader=None):
     """Bounded read-only collection. A failing reader makes only its own source unavailable."""
     probe_reader = runtime_probe or globals()['runtime_probe']
     watch = watch_reader or globals()['watch_reader']
     office = office_reader or globals()['office_reader']
     tasks = task_reader or globals()['task_reader']
+    handoffs = handoff_reader or globals()['handoff_reader']
     started = _now()
     sources = {name: {'status': 'unavailable', 'read_at': started, 'value': None} for name in SOURCES}
 
@@ -923,7 +1137,14 @@ def collect(runtime_root, office_root, runtime_probe=None, watch_reader=None, of
     except Exception:
         sources['office'].update(status='unavailable', value=None)
 
-    return {'schema': SCHEMA, 'provdata': False, 'read_started_at': started, 'sources': sources}
+    handoff = {'status': 'unavailable', 'read_at': _now(), 'value': None}
+    try:
+        handoff.update(status='ok', value=_handoffs_value(handoffs(_primary_office(office_root))))
+    except Exception:
+        handoff.update(status='unavailable', value=None)
+
+    return {'schema': SCHEMA, 'provdata': False, 'read_started_at': started, 'sources': sources,
+            'overlamningar': handoff}
 
 
 # --- command ----------------------------------------------------------------------

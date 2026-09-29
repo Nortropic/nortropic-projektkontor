@@ -291,6 +291,13 @@ class Lager:
                 db.execute('insert or ignore into overlamning values(?,?,?,?,?,?,?,?)',
                            (ev['overlamning'], trad, ev.get('inspel'), 'lamnad', json.dumps(ev, ensure_ascii=False),
                             ev['tid'], ev['tid'], ev.get('nyckel')))
+            elif typ == 'overlamning_start':
+                rad = db.execute('select data from overlamning where id=?', (ev['overlamning'],)).fetchone()
+                data = json.loads(rad[0]) if rad else {}
+                data['start'] = ev.get('start') or {}
+                data.setdefault('starthistorik', []).append(data['start'])
+                db.execute('update overlamning set data=? where id=?',
+                           (json.dumps(data, ensure_ascii=False), ev['overlamning']))
             elif typ == 'overlamning_status':
                 rad = db.execute('select data from overlamning where id=?', (ev['overlamning'],)).fetchone()
                 data = json.loads(rad[0]) if rad else {}

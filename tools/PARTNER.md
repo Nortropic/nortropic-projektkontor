@@ -2,8 +2,9 @@
 
 Johnny lämnar en tanke, skärmklipp, filer, en länk eller ett repo — utan analysprompt — och får ett
 systemkunnigt, källbundet resonemang. Partnern fortsätter tidigare trådar, minns rättelser och beslut mellan
-sessioner och bereder ett uppdrag till kontoret först när Johnny tydligt beställer genomförande. Uppdraget och
-gränserna står i beslutet FORBATTRINGSPARTNER-20260928; planen äger nästa handling.
+sessioner och bereder ett uppdrag till kontoret först när Johnny tydligt beställer genomförande. En lämnad
+överlämning startar mottagarens session av sig själv (startvakten, se Överlämning). Uppdraget och gränserna står i
+besluten FORBATTRINGSPARTNER-20260928 och FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929; planen äger nästa handling.
 
 ## Använda
 
@@ -25,7 +26,11 @@ nästa svar i alla trådar; en pågående körning påverkas inte, och kommandon
 visar vilken modell och ansträngning det kördes med.
 
 I rutan: skriv, klistra in bilder (⌘V), släpp flera filer eller bifoga med "+". Enter skickar, Skift+Enter ger ny
-rad. Växeln "Bara spara" (eller att skriva "bara spara") sparar utan analys. Medan partnern arbetar kan ett nytt inspel skickas efter svaret eller "Skicka och avbryt
+rad. Varje kodblock i ett svar har en knapp "Kopiera" som kopierar blockets text exakt (utan språkmarkör), och under
+varje svar kopierar en knapp hela svaret som markdown, ordagrant. Knapparna nås med Tab och fungerar med Enter och
+mellanslag; ett kort "Kopierat" bekräftar. Går urklippet inte att använda prövas den äldre kopieringen ur en dold
+ruta med samma text; går inte heller den markeras texten synligt (för hela svaret dess markdown-källa i en
+skrivskyddad ruta) och ytan säger att den ska kopieras med ⌘C. Växeln "Bara spara" (eller att skriva "bara spara") sparar utan analys. Medan partnern arbetar kan ett nytt inspel skickas efter svaret eller "Skicka och avbryt
 pågående" (en sen rättelse). Sökfältet hittar tidigare resonemang och underlag utan modellanrop. "Bestående
 förståelse" visar vad som sparats, vad som ersatts och av vad. "Tjänst och källor" visar kod, modell, förbrukning
 och källtäckning.
@@ -58,7 +63,8 @@ ska bära framåt och håller trådens läge aktuellt.
 | Agentloop: Claude Code headless (`claude -p`, dvs. Agent SDK via CLI) i begränsat läge | `partnern/agent.py` | Se modell och drift nedan |
 | Webbkrok och destinationspolicy | `partnern/krok.py`, `partnern/webbpolicy.py` | Servern avgör varje webbanrop |
 | Bakgrundsutredningar | `partnern/jobb.py` | Journalförda, återupptas efter omstart |
-| Överlämning till kontoret | `partnern/overlamning.py` | Paket i `evidence/nasta-uppdrag/local/partner-OVL-…/` med AP-06-utkast |
+| Överlämning till kontoret | `partnern/overlamning.py` | Paket i `evidence/nasta-uppdrag/local/partner-OVL-…/` med AP-06-utkast, ett per mottagare |
+| Startvakt | `partnern/start.py` | Startar mottagarens session för en lämnad överlämning; väntar synligt när skrivplatsen är upptagen eller kvoten slut |
 | Server och samtalsyta | `partnern/server.py`, `partnern/ui/` | 127.0.0.1, inloggning, svenska |
 
 ## Modell, drift och gränser
@@ -105,10 +111,12 @@ Källor är material, aldrig instruktioner. Deterministiska spärrar:
   avgränsning ("beställ båda men det är till riktiga kunder, inte fiktiva test byggen"). Är något beställningsord i
   citatet negerat nekas hela citatet. "ja", "precis" och "låter bra" blir aldrig ett uppdrag, och samma inspel ger
   aldrig två överlämningar. Nekas ett citat säger felbeskedet vilken regel som fällde (för kort, saknar
-  beställningsord, negation, fråga, för gammal, inte funnen, eller öppen överlämning), och paketets
-  `AGARENS-ORD.md` innehåller alla citerade inspel ordagrant. Medan en överlämning i tråden är öppen (lämnad, mottagen, startad) skapas ingen ny till samma
-  mottagare, om inte partnern uttryckligen anger att Johnny beställt något annat; det nya paketet pekar då ut
-  vilket det skiljer sig från.
+  beställningsord, negation, fråga, för gammal eller inte funnen), och paketets `AGARENS-ORD.md` innehåller alla
+  citerade inspel ordagrant. Samma beställning kan ge en överlämning per mottagare (kontoret, Digitala, Runtime,
+  Kundstart) men aldrig två till samma mottagare. Medan en överlämning i tråden är öppen (lämnad, mottagen,
+  startad) skapas ingen ny till samma mottagare, om inte partnern uttryckligen anger att Johnny beställt något
+  annat; det nya paketet pekar då ut vilket det skiljer sig från. Fäller en av de två spärrarna säger svaret vilken
+  spärr och vilken befintlig överlämning.
 - WebFetch går bara till publika värdar som Johnny länkat i tråden, som finns bland träffarna från en webbsökning
   under samma körning, eller som står i en kort lista över exakta dokumentationsvärdar där ingen utomstående kan
   publicera innehåll eller läsa loggar (de hämtas utan frågedel). Länkar i bilagor, hämtade sidor och andra
@@ -147,19 +155,77 @@ start (`ingang.py`) och efter varje publicering. Repo-verktygen läser den senas
 
 ## Överlämning
 
-När Johnny tydligt beställer genomförande skriver partnern ett paket i kontorets beställningsväg:
-`ARBETSORDER.md` (sammanställd, märkt som sådan), `AGARENS-ORD.md` (hela inspelet ordagrant), hashade
+När Johnny tydligt beställer genomförande skriver partnern ett paket per mottagare i kontorets beställningsväg:
+`ARBETSORDER.md` (sammanställd, märkt som sådan), `AGARENS-ORD.md` (de citerade inspelen ordagrant), hashade
 underlagsfiler, `OVERLAMNING.json` och ett AP-06-utkast (`ap06/utkast/`) med sina luckor. Status "lämnad";
 aktuell status är sista raden i paketets `KVITTENS.jsonl`, och `overlamningar` visar den även när tjänsten inte
 kör. AP-06-utkastets behörighet bygger på det ordbaserade citatet; mottagaren läser `AGARENS-ORD.md`.
-Mottagaren kvitterar:
+
+Id:t är `OVL-<datum>-<inspel>`; en andra mottagare ur samma inspel får mottagarens kortnamn som tillägg
+(`OVL-…-runtime`), och står en katalog redan på ett id (till exempel en rest efter ett avbrott) tas nästa lediga id
+med löpnummer. Ett befintligt paket byter aldrig namn, flyttas aldrig och skrivs aldrig över.
+
+**Startvakten** (`partnern/start.py`) gör att en lämnad överlämning startar arbetet av sig själv. Varje minut, och
+direkt när tjänsten startar, går den igenom öppna överlämningar. För en lämnad överlämning som ingen har kvitterat
+startar den en session i mottagarens repo: kontorets primärutcheckning för kontorets kedjedrivare,
+annars `nortropic-digitala`, `Nortropic Runtime` eller `nortropic-kundstart`. Sessionen får en fast instruktion.
+Den börjar utan skrivningar och kontrollerar Git, planen och sina grannar (ListAgents). Den kvitterar `mottagen`,
+läser planen, `AGARENS-ORD.md` och `ARBETSORDER.md`, kvitterar `startad` och arbetar inom gällande mandat och plan med
+separat granskning och skyddad integration. Den avslutar med `levererad` eller `avslagen`. Nya kostnader, konton,
+aktivering av övergångar och publika lanseringar skriver den i planens ÄGARENS TUR i stället för att göra dem.
+Paketet bär instruktionens material, men bara Johnnys ord är beslut.
+
+- **En session per överlämning.** För Claude härleds sessionens id ur överlämningens id; för Codex binder trådens id
+  i paketets första ström. Startbeslutet tas under ett fillås i paketet, och en levande session startas aldrig om,
+  inte heller efter en omstart av tjänsten: den känns igen på sin process, vars kommandorad bär paketets sökväg. En session som
+  stoppades av kvot, åtkomst eller ett avbrott (till exempel en omstart av datorn) fortsätter i samma session. Efter
+  ett fel eller ett avslut startas ingen ny session.
+- **En skrivande session per ansvar.** Starten väntar, med skälet synligt, så länge någon annan skriver i
+  mottagarens repo. Det gäller en Claude Code- eller Codex-process med arbetskatalog i repot, ändringar i
+  primärutcheckningen, en worktree med ändringar från de senaste 30 minuterna och startvaktens egen session för
+  en annan överlämning i samma repo. Också en fortsättning väntar på en annan skrivare; där räknas inte
+  worktree-regeln, eftersom sessionens egna worktrees inte är en annan skrivare. Vakten tar aldrig över och startar
+  aldrig bredvid.
+- **Utföraren väljs som i dag:** i Runtimes bemanning, rollen `driver`, så som Johnny valt den i Runtimes modellval
+  (D028–D030). Bemanningen läses genom Aquariums befintliga sond. Claude Code körs med Runtimes fastlåsta
+  `.runtime/bin/claude-2.1.257` i behörighetsläget `auto`; i dag anger bemanningen Claude med modellen
+  `claude-opus-5`. Codex körs med den fastlåsta `.runtime/bin/codex-0.155.1` (`exec --json --approve-for-me`, och
+  `exec resume <tråd>` för att fortsätta). Båda får bemanningens modell och ansträngningen `high`, och binärens
+  kontrollsumma prövas mot den som Runtime själv binder före varje start. De kör på Johnnys abonnemang (Claude
+  Code-inloggningen respektive Codex ChatGPT-inloggning) i en miljö som byggs från grunden utan API-nycklar. Det finns
+  ingen reservväg. Går bemanningen inte att läsa väntar starten synligt. Saknas kvot eller åtkomst väntar den också
+  synligt och fortsätter samma session, med samma utförare och modell, tidigast en timme senare. Ett senare byte i
+  bemanningen gäller bara nya överlämningar.
+- **Tak:** högst sex nya automatiska starter per dygn (UTC, `gransar.startvakt_per_dygn` i
+  `data/installningar.json`). En fortsättning av samma session räknas inte. Startvakten stängs av med
+  `{"startvakt": {"pa": false}}` i samma fil, och ansträngningen kan ändras där (`{"startvakt": {"anstrangning": "…"}}`).
+- **Sover datorn eller kör inte tjänsten** sker starten när tjänsten kör igen; ingen överlämning hoppas över.
+- Startvakten kör bara i den ordinarie tjänsten, aldrig i en prov- eller utvecklingsinstans (egen `PARTNER_DATA`,
+  `PARTNER_PORT` eller `PARTNER_PROV_DOLJ`), och den startar ingenting annat än mottagarsessioner.
+
+Varje steg står i paketets `START.jsonl` (bara tillägg: `vantar`, `hindrad`, `startad`, `avbruten`, `klar`,
+`avslutad`, `misslyckad`, med skäl och en fast orsakskod) och i partnerns journal. Sessionens ström ligger i
+paketets `session/`; för Codex binder trådens id i den första strömmen sessionen till överlämningen. Tråden och "Överlämningar" visar mottagaren, statusen och vilken session som startade och när,
+eller vad starten väntar på. Aquarium visar en rad per öppen överlämning, lägger levererade och avslagna i Arkivet och
+ett misslyckat eller hindrat startförsök på Ägarens bord (se `tools/AQUARIUM.md`).
+
+Mottagaren kvitterar (startvaktens sessioner gör det själva):
 
 ```sh
-python3 -B tools/partner.py overlamningar
+python3 -B tools/partner.py overlamningar     # mottagare, status, senaste kvittens, session och startvaktens läge
 python3 -B tools/partner.py kvittera OVL-… mottagen --av "<session>"
 python3 -B tools/partner.py kvittera OVL-… levererad --av "<session>" --bevis "<PR eller commit>"
 python3 -B tools/partner.py kvittera OVL-… avslagen --av "<session>" --bevis "<skäl>"
 ```
+
+**Kända gränser för startvakten.** Den ser andra sessioner genom deras processer, Git och worktrees. En session vars
+arbetskatalog ligger ovanför repot, till exempel en VS Code-session som öppnats i `~/nortropic-repos`, syns bara
+genom sina ändringar. Därför kontrollerar mottagarsessionen också sina grannar själv. Går `lsof` inte att köra
+återstår bara kontrollerna med Git. Codex har inte ListAgents; en Codex-session kontrollerar Git och worktrees.
+Codex-vägen är prövad med en fejkad `codex` och mot den fastlåsta binärens händelseformat, men ingen verklig
+Codex-session har startats av startvakten så länge bemanningen anger Claude. En session som avslutas utan leverans
+lämnar överlämningen öppen med planen som återupptagningspunkt; startvakten startar ingen ny, utan nästa steg tas av
+Johnny eller en session han startar.
 
 En provinstans (egen `PARTNER_DATA`, `PARTNER_PORT` och `PARTNER_HEMLIGHETER` samt `PARTNER_PROV_DOLJ`) skriver sina
 paket i sin egen data (`overlamningar/`), inte i beställningsvägen: den vanliga tjänsten indexerar `AGARENS-ORD.md`
@@ -175,5 +241,14 @@ rättelse, bara spara med avbrott, ordnat stopp och krasch mitt i arbetet (tur o
 sparade inspel, verktygsgränser (stegtak per körningstyp), ägarens-ord-spärren och rättelsens företräde, lägets
 uppdelning i Johnnys ord och partnerns egna bedömningar, mellanrader utanför svaret, samtalets alla bilagor och
 läst andel vid öppning, ÄGARENS TUR läst som Aquarium, överlämning utan dubbletter (samma inspel och öppen
-överlämning) och med kvittens, webbkroken med sökträffar och planterade länkar, bakgrundsutredning, provläge och
-dygnsgräns.
+överlämning) och med kvittens, en överlämning per mottagare ur samma meddelande med egna id utan att ett befintligt
+paket flyttas, webbkroken med sökträffar och planterade länkar, bakgrundsutredning, provläge och dygnsgräns.
+Startvakten prövas med en fejkad mottagarsession som kör det riktiga kvitteringskommandot ur sin instruktion: exakt
+en session per överlämning (även efter en omstart av tjänsten), väntan när skrivplatsen är upptagen och sedan start,
+egen session i samma repo och dygnstaket, kvot och saknad inloggning med synlig väntan och samma session, Codex ur
+bemanningen med kvot och fortsättning i samma tråd utan byte när bemanningen ändras, en levande Codex-session som
+känns igen efter en omstart av vakten, ett kvotbesked utan avslutat varv, en fortsättning som väntar på en annan
+skrivare, oläst bemanning utan reservväg,
+fel och avbrott utan en andra session, ändrad binär, att prov- och utvecklingsinstanser aldrig startar något och att
+processer, färska worktrees och raderade arbetskataloger bedöms rätt. Kopieringen prövas i en riktig webbläsare
+(se beslutet).

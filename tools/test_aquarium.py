@@ -771,6 +771,194 @@ class Collect(unittest.TestCase):
         self.assertEqual(damaged['sources']['watch']['status'], 'unavailable')
 
 
+def handoff(identity='OVL-20260929-abc123', status='lamnad', receipt_at=None, start=None,
+            receiver='kontorets-kedjedrivare', title='Underhållsform för riktiga kunder'):
+    return {'id': identity, 'title': title, 'receiver': receiver, 'status': status,
+            'left_at': '2026-09-29T08:09:16.106+00:00', 'receipt_at': receipt_at, 'start': start}
+
+
+def with_handoffs(items=(), status='ok', unreadable=0, **overrides):
+    result = readings(**overrides)
+    result['overlamningar'] = {'status': status, 'read_at': READ_AT,
+                               'value': {'items': list(items), 'unreadable': unreadable}
+                               if status == 'ok' else None}
+    return result
+
+
+class Handoffs(unittest.TestCase):
+    """The partner's handoffs: open ones as calm rows, closed ones in the archive, failed starts on the table."""
+
+    def test_open_closed_and_failed_handoffs_each_have_their_place(self):
+        items = [
+            handoff('OVL-20260929-aaaaaa'),
+            handoff('OVL-20260929-bbbbbb', 'startad', '2026-09-29T09:30:00+00:00',
+                    {'state': 'startad', 'code': None, 'at': '2026-09-29T09:00:00+00:00'}, receiver='runtime'),
+            handoff('OVL-20260929-cccccc-kontoret', 'lamnad', None,
+                    {'state': 'vantar', 'code': 'upptaget', 'at': '2026-09-29T09:05:00+00:00'}),
+            handoff('OVL-20260928-dddddd', 'levererad', '2026-09-28T15:00:00+00:00', receiver='digitala',
+                    title='Levererat arbete'),
+            handoff('OVL-20260927-eeeeee', 'avslagen', '2026-09-27T10:00:00+00:00', title='Avslaget arbete'),
+            handoff('OVL-20260929-ffffff', 'lamnad', None,
+                    {'state': 'misslyckad', 'code': 'fel', 'at': '2026-09-29T10:00:00+00:00'}),
+            handoff('OVL-20260929-gggggg', 'lamnad', None,
+                    {'state': 'hindrad', 'code': 'binar', 'at': '2026-09-29T10:01:00+00:00'}, receiver='kundstart'),
+        ]
+        office = values()['office']
+        office['entries'] = [entry('AP18-LEVERANS-20260917', 'AP18 levererad')]
+        result = aquarium.project(with_handoffs(items, office=office), NOW)
+        rows = result['overlamningar']
+        self.assertEqual((rows['title'], rows['status'], rows['stale_after_seconds']),
+                         ('Kontoret · överlämningar', 'ok', 300))
+        self.assertEqual([item['id'] for item in rows['items']],
+                         ['OVL-20260929-aaaaaa', 'OVL-20260929-bbbbbb', 'OVL-20260929-cccccc-kontoret',
+                          'OVL-20260929-ffffff', 'OVL-20260929-gggggg'])
+        first, started, waiting = rows['items'][:3]
+        self.assertEqual(first, {'id': 'OVL-20260929-aaaaaa', 'title': 'Underhållsform för riktiga kunder',
+                                 'receiver': 'kontoret', 'status': 'lämnad',
+                                 'since': '2026-09-29T08:09:16.106+00:00', 'since_basis': 'lämnad',
+                                 'session': None})
+        self.assertEqual((started['status'], started['receiver'], started['since'], started['since_basis'],
+                          started['session']),
+                         ('startad', 'Runtime', '2026-09-29T09:30:00+00:00', 'kvittens', 'mottagarsession startad'))
+        self.assertEqual(waiting['session'], 'start väntar: en annan session skriver där')
+        # delivered and declined are in the archive, dated by their receipt, newest first
+        self.assertEqual([(item['key'], item['date'], item['basis']) for item in result['arkivet']['items']],
+                         [('OVL-20260928-dddddd', '2026-09-28', 'överlämningens kvittens levererad'),
+                          ('OVL-20260927-eeeeee', '2026-09-27', 'överlämningens kvittens avslagen'),
+                          ('AP18', '2026-09-17', 'beslutsloggen AP18-LEVERANS-20260917')])
+        self.assertEqual(result['arkivet']['items'][0]['title'], 'Levererat arbete · till Digitala')
+        # a start that failed or cannot happen waits for the owner, with its fixed reason
+        table = [item for item in result['agarens_bord']['items'] if item['basis'] == 'överlämningens startlogg']
+        self.assertEqual([(item['kind'], item['text'], item['since']) for item in table], [
+            ('operatörshandling', 'Överlämningen OVL-20260929-ffffff till kontoret startade inte: '
+                                  'mottagarsessionen slutade med fel', '2026-09-29T10:00:00+00:00'),
+            ('operatörshandling', 'Överlämningen OVL-20260929-gggggg till Kundstart startade inte: '
+                                  'den fastlåsta utförarbinären saknas eller har ändrats',
+             '2026-09-29T10:01:00+00:00')])
+        self.assertEqual(result['headline']['behover_dig'], 2)
+        self.assertIs(result['headline']['lugnt'], False)
+
+    def test_a_reading_without_handoffs_is_whole_and_an_empty_one_is_calm(self):
+        without = aquarium.project(readings(), NOW)
+        self.assertNotIn('overlamningar', without)
+        empty = aquarium.project(with_handoffs(), NOW)
+        self.assertEqual(set(empty) - set(without), {'overlamningar'})
+        self.assertEqual(empty['overlamningar']['items'], [])
+        self.assertIs(empty['headline']['lugnt'], True)
+        self.assertEqual(empty['arkivet'], without['arkivet'])
+
+    def test_unread_handoffs_are_unknown_never_none(self):
+        result = aquarium.project(with_handoffs(status='unavailable'), NOW)
+        self.assertEqual(result['overlamningar']['status'], 'otillgänglig')
+        self.assertEqual(result['overlamningar']['items'], [])
+        self.assertEqual(result['agarens_bord']['status'], 'otillgänglig')   # a failed start could be missed
+        self.assertIsNone(result['headline']['behover_dig'])
+        self.assertIs(result['headline']['lugnt'], False)
+
+    def test_values_are_checked_and_nothing_else_is_copied(self):
+        for broken in (handoff(identity='OVL-1'), handoff(status='klar'),
+                       handoff(start={'state': 'startad', 'code': 'hemlig', 'at': None}),
+                       handoff(start={'state': 'kör', 'code': None, 'at': None}),
+                       dict(handoff(), receipt_at='2026-09-29T10:00:00')):
+            with self.assertRaises(ValueError):
+                aquarium.project(with_handoffs([broken]), NOW)
+        extra = dict(handoff(), agarcitat='Genomför det hemliga', arbetsorder='Mål: hemligt',
+                     start={'state': 'vantar', 'code': 'kvot', 'at': None, 'skal': '/Users/agaren/privat'})
+        document = json.dumps(aquarium.project(with_handoffs([extra]), NOW), ensure_ascii=False)
+        for forbidden in ('hemliga', 'hemligt', '/Users/', 'agarcitat', 'arbetsorder', 'skal'):
+            self.assertNotIn(forbidden, document)
+        self.assertIn('start väntar: kvot eller åtkomst saknas', document)
+
+    def test_collect_reads_the_handoffs_through_their_own_reader(self):
+        def reader(root):
+            return {'items': [handoff()], 'unreadable': 0}
+
+        def broken(root):
+            raise OSError('/Users/agaren/privat')
+
+        arguments = {'runtime_probe': Collect.probe(self), 'watch_reader': Collect.watch(self),
+                     'office_reader': Collect.office(self), 'task_reader': lambda root, ids: {'items': []}}
+        result = aquarium.collect('/finns/inte/runtime', '/finns/inte/kontor', handoff_reader=reader, **arguments)
+        self.assertEqual(result['overlamningar']['status'], 'ok')
+        aquarium._aware(result['overlamningar']['read_at'])
+        self.assertEqual(aquarium.project(result, NOW)['overlamningar']['items'][0]['id'], 'OVL-20260929-abc123')
+        failed = aquarium.collect('/finns/inte/runtime', '/finns/inte/kontor', handoff_reader=broken, **arguments)
+        self.assertEqual(failed['overlamningar'], {'status': 'unavailable', 'read_at': failed['overlamningar']['read_at'],
+                                                   'value': None})
+        self.assertEqual(failed['sources']['office']['status'], 'ok')          # only its own part
+
+
+class HandoffReader(unittest.TestCase):
+    """The default reader on its own temporary office under the existing `.scratch` (no git repository)."""
+
+    def setUp(self):
+        self.assertTrue(SCRATCH.is_dir(), 'the repository keeps an existing .scratch')
+        self.temporary = tempfile.TemporaryDirectory(dir=str(SCRATCH))
+        self.addCleanup(self.temporary.cleanup)
+        self.office = Path(self.temporary.name) / 'kontor'
+        self.root = self.office / 'evidence' / 'nasta-uppdrag' / 'local'
+        self.root.mkdir(parents=True)
+
+    def package(self, identity, receipts=(), starts=(), package=None):
+        place = self.root / ('partner-' + identity)
+        place.mkdir()
+        body = {'id': identity, 'rubrik': 'En rubrik', 'mottagare': 'runtime', 'lamnad': '2026-09-29T08:09:16.106Z',
+                'agarcitat': 'HEMLIGA ÄGARORD', 'status_not': 'x'}
+        body.update(package or {})
+        (place / 'OVERLAMNING.json').write_text(json.dumps(body, ensure_ascii=False), 'utf-8')
+        (place / 'KVITTENS.jsonl').write_text(''.join(json.dumps(r) + '\n' for r in receipts), 'utf-8')
+        if starts:
+            (place / 'START.jsonl').write_text(''.join(json.dumps(r, ensure_ascii=False) + '\n' for r in starts), 'utf-8')
+        (place / 'ARBETSORDER.md').write_text('# HEMLIG ARBETSORDER', 'utf-8')
+        (place / 'AGARENS-ORD.md').write_text('HEMLIGA ÄGARORD', 'utf-8')
+        return place
+
+    def test_only_titles_receivers_times_and_codes_are_read(self):
+        self.package('OVL-20260929-abc123',
+                     receipts=[{'status': 'mottagen', 'av': 'autostart', 'kvitterad': '2026-09-29T09:00:00.000Z'},
+                               'trasig rad',
+                               {'status': 'startad', 'av': 'autostart', 'kvitterad': '2026-09-29T09:10:00.000Z'}],
+                     starts=[{'tid': '2026-09-29T08:59:00.000Z', 'typ': 'startad', 'session': 'x', 'pid': 1},
+                             {'tid': '2026-09-29T09:20:00.000Z', 'typ': 'vantar', 'kod': 'kvot',
+                              'skal': 'kvot saknas (/Users/agaren/privat)'}])
+        self.package('OVL-20260929-def456-runtime')
+        (self.root / 'partner-OVL-inte-ett-id').mkdir()
+        (self.root / 'annat-uppdrag').mkdir()
+        result = aquarium.handoff_reader(str(self.office))
+        self.assertEqual(result['unreadable'], 0)
+        self.assertEqual([item['id'] for item in result['items']],
+                         ['OVL-20260929-abc123', 'OVL-20260929-def456-runtime'])
+        first = result['items'][0]
+        self.assertEqual(first, {'id': 'OVL-20260929-abc123', 'title': 'En rubrik', 'receiver': 'runtime',
+                                 'status': 'startad', 'left_at': '2026-09-29T08:09:16.106+00:00',
+                                 'receipt_at': '2026-09-29T09:10:00.000+00:00',
+                                 'start': {'state': 'vantar', 'code': 'kvot', 'at': '2026-09-29T09:20:00.000+00:00'}})
+        self.assertEqual((result['items'][1]['status'], result['items'][1]['start']), ('lamnad', None))
+        document = json.dumps(result, ensure_ascii=False)
+        for forbidden in ('HEMLIG', '/Users/', 'autostart'):
+            self.assertNotIn(forbidden, document)
+        projection = aquarium.project(dict(readings(), overlamningar={'status': 'ok', 'read_at': READ_AT,
+                                                                     'value': result}), NOW)
+        self.assertEqual(projection['overlamningar']['items'][0]['session'],
+                         'start väntar: kvot eller åtkomst saknas')
+
+    def test_links_foreign_ids_and_a_broken_package_are_not_followed_or_trusted(self):
+        elsewhere = self.package('OVL-20260929-aaaaaa')
+        os.rename(str(elsewhere), str(self.office / 'utanfor'))
+        os.symlink(str(self.office / 'utanfor'), str(self.root / 'partner-OVL-20260929-aaaaaa'))
+        self.package('OVL-20260929-bbbbbb', package={'id': 'OVL-20260929-cccccc'})   # the id must match its place
+        broken = self.package('OVL-20260929-dddddd')
+        (broken / 'OVERLAMNING.json').write_text('{inte json', 'utf-8')
+        result = aquarium.handoff_reader(str(self.office))
+        self.assertEqual(result, {'items': [], 'unreadable': 2})
+
+    def test_no_order_path_is_no_handoffs_and_no_office_is_unreadable(self):
+        self.root.rmdir()
+        self.assertEqual(aquarium.handoff_reader(str(self.office)), {'items': [], 'unreadable': 0})
+        with self.assertRaises(ValueError):
+            aquarium.handoff_reader(str(self.office / 'finns-inte'))
+
+
 class TaskReader(unittest.TestCase):
     """The default reader, on its own temporary runtime root under the existing `.scratch`."""
 

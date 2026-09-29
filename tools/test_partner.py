@@ -1069,6 +1069,37 @@ class VerktygProv(Miljo):
         self.assertEqual(self.S.overlamning.las_kvittenser(), 0)
         self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'mottagen')
 
+    def test_ett_inspel_ger_en_overlamning_per_mottagare_och_flyttar_aldrig_ett_paket(self):
+        self.logga_in()
+        text = 'Genomför båda: underhållsformen till kedjedrivaren och veckokörningen till Runtime.'
+        trad = self.skicka(text)['inspel']['trad']
+        self.svar(trad, 1)
+        bas = {'mal': 'Mål', 'agarcitat': text, 'nasta_handling': 'Bered'}
+        # en kvarlämnad katalog med det id som den första överlämningen skulle få: får aldrig flyttas eller skrivas över
+        inspel = self.S.lager.en('select id from inspel where trad=?', (trad,))['id']
+        from datetime import datetime, timezone
+        kvar = self.S.overlamning.katalog('OVL-%s-%s' % (datetime.now(timezone.utc).strftime('%Y%m%d'), inspel[-6:]))
+        kvar.mkdir(parents=True)
+        (kvar / 'KVAR.txt').write_text('rest', 'utf-8')
+        self.manus('RING bered_uppdrag ' + json.dumps(dict(bas, rubrik='Underhållsform', mottagare='kontorets-kedjedrivare')),
+                   'RING bered_uppdrag ' + json.dumps(dict(bas, rubrik='Veckokörning', mottagare='runtime')),
+                   'RING bered_uppdrag ' + json.dumps(dict(bas, rubrik='Underhållsform igen', mottagare='kontorets-kedjedrivare')))
+        self.skicka('Kör.', trad=trad)
+        s = self.svar(trad, 2)
+        self.assertEqual(s.count('LÄMNAD'), 2)
+        self.assertIn('Spärren "samma beställning till samma mottagare" fällde', s)
+        rader = self.S.lager.fraga('select id, data from overlamning order by tid')
+        ids = [r['id'] for r in rader]
+        self.assertEqual(len(set(ids)), 2)
+        self.assertEqual(sorted(json.loads(r['data'])['mottagare'] for r in rader), ['kontorets-kedjedrivare', 'runtime'])
+        self.assertTrue((kvar / 'KVAR.txt').exists())                     # den kvarlämnade katalogen står orörd
+        self.assertNotIn(kvar.name[len('partner-'):], ids)
+        from partnern.overlamning import OVL_ID, kvittera
+        self.assertTrue(all(OVL_ID.match(i) for i in ids))
+        for i in ids:
+            kvittera(self.k.kontor_primar, i, 'mottagen', 'provsession')
+        self.assertEqual(self.S.overlamning.las_kvittenser(), 2)
+
     def test_provinstansens_paket_hamnar_i_egen_data(self):
         self.logga_in()
         self.S.k.prov_dolj = ('imp:CONV-002',)   # som en provinstans: provtext i Johnnys namn stannar i provdatan
@@ -1162,6 +1193,486 @@ class GransProv(Miljo):
         vy = self.vanta(trad, lambda v: self.turer(v, 'begransad'))
         self.assertIn('gräns', self.turer(vy, 'begransad')[0]['svar'])
         self.assertEqual(len(self.fejkanrop()), 1)
+
+
+MOTTAGARE = r"""#!/usr/bin/env python3
+import json, os, re, subprocess, sys, time
+from pathlib import Path
+args = sys.argv[1:]
+def val(f):
+    return args[args.index(f) + 1] if f in args else None
+prompt = sys.stdin.read()
+sid = val('--session-id') or val('--resume')
+sf = Path(os.environ['HOME']) / '.claude' / 'projects' / re.sub(r'[^A-Za-z0-9]', '-', os.getcwd()) / (sid + '.jsonl')
+logg = Path(__file__).with_name('mottagarlogg.jsonl')
+def skriv(o):
+    with open(logg, 'a') as f:
+        f.write(json.dumps(o, ensure_ascii=False) + '\n')
+skriv({'argv': args, 'cwd': os.getcwd(), 'prompt': prompt, 'env': sorted(os.environ), 'pid': os.getpid()})
+def ut(o):
+    sys.stdout.write(json.dumps(o) + '\n'); sys.stdout.flush()
+if '--resume' in args and not sf.exists():
+    sys.stderr.write('No conversation found with session ID: %s\n' % sid); sys.exit(1)
+sf.parent.mkdir(parents=True, exist_ok=True)
+with open(sf, 'a') as f:
+    f.write(json.dumps({'prompt': prompt[:100]}) + '\n')
+ut({'type': 'system', 'subtype': 'init', 'session_id': sid, 'model': val('--model')})
+def ta_manus():  # först repots egna manus, sedan de gemensamma; en fil tas med ett atomärt namnbyte
+    bas = Path(__file__).with_name('mottagarmanus')
+    for katalog in (bas / Path(os.getcwd()).name, bas):
+        for f in (sorted(katalog.glob('*.txt')) if katalog.is_dir() else []):
+            tagen = f.with_suffix('.tagen')
+            try:
+                os.rename(f, tagen)
+            except OSError:
+                continue
+            return tagen.read_text().strip()
+    return 'LEVERERA'
+steg = ta_manus()
+m = re.search(r'("[^"]+" -B "[^"]+" kvittera \S+) mottagen --av "([^"]+)"', prompt)
+def kvittera(status, *extra):
+    r = subprocess.run('%s %s --av "%s" %s' % (m.group(1), status, m.group(2), ' '.join(extra)), shell=True,
+                       capture_output=True, text=True)
+    skriv({'kvittera': status, 'kod': r.returncode, 'ut': r.stdout[-300:], 'fel': r.stderr[-300:]})
+for d in steg.split():
+    if d.startswith('SOV'):
+        time.sleep(float(d[3:]))
+    elif d == 'MOTTAGEN':
+        kvittera('mottagen')
+    elif d == 'STARTAD':
+        kvittera('startad')
+    elif d == 'LEVERERA':
+        kvittera('mottagen'); kvittera('startad'); kvittera('levererad', '--bevis "PR 999"')
+    elif d in ('KVOT', 'INLOGGNING'):
+        text = "You've reached your usage limit" if d == 'KVOT' else 'Not logged in · Please run /login'
+        ut({'type': 'result', 'subtype': 'success', 'is_error': True, 'result': text, 'session_id': sid}); sys.exit(1)
+    elif d == 'FELA':
+        ut({'type': 'result', 'subtype': 'error_during_execution', 'is_error': True, 'result': 'verktyget kraschade', 'session_id': sid}); sys.exit(1)
+    elif d == 'DÖ':
+        sys.exit(3)
+ut({'type': 'result', 'subtype': 'success', 'is_error': False, 'result': 'klart', 'session_id': sid})
+"""
+
+
+MOTTAGARE_CODEX = r"""#!/usr/bin/env python3
+import json, os, re, subprocess, sys, uuid
+from pathlib import Path
+args = sys.argv[1:]
+prompt = sys.stdin.read()
+logg = Path(__file__).with_name('mottagarlogg.jsonl')
+def skriv(o):
+    with open(logg, 'a') as f:
+        f.write(json.dumps(o, ensure_ascii=False) + '\n')
+skriv({'argv': args, 'cwd': os.getcwd(), 'prompt': prompt, 'env': sorted(os.environ), 'codex': True})
+def ut(o):
+    sys.stdout.write(json.dumps(o) + '\n'); sys.stdout.flush()
+tradar = Path(__file__).with_name('codextradar')
+tradar.mkdir(exist_ok=True)
+if args[:2] == ['exec', 'resume']:
+    trad = args[2]
+    if not (tradar / trad).exists():
+        ut({'type': 'error', 'message': 'thread not found'}); sys.exit(1)
+else:
+    trad = str(uuid.uuid4())
+    (tradar / trad).write_text(os.getcwd())
+ut({'type': 'thread.started', 'thread_id': trad})
+ut({'type': 'turn.started'})
+steg = 'LEVERERA'
+bas = Path(__file__).with_name('mottagarmanus')
+for katalog in (bas / 'codex', ):
+    for f in (sorted(katalog.glob('*.txt')) if katalog.is_dir() else []):
+        tagen = f.with_suffix('.tagen')
+        try:
+            os.rename(f, tagen)
+        except OSError:
+            continue
+        steg = tagen.read_text().strip()
+        break
+m = re.search(r'("[^"]+" -B "[^"]+" kvittera \S+) mottagen --av "([^"]+)"', prompt)
+def kvittera(status, *extra):
+    r = subprocess.run('%s %s --av "%s" %s' % (m.group(1), status, m.group(2), ' '.join(extra)), shell=True,
+                       capture_output=True, text=True)
+    skriv({'kvittera': status, 'kod': r.returncode, 'fel': r.stderr[-300:]})
+for d in steg.split():
+    if d.startswith('SOV'):
+        import time; time.sleep(float(d[3:]))
+    elif d == 'MOTTAGEN':
+        kvittera('mottagen')
+    elif d == 'STARTAD':
+        kvittera('startad')
+    elif d == 'LEVERERA':
+        kvittera('mottagen'); kvittera('startad'); kvittera('levererad', '--bevis "PR 998"')
+    elif d == 'FELMEDDELANDE':
+        ut({'type': 'error', 'message': 'Reconnecting... 1/5'})
+    elif d == 'KVOTFEL':
+        ut({'type': 'error', 'message': "You've hit your usage limit."}); sys.exit(1)
+    elif d == 'KVOT':
+        ut({'type': 'error', 'message': "You've hit your usage limit. Try again later."})
+        ut({'type': 'turn.failed', 'error': {'message': "You've hit your usage limit. Try again later."}}); sys.exit(1)
+ut({'type': 'turn.completed', 'usage': {'input_tokens': 1, 'output_tokens': 1}})
+"""
+
+
+class StartvaktProv(Miljo):
+    """Startvakten med en fejkad mottagarsession som kör det riktiga kvitteringskommandot ur sin instruktion."""
+
+    def setUp(self):
+        super().setUp()
+        from partnern import start
+        self.start = start
+        for namn in ('OMPROVA_UPPTAGET', 'KVOT_VANTAN'):
+            fore = getattr(start, namn)
+            self.addCleanup(setattr, start, namn, fore)
+        start.OMPROVA_UPPTAGET = 0
+        self.mottagare = self.rot / 'mottagare'
+        self.mottagare.write_text(MOTTAGARE, 'utf-8')
+        self.mottagare.chmod(0o755)
+        import hashlib
+        self.codex = self.rot / 'codex'
+        self.codex.write_text(MOTTAGARE_CODEX, 'utf-8')
+        self.codex.chmod(0o755)
+        self.k.startvakt = True
+        self.k.startvakt_binarer = {n: (str(f), hashlib.sha256(f.read_bytes()).hexdigest())
+                                    for n, f in (('claude', self.mottagare), ('codex', self.codex))}
+        self.bemanning = ('claude', 'claude-opus-5')                # Runtimes bemanning, rollen driver
+        self.k.repon = {'kontoret': self.k.kontor_primar, 'runtime': self.rot / 'runtime'}
+        for rot in (self.k.kontor_primar, self.rot / 'runtime'):
+            rot.mkdir(exist_ok=True)
+            self.git(rot, 'init', '-q', '-b', 'main')
+            (rot / 'README.md').write_text('repo\n', 'utf-8')
+            self.git(rot, 'add', 'README.md')
+            self.git(rot, 'commit', '-q', '-m', 'start')
+        self.vakt = self.S.startvakt
+        self.vakt.bemanning = lambda: self.bemanning
+
+    @staticmethod
+    def git(rot, *args):
+        subprocess.run(['git', '-C', str(rot), '-c', 'user.name=prov', '-c', 'user.email=prov@example.invalid'] + list(args),
+                       check=True, capture_output=True)
+
+    svar = VerktygProv.svar
+
+    def overlamningar(self, *mottagare):
+        """Lämna en överlämning per mottagare ur samma beställning, genom partnerns riktiga väg."""
+        self.logga_in()
+        text = 'Genomför det: underhållsformen och veckokörningen.'
+        trad = self.skicka(text)['inspel']['trad']
+        self.svar(trad, 1)
+        self.manus(*['RING bered_uppdrag ' + json.dumps({'rubrik': 'Arbete för ' + m, 'mal': 'Mål', 'agarcitat': text,
+                                                         'nasta_handling': 'Bered', 'mottagare': m}) for m in mottagare])
+        self.skicka('Kör.', trad=trad)
+        self.assertEqual(self.svar(trad, 2).count('LÄMNAD'), len(mottagare))
+        rader = self.S.lager.fraga('select id, data from overlamning order by tid')
+        return [(r['id'], Path(json.loads(r['data'])['katalog'])) for r in rader]
+
+    def mottagarmanus(self, *steg, repo=''):
+        katalog = self.rot / 'mottagarmanus' / repo
+        katalog.mkdir(parents=True, exist_ok=True)
+        for s in steg:
+            (katalog / ('%015d.txt' % (len(list(katalog.glob('*'))) + int(time.time() * 1000)))).write_text(s)
+
+    def mottagarlogg(self):
+        fil = self.rot / 'mottagarlogg.jsonl'
+        return [json.loads(r) for r in fil.read_text().splitlines()] if fil.exists() else []
+
+    def vanta_pa(self, kat, typ, sekunder=20, vakt=None):
+        slut = time.time() + sekunder
+        while time.time() < slut:
+            (vakt or self.vakt).granska()
+            h = self.start.handelser(kat)
+            if h and h[-1]['typ'] == typ:
+                return h
+            time.sleep(0.1)
+        self.fail('startvakten nådde inte %s: %s' % (typ, self.start.handelser(kat)))
+
+    def test_ny_overlamning_startar_exakt_en_session_som_kvitterar(self):
+        (oid, kat), = self.overlamningar('kontorets-kedjedrivare')
+        self.mottagarmanus('MOTTAGEN SOV1.5 LEVERERA')
+        os.environ['ANTHROPIC_API_KEY'] = 'sk-ant-prov'           # får aldrig följa med till sessionen
+        self.addCleanup(os.environ.pop, 'ANTHROPIC_API_KEY', None)
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        self.assertEqual(self.vakt.granska(), [])                  # levande session: ingen till
+        omstartad = self.start.Startvakt(self.S)                    # som efter en omstart av tjänsten
+        omstartad.bemanning = lambda: self.bemanning
+        self.assertEqual(omstartad.granska(), [])
+        hist = self.vanta_pa(kat, 'klar')
+        self.assertEqual([h['typ'] for h in hist], ['startad', 'klar'])
+        anrop = [a for a in self.mottagarlogg() if 'argv' in a]
+        self.assertEqual(len(anrop), 1)
+        a = anrop[0]
+        sid = self.start.sessions_id(oid)
+        self.assertEqual(a['argv'][a['argv'].index('--session-id') + 1], sid)
+        for flagga, varde in (('--model', 'claude-opus-5'), ('--effort', 'high'), ('--permission-mode', 'auto'),
+                              ('--add-dir', str(kat))):
+            self.assertEqual(a['argv'][a['argv'].index(flagga) + 1], varde)
+        self.assertEqual(Path(a['cwd']).resolve(), self.k.kontor_primar.resolve())
+        self.assertNotIn('ANTHROPIC_API_KEY', a['env'])
+        self.assertIn(oid, a['prompt'])
+        self.assertIn('AGARENS-ORD.md är Johnnys ord ordagrant', a['prompt'])
+        self.assertIn('"%s" -B "' % sys.executable, a['prompt'])      # kvitteringen med tjänstens egen tolk
+        self.assertNotIn('Genomför det', a['prompt'])               # Johnnys ord läses i paketet, inte i instruktionen
+        kvitt = [a for a in self.mottagarlogg() if 'kvittera' in a]
+        self.assertEqual([(k['kvittera'], k['kod']) for k in kvitt],
+                         [('mottagen', 0), ('mottagen', 0), ('startad', 0), ('levererad', 0)], kvitt)
+        self.S.overlamning.las_kvittenser()
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'levererad')
+        self.assertEqual(self.vakt.granska(), [])                  # levererad: aldrig en ny session
+        self.assertEqual(len([a for a in self.mottagarlogg() if 'argv' in a]), 1)
+        vy = self.json('GET', '/api/trad/' + self.S.lager.en('select trad from overlamning')['trad'])[1]
+        post = [p for p in vy['poster'] if p['slag'] == 'overlamning'][0]
+        self.assertEqual(post['start']['typ'], 'klar')
+        import contextlib, io
+        import partner
+        miljo = {'PARTNER_DATA': str(self.k.data), 'PARTNER_KONTOR_PRIMAR': str(self.k.kontor_primar)}
+        fore = {n: os.environ.get(n) for n in miljo}
+        os.environ.update(miljo)
+        try:
+            ut = io.StringIO()
+            with contextlib.redirect_stdout(ut):
+                partner.main(['overlamningar'])
+        finally:
+            for n, v in fore.items():
+                os.environ.pop(n, None) if v is None else os.environ.__setitem__(n, v)
+        self.assertRegex(ut.getvalue(), r'%s\s+levererad' % oid)
+        self.assertIn('mottagare: kontorets-kedjedrivare', ut.getvalue())
+        self.assertIn('session: %s startad' % sid, ut.getvalue())
+
+    def test_upptagen_skrivplats_ger_vantan_och_sedan_start(self):
+        (oid, kat), = self.overlamningar('kontorets-kedjedrivare')
+        (self.k.kontor_primar / 'README.md').write_text('ändrad av en annan session\n', 'utf-8')
+        self.assertEqual(self.vakt.granska(), [(oid, 'vantar')])
+        self.assertEqual(self.vakt.granska(), [])                  # samma skäl skrivs inte två gånger
+        self.assertIn('primärutcheckningen', self.start.handelser(kat)[-1]['skal'])
+        self.assertEqual(self.mottagarlogg(), [])
+        self.git(self.k.kontor_primar, 'checkout', '--', 'README.md')
+        self.mottagarmanus('LEVERERA')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        self.vanta_pa(kat, 'klar')
+
+    def test_egen_session_i_samma_repo_och_dygnstaket_ger_vantan(self):
+        (a, akat), (b, bkat) = self.overlamningar('kontorets-kedjedrivare', 'runtime')
+        self.k.repon['runtime'] = self.k.kontor_primar             # båda mottagarna i samma repo
+        self.mottagarmanus('SOV2 LEVERERA', 'LEVERERA')
+        self.assertEqual(self.vakt.granska(), [(a, 'startad'), (b, 'vantar')])
+        self.assertIn('mottagarsessionen för %s arbetar redan' % a, self.start.handelser(bkat)[-1]['skal'])
+        self.k.gransar.startvakt_per_dygn = 1                      # när a är klar är dagens enda start förbrukad
+        self.vanta_pa(akat, 'klar')
+        self.vakt.granska()
+        self.assertEqual([h['typ'] for h in self.start.handelser(bkat)], ['vantar', 'vantar'])
+        self.assertIn('dagens tak för nya automatiska starter (1)', self.start.handelser(bkat)[-1]['skal'])
+        self.k.gransar.startvakt_per_dygn = 2
+        self.vanta_pa(bkat, 'klar')
+        self.assertEqual(self.vakt.starter_i_dag(), 2)
+
+    def test_kvot_och_atkomst_ger_synlig_vantan_och_samma_session_fortsatter(self):
+        (oid, kat), = self.overlamningar('runtime')
+        self.mottagarmanus('MOTTAGEN KVOT', 'INLOGGNING', 'STARTAD LEVERERA')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        h = self.vanta_pa(kat, 'vantar')
+        self.assertTrue(h[-1]['kvot'])
+        self.assertIn('usage limit', h[-1]['skal'])
+        self.assertIn('utan byte av modell eller leverantör', h[-1]['skal'])
+        self.assertEqual(self.vakt.granska(), [])                  # väntar en timme
+        # låt timmen löpa ut (och gör följande väntan omedelbar): nästa varv fortsätter samma session
+        rader = kat.joinpath('START.jsonl').read_text().splitlines()
+        sista = json.loads(rader[-1])
+        sista['till'] = '2000-01-01T00:00:00Z'
+        kat.joinpath('START.jsonl').write_text('\n'.join(rader[:-1] + [json.dumps(sista, ensure_ascii=False)]) + '\n')
+        self.start.KVOT_VANTAN = -5
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        h = self.vanta_pa(kat, 'vantar')
+        self.assertIn('Not logged in', h[-1]['skal'])
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])  # KVOT_VANTAN är negativ i provet
+        self.vanta_pa(kat, 'klar')
+        anrop = [a for a in self.mottagarlogg() if 'argv' in a]
+        self.assertEqual(len(anrop), 3)
+        sid = self.start.sessions_id(oid)
+        self.assertEqual(anrop[0]['argv'][anrop[0]['argv'].index('--session-id') + 1], sid)
+        for a in anrop[1:]:
+            self.assertEqual(a['argv'][a['argv'].index('--resume') + 1], sid)   # samma session, ingen ny
+            self.assertIn('Fortsätt arbetet med överlämningen %s' % oid, a['prompt'])
+        for a in anrop:
+            self.assertEqual(a['argv'][a['argv'].index('--model') + 1], 'claude-opus-5')  # inget modellbyte
+        self.assertEqual(self.vakt.starter_i_dag(), 1)
+        self.assertEqual(Path(anrop[0]['cwd']).resolve(), (self.rot / 'runtime').resolve())
+
+    def test_fel_avbrott_och_andrad_binar_syns_och_startar_aldrig_en_andra_session(self):
+        (a, akat), (b, bkat) = self.overlamningar('kontorets-kedjedrivare', 'runtime')
+        self.mottagarmanus('MOTTAGEN FELA', repo='kontor')
+        self.mottagarmanus('DÖ', 'DÖ', 'DÖ', repo='runtime')       # b dör utan resultat tre gånger
+        self.assertEqual(self.vakt.granska(), [(a, 'startad'), (b, 'startad')])
+        h = self.vanta_pa(akat, 'misslyckad')
+        self.assertIn('verktyget kraschade', h[-1]['skal'])
+        self.assertEqual([x for x in self.vakt.granska() if x[0] == a], [])     # ett fel: ingen ny session
+        # b fortsätts två gånger i samma session; tredje gången är det ett synligt fel
+        self.vanta_pa(bkat, 'misslyckad')
+        self.assertEqual([h['typ'] for h in self.start.handelser(bkat)],
+                         ['startad', 'avbruten', 'startad', 'avbruten', 'startad', 'misslyckad'])
+        self.assertEqual(len({a2['argv'][-1] for a2 in self.mottagarlogg() if 'argv' in a2 and a2['cwd'].endswith('runtime')}), 1)
+        # en ändrad binär hindrar starten av en ny överlämning och syns som skäl
+        (c, ckat), = [x for x in self.overlamningar_till_ny_trad('kundstart')]
+        self.k.repon['kundstart'] = self.rot / 'runtime'
+        self.k.startvakt_binarer['claude'] = (str(self.mottagare), '0' * 64)
+        self.vakt.granska()
+        self.assertEqual(self.start.handelser(ckat)[-1]['typ'], 'hindrad')
+        self.assertEqual(self.start.handelser(ckat)[-1]['kod'], 'binar')
+        self.assertIn('fastlåsta binären mottagare saknas eller har ändrats', self.start.handelser(ckat)[-1]['skal'])
+
+    def overlamningar_till_ny_trad(self, mottagare):
+        text = 'Genomför det: kundstartens ärende.'
+        trad = self.skicka(text)['inspel']['trad']
+        self.svar(trad, 1)
+        self.manus('RING bered_uppdrag ' + json.dumps({'rubrik': 'Kundstart', 'mal': 'Mål', 'agarcitat': text,
+                                                       'nasta_handling': 'Bered', 'mottagare': mottagare}))
+        self.skicka('Kör.', trad=trad)
+        self.svar(trad, 2)
+        rad = self.S.lager.en('select id, data from overlamning where trad=?', (trad,))
+        return [(rad['id'], Path(json.loads(rad['data'])['katalog']))]
+
+    def test_codex_ur_bemanningen_kvot_och_samma_trad(self):
+        (oid, kat), = self.overlamningar('runtime')
+        self.bemanning = ('codex', 'gpt-6-astra')
+        self.mottagarmanus('MOTTAGEN KVOT', 'STARTAD LEVERERA', repo='codex')
+        os.environ['OPENAI_API_KEY'] = 'sk-prov'                     # får aldrig följa med till sessionen
+        self.addCleanup(os.environ.pop, 'OPENAI_API_KEY', None)
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        h = self.vanta_pa(kat, 'vantar')
+        self.assertEqual((h[0]['utforare'], h[0]['modell'], h[0]['cli']), ('codex', 'gpt-6-astra', 'codex'))
+        self.assertIn('usage limit', h[-1]['skal'])
+        self.bemanning = ('claude', 'claude-opus-5')                # ett senare val byter inte en pågående session
+        rader = kat.joinpath('START.jsonl').read_text().splitlines()
+        sista = json.loads(rader[-1])
+        sista['till'] = '2000-01-01T00:00:00Z'
+        kat.joinpath('START.jsonl').write_text('\n'.join(rader[:-1] + [json.dumps(sista, ensure_ascii=False)]) + '\n')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        self.vanta_pa(kat, 'klar')
+        anrop = [a for a in self.mottagarlogg() if 'argv' in a]
+        self.assertEqual([a.get('codex') for a in anrop], [True, True])
+        forsta, andra = anrop[0]['argv'], anrop[1]['argv']
+        rot = str((self.rot / 'runtime').resolve())
+        self.assertEqual(forsta, ['exec', '--json', '--approve-for-me', '-C', rot, '--add-dir', str(kat), '-m',
+                                  'gpt-6-astra', '-c', 'model_reasoning_effort="high"', '-'])
+        trad = self.start.codex_trad(kat)
+        self.assertEqual(andra, ['exec', 'resume', trad, '--json', '-m', 'gpt-6-astra', '-c',
+                                 'model_reasoning_effort="high"', '-'])
+        self.assertIn('Fortsätt arbetet med överlämningen %s' % oid, anrop[1]['prompt'])
+        self.assertNotIn('OPENAI_API_KEY', anrop[0]['env'])
+        self.assertEqual([h['utforare'] for h in self.start.handelser(kat) if h['typ'] == 'startad'], ['codex', 'codex'])
+        self.S.overlamning.las_kvittenser()
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'levererad')
+
+    def test_levande_codex_session_startas_inte_om_efter_omstart(self):
+        (oid, kat), = self.overlamningar('runtime')
+        self.bemanning = ('codex', 'gpt-6-astra')
+        self.mottagarmanus('SOV2 FELMEDDELANDE LEVERERA', repo='codex')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        h = self.start.handelser(kat)[-1]
+        self.assertNotIn('session', h)                               # Codex ger tråden sitt id först i strömmen
+        omstartad = self.start.Startvakt(self.S)                    # som efter en omstart av tjänsten
+        omstartad.bemanning = lambda: self.bemanning
+        for _ in range(5):
+            self.assertEqual(omstartad.granska(), [])               # den levande sessionen känns igen på paketet
+            time.sleep(0.2)
+        hist = self.vanta_pa(kat, 'klar', vakt=omstartad)           # ett icke-fatalt fel mitt i varvet är inget slut
+        self.assertEqual([x['typ'] for x in hist], ['startad', 'klar'])
+        self.assertEqual(len([a for a in self.mottagarlogg() if 'argv' in a]), 1)
+
+    def test_kvotfel_utan_slut_och_fortsattning_som_vantar_pa_annan_skrivare(self):
+        (oid, kat), = self.overlamningar('kontorets-kedjedrivare')
+        self.bemanning = ('codex', 'gpt-6-astra')
+        self.mottagarmanus('MOTTAGEN KVOTFEL', 'LEVERERA', repo='codex')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        h = self.vanta_pa(kat, 'vantar')
+        self.assertTrue(h[-1]['kvot'])                               # kvotbeskedet utan turn.failed känns igen
+        rader = kat.joinpath('START.jsonl').read_text().splitlines()
+        sista = json.loads(rader[-1])
+        sista['till'] = '2000-01-01T00:00:00Z'
+        kat.joinpath('START.jsonl').write_text('\n'.join(rader[:-1] + [json.dumps(sista, ensure_ascii=False)]) + '\n')
+        (self.k.kontor_primar / 'README.md').write_text('en annan skrivare\n', 'utf-8')
+        self.assertEqual(self.vakt.granska(), [(oid, 'vantar')])     # också en fortsättning väntar på en annan skrivare
+        self.assertIn('primärutcheckningen', self.start.handelser(kat)[-1]['skal'])
+        self.git(self.k.kontor_primar, 'checkout', '--', 'README.md')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        self.vanta_pa(kat, 'klar')
+        anrop = [a['argv'] for a in self.mottagarlogg() if 'argv' in a]
+        self.assertEqual([a[:2] for a in anrop], [['exec', '--json'], ['exec', 'resume']])
+
+    def test_olast_bemanning_ger_synlig_vantan_utan_reservvag(self):
+        (oid, kat), = self.overlamningar('kontorets-kedjedrivare')
+        self.bemanning = (None, None)
+        self.assertEqual(self.vakt.granska(), [(oid, 'vantar')])
+        h = self.start.handelser(kat)[-1]
+        self.assertEqual(h['kod'], 'bemanning')
+        self.assertIn('ingen reservväg', h['skal'])
+        self.assertEqual(self.mottagarlogg(), [])                  # ingen start med en annan utförare
+        self.bemanning = ('claude', 'claude-opus-5')
+        self.vakt._nasta.clear()
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        self.vanta_pa(kat, 'klar')
+
+    def test_prov_och_utvecklingsinstanser_startar_aldrig(self):
+        (oid, kat), = self.overlamningar('kontorets-kedjedrivare')
+        self.k.prov_dolj = ('imp:CONV-002',)
+        self.assertEqual(self.vakt.granska(), [])
+        self.k.prov_dolj = ()
+        self.k.startvakt = False
+        self.assertEqual(self.vakt.granska(), [])
+        self.assertEqual(self.mottagarlogg(), [])
+        miljo = {'PARTNER_DATA': str(self.rot / 'annan-data'), 'PARTNER_KONTOR_PRIMAR': str(self.k.kontor_primar)}
+        fore = {n: os.environ.get(n) for n in list(miljo) + ['PARTNER_STARTVAKT', 'PARTNER_PORT']}
+        os.environ.update(miljo)
+        os.environ.pop('PARTNER_STARTVAKT', None)
+        os.environ.pop('PARTNER_PORT', None)
+        try:
+            self.assertFalse(kf.ladda().startvakt)                  # egen datakatalog: ingen startvakt
+            os.environ.pop('PARTNER_DATA')
+            os.environ['PARTNER_PORT'] = '4799'
+            self.assertFalse(kf.ladda().startvakt)                  # egen port: ingen startvakt
+            os.environ.pop('PARTNER_PORT')
+            self.assertTrue(kf.ladda().startvakt)                   # den ordinarie tjänsten
+        finally:
+            for n, v in fore.items():
+                os.environ.pop(n, None) if v is None else os.environ.__setitem__(n, v)
+
+    def test_annan_claude_process_och_farsk_worktree_raknas_som_upptaget(self):
+        rot = self.k.kontor_primar
+        self.assertIsNone(self.start.upptaget(rot))
+        wt = self.rot / 'wt'
+        self.git(rot, 'worktree', 'add', '-q', str(wt))
+        (wt / 'README.md').write_text('arbete pågår\n', 'utf-8')
+        self.assertIn('worktree wt', self.start.upptaget(rot))
+        gammal = time.time() - 3 * 3600
+        os.utime(wt / 'README.md', (gammal, gammal))
+        self.assertIsNone(self.start.upptaget(rot))                 # gamla ändringar i en kvarlämnad worktree
+        (wt / 'ÄGARORD å ö.md').write_text('ny fil med svenska tecken\n', 'utf-8')
+        self.assertIn('worktree wt', self.start.upptaget(rot))     # sökvägen läses exakt, inte citerad
+        os.utime(wt / 'ÄGARORD å ö.md', (gammal, gammal))
+        index = Path(subprocess.run(['git', '-C', str(wt), 'rev-parse', '--git-path', 'index'], capture_output=True,
+                                    text=True, check=True).stdout.strip())
+        index = index if index.is_absolute() else wt / index
+        fore = index.stat().st_mtime_ns
+        self.assertIsNone(self.start.upptaget(rot))
+        self.assertEqual(index.stat().st_mtime_ns, fore)          # kontrollen skriver aldrig om någon annans index
+        # processlistan: en fejkad lsof som visar en levande process med arbetskatalog i repot (en riktig claude-process
+        # kan inte iscensättas säkert här; kopior av systemprogram kan fastna i kärnan)
+        (rot / 'underkatalog').mkdir()
+        lsof = self.rot / 'lsof'
+        lsof.write_text('#!/bin/sh\nprintf "p%d\\nccodex\\nfcwd\\nn%s\\n"\n' % (os.getpid(), rot.resolve() / 'underkatalog'))
+        lsof.chmod(0o755)
+        fore = self.start.LSOF
+        self.addCleanup(setattr, self.start, 'LSOF', fore)
+        self.start.LSOF = str(lsof)
+        self.assertIn('process %d' % os.getpid(), self.start.upptaget(rot))
+        self.assertIsNone(self.start.upptaget(rot, undanta=((rot / 'underkatalog').resolve(),)))  # partnerns egen data
+        (rot / 'underkatalog').rmdir()
+        self.assertIsNone(self.start.upptaget(rot))                 # raderad arbetskatalog: skriver inte i repot
+        (rot / 'underkatalog').mkdir()
+        lsof.write_text('#!/bin/sh\nprintf "p999999\\nccodex\\nfcwd\\nn%s\\n"\n' % (rot.resolve() / 'underkatalog'))
+        self.assertIsNone(self.start.upptaget(rot))                 # processen finns inte längre
+        self.start.LSOF = fore
+        riktig = subprocess.run([fore, '-a', '-p', str(os.getpid()), '-d', 'cwd', '-Fn'], capture_output=True, text=True)
+        if riktig.returncode == 0:                                  # den riktiga lsof läser arbetskataloger
+            self.assertIn('n' + os.getcwd(), riktig.stdout)
 
 
 if __name__ == '__main__':

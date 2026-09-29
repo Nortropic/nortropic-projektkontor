@@ -117,6 +117,14 @@ code, pre { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: .
 .svar li { margin: .15em 0; }
 .svar blockquote { margin: .6em 0; padding: 2px 12px; border-left: 3px solid var(--linje); color: var(--dampad); }
 .svar pre { background: var(--yta2); padding: 10px 12px; border-radius: 8px; overflow-x: auto; }
+.kodblock { position: relative; }
+.kodblock pre { padding-top: 12px; padding-right: 76px; }
+.kodblock .kopiera { position: absolute; top: 6px; right: 6px; }
+.kopiera { border: 1px solid var(--linje); background: var(--yta); color: var(--dampad); border-radius: 8px; padding: 2px 10px; font-size: 12.5px; }
+.kopiera:hover, .kopiera:focus-visible { color: var(--text); border-color: var(--dampad); }
+.svarsverktyg { display: flex; gap: 8px; margin-top: 8px; }
+.urklipp { position: fixed; left: -9999px; top: 0; width: 1px; height: 1px; opacity: 0; }
+.kallruta { width: 100%; min-height: 160px; margin-top: 8px; font: 12.5px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--text); background: var(--yta); border: 1px solid var(--linje); border-radius: 8px; padding: 8px; }
 .svar table { border-collapse: collapse; margin: .6em 0; font-size: 14px; }
 .svar th, .svar td { border: 1px solid var(--linje); padding: 4px 8px; text-align: left; vertical-align: top; }
 .svar a { color: var(--accent); }

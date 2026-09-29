@@ -119,7 +119,7 @@ SCEN = '''<!DOCTYPE html>
 .aq-inaktuell .aq-senast{display:inline}
 .aq-panel{display:none;position:fixed;left:24px;bottom:24px;max-width:560px;max-height:70vh;overflow:auto;background:#fbf8f1;color:#2d2a25;border-radius:14px;padding:16px 18px;
 font-size:14px;line-height:1.45;box-shadow:0 10px 30px #0006}.aq-panel:target{display:block}
-.aq-panel h2{margin:0 0 6px;font-size:16px}.aq-panel p{margin:6px 0}.aq-stang{float:right;color:#6f695e;font-size:13px}
+.aq-panel h2{margin:0 0 6px;font-size:16px}.aq-panel h3{margin:14px 0 4px;font-size:14px}.aq-panel p{margin:6px 0}.aq-stang{float:right;color:#6f695e;font-size:13px}
 .aq-lista{list-style:none;margin:8px 0;padding:0}.aq-lista li{padding:5px 0;border-top:1px solid #e8e1d3}.aq-etikett{display:inline-block;min-width:150px;margin-right:10px;font-weight:600;color:#5b5446}
 .aq-kalla{font-size:12px;color:#6f695e}.aq-inaktuell-kalla{color:#8a5a22}.aq-otillganglig-kalla{color:#8a5a22}
 .aq-nytt{display:none}.aq-nytt-lage .aq-nytt{display:inline}.aq-nytt rect,.aq-park .aq-nytt rect{fill:#fff1c9;stroke:#d79a3c;stroke-width:1.2;stroke-dasharray:none}.aq-nytt text,.aq-park .aq-nytt text{font-size:10px;font-weight:700;fill:#6b4610;letter-spacing:.3px}.aq-park .aq-nytt text{font-size:9px}
@@ -314,7 +314,7 @@ font-size:14px;line-height:1.45;box-shadow:0 10px 30px #0006}.aq-panel:target{di
 <rect x="78" y="600" width="306" height="220" rx="10" class="aq-frostglas"/>
 <line x1="180" y1="600" x2="180" y2="820" class="aq-frostpost"/>
 <line x1="282" y1="600" x2="282" y2="820" class="aq-frostpost"/>
-<g class="aq-dorrskylt"><rect x="141" y="690" width="180" height="44" rx="10"/><text x="231" y="709" text-anchor="middle" class="aq-dorrskylt-a">INTERAKTIVT ARBETE</text><text x="231" y="725" text-anchor="middle" class="aq-dorrskylt-b">syns inte här · observeras inte</text></g>
+<g class="aq-dorrskylt"><rect x="141" y="690" width="180" height="44" rx="10"/><text x="231" y="709" text-anchor="middle" class="aq-dorrskylt-a">INTERAKTIVT ARBETE</text><text x="231" y="725" text-anchor="middle" class="aq-dorrskylt-b">{{AQ_OVL_SKYLT}}</text></g>
 </g></a>
 <g class="aq-lounge"><g filter="url(#aq-skugga)"><rect x="1180" y="676" width="120" height="44" rx="6" class="aq-disk"/><rect x="1180" y="716" width="120" height="10" rx="4" class="aq-disk-front"/></g><rect x="1196" y="682" width="30" height="26" rx="5" class="aq-kaffemaskin"/><circle cx="1250" cy="696" r="7" class="aq-mugg"/><circle cx="1420" cy="740" r="26" class="aq-rundbord" filter="url(#aq-skugga-s)"/><g class="aq-stol" filter="url(#aq-skugga-s)"><rect x="1365" y="732" width="34" height="30" rx="10" class="aq-sits"/><path d="M1365 766 q17 12 34 0" class="aq-rygg"/></g><g class="aq-stol" filter="url(#aq-skugga-s)"><rect x="1441" y="732" width="34" height="30" rx="10" class="aq-sits"/><path d="M1441 766 q17 12 34 0" class="aq-rygg"/></g></g>
 <g class="aq-vaxt aq-gungar" transform="translate(1210 800) scale(1.20)"><ellipse cx="0" cy="18" rx="17" ry="6" class="aq-krukskugga"/><rect x="-12" y="3" width="24" height="17" rx="6" class="aq-kruka"/><g class="aq-blad"><ellipse cx="-10" cy="-5" rx="7" ry="14" transform="rotate(-30 -10 -5)"/><ellipse cx="10" cy="-5" rx="7" ry="14" transform="rotate(30 10 -5)"/><ellipse cx="0" cy="-12" rx="7.5" ry="16"/><ellipse cx="-4" cy="-2" rx="5" ry="10" transform="rotate(-8 -4 -2)" class="aq-blad-ljus"/></g></g>
@@ -326,7 +326,7 @@ font-size:14px;line-height:1.45;box-shadow:0 10px 30px #0006}.aq-panel:target{di
 <g class="aq-provband"><rect x="1172" y="866" width="368" height="26" rx="8"/><text x="1356" y="884" text-anchor="middle">PROVDATA · inte en observation av verksamheten</text></g>
 <text x="60" y="884" class="aq-fot-text aq-bildrad">Läsvy · startar, godkänner och ändrar ingenting · välj en plats för detaljer, källa och tid</text><text x="60" y="884" class="aq-fot-text aq-fonsterrad">Läsvy · startar, godkänner och ändrar ingenting · läser om högst varannan minut medan sidan är öppen · nytt läge = ändrat sedan förra läsningen, inte när eller hur</text>
 </svg>
-<section class="aq-panel" id="p-arkivet" aria-labelledby="t-arkivet"><a class="aq-stang" href="#">Stäng</a><h2 id="t-arkivet">Arkivet</h2><p>Levererade och avslutade åtaganden ur kontorets beslutslogg och leveransbesked, nyast först.</p><ul class="aq-lista"><!--AQ:LISTA:arkivet--></ul><p class="aq-kalla">{{AQ_KALLA_ARKIVET}}</p></section><section class="aq-panel" id="p-verkstaden" aria-labelledby="t-verkstaden"><a class="aq-stang" href="#">Stäng</a><h2 id="t-verkstaden">Verkstaden</h2><p>Arbete som motorn visar som pågående, och uppdrag i motorn som inte arbetar.</p><ul class="aq-lista"><!--AQ:LISTA:verkstaden--></ul><p class="aq-kalla">{{AQ_KALLA_VERKSTADEN}}</p></section><section class="aq-panel" id="p-granskningen" aria-labelledby="t-granskningen"><a class="aq-stang" href="#">Stäng</a><h2 id="t-granskningen">Granskningen</h2><p>Granskningar och integrationer som motorn visar som pågående.</p><ul class="aq-lista"><!--AQ:LISTA:granskningen--></ul><p class="aq-kalla">{{AQ_KALLA_GRANSKNINGEN}}</p></section><section class="aq-panel" id="p-utkiken" aria-labelledby="t-utkiken"><a class="aq-stang" href="#">Stäng</a><h2 id="t-utkiken">Utkiken</h2><p>Bevakningens schema, omgångar och besked. Starter är startade, inte genomförda.</p><ul class="aq-lista"><!--AQ:LISTA:utkiken--></ul><p class="aq-kalla">{{AQ_KALLA_UTKIKEN}}</p></section><section class="aq-panel" id="p-bordet" aria-labelledby="t-bordet"><a class="aq-stang" href="#">Stäng</a><h2 id="t-bordet">Ägarens bord</h2><p>Det som väntar på dig: beslut, operatörshandlingar och modellfrågor.</p><ul class="aq-lista"><!--AQ:LISTA:bordet--></ul><p class="aq-kalla">{{AQ_KALLA_BORDET}}</p></section><section class="aq-panel" id="p-maskinrummet" aria-labelledby="t-maskinrummet"><a class="aq-stang" href="#">Stäng</a><h2 id="t-maskinrummet">Maskinrummet</h2><p>Tjänsten, den konfigurerade bemanningen och de tekniska identitetsposterna. Konfiguration är inte observerat utförande.</p><ul class="aq-lista"><!--AQ:LISTA:maskinrummet--></ul><p class="aq-kalla">{{AQ_KALLA_MASKINRUMMET}}</p></section><section class="aq-panel" id="p-interaktivt" aria-labelledby="t-interaktivt"><a class="aq-stang" href="#">Stäng</a><h2 id="t-interaktivt">Interaktivt arbete</h2><p>Aquarium läser Runtimes motor, tjänst och bevakning och kontorets publicerade register. Interaktiva sessioner, till exempel kedjedrivarens, observeras inte och visas därför inte, varken som arbete eller som frånvaro av arbete. Rubrikens räkning gäller bara det som observeras i Runtime.</p></section><section class="aq-panel" id="p-kallor" aria-labelledby="t-kallor"><a class="aq-stang" href="#">Stäng</a><h2 id="t-kallor">Källor och tider</h2><p>När varje källa lästes och när den räknas som inaktuell. Läsningen är en ögonblicksbild, inte live.</p><ul class="aq-lista"><!--AQ:LISTA:kallor--></ul><p class="aq-kalla">Tiderna är lästider, inte sidans skapelsetid; en ny sida gör inte en läsning nyare.</p></section>
+<section class="aq-panel" id="p-arkivet" aria-labelledby="t-arkivet"><a class="aq-stang" href="#">Stäng</a><h2 id="t-arkivet">Arkivet</h2><p>Levererade och avslutade åtaganden ur kontorets beslutslogg och leveransbesked, nyast först.</p><ul class="aq-lista"><!--AQ:LISTA:arkivet--></ul><p class="aq-kalla">{{AQ_KALLA_ARKIVET}}</p></section><section class="aq-panel" id="p-verkstaden" aria-labelledby="t-verkstaden"><a class="aq-stang" href="#">Stäng</a><h2 id="t-verkstaden">Verkstaden</h2><p>Arbete som motorn visar som pågående, och uppdrag i motorn som inte arbetar.</p><ul class="aq-lista"><!--AQ:LISTA:verkstaden--></ul><p class="aq-kalla">{{AQ_KALLA_VERKSTADEN}}</p></section><section class="aq-panel" id="p-granskningen" aria-labelledby="t-granskningen"><a class="aq-stang" href="#">Stäng</a><h2 id="t-granskningen">Granskningen</h2><p>Granskningar och integrationer som motorn visar som pågående.</p><ul class="aq-lista"><!--AQ:LISTA:granskningen--></ul><p class="aq-kalla">{{AQ_KALLA_GRANSKNINGEN}}</p></section><section class="aq-panel" id="p-utkiken" aria-labelledby="t-utkiken"><a class="aq-stang" href="#">Stäng</a><h2 id="t-utkiken">Utkiken</h2><p>Bevakningens schema, omgångar och besked. Starter är startade, inte genomförda.</p><ul class="aq-lista"><!--AQ:LISTA:utkiken--></ul><p class="aq-kalla">{{AQ_KALLA_UTKIKEN}}</p></section><section class="aq-panel" id="p-bordet" aria-labelledby="t-bordet"><a class="aq-stang" href="#">Stäng</a><h2 id="t-bordet">Ägarens bord</h2><p>Det som väntar på dig: beslut, operatörshandlingar och modellfrågor.</p><ul class="aq-lista"><!--AQ:LISTA:bordet--></ul><p class="aq-kalla">{{AQ_KALLA_BORDET}}</p></section><section class="aq-panel" id="p-maskinrummet" aria-labelledby="t-maskinrummet"><a class="aq-stang" href="#">Stäng</a><h2 id="t-maskinrummet">Maskinrummet</h2><p>Tjänsten, den konfigurerade bemanningen och de tekniska identitetsposterna. Konfiguration är inte observerat utförande.</p><ul class="aq-lista"><!--AQ:LISTA:maskinrummet--></ul><p class="aq-kalla">{{AQ_KALLA_MASKINRUMMET}}</p></section><section class="aq-panel" id="p-interaktivt" aria-labelledby="t-interaktivt"><a class="aq-stang" href="#">Stäng</a><h2 id="t-interaktivt">Interaktivt arbete</h2><p>Aquarium läser Runtimes motor, tjänst och bevakning och kontorets publicerade register. Interaktiva sessioner, till exempel kedjedrivarens, observeras inte och visas därför inte, varken som arbete eller som frånvaro av arbete. Rubrikens räkning gäller bara det som observeras i Runtime.</p><!--AQ:LISTA:overlamningar--></section><section class="aq-panel" id="p-kallor" aria-labelledby="t-kallor"><a class="aq-stang" href="#">Stäng</a><h2 id="t-kallor">Källor och tider</h2><p>När varje källa lästes och när den räknas som inaktuell. Läsningen är en ögonblicksbild, inte live.</p><ul class="aq-lista"><!--AQ:LISTA:kallor--></ul><p class="aq-kalla">Tiderna är lästider, inte sidans skapelsetid; en ny sida gör inte en läsning nyare.</p></section>
 <!--AQ:SKRIPT-->
 </body></html>
 '''
@@ -373,6 +373,11 @@ COMMAND_ERROR = 'Kunde inte skapa Aquariums vy.'
 MAX_BYTES = 1000000
 KEYS = ('schema', 'provdata', 'read_at', 'sources', 'revisions', 'headline', 'arkivet',
         'verkstaden', 'utkiken', 'agarens_bord', 'sockeln')
+OPTIONAL = ('overlamningar',)   # the partner's handoffs; a projection without them is still whole
+OVL_KEYS = ('title', 'status', 'read_at', 'stale_after_seconds', 'items', 'unreadable')
+OVL_ITEM_KEYS = ('id', 'title', 'receiver', 'status', 'since', 'since_basis', 'session')
+OVL_STATUS = ('lämnad', 'mottagen', 'startad')
+NOT_OBSERVED = 'syns inte här · observeras inte'
 SOURCES = ('release', 'staffing', 'questions', 'service', 'engine', 'tasks', 'watch', 'office')
 MONTHS = ('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec')
 KINDS = {'beslut': 'Beslut', 'operatörshandling': 'Operatörshandling', 'modellfråga': 'Modellfråga'}
@@ -602,8 +607,10 @@ def _rad(label, text):
 
 def _validate(projection):
     """Refuse anything that is not a schema 2 projection, without private values in the message."""
-    if type(projection) is not dict or set(projection) != set(KEYS):
+    if type(projection) is not dict or set(projection) - set(OPTIONAL) != set(KEYS):
         _refuse()
+    if 'overlamningar' in projection:
+        _validate_overlamningar(projection['overlamningar'])
     if type(projection['schema']) is not int or projection['schema'] != SCHEMA:
         _refuse()
     if type(projection['provdata']) is not bool:
@@ -628,6 +635,24 @@ def _validate(projection):
     for key in ('pagar', 'vantar', 'behover_dig'):
         value = headline.get(key)
         if value is not None and type(value) is not int:
+            _refuse()
+
+
+def _validate_overlamningar(O):
+    if type(O) is not dict or set(O) != set(OVL_KEYS) or O['status'] not in ('ok', 'otillgänglig'):
+        _refuse()
+    if type(O['title']) is not str or type(O['stale_after_seconds']) is not int or type(O['items']) is not list:
+        _refuse()
+    if type(O['unreadable']) is not int or (O['status'] == 'ok' and _moment(O['read_at']) is None):
+        _refuse()
+    for item in O['items']:
+        if type(item) is not dict or set(item) != set(OVL_ITEM_KEYS) or item['status'] not in OVL_STATUS:
+            _refuse()
+        if any(type(item[key]) is not str for key in ('id', 'title', 'receiver', 'since_basis')):
+            _refuse()
+        if item['session'] is not None and type(item['session']) is not str:
+            _refuse()
+        if item['since'] is not None and _moment(item['since']) is None:
             _refuse()
 
 
@@ -1021,7 +1046,41 @@ def _revision(R):
             else 'Runtime ' + R['runtime'] + ' · konfiguration ' + str(R['config']))
 
 
-def _kallor(sources, R, rows):
+OVL_INTRO = ('<h3>Öppna överlämningar</h3><p>Partnerns överlämningar som inte är levererade eller avslagna, med den '
+             'status mottagaren själv har kvitterat. Själva arbetet i sessionen observeras inte. Levererade och '
+             'avslagna står i Arkivet, en start som inte blev av på Ägarens bord.</p>')
+
+
+def _overlamningar(O, values, rows):
+    """One calm row per open handoff; the door sign counts them. Absent or unread is never shown as none.
+
+    A projection without handoffs (made before they existed) shows the room exactly as before."""
+    if O is None:
+        values['AQ_OVL_SKYLT'] = NOT_OBSERVED
+        rows['overlamningar'] = []
+        return
+    kalla = ('<p class="aq-kalla">' + _escape('Källa: ' + O['title'] + (' · läst ' + TID(O['read_at'])
+                                                                        if O['status'] == 'ok'
+                                                                        else ' · otillgänglig')) + '</p>')
+    if O['status'] != 'ok':
+        values['AQ_OVL_SKYLT'] = 'överlämningarna kunde inte läsas'
+        listed = [_rad('Läge', 'Överlämningarna kunde inte läsas; inget visas som tomt')]
+    else:
+        items = O['items']
+        values['AQ_OVL_SKYLT'] = (ANTAL(len(items), '1 öppen överlämning', '%d öppna överlämningar') if items
+                                  else NOT_OBSERVED)
+        listed = [_rad(item['status'] + ('' if item['since'] is None else ' · ' + item['since_basis'] + ' '
+                                          + TID(item['since'])),
+                       item['id'] + ' · ' + item['title'] + ' · till ' + item['receiver']
+                       + ('' if item['session'] is None else ' · ' + item['session'])) for item in items]
+        if O['unreadable']:
+            listed.append(_rad('Läge', ANTAL(O['unreadable'], '1 paket kunde inte läsas',
+                                             '%d paket kunde inte läsas')))
+        listed = listed or [_rad('Läge', 'Inga öppna överlämningar')]
+    rows['overlamningar'] = [OVL_INTRO + '<ul class="aq-lista">'] + listed + ['</ul>' + kalla]
+
+
+def _kallor(sources, R, rows, O=None):
     """When each source was read and when it becomes stale; the times are read times."""
     listed = []
     for name in SOURCES:
@@ -1036,6 +1095,14 @@ def _kallor(sources, R, rows):
         else:
             listed.append('<li class="aq-otillganglig-kalla">' + label
                           + 'otillgänglig vid läsningen</li>')
+    if O is not None:
+        label = '<span class="aq-etikett">' + _escape(O['title']) + '</span>'
+        if O['status'] == 'ok':
+            listed.append('<li data-read-at="' + _escape(O['read_at']) + '" data-stale-after="'
+                          + str(O['stale_after_seconds']) + '">' + label + 'läst ' + _escape(TID(O['read_at']))
+                          + ' · inaktuell efter ' + str(O['stale_after_seconds'] // 60) + ' min</li>')
+        else:
+            listed.append('<li class="aq-otillganglig-kalla">' + label + 'otillgänglig vid läsningen</li>')
     listed.append(_rad('Kontoret · revision', 'okänd' if R['office_main'] is None
                        else 'main ' + R['office_main'] + ' · ' + TID(R['office_main_date'])))
     listed.append(_rad('Runtime · revision', _revision(R)))
@@ -1075,7 +1142,8 @@ def render(projection, jamforelse=None):
     _utkiken(projection['utkiken'], sources, values, rows)
     _bordet(projection['agarens_bord'], sources, waiting, values, rows)
     _maskinrummet(projection['sockeln'], R, sources, values, rows)
-    _kallor(sources, R, rows)
+    _overlamningar(projection.get('overlamningar'), values, rows)
+    _kallor(sources, R, rows, projection.get('overlamningar'))
     return _fill(values, rows, jamforelse)
 
 
