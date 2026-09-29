@@ -7911,3 +7911,45 @@ själv. Arbetsplatsens block ändras inte; dess mening om att produktionen inte 
 **Ersätter:** ingen post. Kompletterar KUNDSTART-TESTLAGE-20260929 och ARBETSPLATS-KUNDSTART-ARENDEN-20260929.
 
 **Avslut.** Ägarens beslut är genomfört när denna post är integrerad. Planen äger nästa handling.
+
+## FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 — ägarens besked: startvakten följer upp en session också efter att den kvitterat, så att `klar` skrivs och processen hämtas; dessutom Codex-CLI:n uppdaterad
+
+**Status:** registrerat 2026-09-29 (15:50 UTC) av sessionen nortropic-repos-04 (Claude Code), som bär
+skrivansvaret för partnerns filer (se blocket om arbetsplatsen). Ägarens svar på "vad återstår?" står ordagrant i
+`evidence/nasta-uppdrag/local/startvakt-20260929/owner-words-startvakt-20260929.md`: "Rätta startvakten", "ja alltid
+igång." och "uppdatera codex".
+
+**Felet.** Sessionen nortropic-repos-9e fann det och beskrev det. Tjänstens slinga läser först kvittenserna
+(`las_kvittenser`), som flyttar överlämningens status till `levererad` eller `avslagen`, och går sedan startvaktens varv
+(`granska`). Varvet prövade bara status `lamnad`, `mottagen` och `startad`. En session som hade levererat föll därför
+bort innan dess utfall lästes. `START.jsonl` slutade på `startad`, tråden visade "Session startad", och den avslutade
+barnprocessen hämtades aldrig, så den blev en zombie tills tjänsten startades om. Statusen, arkiveringen i Aquarium och
+spärren mot en ny session var riktiga. Belägg: OVL-20260929-328e79 kvitterade `levererad` 11:59:42Z, men `START.jsonl`
+har bara `startad` från 10:09:11Z. Proven anropade `granska` direkt, utan kvittensläsningen före, och såg därför inte
+felet.
+
+**Rättat.** `granska` tar också med en överlämning med status `levererad` eller `avslagen` när paketets sista
+START-händelse är `startad`. Den följs då upp som förut: lever processen väntar vakten, annars läses sessionens utfall
+och `klar` skrivs. En egen barnprocess hämtas, och en process från före en omstart prövas genom sin pid. En kvitterad
+och uppföljd överlämning prövas aldrig igen, och en kvitterad överlämning utan startvaktens session får ingen
+`START.jsonl`. Två nya prov i `tools/test_partner.py` går varvet som tjänstens slinga gör, med kvittenserna lästa först.
+Det ena följer en session till `klar` och kontrollerar att processen är hämtad. Det andra är läget efter en omstart, där
+statusen redan är `levererad` och sista händelsen `startad`. Båda faller mot main före rättelsen.
+`tools/PARTNER.md` beskriver uppföljningen.
+
+**Efter integrationen** startas tjänsten om ur main enligt driftregeln. OVL-20260929-328e79 ska då få sin `klar` vid
+det första varvet, genom pid-vägen, eftersom processen inte är den nya tjänstens barn.
+
+**Bestående start ("ja alltid igång").** Sessionen fick inte skriva LaunchAgent-filen i `~/Library/LaunchAgents`
+(behörigheten nekades), och sessioner får inte köra `launchctl`. Raden i ÄGARENS TUR står därför kvar, och ägaren har
+fått kommandona.
+
+**Codex-CLI:n ("uppdatera codex").** `@openai/codex` i PATH uppdaterades med npm från 0.147.0 till 0.159.0, och ett
+anrop med Runtimes modell `gpt-6-astra` svarade. Mätningen står i
+`evidence/nasta-uppdrag/local/startvakt-20260929/codex-uppdatering.txt`. Runtimes egen fastlåsta `codex-0.155.1`
+rördes inte. Raden i ÄGARENS TUR är borttagen.
+
+**Ersätter:** ingen post. Rättar ett fel i FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929.
+
+**Avslut.** Klart när ändringen är integrerad, tjänsten omstartad ur main och OVL-20260929-328e79 har `klar`. Nästa
+bygge kräver ett eget beslut.

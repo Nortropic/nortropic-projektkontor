@@ -183,7 +183,9 @@ Paketet bär instruktionens material, men bara Johnnys ord är beslut.
   i paketets första ström. Startbeslutet tas under ett fillås i paketet, och en levande session startas aldrig om,
   inte heller efter en omstart av tjänsten: den känns igen på sin process, vars kommandorad bär paketets sökväg. En session som
   stoppades av kvot, åtkomst eller ett avbrott (till exempel en omstart av datorn) fortsätter i samma session. Efter
-  ett fel eller ett avslut startas ingen ny session.
+  ett fel eller ett avslut startas ingen ny session. En session som kvitterat `levererad` eller `avslagen` följs ändå
+  upp: startvakten skriver `klar` (eller utfallet) i `START.jsonl` och hämtar den avslutade processen, också när
+  kvittensen lästes före varvet eller tjänsten har startats om sedan sessionen avslutades.
 - **En skrivande session per ansvar.** Starten väntar, med skälet synligt, så länge någon annan skriver i
   mottagarens repo. Det gäller en Claude Code- eller Codex-process med arbetskatalog i repot, ändringar i
   primärutcheckningen, en worktree med ändringar från de senaste 30 minuterna och startvaktens egen session för

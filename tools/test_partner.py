@@ -1437,6 +1437,39 @@ class StartvaktProv(Miljo):
         self.assertIn('mottagare: kontorets-kedjedrivare', ut.getvalue())
         self.assertIn('session: %s startad' % sid, ut.getvalue())
 
+    def varv(self, vakt=None):
+        """Ett varv som tjänstens slinga gör det: kvittenserna läses före granskningen."""
+        self.S.overlamning.las_kvittenser()
+        return (vakt or self.vakt).granska()
+
+    def test_kvittens_fore_varvet_ger_klar_och_hamtar_processen(self):
+        (oid, kat), = self.overlamningar('kontorets-kedjedrivare')
+        self.assertEqual(self.varv(), [(oid, 'startad')])
+        proc = self.vakt._processer[oid]
+        slut = time.time() + 20
+        while time.time() < slut and self.start.handelser(kat)[-1]['typ'] != 'klar':
+            self.varv()
+            time.sleep(0.1)
+        self.assertEqual([h['typ'] for h in self.start.handelser(kat)], ['startad', 'klar'])
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'levererad')
+        self.assertIsNotNone(proc.returncode)                      # hämtad: ingen zombie kvar
+        self.assertNotIn(oid, self.vakt._processer)
+        self.assertEqual(self.varv(), [])                          # uppföljd: aldrig igen
+        self.assertEqual(len([a for a in self.mottagarlogg() if 'argv' in a]), 1)
+
+    def test_levererad_utan_klar_foljs_upp_efter_omstart(self):
+        (oid, kat), = self.overlamningar('kontorets-kedjedrivare')
+        self.assertEqual(self.varv(), [(oid, 'startad')])
+        self.vakt._processer.pop(oid).wait(20)                     # sessionen levererade medan tjänsten var nere
+        self.S.overlamning.las_kvittenser()
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'levererad')
+        self.assertEqual(self.start.handelser(kat)[-1]['typ'], 'startad')
+        omstartad = self.start.Startvakt(self.S)
+        omstartad.bemanning = lambda: self.bemanning
+        self.assertEqual(self.varv(omstartad), [(oid, 'klar')])
+        self.assertEqual(self.varv(omstartad), [])
+        self.assertEqual(len([a for a in self.mottagarlogg() if 'argv' in a]), 1)
+
     def test_upptagen_skrivplats_ger_vantan_och_sedan_start(self):
         (oid, kat), = self.overlamningar('kontorets-kedjedrivare')
         (self.k.kontor_primar / 'README.md').write_text('ändrad av en annan session\n', 'utf-8')
