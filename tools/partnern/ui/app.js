@@ -167,11 +167,39 @@ async function laddaTradar() {
 function ritaTradar() {
   const lista = $('tradlista'); lista.replaceChildren();
   for (const t of tillstand.tradar) {
-    lista.append(el('button', { class: 'trad' + (t.id === tillstand.trad ? ' vald' : ''), onclick: () => { stangTradmeny(); oppnaTrad(t.id, 'lagg'); }, 'aria-current': t.id === tillstand.trad ? 'true' : null,
-      title: t.titel + ' · ' + tid(t.senast) + ' · ' + t.inspel + ' inspel' },
-      el('span', { class: t.aktiv ? 'aktiv' : 'punkt', title: t.aktiv ? 'Arbetar' : null }), el('span', { class: 't', text: t.titel })));
+    lista.append(el('div', { class: 'tradrad' + (t.id === tillstand.trad ? ' vald' : '') },
+      el('button', { class: 'trad' + (t.id === tillstand.trad ? ' vald' : ''), onclick: () => { stangTradmeny(); oppnaTrad(t.id, 'lagg'); }, 'aria-current': t.id === tillstand.trad ? 'true' : null,
+        title: t.titel + ' · ' + tid(t.senast) + ' · ' + t.inspel + ' inspel' },
+        el('span', { class: t.aktiv ? 'aktiv' : 'punkt', title: t.aktiv ? 'Arbetar' : null }), el('span', { class: 't', text: t.titel })),
+      el('button', { class: 'radera', type: 'button', title: 'Radera tråden', 'aria-label': 'Radera tråden ' + t.titel, onclick: () => fragaRadera(t) }, soptunna())));
   }
 }
+function soptunna() {  // el() skapar HTML-element; ikonen behöver SVG:s namnrymd
+  const ns = 'http://www.w3.org/2000/svg';
+  const s = document.createElementNS(ns, 'svg'); s.setAttribute('viewBox', '0 0 20 20'); s.setAttribute('aria-hidden', 'true');
+  const p = document.createElementNS(ns, 'path'); p.setAttribute('d', 'M4.5 6h11M8 6V4.5h4V6M6 6l.7 9.5h6.6L14 6M8.7 9v4M11.3 9v4');
+  s.append(p); return s;
+}
+// ------------------------------------------------------------------ radera en tråd för gott (RADERA-TRAD-20260929)
+function fragaRadera(t) {
+  const d = $('raderadialog');
+  d.dataset.trad = t.id; $('raderatext').textContent = '”' + t.titel + '”'; $('raderafel').textContent = '';
+  $('raderabekrafta').disabled = false;
+  d.showModal(); $('raderaavbryt').focus();  // det säkra valet har fokus
+}
+$('raderaavbryt').addEventListener('click', () => $('raderadialog').close());
+$('raderabekrafta').addEventListener('click', async () => {
+  const d = $('raderadialog'); const id = d.dataset.trad;
+  $('raderabekrafta').disabled = true; $('raderafel').textContent = '';
+  try { await api('POST', '/api/trad/' + id + '/radera', { bekraftat: true }); }
+  catch (f) { $('raderafel').textContent = 'Tråden raderades inte: ' + f.message; $('raderabekrafta').disabled = false; return; }
+  d.close();
+  if (tillstand.trad === id) { tillstand.trad = null; await oppnaTrad('ny', 'ersatt'); }  // null: inget utkast sparas för den raderade
+  try { localStorage.removeItem('utkast:' + id); if (las('senasteTrad', null) === id) localStorage.removeItem('senasteTrad'); } catch { /* */ }
+  skriv('utkorg', las('utkorg', []).filter((x) => x.trad !== id));  // ett osparat inspel skulle annars bli en ny tråd
+  await laddaTradar().catch(() => {});
+  $('nytrad').focus();  // knappen som öppnade dialogen finns inte längre
+});
 async function oppnaTrad(id, adress) {  // adress: 'lagg' (ny historikpost), 'ersatt' eller 'ingen' (routern har redan satt den)
   if (tillstand.trad) sparaUtkast();  // spara den tråd som lämnas, aldrig en tom ruta innan utkastet laddats
   tillstand.trad = id; tillstand.vy = null; tillstand.vyNyckel = null;

@@ -249,7 +249,7 @@ Tillägg 2026-09-29 (19:15 UTC): ägaren har bantat arbetsplatsen (HEM-RUTOR-202
 Ändringen byggdes av nortropic-repos-6d efter besked från 04. Efter integrationen startas tjänsten om ur main enligt
 driftregeln. Därefter följer två egna ändringar:
 - Överlämningar blir backlog, byggt av nortropic-repos-d7 (gjort i FORBATTRINGSPARTNER-BACKLOG-20260929).
-- Trådar kan raderas för gott, byggt av 6d efter d7:s publicering.
+- Trådar kan raderas för gott, byggt av 6d efter d7:s publicering (gjort i RADERA-TRAD-20260929).
 
 Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md`. Arbetsgrenarna publiceras eller arkiveras
 i bundles där och tas bort lokalt.

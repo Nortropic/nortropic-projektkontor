@@ -4,13 +4,15 @@ Tre delar med olika status:
 
 * **Journalen** (`journal/journal.jsonl`) är originalet: varje inspel, tur, förståelse, rättelse och
   överlämning läggs till som en rad och skrivs till disk (fsync) innan något annat händer. Rader ändras
-  aldrig; en rättelse är en ny rad som pekar på det den ersätter.
+  aldrig; en rättelse är en ny rad som pekar på det den ersätter. Enda undantaget är när ägaren raderar en
+  tråd för gott (`radera_trad`, RADERA-TRAD-20260929): då skrivs journalen om utan trådens egna rader.
 * **Originalfilerna** (`blobs/`) är bilagornas exakta byte, namngivna efter sin SHA-256 och skrivna 0600.
 * **Indexet** (`index.sqlite`) är härlett. Det byggs om ur journalen (och källorna) och är aldrig en
   auktoritet i sig. Saknas eller skadas det byggs det om vid start.
 
 Bara serverprocessen skriver. Verktyg som modellen anropar går genom servern (se mcp_brygga.py), så
-journalen har en enda skrivare; låset nedan skyddar ändå mot en andra process på samma katalog.
+journalen har en enda skrivare; låset nedan skyddar ändå mot en andra process som lägger till samtidigt. Det
+skyddar inte under en radering, när journalen byts mot en ny fil; där är den enda skrivaren det som räcker.
 """
 from __future__ import annotations
 
@@ -18,7 +20,9 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 import secrets
+import shutil
 import sqlite3
 import threading
 import time
@@ -26,6 +30,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA = 4
+
+# Händelser som bär en tråds id men ligger kvar när tråden raderas (RADERA-TRAD-20260929): sparad förståelse och
+# överlämningar har ett eget liv utanför samtalet, och ägaren bestämde att de ska finnas kvar.
+BEHALLS_VID_RADERING = frozenset(('forstaelse', 'overlamning', 'overlamning_start', 'overlamning_status'))
+_ID = re.compile(r'^(tur|jobbk)_[A-Za-z0-9]+$')
+_SESSION = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
 
 
 def nu() -> str:
@@ -203,6 +213,117 @@ class Lager:
             self._indexera(ev)
             return ev
 
+    def radera_trad(self, trad: str, radera_session=None) -> dict:
+        """Radera en tråd för gott på ägarens begäran (RADERA-TRAD-20260929).
+
+        Trådens egna händelser tas bort ur journalen: tråden, inspelen, turerna, resonemangen, utredningarna och
+        kopplingar till och från tråden. Förståelse och överlämningar ligger kvar (BEHALLS_VID_RADERING).
+
+        Ordningen tål en krasch var som helst:
+        1. Trådens filer tas bort först: turernas och utredningarnas kataloger, bilagor som ingen kvarvarande rad
+           nämner, med sina härledda filer, och Claude Codes sessionsfiler genom `radera_session` för sessioner som
+           ingen kvarvarande rad nämner. Kraschar det här står tråden kvar i journalen och kan raderas igen.
+        2. Journalen skrivs om atomärt (ny fil, fsync, namnbyte, fsync av katalogen) med övriga rader byte för byte
+           och sist en händelse `trad_raderad` utan innehåll, med ett seq efter det högsta som funnits.
+        3. Indexet byggs om. Kraschar det före det tar `_indexera` bort tråden ur indexet när `trad_raderad` läses
+           ikapp vid nästa start.
+        Anroparen ser till att inget körs eller startar i tråden. KeyError om journalen inte har tråden.
+        """
+        with self._las:
+            with open(self.journal, 'r+b') as f:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                try:
+                    rader = f.read().split(b'\n')
+                    svans = rader.pop()
+                    if svans.strip():
+                        rader.append(svans)  # en avbruten sista rad blir en egen rad, som när lagg_till avslutar den
+                    tolkade, sista_seq, jobb = [], 0, set()
+                    for rad in rader:
+                        try:
+                            ev = json.loads(rad)
+                        except ValueError:
+                            ev = None
+                        if not isinstance(ev, dict):
+                            tolkade.append((rad, None, False))
+                            continue
+                        try:
+                            sista_seq = max(sista_seq, int(ev.get('seq') or 0))
+                        except (TypeError, ValueError):
+                            pass
+                        bort = ev.get('typ') not in BEHALLS_VID_RADERING and (
+                            ev.get('trad') == trad or (ev.get('typ') == 'koppling' and ev.get('till') == trad)
+                            or (ev.get('typ') == 'jobb_status' and ev.get('jobb') in jobb))
+                        if bort and ev.get('typ') == 'jobb':
+                            jobb.add(ev.get('jobb'))
+                        tolkade.append((rad, ev, bort))
+                    borttagna = [ev for _, ev, bort in tolkade if bort]
+                    if not any(ev.get('typ') == 'trad' for ev in borttagna):
+                        raise KeyError(trad)
+                    # det som ligger kvar, utan bilagornas egna blob-rader, avgör vad som fortfarande nämns
+                    kvar = b'\n'.join(rad for rad, ev, bort in tolkade if not bort and not (ev and ev.get('typ') == 'blob'))
+                    shas, sessioner, kataloger = set(), set(), set()
+                    for ev in borttagna:
+                        for b in (ev.get('bilagor') or []) if ev.get('typ') == 'inspel' else []:
+                            if isinstance(b, dict) and isinstance(b.get('sha'), str):
+                                shas.add(b['sha'])
+                        if isinstance(ev.get('session'), str) and _SESSION.match(ev['session']):
+                            sessioner.add(ev['session'])
+                        for nyckel in ('tur', 'korning'):  # turens katalog heter som turen; utredningens anges i jobb_status
+                            if ev.get('typ') in ('tur_start', 'tur_klar', 'jobb_status') and isinstance(ev.get(nyckel), str) \
+                                    and _ID.match(ev[nyckel]):
+                                kataloger.add(ev[nyckel])
+                    bort_blobbar = {s for s in shas if s.encode() not in kvar}
+                    sessioner = {s for s in sessioner if s.encode() not in kvar}
+                    # 1. filerna
+                    if sessioner:  # äldre utredningar har ingen katalog i journalen; deras ström bär sessionen
+                        for katalog in self.turer.glob('jobbk_*'):
+                            try:
+                                strom = (katalog / 'strom.jsonl').read_bytes()
+                            except OSError:
+                                continue
+                            if _ID.match(katalog.name) and any(s.encode() in strom for s in sessioner):
+                                kataloger.add(katalog.name)
+                    for namn in kataloger:
+                        shutil.rmtree(self.turer / namn, ignore_errors=True)
+                    for sha in bort_blobbar:
+                        try:
+                            self.blob_sokvag(sha).unlink()
+                        except (OSError, ValueError):
+                            pass
+                        if len(sha) == 64 and all(c in '0123456789abcdef' for c in sha):
+                            shutil.rmtree(self.harlett / sha, ignore_errors=True)
+                    for session in sessioner:
+                        if radera_session:
+                            radera_session(session)
+                    # 2. journalen
+                    ny = [rad for rad, ev, bort in tolkade
+                          if not bort and not (ev and ev.get('typ') == 'blob' and ev.get('sha') in bort_blobbar)]
+                    post = {'seq': sista_seq + 1, 'id': nytt_id('ev'), 'typ': 'trad_raderad', 'tid': nu(), 'trad': trad,
+                            'handelser': len(borttagna), 'bilagor': len(bort_blobbar)}
+                    ny.append(json.dumps(post, ensure_ascii=False, separators=(',', ':')).encode('utf-8'))
+                    tmp = self.journal.with_name('.journal.%s.tmp' % secrets.token_hex(4))
+                    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                    try:
+                        data = b'\n'.join(ny) + b'\n'
+                        skrivet = 0
+                        while skrivet < len(data):
+                            skrivet += os.write(fd, data[skrivet:])
+                        os.fsync(fd)
+                    finally:
+                        os.close(fd)
+                    os.replace(tmp, self.journal)
+                    dfd = os.open(self.journal.parent, os.O_RDONLY)
+                    try:
+                        os.fsync(dfd)
+                    finally:
+                        os.close(dfd)
+                finally:
+                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            # 3. indexet
+            self.bygg_om_index()
+            return {'trad': trad, 'handelser': len(borttagna), 'bilagor': len(bort_blobbar),
+                    'turer': len([k for k in kataloger if k.startswith('tur_')]), 'sessioner': sorted(sessioner)}
+
     def inspel_kontext(self, inspel_id: str) -> list:
         """Arbetsplatsens hänvisningar som följde med ett inspel, ur journalens händelse (tom för äldre inspel)."""
         rad = self.en("select data from handelse where id=? and typ='inspel'", (inspel_id,))
@@ -231,6 +352,17 @@ class Lager:
             elif typ == 'trad_titel':
                 db.execute('update trad set titel=?, titel_av=? where id=?',
                            (ev['titel'], ev.get('titel_av', 'agare'), trad))
+            elif typ == 'trad_raderad':  # också när indexet läses ikapp efter en krasch mitt i en radering
+                bort = [r[0] for r in db.execute('select id from inspel where trad=? union select id from tur where trad=? '
+                                                 'union select id from jobb where trad=?', (trad, trad, trad))]
+                for i in bort:
+                    db.execute('delete from sok where kalla_id=?', ('partner:' + i,))
+                for tabell in ('inspel', 'tur', 'resonemang', 'jobb'):
+                    db.execute('delete from %s where trad=?' % tabell, (trad,))
+                db.execute('delete from koppling where trad=? or till=?', (trad, trad))
+                db.execute('delete from trad where id=?', (trad,))
+                db.execute('delete from handelse where trad=? and seq<>? and typ not in (%s)'
+                           % ','.join('?' * len(BEHALLS_VID_RADERING)), (trad, ev['seq'], *sorted(BEHALLS_VID_RADERING)))
             elif typ == 'trad_arkiv':
                 db.execute('update trad set arkiverad=? where id=?', (1 if ev.get('arkiverad', True) else 0, trad))
             elif typ == 'blob':

@@ -6779,6 +6779,9 @@ förbättringspartnern inte ska ha någon användningsgräns, så dygnstaket, st
 borttagna. Användningsspåren (tokens, tid, omtag och Claude Codes listprisvärde som information) finns kvar. Övrigt
 gäller.
 
+**Delvis ersatt av:** RADERA-TRAD-20260929, i fråga om journalen som bara läggs till: ägaren beslutade 2026-09-29 att en
+tråd ska kunna raderas för gott, och då skrivs journalen om utan trådens egna rader. Övrigt gäller.
+
 
 ## FORBATTRINGSPARTNER-RESULTAT-20260928 — slutrapport för FORBATTRINGSPARTNER-20260928: förbättringspartnern är integrerad och driftsatt i kontoret, slutproven är gjorda på den införda tjänsten och rättningarna ur dem integreras med denna post; kvar för ägaren är bestående start vid inloggning och en ny fångst av Improvements efter 19 september
 
@@ -8219,3 +8222,89 @@ lade LaunchAgent-filen 16:21:22Z och tjänsten startade 16:21:28Z (kvitto `KVITT
 
 **Avslut.** Klart när ändringen är på main, partnertjänsten kör den nya koden och de tre 20e7b1-överlämningarna är
 avslagna. Nästa bygge i spåret kräver ett eget beslut.
+
+## RADERA-TRAD-20260929 — ägaren vill kunna radera trådar i Förbättringar för gott; sparad förståelse och skickade överlämningar ligger kvar
+
+**Status:** registrerat 2026-09-29 (21:17 UTC) av sessionen nortropic-repos-6d (Claude Code).
+
+**Ägarens besked** (ordagrant i `evidence/nasta-uppdrag/local/radera-trad-20260929/owner-words-radera-trad-20260929.md`,
+med de tidigare orden citerade ur den förseglade HEM-RUTOR-filen):
+- Om Förbättringar: "behöver även kunna ta bort trådar".
+- Sessionen frågade vad som ska hända när en tråd tas bort, "Dölj den" eller "Radera för gott". Ägaren svarade:
+  "Radera för gott".
+- Sessionen frågade om det han sparat ur tråden, till exempel F-26, och överlämningar som redan skickats också ska
+  bort. Den utgick från att de ska ligga kvar. Ägaren svarade: "precis, det behöver ju inte".
+
+**Genomfört.**
+- `tools/partnern/lager.py`, `radera_trad`:
+  - Trådens egna händelser tas bort ur journalen: tråden, inspelen, turerna, resonemangen och utredningarna. Kopplingar
+    till och från tråden tas också bort.
+  - Förståelse och överlämningar med trådens id ligger kvar (`BEHALLS_VID_RADERING`).
+  - Ordningen tål en krasch. Först tas trådens filer bort:
+    - turernas och utredningarnas kataloger under `turer/`;
+    - bilagor som ingen kvarvarande rad nämner, med sina härledda filer;
+    - Claude Codes sessionsfiler för sessioner som ingen kvarvarande rad nämner.
+  - Sedan skrivs journalen om atomärt: ny fil, fsync, namnbyte och fsync av katalogen. Övriga rader står kvar byte för
+    byte. Sist skrivs en rad `trad_raderad` utan innehåll, med ett seq efter det högsta som funnits. Då fortsätter
+    journalens seq uppåt.
+  - Sist byggs indexet om. Kraschar tjänsten före det tar indexet bort tråden när `trad_raderad` läses ikapp vid nästa
+    start. Kraschar den före journalbytet står tråden kvar och kan raderas igen.
+  - En avbruten sista rad behandlas som när `lagg_till` avslutar den. Är den en hel händelse i tråden tas den bort, och
+    dess seq räknas.
+- `tools/partnern/jobb.py`: en utredning startar under serverns lås och journalför sin katalog (`korning`) i
+  `jobb_status`. Då startar en köad utredning antingen före en radering, som då vägras, eller inte alls. Raderingen
+  hittar katalogen också om utredningen kraschat innan strömmen skrevs. Äldre utredningar hittas genom sessionen i
+  strömmen.
+- `tools/partnern/server.py`:
+  - `Server.radera_trad` vägrar medan en tur eller utredning körs, väntar eller är registrerad i tråden. Serverns lås
+    hindrar att en ny tur startar under raderingen.
+  - Lagret anropar tillbaka hit för att radera Claude Codes sessionsfiler.
+  - Har indexet en tråd som journalen saknar, byggs indexet om ur journalen och svaret blir 404.
+  - `POST /api/trad/<id>/radera` kräver `bekraftat: true`. Svaret är 409 medan partnern arbetar och 404 för en okänd
+    tråd.
+  - Vägen kräver inloggning, som varje `/api/`-skrivning, så modellens verktyg kan inte radera.
+- Ytan (`index.html`, `app.js` och `app.css`):
+  - Varje tråd i listan har en papperskorg. Den syns när raden pekas på, har fokus eller visas på en pekskärm.
+  - En egen bekräftelseruta (`<dialog>`) har Avbryt förvalt, och Esc stänger den.
+  - Efter raderingen rensar ytan trådens utkast, senaste tråd och outskickade inspel. Ett outskickat inspel skulle
+    annars bli en ny tråd.
+  - Var den raderade tråden öppen visas en ny tråd, och fokus går till Ny tråd.
+- `tools/test_partner.py`: `RaderaTradProv` med fyra prov. Proven gäller kopplingar i båda riktningarna, överlämningens
+  vy efter raderingen, en krasch mellan journalbytet och indexet, en avbruten sista rad och en utredningskatalog utan
+  ström.
+- `tools/PARTNER.md`: ett stycke om radering, provlistan och tabellen över delarna. Journalen är inte längre
+  append-only utan undantag.
+
+**Oförändrat och gränser.**
+- Sparad förståelse och överlämningar ligger kvar, enligt ägarens besked.
+- En sparad punkts källhänvisning till ett raderat inspel går inte längre att öppna.
+- En överlämnings hänvisning till sin tråd och sitt inspel pekar på något som inte längre finns. Överlämningens vy
+  visar den ändå.
+- Kopior utanför tjänsten rörs inte, till exempel Time Machine.
+- Överlämningspaketen under `evidence/nasta-uppdrag/local/partner-OVL-*` ligger kvar med sina egna filer, också
+  `AGARENS-ORD.md`.
+- Ingen tråd i den levande tjänsten raderas av denna integration. Ägaren raderar själv i ytan.
+
+**Samordning.**
+- nortropic-repos-d7 publicerade FORBATTRINGSPARTNER-BACKLOG-20260929 (PR 137) och lämnade skrivplatsen 20:58Z.
+- OVL-20260929-b4cecc (planstädning, startad av startvakten 20:47Z) skulle publicera först. Dess session slutade med
+  ett fel 21:14Z utan att ha publicerat något. Denna ändring rör bara en mening i arbetsplatsens planblock och en rad
+  sist i FORBATTRINGSPARTNER-20260928. Planens topp och ÄGARENS TUR är orörda.
+
+**Granskning.** Den första separata granskningen (claude-opus-5) godkände kandidaten utan blockerande fynd. Fyra av dess
+noter var ändå verkliga luckor i en radering som inte går att ångra, och de är rättade före publiceringen:
+- en krasch mellan journalbytet och indexet kunde lämna en spöktråd som inte gick att radera;
+- en avbruten sista rad kunde bli en levande händelse igen;
+- en utredning som kraschat innan strömmen skrevs lämnade sin katalog kvar;
+- en köad utredning kunde starta i ett ögonblick under raderingen.
+
+Kopplingar från andra trådar tas nu också bort, och texterna säger vad som gäller. Rättelserna prövas i en ny runda.
+
+**Ersätter:** ingen post helt. Posten ersätter delvis FORBATTRINGSPARTNER-20260928 i fråga om journalen som bara läggs
+till, och markeringen står sist i den posten.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main. En tråd som redan har
+raderats kommer inte tillbaka.
+
+**Avslut.** Ändringen är klar när den är integrerad och tjänsten har startats om ur main enligt driftregeln. Nästa
+bygge i detta spår kräver ett eget beslut.

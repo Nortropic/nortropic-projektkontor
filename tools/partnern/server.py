@@ -13,6 +13,7 @@ import json
 import os
 import re
 import secrets
+import shutil
 import signal
 import subprocess
 import sys
@@ -25,7 +26,7 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from . import VERSION
 from . import bilagor as bil
-from .agent import Agent, Korning, prova_underagent
+from .agent import Agent, Korning, _session_fil, prova_underagent
 from .arbetsplats import Arbetsplats
 from .jobb import Jobb
 from .kallor import Kallindex, KLASSER
@@ -62,6 +63,10 @@ def las_hemlighet(katalog: Path, namn: str, skapa: bool = True) -> str:
         with os.fdopen(fd, 'w') as f:
             f.write(secrets.token_urlsafe(32))
     return fil.read_text().strip()
+
+
+class TradUpptagen(Exception):
+    """Tråden kan inte raderas medan partnern arbetar i den."""
 
 
 class Server:
@@ -246,6 +251,34 @@ class Server:
             if not vantar or all(i['lage'] == 'bara_spara' for i in vantar):
                 return None
             return self._starta(trad, vantar, None)
+
+    def radera_trad(self, trad: str) -> dict | None:
+        """Radera en tråd för gott på ägarens begäran (RADERA-TRAD-20260929). None om tråden inte finns.
+
+        Vägrar medan en tur eller utredning körs, väntar eller är registrerad i tråden (TradUpptagen): då skulle
+        pågående arbete skriva händelser om en tråd som inte längre finns. Serverns lås hålls hela raderingen, så
+        ingen tur eller utredning kan starta under den (Jobb._kor tar samma lås). Lagret raderar journal, index och
+        filer och anropar tillbaka hit för Claude Codes egna sessionsfiler.
+        """
+        def radera_session(session: str) -> None:
+            fil = _session_fil(self.agent.arbetsyta, session)
+            try:
+                fil.unlink()
+            except OSError:
+                pass
+            shutil.rmtree(fil.with_suffix(''), ignore_errors=True)  # underagenternas filer, om några finns
+
+        with self._las:
+            if not self.lager.trad(trad):
+                return None
+            if self.aktiv_tur(trad) or any(k.trad == trad for k in self._korningar.values()) or self.lager.en(
+                    "select id from jobb where trad=? and status in ('registrerat','pagar')", (trad,)):
+                raise TradUpptagen('Partnern arbetar i tråden. Avbryt eller vänta tills den är klar och radera sedan.')
+            try:
+                return self.lager.radera_trad(trad, radera_session)
+            except KeyError:  # indexet hade tråden men journalen inte: indexet byggs om ur journalen, originalet
+                self.lager.bygg_om_index()
+                return None
 
     def avbryt_pagaende(self, trad: str, orsak: str) -> bool:
         """Avbryt trådens pågående tur utan att starta en ny (bara spara med avbryt pågående)."""
@@ -814,10 +847,21 @@ class Hanterare(BaseHTTPRequestHandler):
             elif not dubblett and d.get('avbryt_pagaende'):
                 S.avbryt_pagaende(inspel['trad'], BARA_SPARA_AVBROTT)
             return self._svara(200, {'inspel': inspel, 'dubblett': dubblett, 'tur': tur})
-        m = re.match(r'^/api/trad/(t_[A-Za-z0-9]+)/(titel|arkivera)$', p)
+        m = re.match(r'^/api/trad/(t_[A-Za-z0-9]+)/(titel|arkivera|radera)$', p)
         if m:
             if not S.lager.trad(m.group(1)):
                 return self._fel(404, 'tråden finns inte')
+            if m.group(2) == 'radera':  # för gott; ytan frågar först och skickar då bekraftat
+                if d.get('bekraftat') is not True:
+                    return self._fel(400, 'radering kräver bekraftat: true')
+                try:
+                    ut = S.radera_trad(m.group(1))
+                except TradUpptagen as fel:
+                    return self._fel(409, str(fel))
+                if ut is None:
+                    return self._fel(404, 'tråden finns inte')
+                return self._svara(200, {'raderad': True, 'handelser': ut['handelser'], 'bilagor': ut['bilagor'],
+                                         'turer': ut['turer'], 'sessioner': len(ut['sessioner'])})
             if m.group(2) == 'titel':
                 S.lager.lagg_till('trad_titel', trad=m.group(1), titel=str(d.get('titel') or '').strip()[:90] or 'Tråd',
                                   titel_av='agare')

@@ -99,5 +99,14 @@
 </div>
 </div>
 <div id="slapp" class="slapp" hidden>Släpp filerna för att bifoga dem</div>
+<dialog id="raderadialog" class="dialog" aria-labelledby="raderarubrik" aria-describedby="raderatext">
+  <h3 id="raderarubrik">Radera tråden?</h3>
+  <p id="raderatext"></p>
+  <p class="dampad liten">Meddelandena och partnerns svar raderas för gott och kan inte återställas. Det du sparat ur
+    tråden och överlämningar som redan skickats ligger kvar.</p>
+  <p id="raderafel" class="fel liten" role="alert"></p>
+  <div class="knapprad"><button id="raderaavbryt" class="knapp" type="button">Avbryt</button><button id="raderabekrafta"
+    class="knapp fara" type="button">Radera</button></div>
+</dialog>
 </body>
 </html>

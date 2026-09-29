@@ -60,9 +60,21 @@ code, pre { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: .
 .nytrad svg { color: var(--text); }
 .sektion { padding: 14px 20px 6px; font-size: 12.5px; color: var(--dampad); }
 .tradlista { overflow-y: auto; flex: 1; padding: 0 10px; }
-.trad { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0; background: none; padding: 7px 10px; border-radius: 10px; color: var(--text); }
-.trad:hover { background: var(--yta2); }
-.trad.vald { background: var(--yta2); }
+.tradrad { display: flex; align-items: center; border-radius: 10px; }
+.tradrad:hover, .tradrad.vald { background: var(--yta2); }
+.trad { display: flex; flex: 1; min-width: 0; align-items: center; gap: 10px; text-align: left; border: 0; background: none; padding: 7px 10px; border-radius: 10px; color: var(--text); }
+.radera { flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin-right: 3px; border: 0; background: none; border-radius: 8px; color: var(--dampad); }
+.radera:hover, .radera:focus-visible { color: var(--fel); background: var(--yta); }
+.radera svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) { .tradrad .radera { opacity: 0; } .tradrad:hover .radera, .tradrad:focus-within .radera { opacity: 1; } }
+.dialog { border: 1px solid var(--linje); border-radius: var(--radie); background: var(--yta); color: var(--text); padding: 20px 22px 16px; width: min(420px, calc(100vw - 32px)); box-shadow: var(--skugga); }
+.dialog::backdrop { background: rgba(0, 0, 0, .35); }
+.dialog h3 { margin: 0 0 6px; font: 500 17px/1.3 var(--serif); }
+.dialog p { margin: 0 0 10px; overflow-wrap: anywhere; }
+.dialog .fel:empty { display: none; }
+.dialog .knapprad { justify-content: flex-end; }
+.knapp.fara { background: var(--fel); color: var(--yta); border-color: var(--fel); }
+.knapp:disabled { opacity: .6; }
 .trad .punkt { width: 6px; height: 6px; border-radius: 50%; border: 1.3px solid var(--dampad); flex: none; }
 .trad .t { flex: 1; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .trad .aktiv { width: 7px; height: 7px; border-radius: 50%; background: var(--varm); flex: none; animation: puls 1.6s infinite; }
