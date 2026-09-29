@@ -7948,11 +7948,19 @@ gjort veckokontrollen timvis. En kanal räknas som utförd bara om dess egen lä
 hälsokontroll som aldrig nådde ändpunkten (`monitor_bound_exceeded`, `monitor_stranded_limit`) bär
 `observed: false` och lämnar sin period öppen, eftersom ingenting kontrollerades.
 
-En körning som avbröts efter att den stängt sin egen kanal känner igen sitt eget kvitto, läser ingenting
-igen, flyttar ingen sekvens och skriver bara klart sitt kvitto; det läget heter `already_performed`, inte
-`not_due`. Den kan inte se outfallet om igen, så den läser tillbaka kanalernas egna beständiga
-hälsolägen och märker svaret `attested_by: persisted_channel_state`: en avbruten incidentkörning förblir
-`completed: false`, och ett oläsbart hälsoläge läses aldrig som grönt.
+**Utfall och period är två faser.** När en kanal är klar skrivs först `settled-<kanal>.json` med vad den
+fann, och först därefter stängs perioden. Posten namnger den enda period den stänger, så den kan aldrig
+attestera en senare. Ett avbrott mellan faserna lämnar arbetet hittbart: nästa väckning, med vilket
+kör-id som helst, slutför commit:en ur det som observerades i stället för att läsa kundens sajt igen inom
+samma vecka, och kvittot bär den hälsa som faktiskt uppmättes. Det läget heter `already_performed` med
+`attested_by: settled_outcome`, och en avbruten incidentkörning förblir därför `completed: false`. Ett
+saknat utfallskvitto betyder att arbetet är skyldigt, aldrig att det var friskt; en post för en redan
+stängd period är passerad, och en trasig bevaras för diagnos utan att attestera något.
+
+En kanal räknas dessutom som utförd bara när dess ändpunkt faktiskt svarade. Ett statussvar eller en läst
+kropp är en observation av sajten och stänger veckan; transportfel, DNS-fel och timeout är det inte, så
+perioden står kvar som skyldig. Annars kunde ett tillfälligt nätfel skjuta upp en skyldig kontroll en
+hel vecka.
 
 **Vad kvittot betyder.** `performed` och `completed` är åtskilda. Exit 1 ur driftkontrollen är en
 kontroll som kördes och fann en incident, inte en trasig mekanism: den är `performed` men inte
@@ -8012,6 +8020,12 @@ nu i egen daemontråd och kanalen återvänder när join:en löper ut; det ÄR t
 tråden, eftersom en felkonfigurerad monitor ska vägras högt och inte rapporteras som slut på tiden —
 den regressionen fälldes av D038:s eget prov.
 
+Runda 5: fyra fel till, alla mina, och tre med samma rot — ett kvitto eller ett hälsoläge som
+attesterade något det inte visste. `observed` sattes när monitortråden slutförts i stället för när
+ändpunkten svarat; en återupptagning blev grön när någon kanal bara var `not_due`; attesteringen godtog
+saknat, feltypat och gammalt hälsoläge; och ett avbrott före periodskrivningen gav dubbel driftkontroll
+inom samma vecka. Settle-then-commit ovan svarar på alla fyra.
+
 Runda 4: fyra fel till, alla mina. Trådtaket gällde inte alls mellan Runtime-aktiviteter — Runtime laddar
 hanteraren på nytt varje gång, så ett register i modultillståndet nollställdes vid varje väckning medan
 tidigare trådar levde; registret är nu förankrat i tolken, och ett prov laddar modulen på nytt tre gånger
@@ -8028,9 +8042,9 @@ join:en binder kanalen men inte uttaget, så övergivet nätarbete kunde samlas 
 och en sent frigjord transport kunde starta ett andra försök efter att kanalen redan svarat. Övergivna
 trådar får nu en stoppflagga och är högst två; därutöver vägrar kanalen direkt.
 
-**Prov.** Hanterarens svit ger 61 provkörningar, mot 10 på oförändrad main, fördelade på 49 olika
-metodnamn eftersom en delad fixtur ärvs av två testklasser (granskningsrunda 5 fann att en tidigare
-formulering dolde det). Proven kör Digitalas verkliga frysta
+**Prov.** Hanterarens svit ger 64 provkörningar, mot 10 på oförändrad main, fördelade på 52 olika
+metodnamn eftersom tolv `test_`-metoder ligger i en delad fixtur som ärvs av två testklasser
+(granskningsrunda 5 fann att en tidigare formulering dolde det). Proven kör Digitalas verkliga frysta
 `drift_kontroll.py`-byte mot en loopback-provsajt: ren körning, saknad förväntad text, trasig sitemap,
 incident och återhämtning med oberoende privata kvitton, exitkod mot kvitto, verktygets egen räkning mot
 kvittot, omkörning inom samma sekund, kvitto utanför kundmappen, timeout/vägran/fel som skilda utfall,
@@ -8039,9 +8053,11 @@ förfallologik inklusive framtida och överflödande kvitto, en annan körnings 
 en körning avbruten efter att den stängt sin egen period, en kanal som fortsätter misslyckas utan att dra
 med sig en som gjort sin vecka, ett bestående monitorfel som inte får göra veckan timvis, en monitor som
 aldrig nådde ändpunkten, en avbruten incidentkörning som inte får bli grön, monitorns väggklocka mot en
-droppande statusrad, och de övergivna trådarnas tak över modulomladdningar. Kontorets helsvit är 560 prov
+droppande statusrad, ett avbrott på exakt punkten mellan de två faserna, ett utfallskvitto som inte får
+attestera en senare period, ett saknat, trasigt eller feltypat kvitto, och de övergivna trådarnas tak över
+modulomladdningar. Kontorets helsvit är 563 prov
 OK i tre körningar efter varandra, mätt mot 509 prov OK i tre körningar på oförändrad main `34bcedd` med
-samma maskin och tolk; alla sex kvitton i Runtimes `evidence/runs/runtime-veckodrift-5/`, där också
+samma maskin och tolk; alla sex kvitton i Runtimes `evidence/runs/runtime-veckodrift-6/`, där också
 kvalificeringen mot den verkliga motorn ligger.
 Provsajten och signalytan är loopback-provdata, aldrig en kundadress och aldrig Kundstarts produktion
 eller dess lokala provtjänst.
@@ -8057,8 +8073,14 @@ kör tills den är klar, men då kan kvoten ta slut och all Claude stanna till s
 
 Johnnys svar, ordagrant: **"pausa den"**
 
-Runda 5 underkände, så arbetet stannade där. Fyra blockerare står öppna och orättade i Runtimes
-`evidence/runs/runtime-veckodrift-5/GRANSKNING-r5-DOM-OATGARDAD.md`. Ingen integration är gjord.
+Runda 5 underkände, så arbetet stannade där.
+
+**Pausen upphävd 2026-09-29 ca 18:32Z.** Pausens enda skäl var veckokvoten, och det skälet är borta.
+Johnny skrev i sin egen session, ordagrant: **"vi är inne på ett nytt konto så kvoten är 100 %"** och
+strax därefter **"rättelse, 0 % blir det ju."** Kvotprov på inloggningen omedelbart före återupptagningen:
+veckoandel saknades, fönstren `five_hour` 0,05 och `seven_day` 0,01. Arbetet återupptogs därför: runda 5:s
+fyra blockerare rättas, ny separat granskning, och vid godkänd dom skyddad integration. Fables veckogräns
+gällde det gamla kontot.
 
 **Ägarens tur.** Raden om beställ eller avstå är besvarad av ägarens beställning och tas därför bort. Två
 nya rader ersätter den: staga och kvalificera Runtime-releasen med operationsbindningen, aktivera övergången

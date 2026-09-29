@@ -156,8 +156,6 @@ def monitor(config):
     thread.join(MONITOR_DEADLINE)
     if failure:
         raise failure[0]
-    if not (thread.is_alive() or not answer):
-        answer['observed'] = True
     if thread.is_alive() or not answer:
         # Told to stop, so it cannot start a further attempt after this answer; it holds
         # no lock, is never waited on again, and is counted until it ends by itself.
@@ -182,8 +180,15 @@ def monitor_binding(config):
 
 
 def observe_health(config, headers, stop):
+    """`observed` says whether the endpoint actually answered, not whether we tried.
+
+    A status code or a body read is an answer about the site, healthy or not, and the
+    week's check is then done. A transport failure, a DNS failure or a timeout is not:
+    nothing was learned, so the check is still owed and the period must stay open.
+    Otherwise one transient network fault would postpone a real check a whole week.
+    """
     opener = urllib.request.build_opener(NoRedirect())
-    attempts = []
+    attempts, answered = [], False
     for number in range(2):
         transient = False
         if stop.is_set():
@@ -207,20 +212,27 @@ def observe_health(config, headers, stop):
                            and body.get('candidate') == config['candidate']
                            and body.get('storage') == 'available')
                 attempts.append({'http': response.status, 'body_sha256': digest(raw), 'healthy': healthy})
-                return {'healthy': healthy, 'reason': 'verified' if healthy else 'wrong_candidate_or_unhealthy',
+                return {'healthy': healthy, 'observed': True,
+                        'reason': 'verified' if healthy else 'wrong_candidate_or_unhealthy',
                         'attempts': attempts, 'observed_at': now(), 'candidate': config['candidate']}
         except urllib.error.HTTPError as error:
+            # The server answered. That is an observation of the site, and an unhealthy one.
             transient = error.code in (429, 502, 503, 504)
+            answered = True
             attempts.append({'http': error.code, 'healthy': False})
         except (urllib.error.URLError, TimeoutError, OSError):
+            # Nothing was learned about the site at all.
             transient = True
             attempts.append({'error': 'transport_unavailable', 'healthy': False})
         except (ValueError, TypeError, AttributeError):
+            # Read, but unreadable as a health answer: an observation, and unhealthy.
+            answered = True
             attempts.append({'error': 'invalid_health_response', 'healthy': False})
         if not transient or number == 1 or stop.wait(1):
             break
-    return {'healthy': False, 'reason': 'endpoint_unavailable', 'attempts': attempts,
-            'observed_at': now(), 'candidate': config['candidate']}
+    return {'healthy': False, 'observed': answered,
+            'reason': 'endpoint_unhealthy' if answered else 'endpoint_unavailable',
+            'attempts': attempts, 'observed_at': now(), 'candidate': config['candidate']}
 
 
 def frozen_digitala(config, required):
@@ -473,6 +485,63 @@ def transition(home, channel, current):
     return {'receipts': receipts, 'state_error': state_error}
 
 
+def validate_settled(value, sequence):
+    """A settled outcome is only ever valid for the one period it says it closes."""
+    if (not isinstance(value, dict)
+            or set(value) != {'closes_sequence', 'healthy', 'reason', 'run_id', 'observed_at'}
+            or type(value['closes_sequence']) is not int
+            or value['closes_sequence'] != sequence + 1
+            or type(value['healthy']) is not bool
+            or not isinstance(value['reason'], str) or not re.fullmatch('[a-z_]{1,80}', value['reason'])
+            or not isinstance(value['run_id'], str)
+            or not re.fullmatch('[a-zA-Z0-9-]{1,100}', value['run_id'])):
+        raise StateError('invalid_settled_outcome')
+    timestamp(value['observed_at'])
+    return value
+
+
+def settle_outcome(home, channel, sequence, healthy, reason, run_id):
+    """Record what this channel found, before its period is closed.
+
+    Two phases, in this order: the outcome is durable first, the period second. An
+    interruption between them therefore leaves the work findable, so the next wakeup
+    completes the period instead of reading the customer's site a second time inside
+    the same week - and the receipt it writes carries the health that was actually
+    observed rather than a fresh guess.
+
+    The record names the one period it closes, so it can never be reused in a later
+    one. Once the period advances the record no longer matches and is ignored.
+    """
+    state = {'closes_sequence': sequence + 1, 'healthy': healthy, 'reason': reason,
+             'run_id': run_id, 'observed_at': now()}
+    path = regular(home / ('settled-' + channel + '.json'))
+    write(path, state)
+    if load_state(path) != state:
+        raise StateError('settled_readback_failed')
+    return state
+
+
+def settled(home, channel, sequence):
+    """This channel's already-recorded outcome for the period about to be closed."""
+    path = regular(home / ('settled-' + channel + '.json'))
+    if not path.exists():
+        return None
+    try:
+        return validate_settled(load_state(path), sequence)
+    except StateError:
+        # A record for another period is simply superseded, not a fault. One that is
+        # malformed is preserved for diagnosis. Neither may attest anything.
+        value = None
+        try:
+            value = load_state(path)
+        except StateError:
+            pass
+        if not (isinstance(value, dict) and type(value.get('closes_sequence')) is int
+                and value['closes_sequence'] <= sequence):
+            path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
+        return None
+
+
 def due(home, config, channel, run_id):
     """Is this channel's period due? Read from durable state, never from the wakeup.
 
@@ -499,6 +568,9 @@ def due(home, config, channel, run_id):
     overdue = {'due': True, 'period_seconds': period, 'completed_at': None,
                'due_at': observed.isoformat(), 'overdue_seconds': 0, 'sequence': 0}
     if not path.exists():
+        done = settled(home, channel, 0)
+        if done is not None:
+            return {**overdue, 'due': False, 'reason': 'already_performed', 'settled': done}
         return {**overdue, 'reason': 'no_period_recorded'}
     try:
         value = load_state(path)
@@ -517,12 +589,13 @@ def due(home, config, channel, run_id):
     except (StateError, OverflowError, OSError, ValueError):
         path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
         return {**overdue, 'reason': 'invalid_period_state'}
-    if value['run_id'] == run_id:
-        # This run already closed this channel's period and was then interrupted. The
-        # reading is done; it must not happen again, and the record stands as written.
-        return {'due': False, 'reason': 'own_period_record', 'period_seconds': period,
+    done = settled(home, channel, value['sequence'])
+    if done is not None:
+        # The work for the next period is already recorded but its period was never
+        # closed. Finish the commit from what was observed; do not read again.
+        return {'due': False, 'reason': 'already_performed', 'period_seconds': period,
                 'completed_at': value['completed_at'], 'due_at': due_at.isoformat(),
-                'overdue_seconds': 0, 'sequence': value['sequence']}
+                'overdue_seconds': 0, 'sequence': value['sequence'], 'settled': done}
     late = observed - due_at
     return {'due': late >= timedelta(0),
             'reason': 'period_elapsed' if late >= timedelta(0) else 'not_due',
@@ -549,6 +622,29 @@ def record_period(home, channel, period, completed_at, run_id):
 def observation(healthy, reason, detail):
     return {'healthy': healthy, 'reason': reason, 'observed_at': now(),
             'detail_sha256': digest(json.dumps(detail, sort_keys=True).encode())}
+
+
+def commit_settled(home, result, periods, run_id):
+    """Close the period of every channel whose work was already recorded.
+
+    This is the second phase of a settle-then-commit that was interrupted. The health
+    reported is the one that was actually observed then, read back from the record and
+    validated against the period it closes - never a default, never a fresh guess, and
+    never a state from an earlier period.
+    """
+    for channel in sorted(periods):
+        done = periods[channel].get('settled')
+        if done is None:
+            continue
+        result['settled_channels'][channel] = done
+        if not done['healthy']:
+            result['completed'] = False
+        try:
+            result['periods_recorded'][channel] = record_period(
+                home, channel, periods[channel], done['observed_at'], done['run_id'])
+        except StateError as error:
+            result['periods_recorded'][channel] = {'error_code': str(error)}
+            result['completed'] = False
 
 
 def run(config, run_id):
@@ -586,32 +682,22 @@ def run(config, run_id):
             # doing the work, and `already_performed` says so rather than claiming the
             # period merely had not elapsed - that receipt is finished here.
             observed = now()
-            resumed = bool(periods) and all(
-                periods[channel]['reason'] == 'own_period_record' for channel in skipped)
-            answer = {'run_id': run_id, 'config_sha256': config_sha256,
+            resumed = any(periods[channel].get('settled') for channel in skipped)
+            answer = {'run_id': run_id, 'config_sha256': config_sha256, 'completed': True,
                       'performed': False, 'performed_channels': [],
                       'skipped': 'already_performed' if resumed else 'not_due',
                       'skipped_channels': skipped, 'periods': periods,
+                      'periods_recorded': {}, 'settled_channels': {},
                       'started_at': observed, 'finished_at': observed}
             if resumed:
-                # This run did the work and then lost its receipt. It must not simply
-                # claim success: the outcome it cannot re-observe is read back from the
-                # channels' own durable health, so an interrupted incident run stays
-                # `completed: false` instead of reporting a green business result.
-                health = {}
-                for channel in skipped:
-                    state_file = regular(home / (channel + '.json'))
-                    try:
-                        health[channel] = (load_state(state_file)['healthy']
-                                           if state_file.exists() else True)
-                    except (StateError, KeyError, TypeError):
-                        health[channel] = False
-                answer['persisted_health'] = health
-                answer['attested_by'] = 'persisted_channel_state'
-                answer['completed'] = all(health.values())
-            else:
-                answer['completed'] = True
-            if output.exists():
+                # Work was recorded but its period was never closed. Finish that commit
+                # and report the health that was actually observed then: an interrupted
+                # incident run must not come back as a green business result. This holds
+                # however the other channels answered, not only when all of them did.
+                commit_settled(home, answer, periods, run_id)
+                answer['attested_by'] = 'settled_outcome'
+            if output.exists() or resumed:
+                output.mkdir(mode=0o700, exist_ok=True)
                 write(result_file, answer)
             return answer
         output.mkdir(mode=0o700, exist_ok=True)
@@ -623,7 +709,9 @@ def run(config, run_id):
             write(binding_file, {'config_sha256': config_sha256})
         result = {'run_id': run_id, 'config_sha256': config_sha256, 'started_at': now(),
                   'completed': True, 'periods': periods, 'skipped_channels': skipped,
-                  'deliveries': {}, 'performed_channels': [], 'periods_recorded': {}}
+                  'deliveries': {}, 'performed_channels': [], 'periods_recorded': {},
+                  'settled_channels': {}}
+        commit_settled(home, result, periods, run_id)
 
         def bounded(channel, produce, failure=None):
             """One channel's own reading. With `failure` its errors are named so they
@@ -663,6 +751,10 @@ def run(config, run_id):
             if not periods:
                 return
             try:
+                # Two phases: the outcome is durable before the period is closed, so an
+                # interruption between them leaves the work findable instead of lost.
+                settle_outcome(home, channel, periods[channel]['sequence'],
+                               healthy, reason, run_id)
                 result['periods_recorded'][channel] = record_period(
                     home, channel, periods[channel], result['started_at'], run_id)
             except StateError as error:

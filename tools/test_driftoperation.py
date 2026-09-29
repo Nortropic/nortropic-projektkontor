@@ -601,12 +601,11 @@ class WeeklyDriftTests(DriftFixture, unittest.TestCase):
         (self.state / 'week-one/result.json').unlink()
         calls, receipts = self.calls, self.receipts()
         resumed = operation.run(self.config, 'week-one')
-        self.assertEqual(resumed['skipped'], 'already_performed',
-                         'not the same thing as a period that simply had not elapsed')
+        self.assertEqual(resumed['skipped'], 'not_due',
+                         'the period was committed, so nothing is owed this week')
         self.assertEqual(resumed['skipped_channels'], ['drift'])
         self.assertEqual(resumed['performed_channels'], [])
-        self.assertEqual(resumed['periods']['drift']['reason'], 'own_period_record')
-        self.assertNotIn('periods_recorded', resumed)
+        self.assertEqual(resumed['periods']['drift']['reason'], 'not_due')
         self.assertEqual(self.period_state('drift'), first['periods_recorded']['drift'])
         self.assertEqual(self.calls, calls, 'the site is not read a second time')
         self.assertEqual(self.receipts(), receipts, 'no second receipt overwrites the first')
@@ -723,7 +722,9 @@ class MonitorWallClockTests(unittest.TestCase):
         self.chunks, self.gap = 1, 0
         result = operation.monitor(self.config)
         self.assertFalse(result['healthy'])          # a space is not the health body
-        self.assertEqual(result['reason'], 'endpoint_unavailable')
+        # Read, but unreadable as health: the endpoint DID answer, so it was observed.
+        self.assertTrue(result['observed'])
+        self.assertEqual(result['reason'], 'endpoint_unhealthy')
         self.assertEqual(result['attempts'][0]['error'], 'invalid_health_response')
 
 
@@ -831,7 +832,7 @@ class ChannelSettlementTests(DriftFixture, unittest.TestCase):
         # all. That is not an unhealthy endpoint, and the check is still owed.
         self.week()
         for reason in ('monitor_bound_exceeded', 'monitor_stranded_limit'):
-            for path in self.state.glob('period-*.json'):
+            for path in list(self.state.glob('period-*.json')) + list(self.state.glob('settled-*.json')):
                 path.unlink()
             self.config['monitor'] = {'url': 'https://kund.example/api/health',
                                       'candidate': 'a' * 40}
@@ -858,39 +859,105 @@ class ChannelSettlementTests(DriftFixture, unittest.TestCase):
         self.assertEqual(self.period_state('monitor')['run_id'], 'monitor-ok')
         self.assertTrue(result['completed'])
 
+    def interrupt_before_period(self, run_id):
+        """Interrupt exactly between the settled outcome and the period being closed."""
+        actual = operation.record_period
+        def die(*args, **kwargs):
+            raise KeyboardInterrupt('avbrott precis före periodskrivningen')
+        with patch.object(operation, 'record_period', die):
+            with self.assertRaises(KeyboardInterrupt):
+                operation.run(self.config, run_id)
+
     def test_an_interrupted_incident_run_does_not_resume_as_a_green_result(self):
-        # The receipt was lost after the period closed. This run cannot re-observe the
-        # outcome, so it reads the channel's own durable health instead of claiming one.
+        # The outcome was recorded, then the run died before closing the period. The
+        # next run must finish that commit with the health that WAS observed, not a
+        # fresh claim - an interrupted incident must never come back green.
         self.week()
         self.site_status = 503
-        first = operation.run(self.config, 'incident-avbruten')
-        self.assertFalse(first['completed'])
-        self.assertFalse(first['drift']['healthy'])
-        (self.state / 'incident-avbruten/result.json').unlink()
-        resumed = operation.run(self.config, 'incident-avbruten')
+        self.interrupt_before_period('incident-avbruten')
+        self.assertFalse((self.state / 'period-drift.json').exists())
+        settled = json.loads((self.state / 'settled-drift.json').read_text())
+        self.assertFalse(settled['healthy'])
+        self.assertEqual(settled['closes_sequence'], 1)
+        calls = self.calls
+        resumed = operation.run(self.config, 'incident-fortsatt')
         self.assertEqual(resumed['skipped'], 'already_performed')
-        self.assertEqual(resumed['attested_by'], 'persisted_channel_state')
-        self.assertEqual(resumed['persisted_health'], {'drift': False})
+        self.assertEqual(resumed['attested_by'], 'settled_outcome')
+        self.assertFalse(resumed['settled_channels']['drift']['healthy'])
         self.assertFalse(resumed['completed'],
                          'an interrupted incident run must not report a green business result')
+        self.assertEqual(self.calls, calls, 'and it must not read the site again')
+        self.assertEqual(self.period_state('drift')['sequence'], 1, 'the period is committed')
 
     def test_an_interrupted_clean_run_resumes_as_the_clean_result_it_was(self):
         self.week()
-        operation.run(self.config, 'ren-avbruten')
-        (self.state / 'ren-avbruten/result.json').unlink()
-        resumed = operation.run(self.config, 'ren-avbruten')
+        self.interrupt_before_period('ren-avbruten')
+        resumed = operation.run(self.config, 'ren-fortsatt')
         self.assertEqual(resumed['skipped'], 'already_performed')
-        self.assertEqual(resumed['persisted_health'], {'drift': True})
+        self.assertTrue(resumed['settled_channels']['drift']['healthy'])
         self.assertTrue(resumed['completed'])
+        self.assertEqual(self.period_state('drift')['sequence'], 1)
 
-    def test_unreadable_channel_health_is_not_read_as_green(self):
+    def test_a_mixed_resume_is_attested_even_when_another_channel_was_merely_not_due(self):
+        # The fault round 5 found: health was read back only when EVERY channel was a
+        # resume. With one channel simply inside its period, the run went green.
         self.week()
-        operation.run(self.config, 'trasigt-lage')
-        (self.state / 'drift.json').write_text('{ inte json')
-        (self.state / 'trasigt-lage/result.json').unlink()
-        resumed = operation.run(self.config, 'trasigt-lage')
-        self.assertEqual(resumed['persisted_health'], {'drift': False})
-        self.assertFalse(resumed['completed'])
+        self.intake_fixture()
+        self.set_period('intake', 60, sequence=3, run_id='tidigare')
+        self.site_status = 503
+        self.interrupt_before_period('blandad-avbruten')
+        resumed = operation.run(self.config, 'blandad-fortsatt')
+        self.assertEqual(resumed['skipped'], 'already_performed')
+        self.assertEqual(sorted(resumed['skipped_channels']), ['drift', 'intake'])
+        self.assertEqual(resumed['periods']['intake']['reason'], 'not_due')
+        self.assertFalse(resumed['settled_channels']['drift']['healthy'])
+        self.assertFalse(resumed['completed'], 'one channel being not_due cannot make it green')
+        self.assertEqual(self.period_state('intake')['sequence'], 3, 'intake is untouched')
+
+    def test_a_settled_outcome_cannot_attest_a_later_period(self):
+        # Round 3's hazard, kept closed: a record names the one period it closes.
+        self.week()
+        self.interrupt_before_period('gammal-avbruten')
+        operation.run(self.config, 'commit')
+        self.assertEqual(self.period_state('drift')['sequence'], 1)
+        # The record still exists but now names a period already closed.
+        self.assertTrue((self.state / 'settled-drift.json').exists())
+        self.set_period('drift', 9 * 86400, sequence=1, run_id='commit')
+        calls = self.calls
+        later = operation.run(self.config, 'ny-period')
+        self.assertEqual(later['performed_channels'], ['drift'],
+                         'the overdue week is read again, not attested from the old record')
+        self.assertGreater(self.calls, calls)
+        self.assertEqual(self.period_state('drift')['sequence'], 2)
+
+    def test_a_malformed_settled_record_is_preserved_and_never_attests(self):
+        self.week()
+        self.interrupt_before_period('trasigt-kvitto')
+        for value in ('{ inte json',
+                      json.dumps({'closes_sequence': 1, 'healthy': 'false', 'reason': 'x',
+                                  'run_id': 'a', 'observed_at': operation.now()}),
+                      json.dumps({'closes_sequence': 1, 'healthy': False, 'reason': 'x',
+                                  'run_id': 'a'}),
+                      json.dumps({'closes_sequence': 1, 'healthy': False, 'reason': 'x',
+                                  'run_id': '../escape', 'observed_at': operation.now()}),
+                      json.dumps({'closes_sequence': 1, 'healthy': False, 'reason': 'x',
+                                  'run_id': 'a', 'observed_at': 'inte en tid'})):
+            (self.state / 'settled-drift.json').write_text(value)
+            self.assertIsNone(operation.settled(self.state, 'drift', 0))
+            self.assertEqual(len(list(self.state.glob('settled-drift.json.invalid-*'))), 1)
+            for path in self.state.glob('settled-drift.json.invalid-*'):
+                path.unlink()
+
+    def test_a_missing_settled_record_is_never_read_as_green(self):
+        # There is no default: absence means nothing was recorded, so the work is due.
+        self.week()
+        self.interrupt_before_period('utan-kvitto')
+        (self.state / 'settled-drift.json').unlink()
+        calls = self.calls
+        again = operation.run(self.config, 'utan-kvitto-fortsatt')
+        self.assertEqual(again['performed_channels'], ['drift'], 'the check is redone, not assumed')
+        self.assertGreater(self.calls, calls)
+        self.assertEqual(again['settled_channels'], {})
 
 
 class StrandedRegistryAcrossReloadsTests(unittest.TestCase):
