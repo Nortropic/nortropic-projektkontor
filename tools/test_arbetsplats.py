@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import tempfile
 import threading
 import urllib.parse
 import time
@@ -391,6 +392,63 @@ class IngaSidoeffekter(ArbetsplatsMiljo):
         self.assertEqual(self.journal_seq(), seq, 'läsning skriver inget i journalen')
         self.assertEqual(len(self.fejkanrop()), fore, 'läsning anropar ingen modell')
         self.assertEqual(self.S.lager.fraga('select count(*) as n from tur')[0]['n'], 0)
+
+
+class NortropicApp(unittest.TestCase):
+    """Nortropic.app: ett paket med fasta sökvägar som startar och öppnar arbetsplatsen, utan nyckel."""
+
+    def setUp(self):
+        tp.SCRATCH.mkdir(exist_ok=True)
+        self.tmp = tempfile.TemporaryDirectory(prefix='app-', dir=tp.SCRATCH)
+        self.addCleanup(self.tmp.cleanup)
+        self.rot = Path(self.tmp.name)
+        self.kontor = self.rot / 'kontor med mellanslag'
+        (self.kontor / 'tools').mkdir(parents=True)
+        self.logg = self.rot / 'anrop.jsonl'
+        self.py = self.rot / 'fejkpython'
+        import shlex
+        self.py.write_text('#!/bin/sh\n'
+                           'printf \'{"argv": "%s", "cwd": "%s", "data": "%s", "path": "%s"}\\n\' '
+                           '"$*" "$(pwd)" "${PARTNER_DATA:-}" "$PATH" >> ' + shlex.quote(str(self.logg)) + '\nexit 0\n')
+        self.py.chmod(0o755)
+
+    def test_paketet_skriptet_och_inga_hemligheter(self):
+        from partnern import macapp
+        mal = self.rot / 'Applications' / 'Nortropic.app'
+        ut = macapp.bygg(mal, self.kontor, str(self.py), ikon=False)
+        self.assertFalse(ut['ikon'])
+        import plistlib
+        info = plistlib.loads((mal / 'Contents' / 'Info.plist').read_bytes())
+        self.assertEqual((info['CFBundleExecutable'], info['CFBundlePackageType'], info['CFBundleIdentifier']),
+                         ('Nortropic', 'APPL', 'se.nortropic.arbetsplats'))
+        self.assertNotIn('CFBundleIconFile', info)
+        prog = mal / 'Contents' / 'MacOS' / 'Nortropic'
+        self.assertTrue(os.access(prog, os.X_OK))
+        text = prog.read_text()
+        self.assertNotIn('nyckel=', text)
+        self.assertNotIn('secret', text)
+        miljo = dict(os.environ, PARTNER_DATA='/fel/data', PATH='/usr/bin:/bin')
+        r = subprocess.run([str(prog)], env=miljo, capture_output=True, timeout=30)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        anrop = [json.loads(x) for x in self.logg.read_text().splitlines()]
+        self.assertEqual([a['argv'] for a in anrop], ['-B tools/partner.py start', '-B tools/partner.py oppna'])
+        self.assertTrue(all(a['cwd'] == str(self.kontor.resolve()) or a['cwd'] == str(self.kontor) for a in anrop))
+        self.assertTrue(all(a['data'] == '' for a in anrop), 'provinstansens miljö följer aldrig med')
+        self.assertTrue(all(a['path'].startswith('/opt/homebrew/bin:') for a in anrop))
+
+    def test_ett_framande_paket_rors_aldrig_och_det_egna_ersatts(self):
+        from partnern import macapp
+        mal = self.rot / 'Nortropic.app'
+        mal.mkdir()
+        (mal / 'annat').write_text('ägarens egen app')
+        with self.assertRaises(ValueError):
+            macapp.bygg(mal, self.kontor, str(self.py), ikon=False)
+        self.assertEqual((mal / 'annat').read_text(), 'ägarens egen app')
+        eget = self.rot / 'eget' / 'Nortropic.app'
+        macapp.bygg(eget, self.kontor, '/fel/python', ikon=False)
+        macapp.bygg(eget, self.kontor, str(self.py), ikon=False)
+        self.assertIn(str(self.py), (eget / 'Contents' / 'MacOS' / 'Nortropic').read_text())
+        self.assertEqual([x.name for x in eget.parent.iterdir()], ['Nortropic.app'], 'inga tillfälliga rester')
 
 
 if __name__ == '__main__':

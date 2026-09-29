@@ -205,6 +205,10 @@ Läge (29 september 2026, 12:28 UTC): uppdraget är fullgjort. Arbetsplatsen är
 driftsatt: tjänsten på 127.0.0.1:4760 kör main sedan 12:24:56Z. Den är prövad mot den verkliga tjänsten
 (ARBETSPLATS-RESULTAT-20260929). Nortropic öppnas med `python3 -B tools/partner.py oppna`.
 
+Tillägg 13:25 UTC (ARBETSPLATS-APP-20260929): `python3 -B tools/partner.py app` skapar Nortropic.app, en klickbar ingång
+som startar tjänsten om den inte kör och öppnar Nortropic inloggad. Den integreras med detta stycke; därefter skapar
+sessionen appen en gång i `~/Applications` och prövar ett klick.
+
 Nästa handling: ingen i detta spår. Driftregeln är partnerns: tjänsten startas om ur main efter varje integration av
 `tools/partnern/`. Bestående start vid inloggning är partnerns befintliga rad i ÄGARENS TUR och gäller hela
 arbetsplatsen. Nästa bygge kräver ett eget beslut.

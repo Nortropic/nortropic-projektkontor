@@ -8,6 +8,7 @@
     python3 -B tools/partner.py overlamningar  visa överlämningar: mottagare, status, session och startvaktens läge
     python3 -B tools/partner.py kvittera OVL-… mottagen|startad|levererad|avslagen --av "…" [--bevis "…"]
     python3 -B tools/partner.py autostart    visa hur ägaren gör tjänsten bestående (skriver ingenting)
+    python3 -B tools/partner.py app          skapa Nortropic.app i ~/Applications: ett klick startar och öppnar arbetsplatsen
 
 Se tools/PARTNER.md.
 """
@@ -203,11 +204,29 @@ def autostart(k, args) -> int:
     return 0
 
 
+def app(k, args) -> int:
+    """Skapar Nortropic.app, som startar tjänsten ur kontorets primärutcheckning och öppnar den inloggad."""
+    from partnern import macapp
+    mal = Path(args.mal).expanduser() if args.mal else Path.home() / 'Applications' / (macapp.NAMN + '.app')
+    try:
+        ut = macapp.bygg(mal, Path(k.kontor_primar), sys.executable, ikon=not args.utan_ikon)
+    except (OSError, ValueError) as fel:
+        print('Kunde inte skapa appen: %s' % fel, file=sys.stderr)
+        return 1
+    print('Skapade %s%s. Den startar tjänsten ur %s med %s och öppnar Nortropic inloggad.\n'
+          'Dra den till Dock för ett klick. Den startar inget vid inloggning och innehåller ingen nyckel.'
+          % (ut['app'], '' if ut['ikon'] else ' (utan egen ikon: macOS ikonverktyg misslyckades)', ut['kontor'], ut['python']))
+    return 0
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog='partner.py', description='Projektkontorets förbättringspartner')
     sub = p.add_subparsers(dest='kommando', required=True)
     for namn in ('start', 'kor', 'stopp', 'status', 'oppna', 'index', 'overlamningar', 'autostart'):
         sub.add_parser(namn)
+    ap = sub.add_parser('app')
+    ap.add_argument('--mal', help='var appen skapas (standard ~/Applications/Nortropic.app)')
+    ap.add_argument('--utan-ikon', action='store_true')
     kv = sub.add_parser('kvittera')
     kv.add_argument('id')
     kv.add_argument('status', choices=['mottagen', 'startad', 'levererad', 'avslagen'])
@@ -216,7 +235,7 @@ def main(argv=None) -> int:
     args = p.parse_args(argv)
     k = kf.ladda()
     return {'start': start, 'kor': kor, 'stopp': stopp, 'status': status, 'oppna': oppna, 'index': index,
-            'overlamningar': overlamningar, 'kvittera': kvittera, 'autostart': autostart}[args.kommando](k, args)
+            'overlamningar': overlamningar, 'kvittera': kvittera, 'autostart': autostart, 'app': app}[args.kommando](k, args)
 
 
 if __name__ == '__main__':

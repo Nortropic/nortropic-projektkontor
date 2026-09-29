@@ -17,6 +17,7 @@ python3 -B tools/partner.py oppna     # öppnar samtalsytan inloggad i webbläsa
 python3 -B tools/partner.py status    # kör den, vilken kod (main?) och var ligger datan
 python3 -B tools/partner.py stopp     # pågående arbete avbryts, journalförs och återupptas vid nästa start
 python3 -B tools/partner.py autostart # visar hur ägaren gör tjänsten bestående (skriver ingenting)
+python3 -B tools/partner.py app       # skapar ~/Applications/Nortropic.app: ett klick startar och öppnar (se ARBETSPLATS.md)
 ```
 
 Python 3.9 eller senare räcker (macOS egen `python3` fungerar).

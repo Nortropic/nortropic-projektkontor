@@ -10,6 +10,13 @@ python3 -B tools/partner.py start    # tjänsten, som förut
 python3 -B tools/partner.py oppna    # öppnar Nortropic inloggad (Hem)
 ```
 
+**Nortropic.app.** `python3 -B tools/partner.py app` skapar `~/Applications/Nortropic.app` med Nortropics ikon. Dra den
+till Dock: ett klick startar tjänsten om den inte kör och öppnar Nortropic inloggad. Appen är ett skalskript med fasta
+sökvägar till kontorets primärutcheckning och den Python som skapade den. Den innehåller ingen nyckel (den läses av
+`partner.py oppna` vid varje klick), startar inget vid inloggning och ändrar inga systeminställningar. Kommandot ersätter
+bara en app som det själv skapat; `--mal` väljer en annan plats och `--utan-ikon` hoppar över ikonen. Går start eller
+öppning inte visar appen ett besked om att köra `partner.py status`.
+
 ## Delarna och deras adresser
 
 | Adress | Innehåll |
