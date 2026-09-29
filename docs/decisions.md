@@ -6774,6 +6774,11 @@ server, MCP-brygga och webbkrok mot en fejkad `claude`), kontorets hela svit gr�
 utvecklingsinstans och ett webbläsarprov. Denna post och koden integreras tillsammans; driftsättning ur main och
 slutproven på den införda tjänsten följer och redovisas i en egen resultatpost. Planen äger nästa handling.
 
+**Delvis ersatt av:** DYGNSGRANS-USD-20260929, i fråga om verkställda kostnadsgränser: ägaren beslutade 2026-09-29 att
+förbättringspartnern inte ska ha någon användningsgräns, så dygnstaket, stegtaken och kostnadsspärren per körning är
+borttagna. Användningsspåren (tokens, tid, omtag och Claude Codes listprisvärde som information) finns kvar. Övrigt
+gäller.
+
 
 ## FORBATTRINGSPARTNER-RESULTAT-20260928 — slutrapport för FORBATTRINGSPARTNER-20260928: förbättringspartnern är integrerad och driftsatt i kontoret, slutproven är gjorda på den införda tjänsten och rättningarna ur dem integreras med denna post; kvar för ägaren är bestående start vid inloggning och en ny fångst av Improvements efter 19 september
 
@@ -7953,3 +7958,67 @@ rördes inte. Raden i ÄGARENS TUR är borttagen.
 
 **Avslut.** Klart när ändringen är integrerad, tjänsten omstartad ur main och OVL-20260929-328e79 har `klar`. Nästa
 bygge kräver ett eget beslut.
+
+
+## DYGNSGRANS-USD-20260929 — förbättringspartnern har ingen användningsgräns: ägaren kände inte igen "Dagens gräns (250 USD i listprisvärde)" under abonnemang, och beställde uttryckligen att ingen gräns alls ska finnas
+
+**Status:** registrerat 2026-09-29 (16:24 UTC) av sessionen nortropic-repos-db (Claude Code), i en tråd som öppnades
+av en skärmdump från Förbättringar-ytan i Nortropics arbetsplats.
+
+**Fel.** `tools/partnern/agent.py`s `sparrad()` använde `listpris_usd` — Claude Codes egen listprisuppskattning för
+körda tokens, ur `total_cost_usd` i stream-json, ingen faktura (se ägarens tidigare rättelse "vad menar du med
+förbrukning? vi har ju abonnemang?", FORBRUKNING-ÄR-KVOT-INTE-USD) — som ett hårt dygnstak (`dygn_max_listpris_usd`,
+250.0). `tools/PARTNER.md` dokumenterade redan att listprisvärdet inte är en kostnad, men koden följde inte efter:
+partnern blockerade sig själv 2026-09-29 mot ett tal som inte motsvarar något verkligt under abonnemang.
+
+**Ägarens beslut.** Ett första, snävare svar (bara USD-dygnstaket borttaget, kvar: 150 körningar/dygn och en 8
+USD-körväktare per tur) fick ägarens direkta rättelse: "förbättringspartnern ska inte ha någon gräns." Scopet är
+alltså hela användningsgränsen, inte bara dollarramningen.
+
+**Genomfört.**
+- `sparrad()` borttagen helt, och dess anropsställen i `server.py::_starta` och `jobb.py::_kor`.
+- `Gransar` (konfig.py): `dygn_max_korningar`, `tur_max_steg`, `jobb_max_steg`, `tur_max_listpris_usd`,
+  `dygn_max_listpris_usd` borttagna. `agent.py`s `argv()` skickar inte längre `--max-turns` eller `--max-budget-usd`
+  till Claude Code. Den döda grenen för `error_max_turns`/`error_max_budget_usd` i `_slutstatus` är borttagen (kan
+  inte längre inträffa).
+- **Kvar, och inget av det stoppar en tur för att mycket har körts:** `samtidiga_korningar` (2, ren kö — nekar
+  aldrig, väntar bara på ledig plats); en hangvakt, inte en användningsgräns: `tur_max_sekunder` 4 h /
+  `jobb_max_sekunder` 12 h i `_vakt()`, satt långt bortom vad äkta arbete tar — fångar bara en verkligt hängande
+  process, så att den inte låser en av de två körplatserna permanent (sessionens egen avvägning, flaggad öppet till
+  ägaren); och inmatningens storlek, högst 60 000 tecken och 20 bilagor per inspel och högst 40 MB per fil
+  (`inspel_max_tecken`, `inspel_max_bilagor`, `bilaga_max_byte`).
+- **Utanför ändringen:** startvaktens eget tak, högst sex nya automatiska starter per dygn (`startvakt_per_dygn`). Det
+  gäller sessioner som partnern själv startar i andra repon för lämnade överlämningar, inte Johnnys egna samtal, och
+  är ett verkligt dygnstak för automatiskt arbete. Ägaren har fått frågan om det också ska bort; svaret blir ett eget
+  beslut.
+- `ui/app.js` och `PARTNER.md` uppdaterade i sak: listprisvärdet visas bara informativt, utan "av tak". Tre texter
+  som fortfarande beskrev en gräns är ändrade: lägesblocket i partnerns systemprompt ("Modellkörningar i dag: N (ingen
+  gräns)", tidigare "N av 150"), utredningsverktygets svar till modellen (tidigare "högst 30 min") och avbrottsorsaken
+  när hangvakten slår till (tidigare "tidsgränsen på … min nåddes").
+- `tools/test_partner.py`: `ModellvalProv` bytte exempelfältet `tur_max_steg`→`samtidiga_korningar` i sin
+  installningar.json-rundtursprövning (fältet den prövade togs bort); `JobbProv` prövar nu
+  `assertNotIn('--max-turns', …)` i stället för att jämföra mot borttagna fält; `GransProv` omskriven från "dygnstak
+  verkställs" till en regressionsvakt: flera turer i rad stoppas aldrig, och `--max-turns`/`--max-budget-usd`
+  skickas aldrig till Claude Code. Alla ändringar ligger i egna metoder/klasser, disjunkta från
+  FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929s nya StartvaktProv-prov (bekräftat konfliktfritt med nortropic-repos-04
+  innan denna gren rebasades på deras main).
+
+**Samordning.** `tools/partnern/` bars av nortropic-repos-04 under ARBETSPLATS-20260929. Innan filerna rördes:
+ListAgents, mtime och git status kontrollerade (04 idle, rent). 04 hade en kandidat på väg till main
+(FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929); denna ändring byggdes i en egen gren och mergas efter den. Ett eget
+misstag under vägen: grenen skapades och redigerades först direkt i kontorets primärutcheckning istället för en
+worktree, vilket kortvarigt hindrade 04 från att snabbspola/starta om efter sin egen integration. Rättat genom att
+committa, återställa primärutcheckningen till ren main och flytta arbetet till en egen worktree
+(`nortropic-kontor-dygnsgrans-20260929`) innan rebase och sammanslagning.
+
+**Granskning.** Den första separata granskningen (claude-opus-5) bedömde koden som riktig men underkände kandidaten för
+två dokumentationsfel: `PARTNER.md` beskrev fortfarande dygnsgränsen på tre ställen (en tur som stoppats av den, och
+två rader i provbeskrivningen), och listan över vad som är kvar saknade startvaktens tak och inmatningens
+storleksgränser. Båda är rättade. Sessionens första besked till ägaren om vad som var kvar hade samma lucka och är
+rättat i sessionen.
+
+**Ersätter:** ingen post helt. Ersätter delvis FORBATTRINGSPARTNER-20260928 i fråga om verkställda kostnadsgränser;
+markeringen står sist i den posten.
+
+**Avslut.** Klart när denna ändring är integrerad och tjänsten omstartad ur main enligt driftregeln (`aktiva`
+kontrollerad tom före omstart). Nästa bygge i detta spår kräver ett eget beslut.

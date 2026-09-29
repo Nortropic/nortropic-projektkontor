@@ -163,6 +163,14 @@ Tillägg 2026-09-29 (15:50 UTC): startvaktens uppföljning av sessioner som reda
 (FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929); efter integrationen startas tjänsten om ur main enligt driftregeln, och
 OVL-20260929-328e79 får då sin `klar` i efterhand. Inget annat är öppet i spåret.
 
+Tillägg 2026-09-29 (16:24 UTC): ägaren mötte "Dagens gräns för modellarbete (250 USD i listprisvärde) är nådd" i
+Förbättringar-ytan och kände inte igen den; på hans direkta besked "förbättringspartnern ska inte ha någon gräns"
+är hela användningsgränsen borttagen (DYGNSGRANS-USD-20260929): inget dygnstak på antal körningar, inget stegtak,
+ingen kostnadsspärr — `sparrad()` är borttagen, och Claude Code får inte längre `--max-turns`/`--max-budget-usd`.
+Kvar är en teknisk hangvakt (4 h/12 h i `_vakt()`), kön på två samtidiga körningar och inmatningens storleksgränser;
+inget av det stoppar en tur för att mycket har körts. Startvaktens eget tak på sex automatiska starter per dygn ligger
+utanför ändringen; ägaren har fått frågan i sessionen om det också ska bort, och svaret blir ett eget beslut.
+
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
 

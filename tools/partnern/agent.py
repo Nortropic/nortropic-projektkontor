@@ -78,7 +78,8 @@ class Korning:
         self.anstrangning = None
         self.forsok = 0
         self.fortsatt_avbruten = False
-        self.maxtid = 900
+        g = server.k.gransar  # hangvaktens tid; argv() sätter samma värde före start
+        self.maxtid = g.tur_max_sekunder if typ == 'tur' else g.jobb_max_sekunder
         self._las = threading.Lock()
         self.katalog = Path(server.lager.turer) / self.id
         self.katalog.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -163,16 +164,12 @@ class Agent:
                     tokens_in += int(h.get('tokens_in') or 0)
                     tokens_ut += int(h.get('tokens_ut') or 0)
         return {'dag': idag, 'korningar': antal, 'listpris_usd': round(pris, 4), 'tokens_in': tokens_in,
-                'tokens_ut': tokens_ut, 'max_korningar': self.k.gransar.dygn_max_korningar,
-                'max_listpris_usd': self.k.gransar.dygn_max_listpris_usd}
+                'tokens_ut': tokens_ut}
 
-    def sparrad(self) -> str | None:
-        f = self.dygnsforbrukning()
-        if f['korningar'] >= f['max_korningar']:
-            return 'Dagens gräns för modellkörningar (%d) är nådd.' % f['max_korningar']
-        if f['listpris_usd'] >= f['max_listpris_usd']:
-            return 'Dagens gräns för modellarbete (%.0f USD i listprisvärde) är nådd.' % f['max_listpris_usd']
-        return None
+    # Ägarbeslut 2026-09-29: förbättringspartnern har ingen användningsgräns (inget dygnstak, inget stegtak, ingen
+    # kostnadsspärr). dygnsforbrukning() ovan redovisas bara som information i tjänstvyn. Det som faktiskt kan ta
+    # slut är abonnemangets egen kvot, vilket Claude Code själv då svarar på i turen (se _slutstatus nedan:
+    # "Modellkvoten eller en hastighetsgräns nåddes: …").
 
     # ---------------------------------------------------------------- kontext
     def systemprompt(self, korning: Korning) -> str:
@@ -229,7 +226,7 @@ class Agent:
                                                                     (v.get('origin_main_tid') or '')[:16],
                                                                     v.get('origin_main_rubrik') or ''))
         f = self.dygnsforbrukning()
-        del_.append('\nModellkörningar i dag: %d av %d.' % (f['korningar'], f['max_korningar']))
+        del_.append('\nModellkörningar i dag: %d (ingen gräns).' % f['korningar'])
         return '\n'.join(del_)
 
     def _forstaelseblock(self, korning: Korning, kopplade: list) -> list:
@@ -434,15 +431,11 @@ class Agent:
                 '--restricted', '--strict-mcp-config', '--mcp-config', json.dumps(mcp),
                 '--tools', verktyg, '--allowedTools', 'mcp__partner', 'WebFetch', 'WebSearch', 'Agent',
                 '--permission-mode', 'dontAsk', '--permission-prompts', 'none', '--no-chrome',
-                '--disable-slash-commands', '--settings', json.dumps(installningar), '--agents', json.dumps(agenter),
-                '--max-turns', str(self.maxsteg(korning)), '--max-budget-usd', str(g.tur_max_listpris_usd)]
+                '--disable-slash-commands', '--settings', json.dumps(installningar), '--agents', json.dumps(agenter)]
+        # Inget --max-turns, inget --max-budget-usd: ägarbeslut 2026-09-29, ingen användningsgräns (se Gransar).
         argv += (['--session-id', session] if ny else ['--resume', session])
         korning.maxtid = maxtid
         return argv
-
-    def maxsteg(self, korning: Korning) -> int:
-        g = self.k.gransar
-        return g.tur_max_steg if korning.typ == 'tur' else g.jobb_max_steg
 
     def miljo(self, korning: Korning, ateruppta: bool) -> dict:
         env = {k: os.environ[k] for k in ('HOME', 'USER', 'LOGNAME', 'TMPDIR') if k in os.environ}
@@ -534,7 +527,8 @@ class Agent:
         proc = korning.proc
         while proc.poll() is None:
             if time.time() - korning.startad > korning.maxtid and korning.avbruten_av is None:
-                korning.avbryt('tidsgränsen på %d min nåddes' % (korning.maxtid // 60))
+                korning.avbryt('hangvakten: körningen hade inte avslutats efter %d min och tycks ha hängt sig'
+                               % (korning.maxtid // 60))
             if korning.avbruten_av:
                 t0 = time.time()
                 while proc.poll() is None and time.time() - t0 < 25:
@@ -631,11 +625,6 @@ class Agent:
                                  forbrukning=forbrukning, start=start)
         if resultat and resultat.get('subtype') == 'success' and not resultat.get('is_error') and svar.strip():
             return self._avsluta(korning, 'svarad', svar=svar, forbrukning=forbrukning, start=start)
-        if resultat and resultat.get('subtype') in ('error_max_turns', 'error_max_budget_usd'):
-            skal = ('stegtaket (%d verktygssteg)' % self.maxsteg(korning) if resultat['subtype'] == 'error_max_turns'
-                    else 'kostnadstaket per körning')
-            return self._avsluta(korning, 'begransad', orsak='Arbetet stoppades av %s.' % skal, delsvar=delsvar,
-                                 forbrukning=forbrukning, start=start)
         text = (svar or '') + ' ' + (resultat or {}).get('subtype', '')
         if re.search(r'(?i)usage limit|rate limit|limit reached|reached your .* limit|quota', text):
             return self._avsluta(korning, 'begransad', orsak='Modellkvoten eller en hastighetsgräns nåddes: %s' % svar[:300],

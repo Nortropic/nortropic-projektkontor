@@ -677,14 +677,14 @@ class ModellvalProv(Miljo):
         self.assertEqual(d['nivaer'], ['low', 'medium', 'high', 'xhigh', 'max'])
         self.assertIn('claude-sonnet-5', [m['id'] for m in d['modeller']])
         fil = Path(self.k.data) / 'installningar.json'
-        fil.write_text(json.dumps({'gransar': {'tur_max_steg': 40}}), 'utf-8')
+        fil.write_text(json.dumps({'gransar': {'samtidiga_korningar': 1}}), 'utf-8')
         self.assertEqual(self.json('POST', '/api/installningar', {'huvud': 'gpt-5', 'anstrangning': 'high'})[0], 400)
         self.assertEqual(self.json('POST', '/api/installningar', {'huvud': 'claude-sonnet-5', 'anstrangning': 'ultra'})[0], 400)
         kod, _, _ = self.anrop('POST', '/api/installningar', {'huvud': 'claude-sonnet-5'}, huvud={'X-Partner': ''})
         self.assertEqual(kod, 403)
         kod, d = self.json('POST', '/api/installningar', {'huvud': 'claude-sonnet-5', 'anstrangning': 'max'})
         self.assertEqual((kod, d['huvud'], d['anstrangning']), (200, 'claude-sonnet-5', 'max'))
-        self.assertEqual(json.loads(fil.read_text()), {'gransar': {'tur_max_steg': 40},
+        self.assertEqual(json.loads(fil.read_text()), {'gransar': {'samtidiga_korningar': 1},
                                                        'modell': {'huvud': 'claude-sonnet-5', 'anstrangning': 'max'}})
         self.assertEqual(stat.S_IMODE(fil.stat().st_mode), 0o600)
         handelser = [json.loads(r) for r in self.S.lager.journal.read_text().splitlines()]
@@ -1155,9 +1155,9 @@ class JobbProv(Miljo):
         self.assertIn('FEJKSVAR', jobb[0]['resultat'])
         sista = self.fejkanrop()[-1]
         self.assertEqual(sista['argv'][sista['argv'].index('--tools') + 1], 'WebFetch,WebSearch')
-        self.assertEqual(sista['argv'][sista['argv'].index('--max-turns') + 1], str(self.k.gransar.jobb_max_steg))
+        self.assertNotIn('--max-turns', sista['argv'])  # ingen användningsgräns (ägarbeslut 2026-09-29)
         tur = self.fejkanrop()[0]
-        self.assertEqual(tur['argv'][tur['argv'].index('--max-turns') + 1], str(self.k.gransar.tur_max_steg))
+        self.assertNotIn('--max-turns', tur['argv'])
         self.assertIn('Registrerad utredning', sista['text'])
 
 
@@ -1183,16 +1183,20 @@ class JobbOmstartProv(Miljo):
 
 
 class GransProv(Miljo):
-    gransar = {'dygn_max_korningar': 1}
-
-    def test_dygnsgransen_verkstalls_utan_modellanrop(self):
+    def test_ingen_anvandningsgrans_flera_turer_i_rad(self):
+        # Ägarbeslut 2026-09-29: förbättringspartnern har ingen användningsgräns. Regressionsvakt: flera turer i
+        # rad ska alla svaras, ingen ska stoppas som 'begransad' av ett dygns-/stegtak, och --max-turns/
+        # --max-budget-usd ska aldrig skickas till Claude Code.
         self.logga_in()
         trad = self.skicka('första')['inspel']['trad']
         self.vanta(trad, lambda v: self.turer(v, 'svarad'))
         self.skicka('andra', trad=trad)
-        vy = self.vanta(trad, lambda v: self.turer(v, 'begransad'))
-        self.assertIn('gräns', self.turer(vy, 'begransad')[0]['svar'])
-        self.assertEqual(len(self.fejkanrop()), 1)
+        vy = self.vanta(trad, lambda v: len(self.turer(v, 'svarad')) == 2)
+        self.assertEqual(len(self.turer(vy, 'begransad')), 0)
+        self.assertEqual(len(self.fejkanrop()), 2)
+        for anrop in self.fejkanrop():
+            self.assertNotIn('--max-turns', anrop['argv'])
+            self.assertNotIn('--max-budget-usd', anrop['argv'])
 
 
 MOTTAGARE = r"""#!/usr/bin/env python3

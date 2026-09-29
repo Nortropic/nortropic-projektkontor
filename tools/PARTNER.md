@@ -82,11 +82,21 @@ huvudmodell och ansträngning i ytan (`/model`); valbara är Opus 5.5, Fable 5.1
 4.5, med ansträngningen low, medium, high, xhigh eller max. Valet och utredarens modell står i
 `data/installningar.json` (`{"modell": {"huvud": "…", "anstrangning": "…"}}`).
 
-Verkställda gränser (samma fil, `gransar`): två samtidiga modellkörningar, 15 min och 40 verktygssteg per tur,
-30 min och 150 verktygssteg per bakgrundsutredning, 8 USD listprisvärde per körning (`--max-budget-usd`), 150
-körningar och 250 USD listprisvärde per dygn. Listprisvärdet
-är Claude Codes egen uppskattning, inte en faktura: förbrukningen är abonnemangets kvot. Varje tur journalför
-tokens, tid, omförsök och modell. Sparande, sökning och öppning av källor anropar aldrig en modell.
+Ägarbeslut 2026-09-29: förbättringspartnern har ingen användningsgräns. Inget dygnstak på antal körningar, inget
+stegtak per tur eller bakgrundsutredning, ingen kostnadsspärr (`--max-turns` och `--max-budget-usd` skickas inte
+längre till Claude Code). Vi har abonnemang, inget per-token-pris, så ett tak i USD eller i "listprisvärde" vore ett
+tak mot ingenting — listprisvärdet (per tur och summerat per dygn i ytan) är bara Claude Codes egen uppskattning,
+inte en faktura, och redovisas rent informativt. Förbrukningen som faktiskt kan ta slut är abonnemangets egen kvot,
+vilket i så fall syns som ett vanligt "begränsat"-svar från körningen själv.
+
+Kvar i `gransar`, och inget av det stoppar en tur för att mycket har körts: två samtidiga modellkörningar
+(`samtidiga_korningar`; en tredje väntar på ledig plats och nekas aldrig), en hangvakt på 4 h per tur / 12 h per
+bakgrundsutredning (`tur_max_sekunder`/`jobb_max_sekunder`) som bara fångar en process som blivit hängande — satt
+långt bortom vad ett verkligt, aktivt arbete tar — och inmatningens storlek: högst 60 000 tecken och 20 bilagor per
+inspel och högst 40 MB per fil (`inspel_max_tecken`, `inspel_max_bilagor`, `bilaga_max_byte`). Därutöver har
+startvakten ett eget tak på sex nya automatiska starter per dygn (`startvakt_per_dygn`, se Startvakten nedan); det
+gäller sessioner som partnern själv startar i andra repon. Varje tur journalför tokens, tid, omförsök och modell.
+Sparande, sökning och öppning av källor anropar aldrig en modell.
 
 Claude Code sparar modellens egen sessionsfil under `~/.claude/projects/<arbetsyta>/`; den är en cache för
 trådens modellkontext. Partnerns journal är originalet: saknas sessionen startar en ny med trådens historik ur
@@ -140,8 +150,9 @@ webbläsaren) och spärren efter åtta felaktiga inloggningar gäller alla i tio
 adresskontroller kan neka en vanlig länk vars frågedel liknar en domän (t.ex. `?utm_source=example.com`); de
 felar hellre stängt. Bilagor läses av lokala
 verktyg (pdftotext, textutil, sips, zip-XML). Arbete som avbröts av en omstart återupptas automatiskt bara om det
-startade inom den senaste timmen; äldre står kvar som avbrutet med en knapp. En tur som stoppades av dygnsgränsen
-tas om först när Johnny trycker Återuppta. Svaret är huvudagentens text; en kort mellanrad som följs av fler
+startade inom den senaste timmen; äldre står kvar som avbrutet med en knapp. En tur som stoppades av abonnemangets
+kvot eller av hangvakten tas om först när Johnny trycker Återuppta. Svaret är huvudagentens text; en kort mellanrad
+som följs av fler
 verktygsanrop och ett längre svar räknas till arbetet och står bara i delsvaret. Partnerns omdöme prövas av
 slutproven (verkliga körningar) och Johnnys rättelser, inte av de deterministiska proven.
 
@@ -244,11 +255,12 @@ Claude Codes strömformat, startar den riktiga MCP-bryggan och kör den riktiga 
 inloggning/värd/ursprung, bilagetyper och säker visning, avbruten uppladdning, sparat före modellen, bara spara,
 idempotenta återförsök, sessionsfortsättning och återskapad historik, avbrott före och under körning, sen
 rättelse, bara spara med avbrott, ordnat stopp och krasch mitt i arbetet (tur och utredning), upplockning av
-sparade inspel, verktygsgränser (stegtak per körningstyp), ägarens-ord-spärren och rättelsens företräde, lägets
+sparade inspel, verktyg per körningstyp utan stegtak, ägarens-ord-spärren och rättelsens företräde, lägets
 uppdelning i Johnnys ord och partnerns egna bedömningar, mellanrader utanför svaret, samtalets alla bilagor och
 läst andel vid öppning, ÄGARENS TUR läst som Aquarium, överlämning utan dubbletter (samma inspel och öppen
 överlämning) och med kvittens, en överlämning per mottagare ur samma meddelande med egna id utan att ett befintligt
-paket flyttas, webbkroken med sökträffar och planterade länkar, bakgrundsutredning, provläge och dygnsgräns.
+paket flyttas, webbkroken med sökträffar och planterade länkar, bakgrundsutredning, provläge och att ingen
+användningsgräns stoppar flera turer i rad.
 Startvakten prövas med en fejkad mottagarsession som kör det riktiga kvitteringskommandot ur sin instruktion: exakt
 en session per överlämning (även efter en omstart av tjänsten), väntan när skrivplatsen är upptagen och sedan start,
 egen session i samma repo och dygnstaket, kvot och saknad inloggning med synlig väntan och samma session, Codex ur

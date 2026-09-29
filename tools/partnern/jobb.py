@@ -43,9 +43,8 @@ class Jobb:
                                avgransning=str(a.get('avgransning') or '')[:1500], fran_tur=korning.id)
         korning.handelse('jobb', 'Utredning registrerad: %s (%s)' % (rubrik, jid))
         self._ko.put(jid)
-        return {'text': 'Utredningen "%s" är registrerad som %s och körs i bakgrunden (egen modellkörning, högst %d '
-                        'min). Resultatet läggs i den här tråden; status syns där.' % (
-                            rubrik, jid, self.s.k.gransar.jobb_max_sekunder // 60)}
+        return {'text': 'Utredningen "%s" är registrerad som %s och körs i bakgrunden (egen modellkörning, ingen '
+                        'användningsgräns). Resultatet läggs i den här tråden; status syns där.' % (rubrik, jid)}
 
     def aterstall_vid_start(self) -> list:
         """Registrerade utredningar köas; de som pågick eller avbröts av en omstart (ordnad eller krasch) återupptas.
@@ -99,10 +98,6 @@ class Jobb:
         data = json.loads(j['data'])
         historik = data.get('historik') or []
         if historik and historik[-1].get('status') == 'avbrutet' and 'Johnny' in (historik[-1].get('orsak') or ''):
-            return
-        sparr = self.s.agent.sparrad()
-        if sparr:
-            self.s.lager.lagg_till('jobb_status', jobb=jid, trad=j['trad'], status='begransat', orsak=sparr)
             return
         ater = bool(data.get('session'))
         if not data.get('session'):
