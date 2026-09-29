@@ -47,9 +47,10 @@ class Gransar:
 
 @dataclass
 class Modell:
+    """En modell till allt (Johnnys besked 2026-09-29): huvud och anstrangning gäller svaret, utredaren och de
+    registrerade utredningarna. Det finns ingen egen utredarmodell; ett äldre 'utredare' i installningar.json läses inte."""
     huvud: str = 'claude-opus-5-5'
     anstrangning: str = 'high'
-    utredare: str = 'sonnet'
 
 
 # Startvaktens utförare: Runtimes fastlåsta binärer med de kontrollsummor Runtime själv binder (claude_profile.py och

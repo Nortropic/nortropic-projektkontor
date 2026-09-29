@@ -952,6 +952,35 @@ class HandoffReader(unittest.TestCase):
         result = aquarium.handoff_reader(str(self.office))
         self.assertEqual(result, {'items': [], 'unreadable': 2})
 
+    def test_a_dormant_order_is_not_open_and_only_the_owners_decision_moves_it(self):
+        self.package('OVL-20260929-aaa111', package={'status': 'vilande'},
+                     receipts=[{'status': 'mottagen', 'av': 'någon', 'kvitterad': '2026-09-29T09:00:00.000Z'}])
+        slapp = 'AGARENS-ORD-SLAPP-20260929T090500Z.md'
+        place = self.package('OVL-20260929-bbb222', package={'status': 'vilande'},
+                             receipts=[{'status': 'lamnad', 'beslut': 'slapp', 'agarord': slapp,
+                                        'kvitterad': '2026-09-29T09:05:00.000Z'},
+                                       {'status': 'mottagen', 'av': 'mottagaren', 'kvitterad': '2026-09-29T09:06:00.000Z'}])
+        (place / slapp).write_text('HEMLIGA ÄGARORD', 'utf-8')
+        avslag = 'AGARENS-ORD-AVSLAG-20260929T090700Z.md'
+        place = self.package('OVL-20260929-ccc333', package={'status': 'vilande'},
+                             receipts=[{'status': 'avslagen', 'beslut': 'avslag', 'agarord': avslag,
+                                        'kvitterad': '2026-09-29T09:07:00.000Z'}])
+        (place / avslag).write_text('HEMLIGA ÄGARORD', 'utf-8')
+        self.package('OVL-20260929-ddd444', package={'status': 'vilande'},        # a decision without the owner's words
+                     receipts=[{'status': 'lamnad', 'beslut': 'slapp', 'agarord': 'AGARENS-ORD-SLAPP-20260929T091000Z.md',
+                                'kvitterad': '2026-09-29T09:10:00.000Z'}])
+        result = aquarium.handoff_reader(str(self.office))
+        self.assertNotIn('HEMLIG', json.dumps(result, ensure_ascii=False))
+        self.assertEqual([(item['id'], item['status'], item['receipt_at']) for item in result['items']],
+                         [('OVL-20260929-aaa111', 'vilande', None),                     # a receipt never wakes it
+                          ('OVL-20260929-bbb222', 'mottagen', '2026-09-29T09:06:00.000+00:00'),
+                          ('OVL-20260929-ccc333', 'avslagen', '2026-09-29T09:07:00.000+00:00'),
+                          ('OVL-20260929-ddd444', 'vilande', None)])
+        projection = aquarium.project(dict(readings(), overlamningar={'status': 'ok', 'read_at': READ_AT,
+                                                                     'value': result}), NOW)
+        self.assertEqual([item['id'] for item in projection['overlamningar']['items']], ['OVL-20260929-bbb222'])
+        self.assertNotIn('OVL-20260929-aaa111', json.dumps(projection['agarens_bord'], ensure_ascii=False))
+
     def test_no_order_path_is_no_handoffs_and_no_office_is_unreadable(self):
         self.root.rmdir()
         self.assertEqual(aquarium.handoff_reader(str(self.office)), {'items': [], 'unreadable': 0})

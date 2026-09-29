@@ -154,8 +154,8 @@ OVL-20260929-328e79 ("Digitala: underhållsform och tak för riktiga kunder") oc
 eller väntar synligt så länge någon annan skriver i kontoret; `python3 -B tools/partner.py overlamningar` visar läget.
 Veckokörningen till Runtime, som nekades 2026-09-29, lämnas på nytt först när ägaren beställer den i partnern; denna
 ändring beställer inte det arbetet. Därefter finns inget öppet i partnerns spår; nästa bygge kräver ett eget beslut.
-Ägarens två rader står i ÄGARENS TUR: bestående start vid inloggning och en ny fångst av Improvements efter 19
-september. Arbetsgrenen `partner/forbattringspartner-overlamning-autostart-20260929` publiceras med denna ändring och
+Ägarens rad i ÄGARENS TUR om en ny fångst av Improvements efter 19 september står kvar; raden om bestående start vid
+inloggning är stängd (FORBATTRINGSPARTNER-BACKLOG-20260929). Arbetsgrenen `partner/forbattringspartner-overlamning-autostart-20260929` publiceras med denna ändring och
 tas sedan bort lokalt. De tidigare arbetsgrenarna är publicerade i PR 117–122 och borttagna lokalt; kandidat 1:s
 mellanversioner finns i en privat bundle i uppdragets mapp.
 
@@ -170,6 +170,22 @@ ingen kostnadsspärr — `sparrad()` är borttagen, och Claude Code får inte l�
 Kvar är en teknisk hangvakt (4 h/12 h i `_vakt()`), kön på två samtidiga körningar och inmatningens storleksgränser;
 inget av det stoppar en tur för att mycket har körts. Startvaktens eget tak på sex automatiska starter per dygn ligger
 utanför ändringen; ägaren har fått frågan i sessionen om det också ska bort, och svaret blir ett eget beslut.
+
+Tillägg 2026-09-29 (20:14 UTC): på ägarens beställning är partnern rättad (FORBATTRINGSPARTNER-BACKLOG-20260929). Ett
+repo eller verktyg som ägaren lämnar läses i original och i sin helhet med redovisad täckning, och `github` läser hela
+filträd, stora filer i delar och säkerhetsmeddelanden. Ägarens "beställ" ger en vilande beställning i backloggen, som
+startvakten aldrig startar förrän han släpper den med sina egna ord i en tråd; en beställning bär krav med prov,
+klart-när och underlag löst till filer och märks byggklar eller ofullständig; och utredaren kör samma modell och
+ansträngning som svaret. Dagens tre vilande 20e7b1-överlämningar är avslagna på ägarens ord. Backloggen redovisas inte
+här: dess enda källa är `python3 -B tools/partner.py backlog`, som knappen Backlog i Förbättringar visar. Efter
+integrationen startas tjänsten om ur main enligt driftregeln. Nästa handling i spåret är ägarens nya beställning
+2026-09-29 (ordagrant i `evidence/nasta-uppdrag/local/partner-backlog-20260929/owner-words-modellval-i-dashboarden-20260929.md`):
+alla modell- och ansträngningsval samlade i arbetsplatsen på en karta över hela Nortropics flöde ("Tänk dig en tåg
+bana typ"), med Digitalas flöden och inte bara Runtime ("det får bara inte bli en sörja, i det enkla bor det
+vackra"), och "jag vill att aktiveringarna sker per automatik utifrån modell och effort nivåer jag väljer i
+arbetsplatsen". Den blir ett eget uppdrag med egna beslut i kontoret och Runtime efter denna integration: i Runtime
+blir ansträngning och rollernas utförare val i releasen som modellen, och arbetsplatsen aktiverar ägarens val själv
+när Runtime är ledig.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
@@ -224,15 +240,15 @@ med detta stycke. Kundstarts produktion är inte driftsatt i detta arbete.
 
 Nästa handling: efter integrationen startas partnerns tjänst om ur main (driftregeln), och listan prövas i den verkliga
 tjänsten. Därefter finns inget öppet i detta spår; nästa bygge kräver ett eget beslut. Bestående start vid inloggning är
-partnerns befintliga rad i ÄGARENS TUR.
+ordnad: ägaren lade LaunchAgent-filen 16:21Z, och raden i ÄGARENS TUR är stängd (FORBATTRINGSPARTNER-BACKLOG-20260929).
 
 Tillägg 2026-09-29 (19:15 UTC): ägaren har bantat arbetsplatsen (HEM-RUTOR-20260929):
 - Alla rutor på Hem är borttagna, och Hem visar nu bara hälsningen.
-- Förbättringars sidomeny har kvar Ny tråd, Överlämningar och trådarna.
+- Förbättringars sidomeny har kvar Ny tråd, Överlämningar (sedan FORBATTRINGSPARTNER-BACKLOG-20260929 Backlog) och trådarna.
 
 Ändringen byggdes av nortropic-repos-6d efter besked från 04. Efter integrationen startas tjänsten om ur main enligt
 driftregeln. Därefter följer två egna ändringar:
-- Överlämningar blir backlog, byggt av nortropic-repos-d7.
+- Överlämningar blir backlog, byggt av nortropic-repos-d7 (gjort i FORBATTRINGSPARTNER-BACKLOG-20260929).
 - Trådar kan raderas för gott, byggt av 6d efter d7:s publicering.
 
 Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md`. Arbetsgrenarna publiceras eller arkiveras
@@ -1081,7 +1097,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28), KUNDSTART-TESTLAGE-20260929 (2026-09-29), DIGITALA-UNDERHALL-20260929 (2026-09-29) och FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 (2026-09-29) är åtta rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. DIGITALA-UNDERHALL-20260929 stängde raderna om Digitalas underhållsform och taket för stående arbete: ägaren beslutade båda 2026-09-29, och lade till raden om en medarbetare som slutat. FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 stängde raden om Codex-CLI:n: den är uppdaterad. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28), KUNDSTART-TESTLAGE-20260929 (2026-09-29), DIGITALA-UNDERHALL-20260929 (2026-09-29), FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 (2026-09-29) och FORBATTRINGSPARTNER-BACKLOG-20260929 (2026-09-29) är sju rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. DIGITALA-UNDERHALL-20260929 stängde raderna om Digitalas underhållsform och taket för stående arbete: ägaren beslutade båda 2026-09-29, och lade till raden om en medarbetare som slutat. FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 stängde raden om Codex-CLI:n: den är uppdaterad. FORBATTRINGSPARTNER-BACKLOG-20260929 stängde raden om partnerns bestående start: ägaren lade LaunchAgent-filen 16:21Z, och tjänsten startade 16:21Z. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
@@ -1091,7 +1107,6 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [beslut] Digitala Kundstart: bevarandetid och radering för kundmaterial i Blob-lagret är inte beslutade (KUNDSTART-20260927) — sedan 2026-09-27
 - [beslut] Digitala: schemalagd driftkontroll (drift_kontroll.py) genom Runtime kräver ett eget Runtime-mandat med release och övergång (AP-10:s schema är hårdkodat till bedömningen; inga generella schemalagda kommandon) — beställ eller avstå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [beslut] Digitala: externa aktiveringar bara vid verklig kund — Google Cloud-projekt med OAuth eller tjänstekonto för Search Console, Google Ads-utvecklartoken, Meta-token, företagsprofil genom behörig människa; inget av det ingår i uppdraget (HELHET-RESULTAT-20260927) — sedan 2026-09-27
-- [operatörshandling] Förbättringspartnern: bestående start vid inloggning — `python3 -B tools/partner.py autostart` visar LaunchAgent-filen och de två launchctl-kommandona för ditt eget Terminalfönster; utan den startas tjänsten med `python3 -B tools/partner.py start`, och startvakten startar överlämningarnas sessioner först när tjänsten kör (FORBATTRINGSPARTNER-RESULTAT-20260928, FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929) — sedan 2026-09-28
 - [beslut] Förbättringspartnern: Improvements-samtal efter 2026-09-19 finns inte i partnerns underlag; en ny fångst genom Intake kräver din ChatGPT-inloggning i en webbläsare som en session får styra — beställ eller avstå (FORBATTRINGSPARTNER-RESULTAT-20260928) — sedan 2026-09-28
 - [beslut] Digitala: hör en medarbetare som slutat till stående mandat? Den text du godtog räknar upp den som faktarättelse, men Digitalas gällande mandat lägger personuppgifter i förslagsvägen (MANDAT.md §2, sedan tidigare), en fri textrad går inte att skilja från att någon tillkommit, och Kundstart tar inte emot en sådan rättelse alls (404, prövat). Tills du avgör är en personaländring ett förslag (DIGITALA-UNDERHALL-20260929) — sedan 2026-09-29
 
@@ -1155,7 +1170,9 @@ kvarlämnad driftrad) och `kontor/stang-granskningsbudget-r2` (dess rättelse, e
 tredje);
 `aquarium/leverans-r1` (granskad första version av AQUARIUM-V0-LEVERANS-20260925, ersatt av den publicerade andra).
 Användningsprovets två grenar, `aquarium/uppdrag-arkivdatum-r1` och `aquarium/uppdrag-arkivdatum`, står i stycket om uppdrag och
-grenar i v0.
+grenar i v0. `kontor/digitala-vilande-20260929` (worktreen `nortropic-kontor-digitala-vilande-20260929`, utan egna commits)
+bär en ocommittad registreringspost som Digitala-mottagaren för OVL-20260929-20e7b1-digitala lämnade innan
+överlämningen avslogs; den står orörd på ägarens ord "Skriv inte över något" (FORBATTRINGSPARTNER-BACKLOG-20260929).
 
 
 ARBETSFORM FÖR V0:S RUNTIME-UPPDRAG (AQUARIUM-V0-UPPDRAGSGREN-20260924), ett avgränsat undantag från rutinen ovan för

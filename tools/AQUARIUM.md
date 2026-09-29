@@ -88,8 +88,11 @@ som ändå skulle kunna se privat ut i en rubrik ersätts av `[dolt]` innan det 
   startad) med id, rubrik, mottagare (kontoret, Digitala, Runtime eller Kundstart) och status, samt tiden för senaste
   kvittens eller, utan kvittens, när den lämnades. Raden har också startvaktens läge i fast ordalydelse, till exempel
   `mottagarsession startad` eller `start väntar: en annan session skriver där`. Levererade och avslagna överlämningar
-  går till Arkivet, daterade med den avslutande kvittensens datum (UTC). En läsning utan överlämningar (från
-  före dem) är fortfarande hel, och projektionen har då ingen sådan nyckel; `schema` förblir 2.
+  går till Arkivet, daterade med den avslutande kvittensens datum (UTC). En vilande beställning i partnerns backlog
+  (FORBATTRINGSPARTNER-BACKLOG-20260929) är ingen öppen överlämning och visas inte som arbete: den flyttas bara av
+  Johnnys släpp eller avslag, en rad med beslut vars fil med hans ord finns i paketet (filen öppnas inte här), och en
+  kvittens väcker den aldrig. En läsning utan överlämningar (från före dem) är fortfarande hel, och projektionen har då
+  ingen sådan nyckel; `schema` förblir 2.
 - **Sockeln** — tjänstens verifierade identiteter (`igång`, `delvis`, `okänt`), aktiv konfiguration, den *konfigurerade*
   bemanningen och motorns räkneverk: `busy` är antalet arbetsposter, `idle_tasks` antalet parkerade uppdrag och
   `identity_records` antalet tekniska identitetsposter. Alla tre är `null` när motorn inte gick att läsa.
@@ -117,7 +120,8 @@ standardfel, utan något privat. Kommandot renderar, serverar, startar och ändr
 Proven i `tools/test_aquarium.py` använder bara syntetiska data och tillfälliga kataloger under repots befintliga
 `.scratch`; de läser aldrig verkliga källor, kör aldrig sonden och anropar aldrig git mot ett verkligt repo.
 Överlämningsläsaren prövas på en egen tillfällig kontorskatalog (inget git-repo) med paket vars arbetsorder och
-ägarord innehåller text som aldrig får synas i läsningen, med länkade, felaktiga och trasiga paket.
+ägarord innehåller text som aldrig får synas i läsningen, med länkade, felaktiga och trasiga paket, och med vilande
+beställningar som bara Johnnys beslut flyttar.
 
 ## Datum
 

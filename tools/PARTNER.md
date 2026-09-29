@@ -2,9 +2,12 @@
 
 Johnny lämnar en tanke, skärmklipp, filer, en länk eller ett repo — utan analysprompt — och får ett
 systemkunnigt, källbundet resonemang. Partnern fortsätter tidigare trådar, minns rättelser och beslut mellan
-sessioner och bereder ett uppdrag till kontoret först när Johnny tydligt beställer genomförande. En lämnad
-överlämning startar mottagarens session av sig själv (startvakten, se Överlämning). Uppdraget och gränserna står i
-besluten FORBATTRINGSPARTNER-20260928 och FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929; planen äger nästa handling.
+sessioner och bereder en beställning till kontoret först när Johnny beställer: hans "beställ" ger en vilande
+beställning i backloggen, och för genomförande lämnas den bara när han uttryckligen säger det. En lämnad överlämning
+startar mottagarens session av sig själv (startvakten, se Överlämning); en vilande gör det aldrig. Ett repo eller
+verktyg som Johnny lämnar läses i original och i sin helhet (se Läsning i original). Uppdraget och gränserna står i
+besluten FORBATTRINGSPARTNER-20260928, FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929 och
+FORBATTRINGSPARTNER-BACKLOG-20260929; planen äger nästa handling.
 
 Tjänsten är också Nortropics gemensamma arbetsplats: samtalsytan är delen **Förbättringar** bredvid Hem, Kontoret
 (Aquarium) och Kundstart, och `partner.py oppna` öppnar Hem. Se `tools/ARBETSPLATS.md` och beslutet ARBETSPLATS-20260929.
@@ -22,7 +25,7 @@ python3 -B tools/partner.py app       # skapar ~/Applications/Nortropic.app: ett
 
 Python 3.9 eller senare räcker (macOS egen `python3` fungerar).
 
-Ytan har ungefär Claude-appens form: sidomeny med "Ny tråd", "Överlämningar" och trådarna; en tom tråd visar
+Ytan har ungefär Claude-appens form: sidomeny med "Ny tråd", "Backlog" och trådarna; en tom tråd visar
 en hälsning med inmatningsrutan i mitten och förslag under; i en tråd står svaren i en kolumn och rutan längst ned.
 Modell och ansträngning väljer du i rutan: klicka på "Opus 5.5 · high" (↑↓ modell, ←→ ansträngning, Enter, Esc)
 eller skriv `/model`, `/model sonnet` eller `/effort max`. Valet sparas i `data/installningar.json` och gäller från
@@ -35,7 +38,8 @@ varje svar kopierar en knapp hela svaret som markdown, ordagrant. Knapparna nås
 mellanslag; ett kort "Kopierat" bekräftar. Går urklippet inte att använda prövas den äldre kopieringen ur en dold
 ruta med samma text; går inte heller den markeras texten synligt (för hela svaret dess markdown-källa i en
 skrivskyddad ruta) och ytan säger att den ska kopieras med ⌘C. Växeln "Bara spara" (eller att skriva "bara spara") sparar utan analys. Medan partnern arbetar kan ett nytt inspel skickas efter svaret eller "Skicka och avbryt
-pågående" (en sen rättelse). Sidomenyn har Ny tråd, Överlämningar och trådarna. Sökfältet, "Bestående förståelse"
+pågående" (en sen rättelse). Sidomenyn har Ny tråd, Backlog (tidigare Överlämningar, se Överlämning) och trådarna.
+Sökfältet, "Bestående förståelse"
 och "Tjänst och källor" togs bort ur menyn på ägarens besked (HEM-RUTOR-20260929). Partnern söker och sparar sin
 förståelse som förut, en sparad punkt öppnas från sin notis i tråden (till exempel "Sparat som F-26"), och
 `/api/sok`, `/api/forstaelse` och `/api/lage` svarar som förut.
@@ -64,12 +68,12 @@ ska bära framåt och håller trådens läge aktuellt.
 | Bilagor: typ ur innehållet, textlager (pdftotext, textutil, zip-XML), sidbilder (pdftoppm), modellbild (sips) | `partnern/bilagor.py` | Ljud, video och okänt sparas men märks olästa |
 | Källindex: Improvements-korpusen, ägarens sparade ord och beställningar, kontorets beslut/plan, andra repons dokument, förberedelsens syntes | `partnern/kallor.py` | Byggs om vid start och inom tio minuter när repons lokala origin/main, de sparade ägarorden eller korpusens manifest ändras (`partner.py index` gör det direkt); privata filer tvättas från hemligheter |
 | Systemläge: git (origin/main, primärutcheckning), planen på main, Runtimes drift genom Aquariums läsning, öppna PR | `partnern/systemlage.py` | Alltid med lästid och ålder |
-| Verktyg för modellen: sök, öppna i sammanhang, bilaga, systemläge, repo, GitHub (GET), förståelse, resonemang, tråd, bered_uppdrag, utred | `partnern/verktyg.py` | Genom MCP-bryggan, per körning |
+| Verktyg för modellen: sök, öppna i sammanhang, bilaga, systemläge, repo, GitHub (GET, i delar), förståelse, resonemang, tråd, backlog, bered_uppdrag, backlog_beslut, utred | `partnern/verktyg.py` | Genom MCP-bryggan, per körning |
 | Agentloop: Claude Code headless (`claude -p`, dvs. Agent SDK via CLI) i begränsat läge | `partnern/agent.py` | Se modell och drift nedan |
 | Webbkrok och destinationspolicy | `partnern/krok.py`, `partnern/webbpolicy.py` | Servern avgör varje webbanrop |
 | Bakgrundsutredningar | `partnern/jobb.py` | Journalförda, återupptas efter omstart |
-| Överlämning till kontoret | `partnern/overlamning.py` | Paket i `evidence/nasta-uppdrag/local/partner-OVL-…/` med AP-06-utkast, ett per mottagare |
-| Startvakt | `partnern/start.py` | Startar mottagarens session för en lämnad överlämning; väntar synligt när skrivplatsen är upptagen eller kvoten slut |
+| Överlämning till kontoret och backloggen | `partnern/overlamning.py` | Paket i `evidence/nasta-uppdrag/local/partner-OVL-…/`, vilande eller lämnat, med krav, prov, märkning och AP-06-utkast, ett per mottagare |
+| Startvakt | `partnern/start.py` | Startar mottagarens session för en lämnad överlämning, aldrig för en vilande; väntar synligt när skrivplatsen är upptagen eller kvoten slut |
 | Server och samtalsyta | `partnern/server.py`, `partnern/ui/` | 127.0.0.1, inloggning, svenska |
 
 ## Modell, drift och gränser
@@ -78,10 +82,14 @@ Agentloopen är Claude Code i headless-läge på Johnnys befintliga Claude Code-
 samma väg som Runtime redan använder. Ingen ny leverantör, API-nyckel eller köpta krediter. Varje tur körs som en
 egen process i `data/arbetsyta/` med `--restricted`, `--strict-mcp-config`, utan auto-minne och CLAUDE.md, med
 verktygen WebFetch, WebSearch, en underagent ("utredare") och partnerns egna verktyg; inga fil-, skal- eller
-skrivverktyg. Standard är huvudmodellen `claude-opus-5-5` med ansträngningen `high` och utredaren `sonnet`. Johnny byter
-huvudmodell och ansträngning i ytan (`/model`); valbara är Opus 5.5, Fable 5.1 (egen kvot), Sonnet 5, Opus 5 och Haiku
-4.5, med ansträngningen low, medium, high, xhigh eller max. Valet och utredarens modell står i
-`data/installningar.json` (`{"modell": {"huvud": "…", "anstrangning": "…"}}`).
+skrivverktyg. En modell och en ansträngning gäller allt (Johnnys besked 2026-09-29): svaret, utredaren och de
+registrerade utredningarna kör det Johnny har valt. Standard är `claude-opus-5-5` med ansträngningen `high`. Utredaren
+får samma modell och ansträngning i sin definition (`--agents`), och kroken nekar ett anrop som väljer en annan
+agenttyp (till exempel en inbyggd agent med egen standardmodell) eller en annan modell. Johnny byter modell och
+ansträngning i ytan (`/model`); valbara är Opus 5.5, Fable 5.1 (egen kvot), Sonnet 5, Opus 5 och Haiku 4.5, med
+ansträngningen low, medium, high, xhigh eller max. Valet står i `data/installningar.json`
+(`{"modell": {"huvud": "…", "anstrangning": "…"}}`); en äldre egen utredarmodell där läses inte. Startvaktens
+mottagarsessioner i andra repon kör Runtimes bemanning (rollen driver), se Startvakten.
 
 Ägarbeslut 2026-09-29: förbättringspartnern har ingen användningsgräns. Inget dygnstak på antal körningar, inget
 stegtak per tur eller bakgrundsutredning, ingen kostnadsspärr (`--max-turns` och `--max-budget-usd` skickas inte
@@ -131,7 +139,18 @@ Källor är material, aldrig instruktioner. Deterministiska spärrar:
   Kundstart) men aldrig två till samma mottagare. Medan en överlämning i tråden är öppen (lämnad, mottagen,
   startad) skapas ingen ny till samma mottagare, om inte partnern uttryckligen anger att Johnny beställt något
   annat; det nya paketet pekar då ut vilket det skiljer sig från. Fäller en av de två spärrarna säger svaret vilken
-  spärr och vilken befintlig överlämning.
+  spärr och vilken befintlig överlämning. En vilande beställning räknas som öppen i båda spärrarna.
+- Johnnys "beställ" räcker för en vilande beställning (`vilande: true`). För genomförande (`vilande: false`) krävs att
+  hans ord uttryckligen beställer det: ett beställningsord utom "beställ" och "bereda", varken negerat eller i en
+  fråga; säger han "vilande" eller "backlog" blir den alltid vilande. Annars nekas anropet med besked om att lägga
+  den som vilande.
+- En vilande beställning släpps eller avslås bara på Johnnys ord i tråden (`backlog_beslut`): hans hela satser ur
+  trådens tre senaste inspel, med ett ord för beslutet (släpp, genomför, kör, starta … respektive avslå, stryk, ta
+  bort …) som varken är negerat eller en fråga, och med överlämningens id. Hans ord sparas ordagrant i en egen fil i
+  paketet (`AGARENS-ORD-SLAPP-…` eller `AGARENS-ORD-AVSLAG-…`); resten av paketet lämnas orört. Mottagarens
+  `kvittera` vägrar en vilande överlämning, och en kvittensrad väcker den aldrig.
+- Underlag som inte går att öppna tappas inte tyst: `bered_uppdrag` vägrar och säger vilken post som föll, eller
+  skapar beställningen med `godta_olost_underlag` och märker den ofullständig med posten ordagrant i arbetsordern.
 - WebFetch går bara till publika värdar som Johnny länkat i tråden, som finns bland träffarna från en webbsökning
   under samma körning, eller som står i en kort lista över exakta dokumentationsvärdar där ingen utomstående kan
   publicera innehåll eller läsa loggar (de hämtas utan frågedel). Länkar i bilagor, hämtade sidor och andra
@@ -139,6 +158,10 @@ Källor är material, aldrig instruktioner. Deterministiska spärrar:
   proxy som hämtar något åt en — hämtas aldrig. Lokala adresser, långa sökvägs- eller frågedelar och adresser eller
   sökfrågor med hemlighets- eller personuppgiftsliknande värden nekas, och en sökning med `site:` görs bara mot
   dokumentationsvärdarna och Johnnys länkar. GitHub läses med verktyget `github` (API, endast GET), inte med WebFetch.
+- `github` läser i original och i delar: hela filträdet (`git/trees/<ref>?recursive=1`) med varje post märkt per
+  slag, filer i delar om högst 40 000 tecken (`fran_rad`) med besked om vilka rader som visats och om något
+  återstår, filer över 1 MB genom `git/blobs`, och säkerhetsmeddelanden (`repos/…/security-advisories` och den
+  globala `advisories`). Samma destination som tidigare; en kapad lista säger hur många poster som inte visas.
 - Körningsnyckeln för bryggan och kroken går bara genom processmiljön, aldrig i processargumenten.
 
 **Kända gränser.** Att den sparade förståelsetexten stämmer med det citerade ägarordet prövas inte maskinellt;
@@ -152,7 +175,10 @@ adresskontroller kan neka en vanlig länk vars frågedel liknar en domän (t.ex.
 felar hellre stängt. Bilagor läses av lokala
 verktyg (pdftotext, textutil, sips, zip-XML). Arbete som avbröts av en omstart återupptas automatiskt bara om det
 startade inom den senaste timmen; äldre står kvar som avbrutet med en knapp. En tur som stoppades av abonnemangets
-kvot eller av hangvakten tas om först när Johnny trycker Återuppta. Svaret är huvudagentens text; en kort mellanrad
+kvot eller av hangvakten tas om först när Johnny trycker Återuppta. Regeln för uttryckligt genomförande och orden för
+släpp och avslag är ordbaserade som beställningsregeln. Aquarium prövar att filen med Johnnys ord för ett släpp finns i
+paketet men öppnar den inte; partnern och startvakten prövar också dess hash. En enskild rad över 20 000 tecken (till
+exempel minifierad kod) visas bara till den gränsen. Svaret är huvudagentens text; en kort mellanrad
 som följs av fler
 verktygsanrop och ett längre svar räknas till arbetet och står bara i delsvaret. Partnerns omdöme prövas av
 slutproven (verkliga körningar) och Johnnys rättelser, inte av de deterministiska proven.
@@ -169,13 +195,45 @@ beställningar som sessioner sparar blir sökbara inom tio minuter. Nya beslut o
 primärutcheckningens origin/main har uppdaterats; tjänsten hämtar inte själv från GitHub, men sessioner gör det vid
 start (`ingang.py`) och efter varje publicering. Repo-verktygen läser den senast hämtade origin/main.
 
+## Läsning i original
+
+När Johnny lämnar ett repo eller ett verktyg hämtar partnern hela filträdet först och förtecknar alla delar, läser allt
+som styr beteende eller beskriver metod i original och i sin helhet (stora filer i delar tills de är slut), prövar
+varje del mot kontorets, Runtimes, Digitalas och Kundstarts main och redovisar täckningen i en tabell per repo: läst i
+original, bedömt på namn eller beskrivning (med skäl) och inte läst. En sammanfattning från ett annat verktyg, som
+WebFetch eller utredarens svar, räknas inte som läsning. Ryms inte allt i en tur registrerar partnern en utredning för
+resten med samma krav. Reglerna står i `partnern/roll.md`.
+
 ## Överlämning
 
-När Johnny tydligt beställer genomförande skriver partnern ett paket per mottagare i kontorets beställningsväg:
-`ARBETSORDER.md` (sammanställd, märkt som sådan), `AGARENS-ORD.md` (de citerade inspelen ordagrant), hashade
-underlagsfiler, `OVERLAMNING.json` och ett AP-06-utkast (`ap06/utkast/`) med sina luckor. Status "lämnad";
-aktuell status är sista raden i paketets `KVITTENS.jsonl`, och `overlamningar` visar den även när tjänsten inte
-kör. AP-06-utkastets behörighet bygger på det ordbaserade citatet; mottagaren läser `AGARENS-ORD.md`.
+När Johnny beställer skriver partnern ett paket per mottagare i kontorets beställningsväg: `ARBETSORDER.md`
+(sammanställd, märkt som sådan), `AGARENS-ORD.md` (de citerade inspelen ordagrant), underlaget löst till hashade
+filer, `OVERLAMNING.json` och ett AP-06-utkast (`ap06/utkast/`). Beställningen bär det som krävs för att bygga: krav
+med ett observerbart prov per krav (AP-06:s requirements och tests fylls ur dem), klart-när, berörda filer (repo och
+sökväg), ordning och beroenden, resursram, ursprung (tråd och fynd) och en kort motivering. Den märks **byggklar** när
+varje krav har ett prov, klart-när finns och allt underlag är löst till filer, annars **ofullständig** med luckorna
+uppräknade; märkningen står i verktygets svar, i arbetsordern och i backloggen. Runtime-uppgiftens tekniska fält
+(base-revision, allowed_paths, acceptans, steg och tidsram) fyller mottagaren i mot aktuell main när beställningen
+släpps; de redovisas som väntande, inte som fel.
+
+Läget när paketet skrivs står i `OVERLAMNING.json`: **vilande** (i backloggen) eller **lämnad**. Varje senare övergång
+är en rad i paketets `KVITTENS.jsonl`, och den sista gällande raden gäller: Johnnys släpp eller avslag av en vilande
+beställning (bokförda av partnern, med hans ord i en egen fil) och mottagarens kvittenser. `overlamningar` visar
+statusen även när tjänsten inte kör. AP-06-utkastets behörighet bygger på det ordbaserade citatet; mottagaren läser
+`AGARENS-ORD.md` (och vid ett släpp `AGARENS-ORD-SLAPP-…`).
+
+**Backloggen** är de vilande beställningarna. Startvakten startar aldrig en vilande beställning, och den lägger inga
+rader i planens ÄGARENS TUR; planen pekar hit. Den listas utan modell och bara genom läsning:
+
+```sh
+python3 -B tools/partner.py backlog           # id, mottagare, rubrik, datum, ursprung, märkning och motivering
+python3 -B tools/partner.py backlog --alla    # också de som har släppts eller avslagits
+```
+
+Partnern läser samma lista med verktyget `backlog`, och i samtalsytan är knappen Backlog i sidomenyn (tidigare
+Överlämningar, på ägarens besked) samma lista (`GET /api/backlog`). Går beställningsvägen inte att läsa är backloggen
+okänd (kod 4), aldrig tom; ett paket som inte går att läsa räknas upp, och då sägs att backloggen inte är känd i sin
+helhet. Lämnade och avslutade överlämningar syns i trådarna och i Kontoret.
 
 Id:t är `OVL-<datum>-<inspel>`; en andra mottagare ur samma inspel får mottagarens kortnamn som tillägg
 (`OVL-…-runtime`), och står en katalog redan på ett id (till exempel en rest efter ett avbrott) tas nästa lediga id
@@ -223,7 +281,7 @@ Paketet bär instruktionens material, men bara Johnnys ord är beslut.
 
 Varje steg står i paketets `START.jsonl` (bara tillägg: `vantar`, `hindrad`, `startad`, `avbruten`, `klar`,
 `avslutad`, `misslyckad`, med skäl och en fast orsakskod) och i partnerns journal. Sessionens ström ligger i
-paketets `session/`; för Codex binder trådens id i den första strömmen sessionen till överlämningen. Tråden och "Överlämningar" visar mottagaren, statusen och vilken session som startade och när,
+paketets `session/`; för Codex binder trådens id i den första strömmen sessionen till överlämningen. Tråden och Kontorets lista över överlämningar visar mottagaren, statusen och vilken session som startade och när,
 eller vad starten väntar på. Aquarium visar en rad per öppen överlämning, lägger levererade och avslagna i Arkivet och
 ett misslyckat eller hindrat startförsök på Ägarens bord (se `tools/AQUARIUM.md`).
 
@@ -261,13 +319,23 @@ uppdelning i Johnnys ord och partnerns egna bedömningar, mellanrader utanför s
 läst andel vid öppning, ÄGARENS TUR läst som Aquarium, överlämning utan dubbletter (samma inspel och öppen
 överlämning) och med kvittens, en överlämning per mottagare ur samma meddelande med egna id utan att ett befintligt
 paket flyttas, webbkroken med sökträffar och planterade länkar, bakgrundsutredning, provläge och att ingen
-användningsgräns stoppar flera turer i rad.
+användningsgräns stoppar flera turer i rad. Backloggen prövas med vilande beställningar (byggklar med krav, prov och
+underlag löst till filer; ofullständig när ett prov eller klart-när saknas; underlag som inte går att öppna vägras
+eller märks), regeln att "beställ" inte räcker för genomförande, dubblettregeln mellan vilande och lämnade, släpp och
+avslag bara på Johnnys ord med id (ord utanför tråden, negerat, utan id och med ett annat id nekas), ett släpp som
+lämnar paketet orört och bokför övergången, ett beslut samma sekund som ett annat som nekas läsbart utan att något
+skrivs, kvittenser och rader utan hans ord som aldrig väcker en vilande beställning
+och en backlog som inte kan läsas och därför är okänd. GitHub prövas med en fejkad `gh`: hela trädet märkt per slag,
+ett kapat träd, en fil över 1 MB läst i delar till sista raden och hämtad en gång, säkerhetsmeddelanden, en kapad lista
+och en otillåten sökväg. Modellvalet prövas så att utredaren får samma modell och ansträngning och kroken nekar andra
+agenttyper och modeller.
 Startvakten prövas med en fejkad mottagarsession som kör det riktiga kvitteringskommandot ur sin instruktion: exakt
 en session per överlämning (även efter en omstart av tjänsten), väntan när skrivplatsen är upptagen och sedan start,
 egen session i samma repo och dygnstaket, kvot och saknad inloggning med synlig väntan och samma session, Codex ur
 bemanningen med kvot och fortsättning i samma tråd utan byte när bemanningen ändras, en levande Codex-session som
 känns igen efter en omstart av vakten, ett kvotbesked utan avslutat varv, en fortsättning som väntar på en annan
 skrivare, oläst bemanning utan reservväg,
-fel och avbrott utan en andra session, ändrad binär, att prov- och utvecklingsinstanser aldrig startar något och att
+fel och avbrott utan en andra session, ändrad binär, en vilande beställning som aldrig startas förrän Johnny släpper
+den (inte heller med en kvittensrad eller ett felaktigt index), att prov- och utvecklingsinstanser aldrig startar något och att
 processer, färska worktrees och raderade arbetskataloger bedöms rätt. Kopieringen prövas i en riktig webbläsare
 (se beslutet).

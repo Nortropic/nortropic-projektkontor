@@ -1,8 +1,8 @@
-"""PreToolUse-krok för WebFetch och WebSearch: servern bestämmer, kroken frågar.
+"""PreToolUse-krok för WebFetch, WebSearch och underagenten (Agent): servern bestämmer, kroken frågar.
 
-Claude Code kör kroken före varje webbanrop (även i underagenter). Kroken skickar verktygets indata till
-partnerns server med körningens nyckel och återger serverns beslut. Når den inte servern nekas anropet:
-en destination släpps aldrig igenom av misstag.
+Claude Code kör kroken före varje webbanrop (även i underagenter) och före varje anrop av en underagent. Kroken
+skickar verktygets indata till partnerns server med körningens nyckel och återger serverns beslut. Når den inte
+servern nekas anropet: en destination eller en annan modell släpps aldrig igenom av misstag.
 """
 from __future__ import annotations
 

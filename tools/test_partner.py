@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import socket
 import stat
 import subprocess
@@ -83,7 +84,7 @@ for rad in rader:
     if m:
         r = rpc('tools/call', {'name': m.group(1), 'arguments': json.loads(m.group(2))})['result']
         t = ' '.join(c.get('text', '') for c in r['content'] if c['type'] == 'text')
-        svar.append('%s:%s:%s' % (m.group(1), 'FEL' if r.get('isError') else 'OK', t[:4000]))
+        svar.append('%s:%s:%s' % (m.group(1), 'FEL' if r.get('isError') else 'OK', t[:200000]))
     m = re.match(r'^(HÄMTA|WEBBSÖK) (.+)$', rad)
     if m:
         namn = 'WebFetch' if m.group(1) == 'HÄMTA' else 'WebSearch'
@@ -92,6 +93,13 @@ for rad in rader:
                            capture_output=True, text=True)
         beslut = json.loads(r.stdout)['hookSpecificOutput']['permissionDecision']
         svar.append('%s:%s:%s' % (namn, m.group(2), beslut))
+    m = re.match(r'^AGENT (.+)$', rad)
+    if m:
+        indata = json.loads(m.group(1))
+        r = subprocess.run(krok, shell=True, input=json.dumps({'tool_name': 'Agent', 'tool_input': indata}),
+                           capture_output=True, text=True)
+        beslut = json.loads(r.stdout)['hookSpecificOutput']['permissionDecision']
+        svar.append('Agent:%s:%s:%s' % (indata.get('subagent_type'), indata.get('model'), beslut))
     m = re.match(r'^(SÖKRESULTAT|LÄNKRESULTAT) (\S+)$', rad)
     if m:
         namn = 'WebSearch' if m.group(1) == 'SÖKRESULTAT' else 'mcp__partner__bilaga'
@@ -695,11 +703,44 @@ class ModellvalProv(Miljo):
         a = self.fejkanrop()[-1]['argv']
         self.assertEqual((a[a.index('--model') + 1], a[a.index('--effort') + 1]), ('claude-sonnet-5', 'max'))
         self.assertEqual(self.turer(vy, 'svarad')[0]['forbrukning']['anstrangning'], 'max')
+        agenter = json.loads(a[a.index('--agents') + 1])
+        self.assertEqual(list(agenter), ['utredare'])
+        self.assertEqual((agenter['utredare']['model'], agenter['utredare']['effort']), ('claude-sonnet-5', 'max'))
+        krok = json.loads(a[a.index('--settings') + 1])['hooks']['PreToolUse'][0]['matcher']
+        self.assertIn('Agent', krok.split('|'))
+        self.assertNotIn('utredare', self.json('GET', '/api/installningar')[1])
+        lage = self.json('GET', '/api/lage')[1]['modell']
+        self.assertEqual(lage, {'huvud': 'claude-sonnet-5', 'anstrangning': 'max',
+                                'galler': 'svaret, utredaren och de registrerade utredningarna'})
         system = sorted((Path(self.k.data) / 'turer').glob('*/system.md'), key=lambda p: p.stat().st_mtime)[-1].read_text()
         self.assertIn('Du kör som claude-sonnet-5 med ansträngningen max', system)
+        self.assertIn('samma val gäller utredaren och de registrerade utredningarna', system)
         fil.write_text('{inte json', 'utf-8')  # en oläsbar fil skrivs aldrig över
         self.assertEqual(self.json('POST', '/api/installningar', {'huvud': 'claude-opus-5-5', 'anstrangning': 'high'})[0], 400)
         self.assertEqual(fil.read_text(), '{inte json')
+
+
+    def test_underagenten_ar_utredaren_med_svarets_modell_och_andra_nekas(self):
+        self.logga_in()
+        self.manus('AGENT {"subagent_type": "general-purpose", "prompt": "x"}',
+                   'AGENT {"subagent_type": "Explore", "prompt": "x"}',
+                   'AGENT {"subagent_type": "utredare", "model": "haiku", "prompt": "x"}',
+                   'AGENT {"subagent_type": "utredare", "prompt": "x"}',
+                   'AGENT {"subagent_type": "utredare", "model": "inherit", "prompt": "x"}',
+                   'AGENT {"subagent_type": "utredare", "model": "claude-opus-5-5", "prompt": "x"}')
+        s = self.svar(self.skicka('Utred en sak.')['inspel']['trad'], 1)
+        self.assertIn('Agent:general-purpose:None:deny', s)          # inbyggda agenter har egna standardmodeller
+        self.assertIn('Agent:Explore:None:deny', s)
+        self.assertIn('Agent:utredare:haiku:deny', s)                 # ingen annan modell än svarets
+        self.assertIn('Agent:utredare:None:allow', s)
+        self.assertIn('Agent:utredare:inherit:allow', s)
+        self.assertIn('Agent:utredare:claude-opus-5-5:allow', s)
+        a = self.fejkanrop()[-1]['argv']
+        self.assertEqual(json.loads(a[a.index('--agents') + 1])['utredare']['model'], 'claude-opus-5-5')
+        self.assertFalse(hasattr(kf.Modell(), 'utredare'))                          # ingen egen utredarmodell finns
+
+    def svar(self, trad, antal):
+        return VerktygProv.svar(self, trad, antal)
 
 
 class AvbrottProv(Miljo):
@@ -1142,6 +1183,388 @@ class VerktygProv(Miljo):
         self.logga_in()
         trad = self.skicka('RING bash {"cmd": "ls"}')['inspel']['trad']
         self.assertIn('bash:FEL', self.svar(trad, 1))
+
+
+class BacklogProv(Miljo):
+    """Vilande beställningar, Johnnys släpp och avslag och byggklara beställningar (FORBATTRINGSPARTNER-BACKLOG-20260929)."""
+
+    svar = VerktygProv.svar
+    BYGGKLAR = {'krav': [{'id': 'K1', 'text': 'Aquarium visar om partnerns tjänst kör',
+                          'prov': 'test_aquarium: raden visar "kör" när tjänsten svarar'},
+                         {'text': 'Raden säger när tjänsten inte kör', 'prov': 'provet visar "kör inte"', 'metod': 'enhetsprov'}],
+                'klart_nar': 'Båda kraven har gröna prov på main.',
+                'berorda_filer': [{'repo': 'kontoret', 'sokvag': 'tools/aquarium.py'}],
+                'ordning_och_beroenden': 'Efter postkontrollen.', 'resursram': 'En session, ingen ny kostnad.',
+                'fynd': 'F-1: statusraden i ett externt repo', 'motivering': 'Johnny ser om partnern kör.'}
+
+    def bered(self, trad, n, **args):
+        """Partnern bereder i tur n med de givna argumenten; svaret på den turen."""
+        bas = {'rubrik': 'Statusrad i Aquarium', 'mal': 'Aquarium visar partnerns tjänst.', 'nasta_handling': 'Bered',
+               'mottagare': 'kontorets-kedjedrivare'}
+        self.manus('RING bered_uppdrag ' + json.dumps(dict(bas, **args), ensure_ascii=False))
+        self.skicka('Fortsätt.', trad=trad)
+        return self.svar(trad, n)
+
+    def ny_bestallning(self, text='Beställ statusraden i Aquarium.', **args):
+        self.logga_in()
+        trad = self.skicka(text)['inspel']['trad']
+        self.svar(trad, 1)
+        s = self.bered(trad, 2, agarcitat=text, vilande=True, **args)
+        rad = self.S.lager.en('select id, data from overlamning order by tid desc')
+        return trad, s, rad['id'], Path(json.loads(rad['data'])['katalog'])
+
+    def kommando(self, *argv):
+        import contextlib, io
+        import partner
+        miljo = {'PARTNER_DATA': str(self.k.data), 'PARTNER_KONTOR_PRIMAR': str(self.k.kontor_primar)}
+        fore = {n: os.environ.get(n) for n in miljo}
+        os.environ.update(miljo)
+        ut, fel = io.StringIO(), io.StringIO()
+        try:
+            with contextlib.redirect_stdout(ut), contextlib.redirect_stderr(fel):
+                kod = partner.main(list(argv))
+        finally:
+            for n, v in fore.items():
+                os.environ.pop(n, None) if v is None else os.environ.__setitem__(n, v)
+        return kod, ut.getvalue() + fel.getvalue()
+
+    def test_bestall_ger_en_vilande_byggklar_bestallning_med_krav_prov_och_underlag(self):
+        subprocess.run(['git', 'init', '-q', '-b', 'main', str(self.k.kontor_primar)], check=True)
+        (self.k.kontor_primar / 'README.md').write_text('kontorets ingång\n', 'utf-8')
+        subprocess.run(['git', '-C', str(self.k.kontor_primar), '-c', 'user.name=p', '-c', 'user.email=p@example.invalid',
+                        'commit', '-q', '--allow-empty', '-m', 'x'], check=True)
+        subprocess.run(['git', '-C', str(self.k.kontor_primar), 'add', 'README.md'], check=True)
+        subprocess.run(['git', '-C', str(self.k.kontor_primar), '-c', 'user.name=p', '-c', 'user.email=p@example.invalid',
+                        'commit', '-q', '-m', 'readme'], check=True)
+        trad, s, oid, kat = self.ny_bestallning(underlag=['imp:CONV-001:m2', 'repo:kontoret@main:README.md'], **self.BYGGKLAR)
+        self.assertIn('VILANDE i backloggen', s)
+        self.assertIn('Märkning: byggklar', s)
+        self.assertIn('Väntande tekniska fält', s)
+        self.assertIn('2 underlagsfiler, 2 krav', s)
+        paket = json.loads((kat / 'OVERLAMNING.json').read_text())
+        self.assertEqual((paket['status'], paket['markning']['varde'], paket['markning']['luckor']), ('vilande', 'byggklar', []))
+        self.assertIn('base', paket['markning']['vantande'])
+        self.assertEqual([k['id'] for k in paket['krav']], ['K1', 'K2'])
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'vilande')
+        filer = {u['id']: (kat / u['fil']).read_text() for u in paket['underlag']}
+        self.assertIn('Då bör Aquarium vara en läsvy', filer['imp:CONV-001:m2'])
+        self.assertIn('kontorets ingång', filer['repo:kontoret@main:README.md'])
+        order = (kat / 'ARBETSORDER.md').read_text()
+        for del_ in ('## Krav och prov', '**K1** Aquarium visar', 'Prov: provet visar "kör inte"', 'Metod: enhetsprov',
+                     '## Klart när', 'Båda kraven har gröna prov', 'kontoret: `tools/aquarium.py`', 'Efter postkontrollen.',
+                     'En session, ingen ny kostnad.', 'Fynd: F-1', 'Johnny ser om partnern kör.', '## Runtime-uppgiftens tekniska fält',
+                     'Vilande i backloggen: startvakten startar den inte'):
+            self.assertIn(del_, order)
+        spec = json.loads((kat / 'ap06' / 'spec.json').read_text())
+        self.assertEqual([(r['id'], r['text'], r['tests']) for r in spec['requirements']],
+                         [('K1', 'Aquarium visar om partnerns tjänst kör', ['T-K1']),
+                          ('K2', 'Raden säger när tjänsten inte kör', ['T-K2'])])     # inte en kopia av målet
+        from partnern.overlamning import TESTMETOD_VANTAR
+        self.assertEqual([(t['observable'], t['method']) for t in spec['tests']],
+                         [('test_aquarium: raden visar "kör" när tjänsten svarar', TESTMETOD_VANTAR),
+                          ('provet visar "kör inte"', 'enhetsprov')])
+        brief = (kat / 'ap06' / 'utkast' / 'brief.draft.md').read_text()
+        self.assertIn('Raden säger när tjänsten inte kör', brief)
+        self.assertNotIn('requirement_tests_empty', brief)
+        vy = self.json('GET', '/api/trad/' + trad)[1]
+        post = [p for p in vy['poster'] if p['slag'] == 'overlamning'][0]
+        self.assertEqual((post['status'], post['vilande_fran'], post['markning']['varde']), ('vilande', True, 'byggklar'))
+        self.manus('RING backlog {}')
+        self.skicka('Visa backloggen.', trad=trad)
+        b = self.svar(trad, 3)
+        self.assertIn('backlog:OK', b)
+        for del_ in (oid, 'vilande · till kontoret', '"Statusrad i Aquarium"', 'byggklar', 'fynd: F-1', 'Motivering: Johnny ser'):
+            self.assertIn(del_, b)
+        kod, d = self.json('GET', '/api/backlog')                                     # knappen Backlog i ytan
+        self.assertEqual((kod, d['status'], [p['id'] for p in d['poster']]), (200, 'ok', [oid]))
+        self.assertEqual(d['poster'][0]['markning'], 'byggklar')
+        self.assertEqual(self.json('GET', '/api/backlog', kaka=False)[0], 401)
+        self.assertIn('Backlog</button>', (Path(srv.__file__).parent / 'ui' / 'index.html').read_text())
+        kod, ut = self.kommando('backlog')
+        self.assertEqual(kod, 0)
+        self.assertIn('1 vilande', ut)
+        self.assertIn(oid, ut)
+        kod, ut = self.kommando('overlamningar')
+        self.assertRegex(ut, r'%s\s+vilande' % oid)
+        self.assertIn('lagd som vilande', ut)
+
+    def test_olost_underlag_vagras_eller_marks_och_krav_utan_prov_ar_ofullstandigt(self):
+        self.logga_in()
+        text = 'Beställ det, vi tar det sen.'
+        trad = self.skicka(text)['inspel']['trad']
+        self.svar(trad, 1)
+        s = self.bered(trad, 2, agarcitat=text, vilande=True, underlag=['F-18 punkt 3'], krav=[{'text': 'Något', 'prov': ''}])
+        self.assertIn('bered_uppdrag:FEL', s)
+        self.assertIn('underlag som inte går att öppna tappas inte tyst', s)
+        self.assertIn('"F-18 punkt 3"', s)
+        self.assertEqual(self.S.lager.fraga('select id from overlamning'), [])               # inget skapades
+        self.assertEqual(list((self.k.kontor_primar / 'evidence/nasta-uppdrag/local').glob('partner-*')), [])
+        s = self.bered(trad, 3, agarcitat=text, vilande=True, underlag=['F-18 punkt 3'], godta_olost_underlag=True,
+                       krav=[{'text': 'Något', 'prov': ''}, {'text': 'Något till', 'prov': 'syns'}])
+        self.assertIn('bered_uppdrag:OK', s)
+        self.assertIn('VARNING: underlag som inte kunde öppnas', s)
+        self.assertIn('Märkning: ofullständig — luckor: krav K1 saknar prov; klart-när saknas; underlaget "F-18 punkt 3" '
+                      'är inte löst till en fil', s)
+        kat = Path(json.loads(self.S.lager.en('select data from overlamning')['data'])['katalog'])
+        self.assertIn('Underlag som inte kunde lösas upp', (kat / 'ARBETSORDER.md').read_text())
+        self.assertIn('"F-18 punkt 3"', (kat / 'ARBETSORDER.md').read_text())
+        from partnern.overlamning import _markning
+        self.assertEqual(_markning([], 'klart', [], {})['luckor'], ['inga krav'])
+
+    def test_bestall_racker_inte_for_genomforande_och_dubblettregeln_galler_mellan_vilande_och_lamnade(self):
+        from partnern.verktyg import genomforandehinder
+        self.assertEqual(genomforandehinder('beställ dem vilande'), 'vilande')
+        self.assertEqual(genomforandehinder('Lägg det i backloggen.'), 'vilande')
+        self.assertEqual(genomforandehinder('Beställ statusraden.'), 'bara_bestall')
+        self.assertEqual(genomforandehinder('Genomför inte det än.'), 'bara_bestall')
+        self.assertEqual(genomforandehinder('Kör du det?'), 'bara_bestall')
+        self.assertIsNone(genomforandehinder('Beställ och genomför statusraden nu.'))
+        trad, s, oid, kat = self.ny_bestallning(**self.BYGGKLAR)
+        self.assertIn('Spärren "samma beställning till samma mottagare" fällde', self.bered(
+            trad, 3, agarcitat='Beställ statusraden i Aquarium.', vilande=True))
+        text = 'Beställ också en ordlista för kontoret.'
+        self.skicka(text, trad=trad)
+        self.svar(trad, 4)
+        s = self.bered(trad, 5, agarcitat=text, vilande=False, rubrik='Ordlista')
+        self.assertIn('bered_uppdrag:FEL', s)
+        self.assertIn('ett "beställ" ger en vilande beställning', s)
+        text = 'Genomför statusraden i Aquarium nu.'
+        self.skicka(text, trad=trad)
+        self.svar(trad, 6)
+        s = self.bered(trad, 7, agarcitat=text, vilande=False)
+        self.assertIn('Det finns redan en vilande överlämning i den här tråden', s)
+        self.assertIn(oid, s)
+        self.assertEqual(len(self.S.lager.fraga('select id from overlamning')), 1)
+
+    def test_slapp_kraver_johnnys_ord_i_traden_lamnar_paketet_ororrt_och_bokfor_overgangen(self):
+        trad, s, oid, kat = self.ny_bestallning(**self.BYGGKLAR)
+        fore = {str(p.relative_to(kat)): p.read_bytes() for p in kat.rglob('*') if p.is_file()}
+
+        def slapp(n, johnny, citat=None):
+            self.manus('RING backlog_beslut ' + json.dumps({'id': oid, 'beslut': 'slapp', 'agarcitat': citat or johnny}))
+            self.skicka(johnny, trad=trad)
+            return self.svar(trad, n)
+        s = slapp(3, 'Hur ser backloggen ut?', citat='Släpp %s.' % oid)
+        self.assertIn('backlog_beslut:FEL', s)
+        self.assertIn('citatet finns inte ordagrant', s)                            # hans ord måste stå i tråden
+        s = slapp(4, 'Släpp inte %s än.' % oid)
+        self.assertIn('backlog_beslut:FEL', s)
+        self.assertIn('negerat', s)
+        s = slapp(5, 'Genomför den.')
+        self.assertIn('Johnnys ord nämner inte %s' % oid, s)
+        s = slapp(6, 'Släpp %s-digitala.' % oid)
+        self.assertIn('Johnnys ord nämner inte %s' % oid, s)                         # ett annat id räknas inte
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'vilande')
+        s = slapp(7, 'Släpp %s.' % oid)
+        self.assertIn('backlog_beslut:OK', s)
+        self.assertIn('SLÄPPT på Johnnys ord och nu LÄMNAD', s)
+        efter = {str(p.relative_to(kat)): p.read_bytes() for p in kat.rglob('*') if p.is_file()}
+        nya = sorted(set(efter) - set(fore))
+        self.assertEqual(len(nya), 1)
+        self.assertRegex(nya[0], r'^AGARENS-ORD-SLAPP-\d{8}T\d{6}Z\.md$')
+        self.assertIn('Släpp %s.' % oid, efter[nya[0]].decode())
+        for namn, innehall in fore.items():                                         # paketet i övrigt orört
+            if namn != 'KVITTENS.jsonl':
+                self.assertEqual(efter[namn], innehall, namn)
+        self.assertTrue(efter['KVITTENS.jsonl'].startswith(fore['KVITTENS.jsonl']))
+        tillagt = efter['KVITTENS.jsonl'][len(fore['KVITTENS.jsonl']):].decode().splitlines()
+        self.assertEqual(len(tillagt), 1)
+        rad = json.loads(tillagt[0])
+        self.assertEqual((rad['status'], rad['beslut'], rad['agarord']), ('lamnad', 'slapp', nya[0]))
+        self.assertIn('Släpp %s.' % oid, rad['bevis'])
+        o = self.S.lager.en('select status, data from overlamning')
+        self.assertEqual(o['status'], 'lamnad')
+        self.assertEqual(json.loads(o['data'])['historik'][-1]['status'], 'lamnad')
+        from partnern.overlamning import backlog, kvittera, paketlage
+        self.assertEqual(paketlage(kat)['status'], 'lamnad')
+        self.assertEqual(backlog(self.k)['poster'], [])                              # inte längre vilande
+        self.assertEqual([p['status'] for p in backlog(self.k, alla=True)['poster']], ['lamnad'])
+        kvittera(self.k, oid, 'mottagen', 'provsession')                              # nu kvitterar mottagaren som vanligt
+        self.assertEqual(self.S.overlamning.las_kvittenser(), 1)
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'mottagen')
+        s = slapp(8, 'Släpp %s igen.' % oid)
+        self.assertIn('är inte vilande', s)
+
+    def test_avslag_ur_backloggen_och_en_kvittens_vacker_aldrig_en_vilande_bestallning(self):
+        trad, s, oid, kat = self.ny_bestallning(**self.BYGGKLAR)
+        from partnern.overlamning import kvittera, paketlage
+        with self.assertRaises(ValueError):
+            kvittera(self.k, oid, 'mottagen', 'provsession')
+        kod, ut = self.kommando('kvittera', oid, 'startad', '--av', 'x')
+        self.assertEqual(kod, 2)
+        self.assertIn('vilande i backloggen', ut)
+        with open(kat / 'KVITTENS.jsonl', 'a') as f:                                   # rader utan Johnnys ord väcker inget
+            f.write(json.dumps({'status': 'mottagen', 'av': 'någon', 'kvitterad': '2026-09-29T20:00:00.000Z'}) + '\n')
+            f.write(json.dumps({'status': 'lamnad', 'beslut': 'slapp', 'agarord': 'AGARENS-ORD-SLAPP-20260929T200000Z.md',
+                                'agarord_sha256': '0' * 64, 'kvitterad': '2026-09-29T20:00:01.000Z'}) + '\n')
+        self.assertEqual(paketlage(kat)['status'], 'vilande')
+        self.assertEqual(self.S.overlamning.las_kvittenser(), 0)
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'vilande')
+        self.manus('RING backlog_beslut ' + json.dumps({'id': oid, 'beslut': 'avslag',
+                                                         'agarcitat': 'Avslå %s, vi börjar om.' % oid}))
+        self.skicka('Avslå %s, vi börjar om.' % oid, trad=trad)
+        s = self.svar(trad, 3)
+        self.assertIn('AVSLAGEN på Johnnys ord, direkt ur backloggen', s)
+        self.assertEqual(paketlage(kat)['status'], 'avslagen')
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'avslagen')
+        self.assertTrue(list(kat.glob('AGARENS-ORD-AVSLAG-*.md')))
+        self.manus('RING backlog_beslut ' + json.dumps({'id': oid, 'beslut': 'slapp', 'agarcitat': 'Släpp %s.' % oid}))
+        self.skicka('Släpp %s.' % oid, trad=trad)
+        self.assertIn('är inte vilande (status avslagen)', self.svar(trad, 4))
+
+    def test_ett_samtidigt_beslut_ger_ett_lasbart_nekande_och_inget_skrivs(self):
+        trad, s, oid, kat = self.ny_bestallning(**self.BYGGKLAR)
+        from datetime import datetime, timedelta, timezone
+        from partnern.overlamning import paketlage
+        from partnern.verktyg import Verktygsfel
+        johnny = 'Släpp %s.' % oid
+        self.S.spara_inspel(trad, 'klient-samtidigt-0001', johnny, [], None)
+        korning = type('K', (), {'typ': 'tur', 'id': 'tur_prov', 'trad': trad, 'logga_kallor': lambda *a: None,
+                                 'handelse': lambda *a: None})()
+        nu = datetime.now(timezone.utc)
+        upptagna = [kat / ('AGARENS-ORD-SLAPP-%s.md' % (nu + timedelta(seconds=i)).strftime('%Y%m%dT%H%M%SZ'))
+                    for i in range(-1, 10)]
+        for f in upptagna:                                  # ett annat beslut har just skrivit sin fil
+            f.write_text('ett annat beslut', 'utf-8')
+        kvitto = (kat / 'KVITTENS.jsonl').read_bytes()
+        with self.assertRaises(Verktygsfel) as fel:
+            self.S.overlamning.besluta(korning, {'id': oid, 'beslut': 'slapp', 'agarcitat': johnny})
+        self.assertIn('Ett annat beslut om %s skrevs just nu' % oid, str(fel.exception))
+        self.assertEqual(((kat / 'KVITTENS.jsonl').read_bytes(), paketlage(kat)['status']), (kvitto, 'vilande'))
+        for f in upptagna:
+            f.unlink()
+        self.assertIn('SLÄPPT', self.S.overlamning.besluta(korning, {'id': oid, 'beslut': 'slapp', 'agarcitat': johnny})['text'])
+
+    def test_en_backlog_som_inte_kan_lasas_ar_okand_inte_tom(self):
+        import types
+        from partnern.overlamning import backlog, backlogtext
+        saknas = types.SimpleNamespace(kontor_primar=self.rot / 'finns-inte', data=self.k.data, prov_dolj=())
+        b = backlog(saknas)
+        self.assertEqual((b['status'], b['poster']), ('okand', []))
+        self.assertIn('OKÄND, inte tom', backlogtext(b))
+        self.assertNotIn('Inga vilande', backlogtext(b))
+        rot = self.k.kontor_primar / 'evidence' / 'nasta-uppdrag' / 'local'
+        trasig = rot / 'partner-OVL-20260929-abcdef'
+        trasig.mkdir()
+        (trasig / 'OVERLAMNING.json').write_text('{inte json', 'utf-8')
+        b = backlog(self.k)
+        self.assertEqual((b['status'], [o['id'] for o in b['olasbara']]), ('ofullstandig', ['OVL-20260929-abcdef']))
+        self.assertIn('inte känd i sin helhet', backlogtext(b))
+        kod, ut = self.kommando('backlog')
+        self.assertIn('inte känd i sin helhet', ut)
+        (trasig / 'OVERLAMNING.json').unlink()
+        trasig.rmdir()
+        os.chmod(rot, 0o000)
+        try:
+            kod, ut = self.kommando('backlog')
+        finally:
+            os.chmod(rot, 0o755)
+        self.assertEqual(kod, 4)
+        self.assertIn('OKÄND, inte tom', ut)
+
+
+FEJK_GH = r"""#!/usr/bin/env python3
+import json, sys
+from pathlib import Path
+svar = json.loads(Path(__file__).with_name('gh-svar.json').read_text())
+sokvag = sys.argv[-1]
+with open(Path(__file__).with_name('gh-logg.txt'), 'a') as f:
+    f.write(' '.join(sys.argv[1:]) + '\n')
+if sokvag not in svar:
+    sys.stderr.write('gh: Not Found (HTTP 404)\n'); sys.exit(1)
+sys.stdout.write(svar[sokvag])
+"""
+
+
+class GithubProv(Miljo):
+    """GitHub i original och i delar: hela filträdet, stora filer och säkerhetsmeddelanden, bara GET."""
+
+    svar = VerktygProv.svar
+
+    def setUp(self):
+        super().setUp()
+        import base64
+        bin_ = self.rot / 'bin'
+        bin_.mkdir()
+        (bin_ / 'gh').write_text(FEJK_GH, 'utf-8')
+        (bin_ / 'gh').chmod(0o755)
+        fore = os.environ['PATH']
+        self.addCleanup(os.environ.__setitem__, 'PATH', fore)
+        os.environ['PATH'] = '%s:%s' % (bin_, fore)
+        trad = [{'path': 'skills/granska/SKILL.md', 'type': 'blob', 'size': 900},
+                {'path': 'agents/utredare.md', 'type': 'blob', 'size': 400},
+                {'path': 'commands/bygg.md', 'type': 'blob', 'size': 300},
+                {'path': 'hooks/hooks.json', 'type': 'blob', 'size': 200},
+                {'path': 'README.md', 'type': 'blob', 'size': 5000}, {'path': 'AGENTS.md', 'type': 'blob', 'size': 50},
+                {'path': '.claude/settings.json', 'type': 'blob', 'size': 80}, {'path': 'docs', 'type': 'tree'}]
+        trad += [{'path': 'docs/del-%03d.md' % i, 'type': 'blob', 'size': i} for i in range(80)]
+        trad += [{'path': 'src/mod_%03d.py' % i, 'type': 'blob', 'size': i} for i in range(40)]
+        self.stor = '\n'.join(['# Stor fil'] + ['## Avsnitt %d\n%s' % (i, 'text ' * 30) if i % 50 == 0 else 'rad %d %s' % (i, 'x' * 60)
+                                                for i in range(1, 3001)] + ['SISTA RADEN'])
+        svar = {
+            'repos/o/r/git/trees/main?recursive=1': {'sha': 'a' * 40, 'tree': trad, 'truncated': False},
+            'repos/o/r/git/trees/stor?recursive=1': {'sha': 'b' * 40, 'tree': trad[:3], 'truncated': True},
+            'repos/o/r/contents/docs/stor.md': {'type': 'file', 'path': 'docs/stor.md', 'sha': 'c' * 40,
+                                                'size': 2_000_000, 'encoding': 'none', 'content': ''},
+            'repos/o/r/git/blobs/' + 'c' * 40: {'sha': 'c' * 40, 'encoding': 'base64',
+                                               'content': base64.b64encode(self.stor.encode()).decode()},
+            'advisories?ecosystem=pip&affects=requests@2.0.0': [{'ghsa_id': 'GHSA-aaaa-bbbb-cccc', 'severity': 'high'}],
+            'repos/o/r/security-advisories': [],
+            'repos/o/r/releases?per_page=100': [{'tag_name': 'v%d' % i} for i in range(350)],
+        }
+        (bin_ / 'gh-svar.json').write_text(json.dumps({k: json.dumps(v) for k, v in svar.items()}), 'utf-8')
+        self.gh_logg = bin_ / 'gh-logg.txt'
+
+    def las(self, trad, n, **args):
+        self.manus('RING github ' + json.dumps(args))
+        self.skicka('Läs vidare.', trad=trad)
+        return self.svar(trad, n)
+
+    def test_hela_tradet_stora_filer_i_delar_och_sakerhetsmeddelanden(self):
+        self.logga_in()
+        trad = self.skicka('Titta på repot o/r.')['inspel']['trad']
+        self.svar(trad, 1)
+        s = self.las(trad, 2, sokvag='repos/o/r/git/trees/main?recursive=1')
+        self.assertIn('github:OK', s)
+        self.assertIn('128 poster', s)                                                # varje post, inte de 50 första
+        for del_ in ('skills/granska/SKILL.md\tskill', 'agents/utredare.md\tagent', 'commands/bygg.md\tkommando',
+                     'hooks/hooks.json\tkrok', 'AGENTS.md\tstyrande', '.claude/settings.json\tkonfiguration',
+                     'docs/del-079.md\tdokument', 'src/mod_039.py\tkod', 'docs\tkatalog'):
+            self.assertIn(del_, s)
+        self.assertIn('läses i original och i sin helhet', s)
+        self.assertIn('slutet av svaret är nått', s)
+        s = self.las(trad, 3, sokvag='repos/o/r/git/trees/stor?recursive=1')
+        self.assertIn('GitHub KAPADE trädet', s)
+        s = self.las(trad, 4, sokvag='repos/o/r/contents/docs/stor.md')
+        self.assertIn('hämtad i original genom git/blobs (filen är över 1 MB)', s)
+        self.assertIn('Rubriker (radnummer', s)
+        m = re.search(r'Visar rad 1–(\d+) av (\d+)\. Svaret är INTE läst till slut: läs vidare med fran_rad=(\d+)', s)
+        self.assertTrue(m, s[-500:])
+        self.assertEqual(int(m.group(3)), int(m.group(1)) + 1)
+        total, nasta, delar = int(m.group(2)), int(m.group(3)), 1
+        while True:
+            delar += 1
+            s = self.las(trad, 3 + delar, sokvag='repos/o/r/contents/docs/stor.md', fran_rad=nasta)
+            m = re.search(r'Visar rad %d–(\d+) av %d[.:]' % (nasta, total), s)
+            self.assertTrue(m, s[-500:])
+            if 'slutet av svaret är nått' in s:
+                break
+            nasta = int(m.group(1)) + 1
+        self.assertIn('%6d  SISTA RADEN' % total, s)                                 # sista raden kom med
+        self.assertGreater(delar, 2)
+        logg = self.gh_logg.read_text().splitlines()
+        self.assertEqual(sum(1 for r in logg if 'git/blobs/' in r), 1)               # hämtad en gång, läst i delar
+        self.assertTrue(all(r.startswith('api -X GET ') for r in logg))              # bara GET
+        n = 4 + delar
+        s = self.las(trad, n, sokvag='advisories?ecosystem=pip&affects=requests@2.0.0')
+        self.assertIn('GHSA-aaaa-bbbb-cccc', s)
+        s = self.las(trad, n + 1, sokvag='repos/o/r/security-advisories')
+        self.assertIn('github:OK', s)
+        s = self.las(trad, n + 2, sokvag='repos/o/r/releases?per_page=100')
+        self.assertIn('50 poster till visas inte', s)                                 # en kapad lista sägs
+        s = self.las(trad, n + 3, sokvag='repos/o/r/actions/secrets')
+        self.assertIn('github:FEL', s)
+        self.assertIn('inte tillåten', s)
 
 
 class JobbProv(Miljo):
@@ -1710,6 +2133,41 @@ class StartvaktProv(Miljo):
         riktig = subprocess.run([fore, '-a', '-p', str(os.getpid()), '-d', 'cwd', '-Fn'], capture_output=True, text=True)
         if riktig.returncode == 0:                                  # den riktiga lsof läser arbetskataloger
             self.assertIn('n' + os.getcwd(), riktig.stdout)
+
+
+    def test_vilande_startas_aldrig_forran_johnny_slapper_den(self):
+        self.logga_in()
+        text = 'Beställ underhållsformen.'
+        trad = self.skicka(text)['inspel']['trad']
+        self.svar(trad, 1)
+        self.manus('RING bered_uppdrag ' + json.dumps({'rubrik': 'Underhåll', 'mal': 'Mål', 'agarcitat': text,
+                                                         'nasta_handling': 'Bered', 'mottagare': 'kontorets-kedjedrivare',
+                                                         'vilande': True}))
+        self.skicka('Fortsätt.', trad=trad)
+        self.assertIn('VILANDE', self.svar(trad, 2))
+        rad = self.S.lager.en('select id, data from overlamning')
+        oid, kat = rad['id'], Path(json.loads(rad['data'])['katalog'])
+        for _ in range(3):
+            self.assertEqual(self.varv(), [])
+        self.assertEqual(self.start.handelser(kat), [])
+        with open(kat / 'KVITTENS.jsonl', 'a') as f:                                   # en rå kvittens väcker den inte
+            f.write(json.dumps({'status': 'mottagen', 'av': 'någon', 'kvitterad': '2026-09-29T20:00:00.000Z'}) + '\n')
+        self.S.lager.kor("update overlamning set status='lamnad' where id=?", (oid,))   # inte ens ett felaktigt index
+        self.assertEqual(self.varv(), [])
+        self.S.lager.kor("update overlamning set status='vilande' where id=?", (oid,))
+        self.assertEqual([a for a in self.mottagarlogg() if 'argv' in a], [])
+        self.manus('RING backlog_beslut ' + json.dumps({'id': oid, 'beslut': 'slapp', 'agarcitat': 'Släpp %s.' % oid}))
+        self.skicka('Släpp %s.' % oid, trad=trad)
+        self.assertIn('SLÄPPT', self.svar(trad, 3))
+        self.assertEqual(self.varv(), [(oid, 'startad')])
+        self.vanta_pa(kat, 'klar')
+        a = [x for x in self.mottagarlogg() if 'argv' in x][0]
+        self.assertIn('AGARENS-ORD-SLAPP', a['prompt'])
+        self.assertIn('fyll i dem mot aktuell main', a['prompt'])
+        kvitt = [x['kvittera'] for x in self.mottagarlogg() if 'kvittera' in x]
+        self.assertEqual(kvitt[-1], 'levererad')
+        self.S.overlamning.las_kvittenser()
+        self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'levererad')
 
 
 if __name__ == '__main__':

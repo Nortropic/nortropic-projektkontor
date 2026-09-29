@@ -7152,6 +7152,10 @@ inte att du genomför det här nu.", och nya fall prövar "genomför inte …", 
 beställning över två meddelanden. Det ger 46 partnerprov. Ändringen integreras genom den ordinarie skyddade vägen
 efter separat granskning, och tjänsten startas sedan om ur main enligt driftregeln. Planen äger nästa handling.
 
+**Delvis ersatt av:** FORBATTRINGSPARTNER-BACKLOG-20260929, i fråga om vad ett ensamt "beställ" ger: det lägger en
+vilande beställning i backloggen, och för genomförande krävs att ägaren uttryckligen säger det (genomför, kör, bygg …).
+Övrigt gäller.
+
 
 ## KUNDSTART-TESTLAGE-20260929 — ägaren tar bort kostnads-AI och API-nyckel ur Kundstart: produktionen ställer standardlistans frågor utan språkmodell, och Claude körs bara i ett lokalt testläge på ägarens inloggning, som förbättringspartnern
 
@@ -8113,3 +8117,105 @@ sidomeny, och markeringen står sist i den posten.
 
 **Avslut.** Ändringen är klar när den är integrerad och tjänsten har startats om ur main enligt driftregeln. Nästa
 bygge i detta spår är raderingen av trådar, med eget beslut.
+
+
+## FORBATTRINGSPARTNER-BACKLOG-20260929 — rättelse av förbättringspartnern på ägarens beställning: ett repo läses i original och i sin helhet, en backlog med vilande beställningar som bara ägarens ord släpper, byggklara beställningar och en modell till allt; dagens tre vilande 20e7b1-överlämningar är avslagna
+
+**Status:** registrerat 2026-09-29 (19:04 UTC) av sessionen nortropic-repos-d7 (Claude Code) på ägarens beställning,
+inklistrad i sessionen och sparad ordagrant i
+`evidence/nasta-uppdrag/local/partner-backlog-20260929/owner-words-partner-backlog-20260929.md`; ägarens tillägg om
+modellen står i `owner-words-partner-backlog-tillagg-modell-20260929.md` bredvid.
+
+**Ägarens ord** (urval, ordagrant): "Varför läser du inte allt?", "Ja, jag vill också att vi ska ha en "Backlog" som
+är vilande beställningar", "En beställning behöver ju ha det som krävs för att bygga" och "Jag vill inte ha några
+vilande beställningar från det vi hittat nu, vi kommer börja om på nytt." Tillägget: "Vi använder en modell till allt
+dvs de modelle som är vald och den effort nivå. Säkerställ att det fungerar såhär".
+
+**Problemet.** När ägaren lämnade ett repo läste partnern ett urval, och slutsatserna lät säkrare än underlaget.
+Verktyget `github` begränsade läsningen: varje lista kapades vid 50 poster, så ett rekursivt filträd visade bara de
+50 första posterna; filinnehåll kapades tyst vid 60 000 tecken; en fil över 1 MB gick inte att läsa (GitHub lämnar då
+innehållet tomt); och säkerhetsmeddelanden var ingen tillåten sökväg. En beställning som skulle vänta blev en
+textgräns i arbetsordern, men startvakten startade ändå mottagarens session. Underlag som inte var ett id som gick att
+öppna tappades utan varning, och AP-06-utkastet fick målet som enda krav och inga prov. Utredaren, partnerns
+underagent, körde en egen modell (`sonnet`) oavsett ägarens val.
+
+**Genomfört (del A, läsning i original).** `tools/partnern/roll.md` säger att partnern hämtar hela filträdet först
+och förtecknar alla delar. Allt som styr beteende eller beskriver metod läses i original och i sin helhet, stora filer
+i delar tills de är slut. En sammanfattning från ett annat verktyg, som WebFetch eller utredarens svar, räknas inte som
+läsning. Varje del prövas mot kontorets, Runtimes, Digitalas och Kundstarts main med de tre frågorna och mot kända
+öppna behov. Täckningen redovisas i en tabell per repo, och det som inte ryms i en tur blir en registrerad utredning
+med samma krav, utan att partnern frågar. `github` visar nu varje post i ett filträd märkt per slag (skill, agent,
+kommando, krok, styrande, konfiguration, dokument, kod) och säger när GitHub kapat trädet. Filer läses i delar
+(`fran_rad`) med besked om vilka rader som visats och om något återstår, filer över 1 MB hämtas genom
+`git/blobs`, och säkerhetsmeddelanden läses genom `repos/…/security-advisories` och den globala `advisories`.
+En kapad lista säger hur många poster som inte visas. Det är samma destination som tidigare (GitHubs API genom ägarens
+gh-inloggning), bara GET, och inga nya behörigheter. Utredarens instruktion och verktyget `utred` bär samma läskrav.
+
+**Genomfört (del B, backlog).** En överlämning kan skrivas som **vilande**: paketet är fullständigt och ligger i den
+vanliga beställningsvägen, men startvakten startar det aldrig. Startvakten prövar både partnerns journal och paketet,
+så varken en kvittensrad eller ett felaktigt index väcker en vilande beställning, och mottagarens `kvittera` vägrar
+den. Ägarens "beställ" räcker för en vilande beställning. För genomförande lämnas den bara när hans ord uttryckligen
+beställer det (ett beställningsord utom "beställ", varken negerat eller en fråga); säger han "vilande" eller "backlog"
+blir den alltid vilande. Kontrollen av ägarcitatet, regeln om en överlämning per mottagare och `annan_bestallning`
+gäller som tidigare, och en vilande beställning räknas som öppen i dubblettreglerna. Ägaren släpper eller avslår en
+vilande beställning i partnertråden ("släpp OVL-…", "genomför OVL-…", "avslå OVL-…"). Verktyget `backlog_beslut`
+kräver hans egna hela satser ur trådens tre senaste inspel, med ordet för beslutet och överlämningens id. Hans ord
+sparas ordagrant i en egen fil i paketet (`AGARENS-ORD-SLAPP-…` eller `AGARENS-ORD-AVSLAG-…`), resten av paketet
+lämnas orört, och övergången bokförs som en rad i `KVITTENS.jsonl` och i journalen; därefter startar startvakten ett
+släppt paket som vanligt. Backloggen listas utan modell med `python3 -B tools/partner.py backlog` (och `--alla`) och
+med partnerns läsverktyg `backlog`, med id, mottagare, rubrik, datum, ursprung (tråd och fynd), märkning och
+motivering. Går den inte att läsa är den okänd, aldrig tom. På ägarens besked till sessionen nortropic-repos-6d,
+ordagrant i \`evidence/nasta-uppdrag/local/hem-rutor-20260929/owner-words-hem-rutor-20260929.md\` ("överlämningar kan
+vara denna backlog" och "du säger till d7 gör om den"), är knappen Överlämningar i Förbättringars sidomeny nu Backlog
+med samma lista (\`GET /api/backlog\`). Aquarium visar inte en vilande beställning som en öppen överlämning.
+Backloggen lägger inga rader i ÄGARENS TUR; planen har en enda pekare dit.
+
+**Genomfört (del C, byggklara beställningar).** `bered_uppdrag` vägrar när en underlagspost inte går att öppna och
+säger vilken; med `godta_olost_underlag` skapas beställningen ändå, med posten ordagrant i arbetsordern och märkt
+ofullständig. Underlag kan nu också vara en fil i ett Nortropic-repo (`repo:<repo>[@ref]:<sökväg>`) eller ett
+GitHub-svar (`github:<API-sökväg>`), och det löses till hashade filer i paketet. Nya fält: `krav` (id, text och ett
+observerbart prov per krav, gärna metod), `klart_nar`, `berorda_filer`, `ordning_och_beroenden`, `resursram`,
+`fynd` och `motivering`. AP-06-specens requirements och tests fylls ur kraven i stället för att kopiera målet.
+Beställningen märks **byggklar** när varje krav har ett prov, klart-när finns och allt underlag är löst till filer,
+annars **ofullständig** med luckorna uppräknade; märkningen står i verktygets svar, i arbetsordern och i backloggen.
+Runtime-uppgiftens tekniska fält (base-revision, allowed_paths, acceptans, steg och tidsram) fyller mottagaren i mot
+aktuell main när beställningen släpps, och de redovisas som väntande, inte som fel.
+
+**Genomfört (en modell till allt).** Utredaren får samma modell och ansträngning som svaret i sin definition
+(`--agents`), och webbkroken prövar nu också anrop av underagenter: en annan agenttyp (till exempel en inbyggd agent
+med egen standardmodell) eller en annan modell nekas. Den egna utredarmodellen finns inte längre i konfigurationen,
+och tjänstens egen läsning av modellvalet (`/api/installningar` och `/api/lage`) anger en modell och en ansträngning
+för svaret, utredaren och de registrerade utredningarna.
+Startvaktens mottagarsessioner i andra repon kör som tidigare den modell som Runtimes bemanning anger för rollen driver
+(FORBATTRINGSPARTNER-OVERLAMNING-AUTOSTART-20260929), med ansträngningen high. Den modellen väljer ägaren själv i
+Runtimes modellval. På frågan om de i stället skulle följa partnerns val svarade han "jag väljer väl vad runtime ska
+köra på eller?" (ordagrant i `owner-words-partner-backlog-startvaktens-modell-20260929.md` bredvid hans beställning),
+så startvakten ändras inte.
+
+**Del D, avslag.** OVL-20260929-20e7b1 (Runtime), OVL-20260929-20e7b1-digitala och OVL-20260929-20e7b1-kontoret
+kvitterades som avslagna 2026-09-29 18:19:56Z med `tools/partner.py kvittera`, med ägarens ord som skäl; kvittot står
+i `evidence/nasta-uppdrag/local/partner-backlog-20260929/KVITTO-avslag-20e7b1.txt`. Ingen av dem var registrerad i
+Runtimes, Digitalas eller kontorets plan, varken på main eller i någon commit på någon gren (kvitto
+`KVITTO-sokning-20e7b1.txt` bredvid), så ingen planrad behövde märkas. Runtime- och kontorsmottagaren hade inte startats. Digitala-mottagaren hade kvitterat mottagen och startad.
+Dess session avslutades 18:01:25Z utan leverans och byggde inget. Den lämnade en ocommittad registreringspost i
+worktreen `nortropic-kontor-digitala-vilande-20260929` (gren `kontor/digitala-vilande-20260929`), privata kvitton och
+en lärdom. De står orörda enligt ägarens "Skriv inte över något", och grenen är namngiven i planen.
+OVL-20260929-05dd15, -05dd15-digitala och -b4cecc rördes inte.
+
+**Samordning.** Skrivansvaret för `tools/partnern/` låg hos nortropic-repos-04, som bekräftade att platsen var fri.
+nortropic-repos-db lämnade `start.py` fri (startvaktens dygnstak rörs inte här). Arbetet gjordes i worktreen
+`nortropic-kontor-partner-backlog-20260929`, skilt från nortropic-repos-6d:s Hem-ändring och från
+OVL-20260929-05dd15:s och OVL-20260929-4f194f:s ändringar i planen. Publiceringarna görs i tur och ordning.
+
+**Granskning.** Den första separata granskningen (claude-opus-5, läsarprofil) godkände kandidaten utan blockerande fynd.
+Två av dess anteckningar gällde text och är rättade: posten sade att panelen "Tjänst och källor" visar modellvalet, men
+den panelen togs bort ur sidomenyn i HEM-RUTOR-20260929, och arbetsplatsens planblock räknade fortfarande knappen
+Backlog som en kommande ändring. Ett beslut om samma paket inom samma sekund ger nu ett läsbart nekande i stället för
+ett serverfel. Rättelserna granskas i en andra runda.
+
+**Ersätter:** ingen post helt. Ersätter delvis FORBATTRINGSPARTNER-BESTALLNINGSKONTROLL-20260929 i fråga om vad ett
+ensamt "beställ" ger; markeringen står sist i den posten. ÄGARENS TUR-raden om partnerns bestående start stängs: ägaren
+lade LaunchAgent-filen 16:21:22Z och tjänsten startade 16:21:28Z (kvitto `KVITTO-launchagent.txt` bredvid ägarens ord).
+
+**Avslut.** Klart när ändringen är på main, partnertjänsten kör den nya koden och de tre 20e7b1-överlämningarna är
+avslagna. Nästa bygge i spåret kräver ett eget beslut.

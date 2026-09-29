@@ -324,9 +324,10 @@ function ritaJobb(p, vy) {
   return k;
 }
 const OVLSTATUS = ['lamnad', 'mottagen', 'startad', 'levererad'];
-const OVLTEXT = { lamnad: 'lämnad', mottagen: 'mottagen', startad: 'startad', levererad: 'levererad', avslagen: 'avslagen' };
+const OVLTEXT = { vilande: 'vilande i backloggen', lamnad: 'lämnad', mottagen: 'mottagen', startad: 'startad', levererad: 'levererad', avslagen: 'avslagen' };
 const MOTTAGARNAMN = { 'kontorets-kedjedrivare': 'kontoret', digitala: 'Digitala', runtime: 'Runtime', kundstart: 'Kundstart' };
 function starttext(s, status) {
+  if (!s && status === 'vilande') return 'Vilande i backloggen: startvakten startar den inte förrän du släpper den ("släpp OVL-…" eller "genomför OVL-…").';
   if (!s) return status === 'lamnad' ? 'Startvakten har inte startat någon session ännu.' : '';
   const skal = s.skal ? ': ' + s.skal : '';
   return ({
@@ -337,11 +338,15 @@ function starttext(s, status) {
   })[s.typ] || s.typ;
 }
 function ritaOverlamning(p) {
-  const nar = {}; nar.lamnad = p.tid; for (const h of p.historik || []) nar[h.status] = h.tid;
+  // En vilande beställning är inte lämnad förrän du släppt den: då är släppet dess "lämnad".
+  const nar = {}; if (p.vilande_fran) nar.vilande = p.tid; else nar.lamnad = p.tid;
+  for (const h of p.historik || []) nar[h.status] = h.tid;
+  const steg = p.vilande_fran ? ['vilande'].concat(OVLSTATUS) : OVLSTATUS;
   const start = starttext(p.start, p.status);
-  return el('div', { class: 'kort' }, el('h4', null, 'Överlämning till ' + (MOTTAGARNAMN[p.mottagare] || p.mottagare) + ': ' + p.rubrik),
+  return el('div', { class: 'kort' }, el('h4', null, (p.vilande_fran ? 'Vilande beställning till ' : 'Överlämning till ') + (MOTTAGARNAMN[p.mottagare] || p.mottagare) + ': ' + p.rubrik),
     p.agarcitat ? el('blockquote', { class: 'svar' }, '”' + p.agarcitat + '”') : null,
-    el('div', { class: 'tidslinje' }, OVLSTATUS.map((s) => el('span', { class: 'chip ' + (nar[s] ? 'ok' : ''), text: OVLTEXT[s] + (nar[s] ? ' ' + tid(nar[s]) : '') }))),
+    el('div', { class: 'tidslinje' }, steg.map((s) => el('span', { class: 'chip ' + (nar[s] ? 'ok' : ''), text: (s === 'vilande' ? 'vilande' : OVLTEXT[s]) + (nar[s] ? ' ' + tid(nar[s]) : '') }))),
+    p.markning ? el('div', { class: 'pagar', text: 'Märkning: ' + p.markning.varde + (p.markning.luckor && p.markning.luckor.length ? ' — luckor: ' + p.markning.luckor.join('; ') : '') }) : null,
     start ? el('div', { class: 'pagar', text: start }) : null,
     el('div', { class: 'pagar', text: p.id + ' · mottagare: ' + p.mottagare + ' · paket: ' + p.katalog + (p.ap06 ? ' · AP-06: ' + p.ap06.status : '') }),
     el('div', { class: 'atgarder' }, el('a', { class: 'knapplank', href: '/kontoret/objekt/' + encodeURIComponent(p.id), 'data-nav': true }, 'Visa i Kontoret')));
@@ -599,11 +604,25 @@ async function visaKalla(id, omkrets) {
     oppnaPanel('Källa', delar);
   } catch (f) { oppnaPanel('Källa', el('div', { class: 'fel', text: f.message })); }
 }
+// Ägarens besked 2026-09-29: "överlämningar kan vara denna backlog". Panelen visar de vilande beställningarna, som bara
+// hans egna ord i en tråd släpper eller avslår; lämnade och avslutade överlämningar syns i trådarna och i Kontoret.
 $('visaoverlamningar').addEventListener('click', async () => {
-  const d = await api('GET', '/api/overlamningar');
-  oppnaPanel('Överlämningar', d.overlamningar.length ? d.overlamningar.map((o) => el('div', { class: 'traff' }, el('div', { class: 'kl', text: o.id + ' · ' + (OVLTEXT[o.status] || o.status) + ' · ' + tid(o.uppdaterad) }),
-    el('div', { text: o.rubrik }), el('div', { class: 'kl', text: 'Mottagare: ' + o.mottagare + ' · ' + o.katalog_visning }),
-    starttext(o.start, o.status) ? el('div', { class: 'kl', text: starttext(o.start, o.status) }) : null)) : el('div', { class: 'meta', text: 'Inga överlämningar ännu.' }));
+  const d = await api('GET', '/api/backlog');
+  if (d.status === 'okand') { oppnaPanel('Backlog', el('div', { class: 'meta', text: 'Backloggen är okänd, inte tom: ' + d.skal + '.' })); return; }
+  const poster = d.poster.filter((p) => p.status === 'vilande');
+  const delar = [];
+  if (d.olasbara.length) delar.push(el('div', { class: 'meta', text: 'Backloggen är inte känd i sin helhet: ' + d.olasbara.length + ' paket gick inte att läsa (' + d.olasbara.map((o) => o.id).join(', ') + ').' }));
+  for (const p of poster) {
+    delar.push(el('div', { class: 'traff' },
+      el('div', { class: 'kl', text: p.id + ' · till ' + (MOTTAGARNAMN[p.mottagare] || p.mottagare) + ' · ' + tid(p.datum) + ' · ' + p.markning }),
+      el('div', { text: p.rubrik }),
+      p.luckor.length ? el('div', { class: 'kl', text: 'Luckor: ' + p.luckor.join('; ') }) : null,
+      el('div', { class: 'kl' }, 'Ursprung: ', el('a', { href: '/forbattringar/' + p.trad, 'data-nav': true }, p.trad_titel || p.trad), p.fynd ? ' · fynd: ' + p.fynd : ''),
+      p.motivering ? el('div', { class: 'kl', text: 'Motivering: ' + p.motivering }) : null));
+  }
+  if (!poster.length && d.status === 'ok') delar.push(el('div', { class: 'meta', text: 'Inga vilande beställningar.' }));
+  delar.push(el('div', { class: 'meta', text: 'En vilande beställning startas inte. Du släpper den genom att skriva till exempel "släpp OVL-…" i en tråd, eller avslår den med "avslå OVL-…".' }));
+  oppnaPanel('Backlog (' + poster.length + ' vilande)', delar);
 });
 
 // ------------------------------------------------------------------ start
