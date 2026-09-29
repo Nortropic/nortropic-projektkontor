@@ -267,7 +267,6 @@ class Server:
     def _starta(self, trad: str, inspel: list, ateruppta: str | None, fortsatt: bool = False) -> str:
         korning = Korning(self, 'tur', trad, inspel, ateruppta=ateruppta)
         korning.fortsatt_avbruten = fortsatt
-        sparr = self.agent.sparrad()
         session = (self.lager.trad(trad) or {}).get('session')
         if ateruppta:
             tidigare = self.lager.en('select session from tur where id=?', (ateruppta,))
@@ -277,12 +276,6 @@ class Server:
         self.lager.lagg_till('tur_start', tur=korning.id, trad=trad, inspel=[i['id'] for i in inspel],
                              session=session, modell=self.k.modell.huvud, anstrangning=self.k.modell.anstrangning,
                              ateruppta=ateruppta)
-        if sparr:
-            self.lager.lagg_till('tur_klar', tur=korning.id, trad=trad, status='begransad',
-                                 svar='Jag har sparat ditt inspel, men %s Det räknas om vid midnatt (UTC), eller '
-                                      'när gränsen höjs i installningar.json.' % sparr, orsak=sparr,
-                                 forbrukning={'modellanrop': False})
-            return korning.id
         self.registrera_korning(korning)
         threading.Thread(target=self._kor_tur, args=(korning, session), name='tur-' + korning.id, daemon=True).start()
         return korning.id
