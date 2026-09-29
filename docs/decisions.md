@@ -8028,7 +8028,9 @@ join:en binder kanalen men inte uttaget, så övergivet nätarbete kunde samlas 
 och en sent frigjord transport kunde starta ett andra försök efter att kanalen redan svarat. Övergivna
 trådar får nu en stoppflagga och är högst två; därutöver vägrar kanalen direkt.
 
-**Prov.** Hanterarens svit är 61 prov, mot 10 på oförändrad main, på Digitalas verkliga frysta
+**Prov.** Hanterarens svit ger 61 provkörningar, mot 10 på oförändrad main, fördelade på 49 olika
+metodnamn eftersom en delad fixtur ärvs av två testklasser (granskningsrunda 5 fann att en tidigare
+formulering dolde det). Proven kör Digitalas verkliga frysta
 `drift_kontroll.py`-byte mot en loopback-provsajt: ren körning, saknad förväntad text, trasig sitemap,
 incident och återhämtning med oberoende privata kvitton, exitkod mot kvitto, verktygets egen räkning mot
 kvittot, omkörning inom samma sekund, kvitto utanför kundmappen, timeout/vägran/fel som skilda utfall,
@@ -8044,7 +8046,21 @@ kvalificeringen mot den verkliga motorn ligger.
 Provsajten och signalytan är loopback-provdata, aldrig en kundadress och aldrig Kundstarts produktion
 eller dess lokala provtjänst.
 
-**Ägarens tur.** Raden om beställ eller avstå är besvarad av ägarens beställning och tas därför bort. En
-ny rad ersätter den: staga och kvalificera Runtime-releasen med operationsbindningen, aktivera övergången
+**Ägarens beslut att pausa, 2026-09-29 ca 18:08Z.** Kontots veckokvot hos Claude stod på 98 % och
+nollställs först 2026-10-04 07:00Z. Frågan gick till ägaren genom hans egen session (nortropic-repos-22 i
+VS Code), ordagrant ställd så: "Det du ska ta ställning till: ska sessionen få fortsätta även om kvoten
+tar slut? — Pausa (mitt förslag): den femte granskningen får gå, eftersom den inte kostar någon
+Claude-kvot. Godkänns den blir sessionen klar och levererar. Underkänns den stannar sessionen och
+fortsätter efter söndag. Kontrollen behövs ändå inte förrän du har en riktig kund. — Fortsätt: sessionen
+kör tills den är klar, men då kan kvoten ta slut och all Claude stanna till söndag. Svara "pausa" eller
+"fortsätt"."
+
+Johnnys svar, ordagrant: **"pausa den"**
+
+Runda 5 underkände, så arbetet stannade där. Fyra blockerare står öppna och orättade i Runtimes
+`evidence/runs/runtime-veckodrift-5/GRANSKNING-r5-DOM-OATGARDAD.md`. Ingen integration är gjord.
+
+**Ägarens tur.** Raden om beställ eller avstå är besvarad av ägarens beställning och tas därför bort. Två
+nya rader ersätter den: staga och kvalificera Runtime-releasen med operationsbindningen, aktivera övergången
 och först därefter installera och starta schemat. Ingenting av det görs åt honom. Runtime bär omfattningen
 i sin D040; status och nästa handling står i planen.
