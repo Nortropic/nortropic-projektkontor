@@ -25,7 +25,7 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from . import VERSION
 from . import bilagor as bil
-from .agent import Agent, Korning
+from .agent import Agent, Korning, prova_underagent
 from .arbetsplats import Arbetsplats
 from .jobb import Jobb
 from .kallor import Kallindex, KLASSER
@@ -40,6 +40,7 @@ from .webbpolicy import prova
 UI = Path(__file__).resolve().parent / 'ui'
 KAKA = 'partner'
 KAKA_DAGAR = 30
+GALLER = 'svaret, utredaren och de registrerade utredningarna'  # en modell och ansträngning till allt
 BARA_SPARA = re.compile(r'^\s*(bara\s+spara|spara\s+bara|spara\s+(det\s+här|detta|den\s+här|dem)|spara)\s*[.!]?\s*$', re.I)
 BARA_SPARA_START = re.compile(r'^\s*bara\s+spara\b', re.I)
 NYTT_INSPEL = 'Johnny skickade ett nytt inspel under arbetet'
@@ -390,7 +391,8 @@ class Server:
             poster.append({'slag': 'overlamning', 'id': o['id'], 'tid': o['tid'], 'status': o['status'],
                            'rubrik': d.get('rubrik'), 'mottagare': d.get('mottagare'), 'katalog': d.get('katalog_visning'),
                            'ap06': d.get('ap06'), 'historik': d.get('historik') or [], 'agarcitat': d.get('agarcitat'),
-                           'start': d.get('start')})
+                           'start': d.get('start'), 'vilande_fran': d.get('status') == 'vilande',
+                           'markning': d.get('markning')})
         for kp in self.lager.fraga('select * from koppling where trad=? or till=? order by tid', (trad, trad)):
             annan = kp['till'] if kp['trad'] == trad else kp['trad']
             poster.append({'slag': 'koppling', 'id': kp['id'], 'tid': kp['tid'], 'annan': annan,
@@ -412,15 +414,16 @@ class Server:
                 'seq': self.lager.en("select varde from meta where nyckel='journal_seq'")['varde']}
 
     def modellval(self) -> dict:
-        return {'huvud': self.k.modell.huvud, 'anstrangning': self.k.modell.anstrangning,
-                'utredare': self.k.modell.utredare, 'modeller': list(MODELLER), 'nivaer': list(ANSTRANGNING)}
+        # En modell till allt: valet gäller svaret, utredaren och de registrerade utredningarna.
+        return {'huvud': self.k.modell.huvud, 'anstrangning': self.k.modell.anstrangning, 'galler': GALLER,
+                'modeller': list(MODELLER), 'nivaer': list(ANSTRANGNING)}
 
     def lagevy(self) -> dict:
         with self._las:
             aktiva = [k.lage() for k in self._korningar.values()]
         return {'version': VERSION, 'kodrevision': self.kodrevision, 'startad': self.startad,
                 'modell': {'huvud': self.k.modell.huvud, 'anstrangning': self.k.modell.anstrangning,
-                           'utredare': self.k.modell.utredare},
+                           'galler': GALLER},
                 'forbrukning': self.agent.dygnsforbrukning(), 'gransar': self.k.gransar.__dict__,
                 'tackning': self.tackningstext(), 'aktiva': aktiva, 'prov_dolj': list(self.k.prov_dolj),
                 'beroende': ('Tjänsten körs lokalt på Johnnys Mac (127.0.0.1:%d) och nås bara när den är igång. '
@@ -649,6 +652,9 @@ class Hanterare(BaseHTTPRequestHandler):
             return self._bilaga(m.group(1), q)
         if p.startswith('/api/arbetsplats/'):
             return self._arbetsplats(p, q)
+        if p == '/api/backlog':  # ägarens besked: Överlämningar i sidomenyn är backloggen (bara läsning, ingen modell)
+            from .overlamning import backlog
+            return self._svara(200, backlog(S.k, alla=q.get('alla') == '1'))
         if p == '/api/overlamningar':
             S.overlamning.las_kvittenser()
             rader = S.lager.fraga('select id, trad, status, tid, uppdaterad, data from overlamning order by tid desc')
@@ -845,7 +851,11 @@ class Hanterare(BaseHTTPRequestHandler):
         except ValueError:
             return self._fel(400, 'felaktig begäran')
         if p == '/intern/krok':
-            beslut, skal = prova(k, str(d.get('verktyg')), d.get('indata') or {}, self.S.hemligheter())
+            verktyg = str(d.get('verktyg'))
+            if verktyg in ('Agent', 'Task'):  # en modell till allt: bara utredaren, med svarets modell
+                beslut, skal = prova_underagent(k, d.get('indata') or {})
+            else:
+                beslut, skal = prova(k, verktyg, d.get('indata') or {}, self.S.hemligheter())
             if beslut == 'deny':
                 k.handelse('nekat', skal)
             return self._svara(200, {'beslut': beslut, 'skal': skal})

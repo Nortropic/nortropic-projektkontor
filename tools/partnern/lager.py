@@ -297,7 +297,8 @@ class Lager:
                            (ev['status'], json.dumps(data, ensure_ascii=False), ev['tid'], ev['jobb']))
             elif typ == 'overlamning':
                 db.execute('insert or ignore into overlamning values(?,?,?,?,?,?,?,?)',
-                           (ev['overlamning'], trad, ev.get('inspel'), 'lamnad', json.dumps(ev, ensure_ascii=False),
+                           (ev['overlamning'], trad, ev.get('inspel'), ev.get('status') or 'lamnad',
+                            json.dumps(ev, ensure_ascii=False),
                             ev['tid'], ev['tid'], ev.get('nyckel')))
             elif typ == 'overlamning_start':
                 rad = db.execute('select data from overlamning where id=?', (ev['overlamning'],)).fetchone()

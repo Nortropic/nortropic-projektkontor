@@ -200,8 +200,12 @@ class Arbetsplats:
                 return None
             d = json.loads(rad['data'] or '{}')
             trad = S.lager.trad(rad['trad']) or {}
+            vilande = d.get('status') == 'vilande'  # en vilande beställning är lämnad först när Johnny släppt den
+            lamnad = (next((h.get('tid') for h in d.get('historik') or [] if h.get('status') == 'lamnad'), None)
+                      if vilande else rad['tid'])
             ut = {'ref': ref, 'typ': 'overlamning', 'titel': d.get('rubrik') or ref, 'status': rad['status'],
-                  'mottagare': d.get('mottagare'), 'lamnad': rad['tid'], 'uppdaterad': rad['uppdaterad'],
+                  'mottagare': d.get('mottagare'), 'lamnad': lamnad, 'vilande_fran': rad['tid'] if vilande else None,
+                  'uppdaterad': rad['uppdaterad'], 'markning': d.get('markning'),
                   'historik': [{k: h.get(k) for k in ('status', 'tid', 'kvitterad', 'av', 'bevis')}
                                for h in d.get('historik') or []],
                   'start': d.get('start'), 'paket': d.get('katalog_visning'), 'ap06': d.get('ap06'),

@@ -6,6 +6,7 @@
     python3 -B tools/partner.py stopp        stoppa tjänsten (pågående arbete markeras avbrutet och återupptas)
     python3 -B tools/partner.py index        bygg om källindexet ur originalen
     python3 -B tools/partner.py overlamningar  visa överlämningar: mottagare, status, session och startvaktens läge
+    python3 -B tools/partner.py backlog [--alla]  visa backloggen: vilande beställningar (bara läsning, ingen modell)
     python3 -B tools/partner.py kvittera OVL-… mottagen|startad|levererad|avslagen --av "…" [--bevis "…"]
     python3 -B tools/partner.py autostart    visa hur ägaren gör tjänsten bestående (skriver ingenting)
     python3 -B tools/partner.py app          skapa Nortropic.app i ~/Applications: ett klick startar och öppnar arbetsplatsen
@@ -139,7 +140,8 @@ def index(k, args) -> int:
 
 def overlamningar(k, args) -> int:
     from partnern.lager import Lager
-    from partnern.start import handelser, kvittenser
+    from partnern.overlamning import paketlage
+    from partnern.start import handelser
     lager = Lager(k.data)
     rader = lager.fraga('select id, status, tid, uppdaterad, data from overlamning order by tid desc')
     if not rader:
@@ -147,12 +149,14 @@ def overlamningar(k, args) -> int:
     for r in rader:
         d = json.loads(r['data'])
         kat = Path(d.get('katalog') or '')
-        kv = kvittenser(kat)  # mottagarens senaste kvittens gäller även när tjänsten inte har läst den ännu
-        status = (kv[-1].get('status') if kv else None) or r['status']
-        print('%s  %-9s  %s\n    mottagare: %s\n    lämnad %s%s\n    %s' % (
-            r['id'], status, d.get('rubrik'), d.get('mottagare') or 'kontorets-kedjedrivare', r['tid'][:19] + 'Z',
-            ('; senaste kvittens %s %s av %s' % (kv[-1].get('status'), str(kv[-1].get('kvitterad'))[:19] + 'Z',
-                                                 kv[-1].get('av'))) if kv else '', kat))
+        lage = paketlage(kat)  # paketets gällande status, även när tjänsten inte har läst kvittensen ännu
+        kv = lage['overgangar'] if lage else []
+        status = lage['status'] if lage else r['status']
+        print('%s  %-9s  %s\n    mottagare: %s\n    %s %s%s\n    %s' % (
+            r['id'], status, d.get('rubrik'), d.get('mottagare') or 'kontorets-kedjedrivare',
+            'lagd som vilande' if d.get('status') == 'vilande' else 'lämnad', r['tid'][:19] + 'Z',
+            ('; senaste %s %s %s av %s' % ('beslut' if kv[-1].get('beslut') else 'kvittens', kv[-1].get('status'),
+                                           str(kv[-1].get('kvitterad'))[:19] + 'Z', kv[-1].get('av'))) if kv else '', kat))
         hist = handelser(kat)
         starter = [h for h in hist if h.get('typ') == 'startad']
         if starter:
@@ -168,9 +172,21 @@ def overlamningar(k, args) -> int:
     return 0
 
 
+def backlog(k, args) -> int:
+    """Backloggen ur paketen i beställningsvägen; en backlog som inte kan läsas är okänd (kod 4), aldrig tom."""
+    from partnern.overlamning import backlog as las, backlogtext
+    b = las(k, alla=args.alla)
+    print(backlogtext(b))
+    return 4 if b['status'] == 'okand' else 0
+
+
 def kvittera(k, args) -> int:
     from partnern.overlamning import kvittera as kv
-    fil = kv(k, args.id, args.status, args.av, args.bevis or '')
+    try:
+        fil = kv(k, args.id, args.status, args.av, args.bevis or '')
+    except (ValueError, FileNotFoundError) as fel:
+        print('Ingen kvittens skrevs: %s' % fel, file=sys.stderr)
+        return 2
     print('Kvitterat %s som %s i %s. Partnern visar statusen i tråden (inom 30 s när tjänsten kör).' % (args.id, args.status, fil))
     return 0
 
@@ -227,6 +243,8 @@ def main(argv=None) -> int:
     ap = sub.add_parser('app')
     ap.add_argument('--mal', help='var appen skapas (standard ~/Applications/Nortropic.app)')
     ap.add_argument('--utan-ikon', action='store_true')
+    bl = sub.add_parser('backlog')
+    bl.add_argument('--alla', action='store_true', help='visa också släppta och avslagna beställningar ur backloggen')
     kv = sub.add_parser('kvittera')
     kv.add_argument('id')
     kv.add_argument('status', choices=['mottagen', 'startad', 'levererad', 'avslagen'])
@@ -235,7 +253,8 @@ def main(argv=None) -> int:
     args = p.parse_args(argv)
     k = kf.ladda()
     return {'start': start, 'kor': kor, 'stopp': stopp, 'status': status, 'oppna': oppna, 'index': index,
-            'overlamningar': overlamningar, 'kvittera': kvittera, 'autostart': autostart, 'app': app}[args.kommando](k, args)
+            'overlamningar': overlamningar, 'backlog': backlog, 'kvittera': kvittera, 'autostart': autostart,
+            'app': app}[args.kommando](k, args)
 
 
 if __name__ == '__main__':

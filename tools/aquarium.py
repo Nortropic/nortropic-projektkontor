@@ -50,7 +50,12 @@ HANDOFF_BYTES = 262144
 HANDOFF_ID = re.compile(r'OVL-\d{8}-[A-Za-z0-9]{6}(?:-(?:kontoret|digitala|runtime|kundstart)\d*)?')
 RECEIVERS = {'kontorets-kedjedrivare': 'kontoret', 'digitala': 'Digitala', 'runtime': 'Runtime',
              'kundstart': 'Kundstart'}
-HANDOFF_STATUSES = ('lamnad', 'mottagen', 'startad', 'levererad', 'avslagen')
+HANDOFF_STATUSES = ('vilande', 'lamnad', 'mottagen', 'startad', 'levererad', 'avslagen')
+# A dormant order (the partner's backlog) is not an open handoff: it waits for the owner's release and is not shown
+# as work. Only the owner's release or refusal, booked by the partner with a decision, moves it; a receipt never does.
+HANDOFF_RECEIPTS = ('mottagen', 'startad', 'levererad', 'avslagen')
+HANDOFF_DECISIONS = (('slapp', 'lamnad'), ('avslag', 'avslagen'))
+HANDOFF_WORDS = re.compile(r'AGARENS-ORD-(SLAPP|AVSLAG)-\d{8}T\d{6}Z\.md')
 HANDOFF_OPEN = {'lamnad': 'lämnad', 'mottagen': 'mottagen', 'startad': 'startad'}
 HANDOFF_CLOSED = {'levererad': 'levererad', 'avslagen': 'avslagen'}
 START_STATES = {'startad': 'mottagarsession startad', 'vantar': 'start väntar', 'avbruten': 'session avbruten, fortsätts',
@@ -1032,12 +1037,24 @@ def _primary_office(office_root):
     return Path(lines[1][:-len('/.git')]) if lines[1].endswith('/.git') else given
 
 
+def _owner_words_present(place, name):
+    """A decision on a dormant order counts only when the file with the owner's words is in its package; only its
+    presence is checked (lstat), the words themselves are never read here."""
+    if not isinstance(name, str) or HANDOFF_WORDS.fullmatch(name) is None:
+        return False
+    try:
+        return stat.S_ISREG(os.lstat(str(place / name)).st_mode)
+    except OSError:
+        return False
+
+
 def handoff_reader(office_root):
     """The partner's handoff packages (`evidence/nasta-uppdrag/local/partner-OVL-*`), read without following links.
 
-    Per package only OVERLAMNING.json (id, the partner's title, receiver, when it was left), the receipts in
-    KVITTENS.jsonl (latest status and its time) and the start log START.jsonl (latest state, its time and its fixed
-    code) are opened. The work order, the owner's words and the underlying material are never opened.
+    Per package only OVERLAMNING.json (id, the partner's title, receiver, when it was left, dormant or left), the
+    receipts in KVITTENS.jsonl (latest status and its time) and the start log START.jsonl (latest state, its time and its
+    fixed code) are opened. The work order, the owner's words and the underlying material are never opened. A dormant
+    package moves only by the owner's release or refusal (a line with a decision); receipts never wake it.
     """
     office = Path(office_root)
     if not office.is_dir():
@@ -1062,17 +1079,24 @@ def handoff_reader(office_root):
             package = json.loads(_read_file(place / 'OVERLAMNING.json')[:HANDOFF_BYTES].decode('utf-8'))
             if type(package) is not dict or package.get('id') != identity:
                 _fail()
-            receipts = [line for line in _json_lines(place / 'KVITTENS.jsonl')
-                        if line.get('status') in HANDOFF_STATUSES[1:]]
+            status = package.get('status') if package.get('status') in ('vilande', 'lamnad') else 'lamnad'
+            latest = None
+            for line in _json_lines(place / 'KVITTENS.jsonl'):
+                if status == 'vilande':  # the owner's words must be in the package; they are never opened here
+                    if (line.get('beslut'), line.get('status')) not in HANDOFF_DECISIONS \
+                            or not _owner_words_present(place, line.get('agarord')):
+                        continue
+                elif line.get('beslut') or line.get('status') not in HANDOFF_RECEIPTS:
+                    continue
+                status, latest = line['status'], line
             starts = [line for line in _json_lines(place / 'START.jsonl') if line.get('typ') in START_STATES]
         except FAILURES:
             unreadable += 1
             continue
-        latest = receipts[-1] if receipts else None
         start = starts[-1] if starts else None
         items.append({'id': identity, 'title': str(package.get('rubrik') or '')[:TITLE_LIMIT],
                       'receiver': str(package.get('mottagare') or ''),
-                      'status': latest['status'] if latest else 'lamnad',
+                      'status': status,
                       'left_at': _utc(package.get('lamnad')),
                       'receipt_at': _utc(latest.get('kvitterad')) if latest else None,
                       'start': None if start is None else {
