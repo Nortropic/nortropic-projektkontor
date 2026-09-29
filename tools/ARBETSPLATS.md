@@ -21,12 +21,12 @@ bara en app som det själv skapat; `--mal` väljer en annan plats och `--utan-ik
 
 | Adress | Innehåll |
 | --- | --- |
-| `/` | **Hem**: fortsätt där du var (senaste tråd, öppna överlämningar, ditt provärende i Kundstart), levererat och ändrat (sammanfogningar med egen tid, sedan förra besöket när det går att jämföra), det som behöver dig (ur ägarens bord, uppdelat), Kontoret just nu och sökning |
+| `/` | **Hem**: bara hälsningen. Rutorna Fortsätt där du var, Levererat och ändrat, Kontoret just nu, Behöver dig och Sök i underlaget togs bort på ägarens besked (HEM-RUTOR-20260929); sidan läser ingenting. `GET /api/arbetsplats/hem` finns kvar oförändrad men anropas inte längre av sidan |
 | `/kontoret` | **Kontoret**: Aquarium som arbetsvärld, med samma uppgifter som lista bredvid |
 | `/kontoret/objekt/<ref>` | samma, med ett objekt öppet: `OVL-…` (överlämning), `beslut:<ID>`, `uppdrag:<namn>` |
 | `/kontoret/presentation` | bara Aquarium, helskärm möjlig, ingen navigation eller lista i sidan; Esc tillbaka |
 | `/kundstart` | **Kundstart**: provläget, ditt provärende, kopplingar och det som är öppet enligt planens ägartur |
-| `/forbattringar`, `/forbattringar/ny`, `/forbattringar/t_…` | **Förbättringar**: partnerns samtalsyta, som förut |
+| `/forbattringar`, `/forbattringar/ny`, `/forbattringar/t_…` | **Förbättringar**: partnerns samtalsyta. Sidomenyn har Ny tråd, Överlämningar och trådarna; Sök i tidigare resonemang, Bestående förståelse och Tjänst och källor togs bort ur menyn på ägarens besked (HEM-RUTOR-20260929), medan `/api/sok`, `/api/forstaelse` och `/api/lage` finns kvar oförändrade |
 
 Direktlänkar, omladdning och bakåt/framåt fungerar för alla adresser. Gamla ingångar består: `/#t_…` och `/#ny` leds
 till `/forbattringar/…`, `#nyckel=` loggar in (`partner.py oppna`), och Aquarium-fönstret (`tools/aquarium_fonster.py`,
@@ -81,10 +81,12 @@ har körts.
 
 Den anropar ingen modell vid navigering, statusläsning eller sökning, skriver ingenting i partnerns journal eller i något
 annat system vid läsning och startar eller återupptar inga uppdrag. Egna UI-uppgifter ligger bara i webbläsaren:
-besöksmarkören (`arbetsplats:besok`), senaste adress per del och utkasten per tråd. Okänt är aldrig noll: en källa som
-inte gick att läsa visas som okänd, med tidpunkten för senaste försöket, och övriga delar fungerar. Tider är
-händelsernas egna (en sammanfogning, en kvittens); lästiden står för sig. Hem och Kundstart väntar aldrig på en
-Aquarium-läsning; de visar senaste läsningen och läser om några gånger medan en ny pågår.
+senaste adress per del (`arbetsplats:senast:*`), om Kontorets lista är dold (`arbetsplats:lista-dold`), senaste tråden
+(`senasteTrad`), utkasten per tråd (`utkast:*`) och inspel som väntar på att skickas (`utkorg`). Okänt är aldrig noll:
+en källa som inte gick att läsa visas som okänd,
+med tidpunkten för senaste försöket, och övriga delar fungerar. Tider är händelsernas egna (en sammanfogning, en
+kvittens); lästiden står för sig. Kundstart väntar aldrig på en Aquarium-läsning; den visar senaste läsningen och läser
+om några gånger medan en ny pågår.
 
 ## Prov
 

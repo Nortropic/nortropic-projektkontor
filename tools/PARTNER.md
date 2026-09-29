@@ -22,7 +22,7 @@ python3 -B tools/partner.py app       # skapar ~/Applications/Nortropic.app: ett
 
 Python 3.9 eller senare räcker (macOS egen `python3` fungerar).
 
-Ytan har ungefär Claude-appens form: sidomeny med "Ny tråd", sökning, trådarna och dina verktyg; en tom tråd visar
+Ytan har ungefär Claude-appens form: sidomeny med "Ny tråd", "Överlämningar" och trådarna; en tom tråd visar
 en hälsning med inmatningsrutan i mitten och förslag under; i en tråd står svaren i en kolumn och rutan längst ned.
 Modell och ansträngning väljer du i rutan: klicka på "Opus 5.5 · high" (↑↓ modell, ←→ ansträngning, Enter, Esc)
 eller skriv `/model`, `/model sonnet` eller `/effort max`. Valet sparas i `data/installningar.json` och gäller från
@@ -35,9 +35,10 @@ varje svar kopierar en knapp hela svaret som markdown, ordagrant. Knapparna nås
 mellanslag; ett kort "Kopierat" bekräftar. Går urklippet inte att använda prövas den äldre kopieringen ur en dold
 ruta med samma text; går inte heller den markeras texten synligt (för hela svaret dess markdown-källa i en
 skrivskyddad ruta) och ytan säger att den ska kopieras med ⌘C. Växeln "Bara spara" (eller att skriva "bara spara") sparar utan analys. Medan partnern arbetar kan ett nytt inspel skickas efter svaret eller "Skicka och avbryt
-pågående" (en sen rättelse). Sökfältet hittar tidigare resonemang och underlag utan modellanrop. "Bestående
-förståelse" visar vad som sparats, vad som ersatts och av vad. "Tjänst och källor" visar kod, modell, förbrukning
-och källtäckning.
+pågående" (en sen rättelse). Sidomenyn har Ny tråd, Överlämningar och trådarna. Sökfältet, "Bestående förståelse"
+och "Tjänst och källor" togs bort ur menyn på ägarens besked (HEM-RUTOR-20260929). Partnern söker och sparar sin
+förståelse som förut, en sparad punkt öppnas från sin notis i tråden (till exempel "Sparat som F-26"), och
+`/api/sok`, `/api/forstaelse` och `/api/lage` svarar som förut.
 
 Tjänsten körs lokalt på Johnnys Mac och nås bara när den är igång; det är ett synligt beroende. Den startas inte
 automatiskt vid inloggning. Att göra den bestående kräver en LaunchAgent som ägaren själv aktiverar (hanterad

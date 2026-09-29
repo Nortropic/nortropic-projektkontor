@@ -4,7 +4,7 @@
 // bekräftat att de är sparade, och samma klient_id används vid varje nytt försök så att inget dubbleras.
 
 const $ = (id) => document.getElementById(id);
-const tillstand = { trad: null, vy: null, tradar: [], sokOmkrets: 2, utkorgTimer: null, pollTimer: null };
+const tillstand = { trad: null, vy: null, tradar: [], utkorgTimer: null, pollTimer: null };
 
 // ------------------------------------------------------------------ hjälp
 function el(tag, attrs, ...barn) {
@@ -599,41 +599,11 @@ async function visaKalla(id, omkrets) {
     oppnaPanel('Källa', delar);
   } catch (f) { oppnaPanel('Källa', el('div', { class: 'fel', text: f.message })); }
 }
-$('sokformular').addEventListener('submit', async (e) => {
-  e.preventDefault(); const q = $('sokfalt').value.trim(); if (!q) return;
-  oppnaPanel('Sök', el('div', { class: 'meta', text: 'Söker…' }));
-  const d = await api('GET', '/api/sok?q=' + encodeURIComponent(q) + '&antal=25');
-  if (!d.traffar.length) { oppnaPanel('Sök', el('div', { class: 'meta', text: 'Inga träffar. Pröva andra ord.' })); return; }
-  oppnaPanel('Sök: ' + q, [el('div', { class: 'meta', text: 'Träffarna är utdrag; öppna för sammanhanget. Sökningen anropar ingen modell.' }),
-    ...d.traffar.map((t) => el('div', { class: 'traff' }, el('div', { class: 'kl', text: t.kalla_klass + ' · ' + (t.talare || '') + ' · ' + (t.datum || '') + (t.status ? ' · ' + t.status : '') }),
-      el('button', { class: 'kalla-lank', onclick: () => visaKalla(t.kalla_id) }, t.titel || t.kalla_id), el('div', { class: 'ut', text: t.utdrag })))]);
-});
-$('visaforstaelse').addEventListener('click', async () => {
-  const d = await api('GET', '/api/forstaelse');
-  const nrFor = {}; for (const f of d.poster) nrFor[f.id] = 'F-' + f.nr;
-  oppnaPanel('Bestående förståelse', d.poster.length ? d.poster.slice().reverse().map((f) => el('div', { class: 'forst' + (f.ersatt_av ? ' ersatt' : '') },
-    el('div', { class: 'kl', text: 'F-' + f.nr + ' · ' + f.slag + ' · ' + f.auktoritet.replace('_', ' ') + ' · ' + tid(f.tid) + (f.ersatt_av ? ' · ersatt av ' + (nrFor[f.ersatt_av] || '') : ' · gällande') + (f.ersatter.length ? ' · ersätter ' + f.ersatter.map((x) => nrFor[x] || x).join(', ') : '') }),
-    el('div', { text: f.text }), f.agarcitat ? el('div', { class: 'kl', text: 'Dina ord: ”' + f.agarcitat + '”' }) : null)) :
-    el('div', { class: 'meta', text: 'Inget sparat ännu. Partnern sparar beslut, rättelser, bortval och viktiga slutsatser här när de uppstår.' }));
-});
 $('visaoverlamningar').addEventListener('click', async () => {
   const d = await api('GET', '/api/overlamningar');
   oppnaPanel('Överlämningar', d.overlamningar.length ? d.overlamningar.map((o) => el('div', { class: 'traff' }, el('div', { class: 'kl', text: o.id + ' · ' + (OVLTEXT[o.status] || o.status) + ' · ' + tid(o.uppdaterad) }),
     el('div', { text: o.rubrik }), el('div', { class: 'kl', text: 'Mottagare: ' + o.mottagare + ' · ' + o.katalog_visning }),
     starttext(o.start, o.status) ? el('div', { class: 'kl', text: starttext(o.start, o.status) }) : null)) : el('div', { class: 'meta', text: 'Inga överlämningar ännu.' }));
-});
-$('visalage').addEventListener('click', async () => {
-  const d = await api('GET', '/api/lage');
-  const f = d.forbrukning;
-  oppnaPanel('Tjänst och källor', [
-    el('p', { text: d.beroende }),
-    el('p', { text: 'Kod: ' + d.kodrevision.head + (d.kodrevision.ar_main ? ' (samma som kontorets main)' : ' (inte main: ' + d.kodrevision.gren + ')') + (d.kodrevision.lokala_andringar ? ', med lokala ändringar' : '') + ' · startad ' + tid(d.startad) }),
-    el('p', { text: 'Modell: ' + d.modell.huvud + ' (' + d.modell.anstrangning + '), utredare ' + d.modell.utredare + '.' }),
-    el('p', { text: 'I dag: ' + f.korningar + ' modellkörningar, ingen gräns · ' + Math.round(f.tokens_in / 1000) + 'k tokens in, ' + Math.round(f.tokens_ut / 1000) + 'k ut · listprisvärde ' + f.listpris_usd.toFixed(2) + ' USD, Claude Codes egen uppskattning (inte en kostnad; abonnemangets kvot förbrukas).' }),
-    el('p', { text: 'Källtäckning: ' + d.tackning }),
-    el('p', { text: 'Pågår nu: ' + (d.aktiva.length ? d.aktiva.map((a) => a.typ + ' ' + a.sekunder + ' s').join(', ') : 'inget') }),
-    d.startvakt ? el('p', { text: 'Startvakten: ' + (d.startvakt.pa ? 'på' : 'av (bara den ordinarie tjänsten startar sessioner)') + ' · ' + d.startvakt.i_dag + ' av ' + d.startvakt.tak + ' nya starter i dag · utföraren ur ' + d.startvakt.utforare_ur + ' · ansträngning ' + d.startvakt.anstrangning + '.' }) : null,
-  ]);
 });
 
 // ------------------------------------------------------------------ start

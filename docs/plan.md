@@ -226,6 +226,15 @@ Nästa handling: efter integrationen startas partnerns tjänst om ur main (drift
 tjänsten. Därefter finns inget öppet i detta spår; nästa bygge kräver ett eget beslut. Bestående start vid inloggning är
 partnerns befintliga rad i ÄGARENS TUR.
 
+Tillägg 2026-09-29 (19:15 UTC): ägaren har bantat arbetsplatsen (HEM-RUTOR-20260929):
+- Alla rutor på Hem är borttagna, och Hem visar nu bara hälsningen.
+- Förbättringars sidomeny har kvar Ny tråd, Överlämningar och trådarna.
+
+Ändringen byggdes av nortropic-repos-6d efter besked från 04. Efter integrationen startas tjänsten om ur main enligt
+driftregeln. Därefter följer två egna ändringar:
+- Överlämningar blir backlog, byggt av nortropic-repos-d7.
+- Trådar kan raderas för gott, byggt av 6d efter d7:s publicering.
+
 Återupptagning: `evidence/nasta-uppdrag/local/arbetsplats-20260929/LAGE.md`. Arbetsgrenarna publiceras eller arkiveras
 i bundles där och tas bort lokalt.
 

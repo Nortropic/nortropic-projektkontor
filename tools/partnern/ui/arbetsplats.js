@@ -2,10 +2,10 @@
 // Nortropics arbetsplats: huvudnavigationen (Hem, Kontoret, Kundstart, Förbättringar) runt partnerns samtalsyta.
 // Allt här läser: ingen vy anropar en modell, skriver i journalen eller startar något. Innehåll renderas som DOM-noder
 // med textContent (el() i app.js). Adressen bär bara del och objekt-id, aldrig privata texter eller nycklar; i
-// webbläsaren sparas bara besöksmarkören och senaste adress per del.
+// webbläsaren sparas bara senaste adress per del och om Kontorets lista är dold (samtalsytans nycklar: se app.js).
 
 const DELAR = { hem: 'Hem', kontoret: 'Kontoret', kundstart: 'Kundstart', forbattringar: 'Förbättringar' };
-const as = { del: null, vag: null, forsta: true, kontorTimer: null, kontorData: null, kontorGrupp: null, hem: null, kundstart: null };
+const as = { del: null, vag: null, forsta: true, kontorTimer: null, kontorData: null, kontorGrupp: null, kundstart: null };
 const KUNDSTART_PROV = 'http://127.0.0.1:3131';
 
 // ------------------------------------------------------------------ hjälp
@@ -30,10 +30,6 @@ function nar(iso) {  // en händelsetid som går att läsa: i dag 12:07, i går 
 }
 function tidEl(iso) { return el('time', { datetime: iso || '', title: iso ? new Date(iso).toLocaleString('sv-SE') : null, text: nar(iso) }); }
 function stor(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; }
-function utanId(rubrik) {  // "Rubrik (BESLUT-ID) (#124)" -> ["Rubrik", "BESLUT-ID", 124]
-  const m = String(rubrik).match(/^(.*?)\s*(?:\(([A-ZÅÄÖ0-9][A-ZÅÄÖ0-9-]{3,119})\))?\s*(?:\(#(\d+)\))?\s*$/);
-  return m ? [m[1] || rubrik, m[2] || null, m[3] ? Number(m[3]) : null] : [rubrik, null, null];
-}
 function dag(iso) {  // ett datum utan klockslag (Arkivet) visas som datum, aldrig med påhittad tid
   if (!iso) return 'odaterad';
   return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso : tid(iso);
@@ -130,175 +126,17 @@ async function visa() {
 }
 
 // ------------------------------------------------------------------ Hem
-function besok() {  // besöksmarkören: bara i den här webbläsaren, skild från allt operativt
-  let forra = null;
-  try { forra = sessionStorage.getItem('arbetsplats:besok:forra'); } catch { /* */ }
-  if (forra === null) {
-    forra = las('arbetsplats:besok', null);
-    forra = forra && forra.senast ? forra.senast : '';
-    try { sessionStorage.setItem('arbetsplats:besok:forra', forra); } catch { /* */ }
-  }
-  skriv('arbetsplats:besok', { senast: new Date().toISOString() });
-  return forra || null;
-}
-async function visaHem(r) {
-  const rot = $('del-hem');
-  if (!as.hem) rot.replaceChildren(el('header', { class: 'del-huvud' }, el('h1', { id: 'hem-rubrik', tabindex: '-1' }, halsning().replace('Hej, Johnny', 'Hej')), status('Läser läget…')));
-  let d;
-  try { d = await api('GET', '/api/arbetsplats/hem'); }
-  catch (f) { rot.replaceChildren(el('header', { class: 'del-huvud' }, el('h1', { id: 'hem-rubrik', tabindex: '-1' }, 'Hem'), status('Hem kunde inte läsas: ' + f.message, 'fel'))); return; }
-  as.hem = d;
-  clearTimeout(as.hemTimer);
-  as.hemForsok = d.kontoret.status === 'laser' || d.kontoret.status === 'ingen_lasning' ? (as.hemForsok || 0) + 1 : 0;
-  if (as.hemForsok && as.hemForsok <= 5) as.hemTimer = setTimeout(uppdateraHemKontor, 3000);
-  const forra = as.forraBesok !== undefined ? as.forraBesok : (as.forraBesok = besok());
-  rot.replaceChildren(
-    el('header', { class: 'del-huvud' },
-      el('h1', { id: 'hem-rubrik', tabindex: '-1' }, halsning()),
-      el('p', { class: 'dampad' }, 'Läst ' + nar(d.lasttid) + '. ',
-        el('button', { class: 'lank', type: 'button', onclick: () => visaHem(r) }, 'Läs om'),
-        r.okand ? el('span', { class: 'fel', text: ' Adressen ' + r.okand + ' finns inte; du är på Hem.' }) : null)),
-    el('div', { class: 'hem-rutnat' },
-      el('div', { class: 'hem-spalt' }, hemFortsatt(d), hemAndrat(d, forra)),
-      el('div', { class: 'hem-spalt' }, hemKontoret(d), hemBehover(d), hemSok(d))));
-}
-async function uppdateraHemKontor() {  // bara blocken som bygger på kontorets läsning; sökfält och annat lämnas orört
-  if (as.del !== 'hem') return;
-  let d;
-  try { d = await api('GET', '/api/arbetsplats/hem'); } catch { return; }
-  if (as.del !== 'hem') return;
-  for (const [id, ny] of [['h-behover', hemBehover(d)], ['h-kontoret', hemKontoret(d)]]) {
-    const gammal = document.querySelector('[aria-labelledby="' + id + '"]');
-    if (gammal) gammal.replaceWith(ny);
-  }
-  as.hemForsok = d.kontoret.status === 'laser' || d.kontoret.status === 'ingen_lasning' ? as.hemForsok + 1 : 0;
-  if (as.hemForsok && as.hemForsok <= 5) as.hemTimer = setTimeout(uppdateraHemKontor, 3000);
+function visaHem(r) {  // bara hälsningen (HEM-RUTOR-20260929): Hem läser ingenting
+  $('del-hem').replaceChildren(el('header', { class: 'del-huvud' },
+    el('h1', { id: 'hem-rubrik', tabindex: '-1' }, halsning()),
+    r.okand ? status('Adressen ' + r.okand + ' finns inte; du är på Hem.', 'fel') : null));
 }
 function sektion(id, rubrik, ...barn) { return el('section', { class: 'block', 'aria-labelledby': id }, el('h2', { id }, rubrik), ...barn); }
-function hemFortsatt(d) {
-  const rader = [];
-  const senaste = las('senasteTrad', null);
-  const t = d.tradar.find((x) => x.id === senaste) || d.tradar[0];
-  if (t) rader.push(el('li', { class: 'fortsatt-rad' }, el('span', { class: 'etikett', text: 'Förbättringar' }),
-    lank('/forbattringar/' + t.id, t.titel), el('span', { class: 'dampad' }, (t.aktiv ? ' · partnern arbetar' : '') + ' · senast ', tidEl(t.senast))));
-  const ovriga = d.tradar.filter((x) => x !== t).slice(0, 3);
-  if (ovriga.length) rader.push(el('li', { class: 'fortsatt-rad fler' }, el('span', { class: 'etikett', text: 'Andra trådar' }),
-    el('span', null, ...ovriga.map((x, n) => [n ? ' · ' : '', lank('/forbattringar/' + x.id, x.titel), el('span', { class: 'dampad kl' }, ' ', tidEl(x.senast))]).flat())));
-  for (const o of d.overlamningar.filter((x) => x.oppen)) {
-    rader.push(el('li', { class: 'fortsatt-rad' }, el('span', { class: 'etikett', text: 'Överlämning' }),
-      lank(objektlank(o.id), o.rubrik || o.id),
-      el('span', { class: 'dampad' }, ' · ' + (MOTTAGARNAMN[o.mottagare] || o.mottagare) + ' · ' + (OVLTEXT[o.status] || o.status) + ' ', tidEl(o.uppdaterad || o.lamnad))));
-  }
-  const k = d.kundstart;
-  rader.push(el('li', { class: 'fortsatt-rad' }, el('span', { class: 'etikett', text: 'Kundstart' }),
-    lank('/kundstart', 'Ditt provärende'), el('span', { class: 'dampad', text: ' · provläge · testservern ' + (k.provserver.kor ? 'kör' : 'kör inte') })));
-  return sektion('h-fortsatt', 'Fortsätt där du var', el('ul', { class: 'lista' }, rader));
-}
-const BORDGRUPPER = [  // källornas egna slag; arbetsplatsen lägger inte till eller omtolkar några rader
-  ['stoppat', 'Stoppar arbete enligt källan', (x) => x.basis === 'överlämningens startlogg' || x.kind === 'modellfråga'],
-  ['beslut', 'Beslut som väntar på dig (planens ägartur)', (x) => x.basis === 'planens ägartur' && x.kind === 'beslut'],
-  ['handling', 'Något du gör själv (planens ägartur)', (x) => x.basis === 'planens ägartur' && x.kind === 'operatörshandling'],
-  ['forslag', 'Förslag som väntar på ditt besked', (x) => /^beslutsloggen /.test(x.basis) || x.basis === 'bevakningens förslag'],
-  ['ovrigt', 'Övrigt på ägarens bord', () => true],
-];
 function bordrad(x) {
   const beslut = beslutIText(x.text);
   return el('li', { class: 'bordrad' }, el('span', null, utanBeslut(x.text)),
     el('span', { class: 'dampad kl' }, (x.since ? 'sedan ' + dag(x.since) + ' · ' : '') + x.basis,
       ...beslut.map((b) => [' · ', lank(objektlank('beslut:' + b), b)]).flat()));
-}
-function hemBehover(d) {
-  const k = d.kontoret;
-  const delar = [];
-  if (!k.agarens_bord || k.status !== 'ok') {
-    delar.push(status('Okänt just nu: kontorets läsning är ' + ({ laser: 'på väg', otillganglig: 'inte tillgänglig', ingen_lasning: 'inte gjord ännu' }[k.status] || 'inte tillgänglig')
-      + (k.senaste_fel ? ' (senaste försök ' + tid(k.senaste_fel) + ')' : '') + '. Det betyder inte att inget väntar.', 'varning'));
-  } else if (k.agarens_bord.status && k.agarens_bord.status !== 'ok') {
-    delar.push(status('Ägarens bord gick inte att läsa helt; det kan finnas mer än det som syns.', 'varning'));
-  }
-  const rader = (k.agarens_bord && k.agarens_bord.items) || [];
-  const tagna = new Set();
-  for (const [id, rubrik, villkor] of BORDGRUPPER) {
-    const grupp = rader.filter((x) => !tagna.has(x) && villkor(x));
-    grupp.forEach((x) => tagna.add(x));
-    if (!grupp.length) continue;
-    const visas = id === 'stoppat' ? grupp.length : Math.min(2, grupp.length);
-    delar.push(el('h3', { class: 'grupp' + (id === 'stoppat' ? ' stoppat' : '') }, rubrik + ' · ' + grupp.length + (visas < grupp.length ? ' (' + visas + ' visas)' : '')),
-      el('ul', { class: 'lista' }, grupp.slice(0, visas).map(bordrad)));
-    if (grupp.length > visas) delar.push(el('details', { class: 'fler' }, el('summary', null, 'Visa ' + (grupp.length - visas) + ' till'), el('ul', { class: 'lista' }, grupp.slice(visas).map(bordrad))));
-  }
-  if (k.status === 'ok' && !rader.length) delar.push(el('p', { text: 'Inget väntar på dig enligt kontorets källor (läst ' + nar(k.read_at) + ').' }));
-  const vantar = d.overlamningar.filter((o) => o.oppen && o.start && o.start.typ === 'vantar');
-  if (vantar.length) delar.push(el('h3', { class: 'grupp' }, 'Väntar på något annat än dig'),
-    el('ul', { class: 'lista' }, vantar.map((o) => el('li', null, lank(objektlank(o.id), o.rubrik || o.id), el('span', { class: 'dampad', text: ' · ' + starttext(o.start, o.status) })))));
-  if (k.status === 'ok') delar.push(el('p', { class: 'kl dampad', text: 'Ur kontorets källor genom Aquarium, läst ' + nar(k.read_at) + '. Raderna och deras slag är källornas egna.' }));
-  return sektion('h-behover', 'Behöver dig', ...delar);
-}
-function hemAndrat(d, forra) {
-  const a = d.andringar;
-  const delar = [];
-  const forraT = forra ? new Date(forra).getTime() : null;
-  if (forraT) {
-    const nya = a.poster.filter((p) => new Date(p.tid).getTime() > forraT).length;
-    delar.push(el('p', null, 'Sedan ditt förra besök (' + nar(forra) + '): ', el('b', null, nya ? nya + ' ' + (nya === 1 ? 'sammanfogning' : 'sammanfogningar') : 'inga nya sammanfogningar i de lästa repona'), '.'));
-  } else delar.push(el('p', { class: 'dampad', text: 'Första besöket i den här webbläsaren, så det finns ingen jämförelse med förra gången. Här är de senaste daterade händelserna.' }));
-  const hlrad = (p) => {
-    const ny = forraT && new Date(p.tid).getTime() > forraT;
-    const [rubrik] = utanId(p.rubrik);
-    return el('li', { class: ny ? 'ny' : null },
-      el('div', null, p.beslut ? lank(objektlank('beslut:' + p.beslut), rubrik) : el('span', { text: rubrik }), ny ? el('span', { class: 'chip varm', text: 'ny' }) : null),
-      el('div', { class: 'kl dampad' }, p.namn + ' · ', tidEl(p.tid), (p.pr ? ' · PR ' + p.pr : '') + (p.beslut ? ' · ' + p.beslut : '')));
-  };
-  delar.push(el('ol', { class: 'tidslinje-lista' }, a.poster.slice(0, 5).map(hlrad)));
-  if (a.poster.length > 5) delar.push(el('details', { class: 'fler' }, el('summary', null, 'Visa ' + Math.min(a.poster.length - 5, 11) + ' till'), el('ol', { class: 'tidslinje-lista' }, a.poster.slice(5, 16).map(hlrad))));
-  const ark = d.kontoret.arkivet;
-  if (ark && ark.items && ark.items.length) delar.push(el('details', { class: 'arkiv' }, el('summary', null, 'Levererat enligt kontorets arkiv (' + ark.items.length + ' senaste)'),
-    el('ul', { class: 'lista' }, ark.items.map((x) => el('li', null, el('span', { class: 'dampad kl', text: dag(x.date) + ' · ' }),
-      /^beslutsloggen /.test(x.basis) ? lank(objektlank('beslut:' + x.basis.split(' ')[1].replace(/,$/, '')), x.title) : el('span', { text: x.title }))))));
-  const otillg = a.repon.filter((x) => x.status !== 'ok').map((x) => x.namn);
-  delar.push(el('p', { class: 'kl dampad', text: 'Tiderna är sammanfogningarnas egna. Läst ur lokala origin/main: ' + a.repon.map((x) => x.namn + (x.hamtad ? ' (hämtad ' + nar(x.hamtad) + ')' : '')).join(', ') + '.' + (otillg.length ? ' Gick inte att läsa: ' + otillg.join(', ') + '.' : '') }));
-  return sektion('h-andrat', 'Levererat och ändrat', ...delar);
-}
-function hemKontoret(d) {
-  const k = d.kontoret;
-  const delar = [];
-  if (k.status === 'ok') {
-    const h = k.headline || {};
-    const tal = (n) => (n === null || n === undefined ? 'okänt' : String(n));
-    delar.push(el('p', { class: 'lugn' }, 'I Runtime pågår ', el('b', null, tal(h.pagar)), ', ', el('b', null, tal(k.verkstaden && k.verkstaden.vilar)), ' uppdrag vilar och ',
-      el('b', null, tal(h.behover_dig)), ' rader väntar på dig.'));
-    const u = k.utkiken || {};
-    if (u.status === 'ok') delar.push(el('p', { class: 'kl' }, 'Bevakningen ' + (u.schedule || 'okänt schema') + (u.latest ? ' · senaste omgång ' + nar(u.latest.at) + ' (' + u.latest.outcome + ')' : '') + (u.next_planned ? ' · nästa planerad ' + nar(u.next_planned) : '') + '.'));
-    const gamla = Object.values(k.sources || {}).filter((s) => s.status !== 'ok').map((s) => s.title);
-    if (gamla.length) delar.push(status('Gick inte att läsa: ' + gamla.join(', ') + '. Deras läge är okänt, inte tomt.', 'varning'));
-    delar.push(el('p', { class: 'kl dampad', text: 'Aquarium läste ' + nar(k.read_at) + ' (' + alder(k.read_at) + ').' }));
-  } else delar.push(status('Kontorets läsning är ' + ({ laser: 'på väg', otillganglig: 'inte tillgänglig just nu', ingen_lasning: 'inte gjord ännu' }[k.status] || 'okänd') + '. Läget är okänt, inte lugnt.', 'varning'));
-  delar.push(el('div', { class: 'knapprad' }, lank('/kontoret', 'Gå in i Kontoret', { class: 'knapp primar' }), lank('/kontoret/presentation', 'Presentation', { class: 'knapp' })));
-  return sektion('h-kontoret', 'Kontoret just nu', ...delar);
-}
-function hemSok(d) {
-  const falt = el('input', { id: 'hemsok', type: 'search', placeholder: 'Sök i beslut, trådar och underlag', 'aria-describedby': 'hemsok-omfang' });
-  const ut = el('div', { class: 'sokresultat', 'aria-live': 'polite' });
-  const omfang = d.sok.omfang.filter((o) => o.antal > 0).map((o) => o.namn);
-  const tomma = d.sok.omfang.filter((o) => !o.antal).map((o) => o.namn);
-  const form = el('form', { role: 'search', class: 'sokform', onsubmit: async (e) => {
-    e.preventDefault(); const q = falt.value.trim(); if (!q) return;
-    ut.replaceChildren(status('Söker…'));
-    let r;
-    try { r = await api('GET', '/api/sok?q=' + encodeURIComponent(q) + '&antal=15'); }
-    catch (f) { ut.replaceChildren(status('Sökningen kunde inte köras (' + f.message + '). Det är inte samma sak som inga träffar.', 'fel')); return; }
-    if (!r.traffar.length) { ut.replaceChildren(el('p', { text: 'Inga träffar på "' + q + '" i de sökta områdena.' })); return; }
-    ut.replaceChildren(el('ul', { class: 'lista' }, r.traffar.map((t) => el('li', null,
-      el('div', { class: 'kl dampad', text: t.kalla_klass + (t.datum ? ' · ' + t.datum : '') }),
-      /^kontor:beslut:/.test(t.kalla_id) ? lank(objektlank('beslut:' + t.kalla_id.slice(14)), t.titel || t.kalla_id)
-        : el('button', { class: 'kalla-lank', type: 'button', onclick: () => { navigera('/forbattringar'); setTimeout(() => visaKalla(t.kalla_id), 50); } }, t.titel || t.kalla_id),
-      el('div', { class: 'utdrag', text: t.utdrag })))));
-  } }, el('label', { for: 'hemsok', class: 'dold' }, 'Sök i underlaget'), falt, el('button', { type: 'submit', class: 'knapp' }, 'Sök'));
-  return sektion('h-sok', 'Sök i underlaget', form,
-    el('p', { id: 'hemsok-omfang', class: 'kl dampad', text: 'Söker i ' + omfang.length + ' områden i partnerns index, till exempel kontorets beslut och plan, dina sparade ord och Improvements-samtalen. Inte i: ' + d.sok.utanfor.join(', ') + '. Ingen modell anropas.' }),
-    el('details', { class: 'fler' }, el('summary', null, 'Vad sökningen omfattar'), el('ul', { class: 'lista kl' },
-      d.sok.omfang.map((o) => el('li', null, o.namn + ': ' + (o.antal ? o.antal + ' poster' : 'tomt eller ej anslutet')))),
-      tomma.length ? el('p', { class: 'kl', text: 'Tomt eller ej anslutet: ' + tomma.join(', ') + '. Inga träffar därifrån betyder inte att inget finns.' }) : null), ut);
 }
 
 // ------------------------------------------------------------------ Kontoret
