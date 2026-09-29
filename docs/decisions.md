@@ -7881,3 +7881,33 @@ har en ärendedel. Listan prövad i webbläsare mot den verkliga testservern: 93
 
 **Återgång.** Återställ integrationscommiten i kontoret och Kundstarts PR 4 med `git revert`; starta om partnerns tjänst
 och testservern ur main.
+
+
+## KUNDSTART-DRIFT-20260929 — ägaren beslutar att Kundstarts main driftsätts: produktionen kör main `287ec0c`, också med arbetsplatsens interna ärendelista
+
+**Status:** registrerat 2026-09-29 (14:58 UTC) av sessionen nortropic-repos-f1 (Claude Code) i Kundstart-dialogens
+spår (KUNDSTART-DIALOG-20260928). Ägarens svar står ordagrant i
+`evidence/nasta-uppdrag/local/kundstart-dialog-20260928/AGARBESLUT-DRIFT-20260929.md`.
+
+**Bakgrund.** Kundstarts PR 4 (ARBETSPLATS-KUNDSTART-ARENDEN-20260929, sessionen nortropic-repos-04) lade till den
+interna läsvägen `GET /api/intern/arenden`. Den kräver den interna nyckeln och ger bara ärendenas metadata. PR 4
+sammanfogades till main `287ec0c`, men produktionen driftsattes inte. Vercel-projektet saknar git-koppling, så en
+sammanfogning driftsätter inte av sig själv.
+
+**Ägarens beslut.** Sessionen frågade om main skulle driftsättas, så att produktionen och main blir samma igen. Ägaren
+valde "Driftsätt nu (Rekommenderas)".
+
+**Genomfört.** Produktionen driftsattes ur main `287ec0c` 2026-09-29 14:50 UTC (`dpl_4jDAYDbY25xwcNkPityDgh85ZNqg`)
+med `vercel deploy --prod` ur Kundstarts primärutcheckning. Återläsningen efteråt visade:
+- sidorna svarar, `/om` säger att inget AI-stöd används, och testlägets inställningsväg svarar 404
+- `GET /api/intern/arenden` svarar 401 utan nyckel och 200 med nyckeln, med bara metadatafält: id, kund, testdialog,
+  skapad, uppdaterad, revision, antal svar och material, senaste inlämning och om ärendet ändrats efter den
+- hela webbläsarsviten mot produktionen: 26 godkända och 6 avsiktligt överhoppade prov
+- tjänstens reskontra: 59 modellanrop för september både före och efter driftsättningen, inga nya
+
+**Plan:** Kundstart-blocket anger att produktionen kör main `287ec0c` och att en sammanfogning inte driftsätter av sig
+själv. Arbetsplatsens block ändras inte; dess mening om att produktionen inte driftsattes gäller det arbetet.
+
+**Ersätter:** ingen post. Kompletterar KUNDSTART-TESTLAGE-20260929 och ARBETSPLATS-KUNDSTART-ARENDEN-20260929.
+
+**Avslut.** Ägarens beslut är genomfört när denna post är integrerad. Planen äger nästa handling.

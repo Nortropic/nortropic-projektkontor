@@ -170,12 +170,15 @@ Parallellt uppdrag med eget skrivansvar. Blocken ovanför ersätter inte detta b
 Skrivansvar: sessionen nortropic-repos-f1 (Claude Code) för Kundstart-repot, Digitalas `verktyg/kundstart.py` med
 dess prov, Kundstart-delarna av `verktyg/overfor_steg.py` och `kunskap/kundintervju.md`, detta block och postens beslut.
 
-Läge när blocket skrevs (29 september 2026, 10:46 svensk tid / 08:46 UTC): Kundstarts main `48dceca` (PR 3) är skyddad.
-Ändringar går via PR, och kontrollen `kontroll` måste vara grön. Produktionen kör main sedan 2026-09-29 08:36 UTC.
-Enligt ägarens beslut (KUNDSTART-TESTLAGE-20260929) används Kundstart nu bara för prov. Produktionen anropar ingen
-språkmodell och ställer standardlistans frågor. Claude körs bara i det lokala testläget på ägarens inloggning, som
-förbättringspartnern: `npm run prov -- start` i Kundstarts primärutcheckning på main, på 127.0.0.1:3131, med modell och
-ansträngning i skrivrutan. Testservern startas om efter varje sammanfogning. Kundvyn har en samtalstjänsts form.
+Läge när blocket skrevs (29 september 2026, 16:58 svensk tid / 14:58 UTC): Kundstarts main `287ec0c` (PR 4) är skyddad.
+Ändringar går via PR, och kontrollen `kontroll` måste vara grön. Produktionen kör main sedan 2026-09-29 14:50 UTC
+(KUNDSTART-DRIFT-20260929). En sammanfogning driftsätter inte av sig själv, eftersom Vercel-projektet saknar
+git-koppling; driftsättning görs med `vercel deploy --prod` ur primärutcheckningen på main. Enligt ägarens beslut
+(KUNDSTART-TESTLAGE-20260929) används Kundstart nu bara för prov. Produktionen anropar ingen språkmodell och ställer
+standardlistans frågor. Claude körs bara i det lokala testläget på ägarens inloggning, som förbättringspartnern:
+`npm run prov -- start` i Kundstarts primärutcheckning på main, på 127.0.0.1:3131, med modell och ansträngning i
+skrivrutan. Testservern startas om efter varje sammanfogning. PR 4 (ARBETSPLATS-KUNDSTART-ARENDEN-20260929) lade till
+en intern läsväg med ärendenas metadata, som arbetsplatsen läser genom testservern. Kundvyn har en samtalstjänsts form.
 Adressen nås utan Vercel-inloggning, och ett ärende öppnas bara med sin personliga länk. Digitalas main `c2144be`
 (PR 17) tar emot kundens tillval, domänkontroll och citerade uppgifter. Kundstarts skyddsbegränsning
 (403- och planhindret), som daterade avsnitt längre ned nämner, är passerad sedan repona blev publika 2026-09-28.
@@ -185,8 +188,8 @@ kundinbjudan kräver ett kunduppdrag och ett eget beslut om AI i kundens samtal.
 automatisk import kräver Runtime-mandat.
 
 Arbetsgrenar: Kundstarts `dialog/uppdrag-20260928`, `vy/samtalsvy-20260929` och `prov/lokalt-lage-20260929` är
-sammanfogade i PR 1, 2 och 3. Digitalas `kundstart/dialog-tillval-20260928` är integrerad i PR 17. Kontorets gren
-publiceras med denna ändring. De lokala arbetsytorna tas bort efter publiceringen.
+sammanfogade i PR 1, 2 och 3; PR 4 är nortropic-repos-04:s. Digitalas `kundstart/dialog-tillval-20260928` är integrerad
+i PR 17. Kontorets gren publiceras med denna ändring. De lokala arbetsytorna tas bort efter publiceringen.
 
 Återupptagning: `evidence/nasta-uppdrag/local/kundstart-dialog-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid.
