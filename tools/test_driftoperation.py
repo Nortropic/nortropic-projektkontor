@@ -6,6 +6,7 @@ from pathlib import Path
 import tempfile
 import sys
 import threading
+import time
 import unittest
 from unittest.mock import patch
 import driftoperation as operation
@@ -320,10 +321,11 @@ class WeeklyDriftTests(unittest.TestCase):
         self.assertTrue(first['performed']); self.assertTrue(second['performed'])
         if first['drift']['receipt'] == second['drift']['receipt']:
             # Recorded rather than hidden: the later check overwrote the earlier
-            # receipt in the customer path. A weekly period cannot collide, and the
-            # per-run result.json keeps each check's own hash regardless.
+            # receipt in the customer path. A weekly period cannot collide, and each
+            # run's own result.json keeps the hash of the bytes that run read.
             self.assertEqual(len(self.receipts()), 1)
-            self.assertNotEqual(first['drift']['receipt_sha256'], second['drift']['receipt_sha256'])
+            self.assertEqual(operation.digest((self.customer / second['drift']['receipt']).read_bytes()),
+                             second['drift']['receipt_sha256'])
 
     def test_the_tools_own_count_must_agree_with_the_receipt(self):
         actual = operation.bounded_start
@@ -372,7 +374,11 @@ class WeeklyDriftTests(unittest.TestCase):
         self.assertEqual(operation.BOUND_SECONDS,
                          operation.INTAKE_BOUND + operation.DRIFT_BOUND
                          + 2 * operation.TERMINATION_BOUND + operation.MONITOR_BOUND)
-        self.assertEqual(operation.MONITOR_BOUND, 2 * operation.MONITOR_TIMEOUT + 1)
+        # The monitor's ceiling is its own enforced wall clock plus one socket
+        # operation that may already have been blocked when the deadline passed.
+        self.assertEqual(operation.MONITOR_BOUND,
+                         operation.MONITOR_DEADLINE + operation.MONITOR_TIMEOUT)
+        self.assertGreater(operation.MONITOR_DEADLINE, 2 * operation.MONITOR_TIMEOUT)
 
     def test_an_operation_without_a_channel_is_refused(self):
         with self.assertRaises(ValueError):
@@ -384,11 +390,12 @@ class WeeklyDriftTests(unittest.TestCase):
         self.config['period_seconds'] = 604800
         self.config.update(change)
 
-    def set_period(self, ago_seconds, sequence=1):
+    def set_period(self, ago_seconds, sequence=1, run_id='tidigare-korning'):
         from datetime import datetime, timedelta, timezone
         stamp = (datetime.now(timezone.utc) - timedelta(seconds=ago_seconds)).isoformat()
+        self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
         (self.state / 'period.json').write_text(
-            json.dumps({'completed_at': stamp, 'sequence': sequence}) + '\n')
+            json.dumps({'completed_at': stamp, 'sequence': sequence, 'run_id': run_id}) + '\n')
 
     def test_first_run_is_due_and_a_wakeup_inside_the_period_reads_nothing(self):
         self.week()
@@ -397,6 +404,7 @@ class WeeklyDriftTests(unittest.TestCase):
         self.assertEqual(first['period']['reason'], 'no_period_recorded')
         self.assertEqual(first['period_recorded']['sequence'], 1)
         self.assertEqual(first['period_recorded']['completed_at'], first['started_at'])
+        self.assertEqual(first['period_recorded']['run_id'], 'week-one')
         calls, receipts = self.calls, self.receipts()
 
         inside = operation.run(self.config, 'week-one-tick-two')
@@ -435,7 +443,8 @@ class WeeklyDriftTests(unittest.TestCase):
     def test_invalid_period_state_is_preserved_and_the_work_still_runs(self):
         self.week()
         operation.run(self.config, 'week-one')
-        (self.state / 'period.json').write_text(json.dumps({'completed_at': 'inte en tid', 'sequence': 1}))
+        (self.state / 'period.json').write_text(
+            json.dumps({'completed_at': 'inte en tid', 'sequence': 1, 'run_id': 'nagon'}))
         result = operation.run(self.config, 'after-corrupt-period')
         self.assertTrue(result['performed'])
         self.assertFalse(result['completed'], 'the corrupt period state is reported, not hidden')
@@ -445,12 +454,46 @@ class WeeklyDriftTests(unittest.TestCase):
 
     def test_closed_period_state_shapes_are_refused(self):
         self.week()
-        for value in ({'completed_at': operation.now()}, {'completed_at': operation.now(), 'sequence': 0},
-                      {'completed_at': operation.now(), 'sequence': True},
-                      {'completed_at': operation.now(), 'sequence': 1, 'extra': 1}):
+        now = operation.now()
+        for value in ({'completed_at': now, 'sequence': 1},
+                      {'completed_at': now, 'run_id': 'a'},
+                      {'completed_at': now, 'sequence': 0, 'run_id': 'a'},
+                      {'completed_at': now, 'sequence': True, 'run_id': 'a'},
+                      {'completed_at': now, 'sequence': 1, 'run_id': '../escape'},
+                      {'completed_at': now, 'sequence': 1, 'run_id': 1},
+                      {'completed_at': now, 'sequence': 1, 'run_id': 'a', 'extra': 1}):
             self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
             (self.state / 'period.json').write_text(json.dumps(value))
-            self.assertEqual(operation.due(self.state, self.config)['reason'], 'invalid_period_state')
+            self.assertEqual(operation.due(self.state, self.config, 'nu')['reason'],
+                             'invalid_period_state')
+
+    def test_a_future_or_overflowing_period_record_cannot_silence_the_work(self):
+        # A stamp from the future would report every wakeup as a successful skip until
+        # that date arrives, and year 9999 overflows the addition. Both must be caught.
+        self.week()
+        def plant(stamp):
+            # due() quarantines the file it rejects, so each assertion needs its own.
+            self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
+            (self.state / 'period.json').write_text(
+                json.dumps({'completed_at': stamp, 'sequence': 1, 'run_id': 'framtiden'}))
+        for stamp in ('2099-01-01T00:00:00+00:00', '9999-12-31T00:00:00+00:00'):
+            plant(stamp)
+            answer = operation.due(self.state, self.config, 'nu')
+            self.assertTrue(answer['due']); self.assertEqual(answer['reason'], 'invalid_period_state')
+            plant(stamp)
+            result = operation.run(self.config, 'efter-' + stamp[:4])
+            self.assertTrue(result['performed'], 'the work runs despite the bad record')
+            self.assertFalse(result['completed'], 'the bad record is reported, not hidden')
+            self.assertEqual(result['period']['reason'], 'invalid_period_state')
+            for path in self.state.glob('period.json.invalid-*'):
+                path.unlink()
+
+    def test_a_record_is_not_due_only_a_moment_before_its_time(self):
+        self.week()
+        self.set_period(604800 - 1)
+        self.assertFalse(operation.due(self.state, self.config, 'nu')['due'])
+        self.set_period(604800)
+        self.assertTrue(operation.due(self.state, self.config, 'nu')['due'])
 
     def test_period_outside_its_bounds_is_refused(self):
         for period in (60, 3599, 2678401, True, '604800'):
@@ -458,20 +501,85 @@ class WeeklyDriftTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 operation.run(self.config, 'bad-period-' + str(period))
 
-    def test_an_interrupted_due_run_resumes_instead_of_reporting_its_own_period(self):
+    def test_a_run_interrupted_after_closing_its_period_does_not_close_it_twice(self):
+        # The receipt is written after the period is closed, so a crash in between
+        # leaves a record naming this run. Resuming must finish the receipt without
+        # advancing the sequence again and without reporting the period as not due.
         self.week()
-        operation.run(self.config, 'week-one')
-        # The run recorded its period and then died before writing result.json.
-        interrupted = self.state / 'interrupted'; interrupted.mkdir(mode=0o700)
-        config_sha = operation.digest(json.dumps(self.config, sort_keys=True,
-                                                 separators=(',', ':')).encode())
-        (interrupted / 'binding.json').write_text(json.dumps({'config_sha256': config_sha}))
-        resumed = operation.run(self.config, 'interrupted')
+        first = operation.run(self.config, 'week-one')
+        self.assertEqual(first['period_recorded']['sequence'], 1)
+        (self.state / 'week-one/result.json').unlink()
+        resumed = operation.run(self.config, 'week-one')
         self.assertNotIn('skipped', resumed)
         self.assertTrue(resumed['performed'])
-        self.assertEqual(resumed['period_recorded']['sequence'], 2)
+        self.assertEqual(resumed['period']['reason'], 'own_period_record')
+        self.assertEqual(resumed['period_recorded']['sequence'], 1, 'one period, one sequence step')
+        self.assertEqual(json.loads((self.state / 'period.json').read_text())['run_id'], 'week-one')
+        # The next period still advances normally for a different run.
+        self.set_period(604800, sequence=1, run_id='week-one')
+        later = operation.run(self.config, 'week-two')
+        self.assertEqual(later['period_recorded']['sequence'], 2)
+
+    def test_another_runs_record_does_not_make_this_run_due(self):
+        self.week()
+        self.set_period(60, sequence=4, run_id='nagon-annan')
+        answer = operation.due(self.state, self.config, 'jag')
+        self.assertFalse(answer['due']); self.assertEqual(answer['reason'], 'not_due')
 
     def test_a_cached_result_is_returned_before_dueness_is_consulted(self):
         self.week()
         first = operation.run(self.config, 'week-one')
         self.assertEqual(operation.run(self.config, 'week-one'), first)
+
+
+class MonitorWallClockTests(unittest.TestCase):
+    """A trickling server must not outlast the monitor's own declared ceiling.
+
+    urlopen's timeout bounds each blocking socket operation, not the whole attempt, so
+    without its own wall clock the monitor could read for as long as a server keeps
+    sending a byte just inside the timeout - holding the state lock past the workflow's
+    own bound and blocking later periods.
+    """
+
+    def setUp(self):
+        self.chunks, self.gap = 40, 0.25
+        owner = self
+        class Trickle(BaseHTTPRequestHandler):
+            protocol_version = 'HTTP/1.1'
+            def log_message(self, *_): pass
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header('Content-Length', str(owner.chunks))
+                self.end_headers()
+                for _ in range(owner.chunks):
+                    try:
+                        self.wfile.write(b' '); self.wfile.flush()
+                    except (BrokenPipeError, ConnectionResetError, OSError):
+                        return
+                    time.sleep(owner.gap)
+        self.server = ThreadingHTTPServer(('127.0.0.1', 0), Trickle)
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+        self.addCleanup(self.server.server_close); self.addCleanup(self.server.shutdown)
+        self.config = {'url': 'http://127.0.0.1:%s/health' % self.server.server_port,
+                       'candidate': 'a' * 40, 'isolated_test': True}
+
+    def test_a_trickling_endpoint_is_cut_at_the_monitor_deadline(self):
+        # Shortened only to keep the test quick; the enforced relationship is the same.
+        with patch.object(operation, 'MONITOR_DEADLINE', 2), \
+             patch.object(operation, 'MONITOR_TIMEOUT', 5):
+            started = time.monotonic()
+            result = operation.monitor(self.config)
+            elapsed = time.monotonic() - started
+        self.assertFalse(result['healthy'])
+        self.assertEqual(result['reason'], 'endpoint_unavailable')
+        self.assertLess(elapsed, 2 + 5, 'the deadline plus one blocked operation is the ceiling')
+        self.assertGreaterEqual(len(result['attempts']), 1)
+        self.assertTrue(any(a.get('error') in ('transport_unavailable', 'monitor_bound_exceeded')
+                            for a in result['attempts']), result['attempts'])
+
+    def test_a_prompt_endpoint_is_unaffected_by_the_deadline(self):
+        self.chunks, self.gap = 1, 0
+        result = operation.monitor(self.config)
+        self.assertFalse(result['healthy'])          # a space is not the health body
+        self.assertEqual(result['attempts'][0]['error'], 'invalid_health_response')

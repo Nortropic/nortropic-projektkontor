@@ -8,16 +8,25 @@ ersätter inget annat block nedan; de ersätter inte detta.
 Kontorets del är byggd på grenen `veckodrift/kontor-20260929`: `tools/driftoperation.py` får en tredje
 kanal `drift`, som startar Digitalas frysta `verktyg/drift_kontroll.py` och skriver kontrollens
 `DRIFT-<tid>.json` i kundens egen mapp — samma fil `underhall.py besked` läser — plus en periodbunden
-körning. Hanterarens svit är 30 prov, varav tjugo nya. Runtimes del ligger på `veckodrift/digitala-20260929`
-med D040, en ny `--operations`-bindning i `scripts/install_ap10.py` och kvalificeringen i Runtimes
-`evidence/runs/runtime-veckodrift-1/`: tre verkliga schemalagda väckningar på den befintliga motorn, en ren
-kontroll, en väckning inne i perioden som inte gjorde ett enda anrop, och en förfallen period som utfördes
-som incident med kundkvitto och en privat kvittens.
+körning. Kontorets helsvit är 534 prov OK mot 509 OK på oförändrad main `34bcedd`. Runtimes del ligger på
+`veckodrift/digitala-20260929` med D040, en ny `--operations`-bindning i `scripts/install_ap10.py` och
+kvalificeringen i Runtimes `evidence/runs/runtime-veckodrift-2/`: tre verkliga schemalagda väckningar på
+den befintliga motorn, en ren kontroll, en väckning inne i perioden som inte gjorde ett enda anrop, och en
+förfallen period som utfördes som incident med kundkvitto och en privat kvittens.
+
+Granskningsrunda 1 underkände kandidaterna på fem blockerare, alla besvarade: monitorns gräns var ingen
+väggklocka, ett periodkvitto från framtiden tystade arbetet, en återupptagen körning stängde samma period
+två gånger, ordet "läsande" var för brett och svitantalen saknade kvitto. Domen ordagrant i
+`evidence/runs/runtime-veckodrift-2/GRANSKNING-r1-DOM.md` i Runtime.
 
 Väckningen är inte perioden: en körning som missats för att Macen sov står kvar som förfallen och utförs av
 den första väckning som blir möjlig, ur kontorets eget beständiga periodkvitto och inte ur Temporals
-catch-up-fönster. Kontrollen och hämtningen är läsande, och Kundstarts repo, dess interna API och Digitalas
-`verktyg/kundstart.py` är oförändrade.
+catch-up-fönster. Kundstarts repo, dess interna API och Digitalas `verktyg/kundstart.py` är oförändrade.
+
+Driftkontrollen är renodlat läsande och ingenting skrivs på en kunds sajt. Signalhämtningen är inte
+renodlat läsande: vid en verklig ny signal gör Digitalas frysta konsument sin egen `POST
+/api/intern/arenden/{id}/kvittens` enligt KUNDSTART-KONTRAKT.md, vilket är den idempotenta bokföring som
+beställningens beständiga importläge vilar på. Den rör inte kundens sajt, material eller svar.
 
 Ingen riktig kund finns i dag, så ingen operation är bunden till någon sajt: det finns bara en mall i
 Runtimes `config/veckodrift-operation.example.json`. Provsajten och signalytan är loopback-provdata, aldrig

@@ -7944,7 +7944,18 @@ kvittots egna rader är överens och den namngivna filen ligger i kundens mapp. 
 sekund och en omkörning inom samma sekund skriver över det, så en ny filnamnsförekomst är inget bevis;
 det är bokfört, inte gömt.
 
-**Gränser som gäller.** Kontrollen och hämtningen är läsande: ingen åtgärd på sajten och ingen
+**Om "läsande".** Driftkontrollen är renodlat läsande, och ingenting skrivs på en kunds sajt. Men
+signalhämtningen är inte renodlat läsande, och en oreserverad formulering om det vore för bred. Vid en
+verklig ny signal sparar Digitalas konsument exportbyten och gör sedan sin egen `POST
+/api/intern/arenden/{id}/kvittens` — den väg KUNDSTART-KONTRAKT.md namnger, och just det som
+beställningens "beständigt importläge och lås per ärende" vilar på. Det är konsumentens egen idempotenta
+bokföring av vad den konsumerat: en identisk kvittens får upprepas efter ett tappat svar, och den ändrar
+aldrig en exportrevision. Den rör inte kundens sajt, material eller svar. Kandidaten inför den inte och
+ändrar inte en byte i konsumenten. Den vägen är dessutom inte utövad i vårt eget prov, där
+signallistorna är tomma; den är täckt av Digitalas egen svit `verktyg/test_kundstart_konsumtion.py`,
+som är oförändrad.
+
+**Gränser som gäller.** Ingen åtgärd på sajten och ingen
 självläkning. Ingen ny kostnad, molnvärd, Temporal Cloud eller bredare kontoåtkomst. Kundtext ur
 signalerna är underlag, aldrig en instruktion till utföraren. Kundstarts repo, dess interna API och
 Digitalas `verktyg/kundstart.py` är oförändrade: den frysta konsumenten startas som den är. Ingen
@@ -7952,12 +7963,27 @@ generell schemaläggare för godtyckliga kommandon — bara de två namngivna up
 för en sajt först när en riktig kunds sajt är lanserad med lanseringsmandat; i dag finns ingen sådan
 bindning.
 
-**Prov.** Hanterarens svit är 30 prov, varav tjugo nya, på Digitalas verkliga frysta
+**Granskningsrunda 1 underkände och rättades.** Tre av de fem blockerarna satt i den här filen.
+Monitorns gräns var ingen väggklocka: `urlopen(timeout=...)` begränsar en blockerande socketoperation,
+inte ett helt försök, så en server som droppar byte strax inom timeouten kunde läsa på obegränsat och
+hålla hanterarens exklusiva tillståndslås förbi workflowets egen gräns — och därmed blockera senare
+perioder. Monitorn har nu en egen påtvingad deadline och läser med `read1`, eftersom `read(n)` blockerar
+till alla n byte finns. Ett periodkvitto från framtiden tystade arbetet till det datumet, och år 9999 gav
+obehandlad `OverflowError`: ett kvitto senare än en liten klockavvikelse sätts nu i karantän som
+fördärvat och arbetet körs. En återupptagen körning stängde samma period två gånger: kvittot namnger nu
+den stängande körningen, och en körning som känner igen sitt eget kvitto skriver klart utan att flytta
+sekvensen igen. Domen ordagrant i Runtimes
+`evidence/runs/runtime-veckodrift-2/GRANSKNING-r1-DOM.md`.
+
+**Prov.** Hanterarens svit är 35 prov, varav tjugofem nya, på Digitalas verkliga frysta
 `drift_kontroll.py`-byte mot en loopback-provsajt: ren körning, saknad förväntad text, trasig sitemap,
-incident och återhämtning med oberoende privata kvitton, exitkod mot kvitto, omkörning inom samma
-sekund, kvitto utanför kundmappen, timeout/vägran/fel som skilda utfall, ändrade plan- eller verktygsbyte,
-och periodens förfallologik inklusive fördärvat periodtillstånd och avbruten körning. Runtimes egen
-kvalificering mot den verkliga motorn ligger i Runtimes `evidence/runs/runtime-veckodrift-1/`.
+incident och återhämtning med oberoende privata kvitton, exitkod mot kvitto, verktygets egen räkning mot
+kvittot, omkörning inom samma sekund, kvitto utanför kundmappen, timeout/vägran/fel som skilda utfall,
+ändrade plan- eller verktygsbyte, monitorns väggklocka mot en droppande server, och periodens
+förfallologik inklusive framtida och överflödande kvitto, en annan körnings kvitto, fördärvat tillstånd
+och en körning avbruten efter att den stängt sin egen period. Kontorets helsvit är 534 prov OK, mätt mot
+509 prov OK på oförändrad main `34bcedd` med samma maskin och tolk; kvitton i Runtimes
+`evidence/runs/runtime-veckodrift-2/`, där också kvalificeringen mot den verkliga motorn ligger.
 Provsajten och signalytan är loopback-provdata, aldrig en kundadress och aldrig Kundstarts produktion
 eller dess lokala provtjänst.
 

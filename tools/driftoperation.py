@@ -32,10 +32,19 @@ import urllib.request
 # its parts can never drift apart silently.
 INTAKE_BOUND = 120
 DRIFT_BOUND = 90
-MONITOR_TIMEOUT = 8
-MONITOR_BOUND = 2 * MONITOR_TIMEOUT + 1          # two attempts and one backoff
+MONITOR_TIMEOUT = 8                              # per blocking socket operation
+MONITOR_DEADLINE = 25                            # enforced wall clock for both attempts
+# A urlopen timeout bounds each blocking socket operation, not the whole attempt: a
+# server that trickles bytes slower than the timeout keeps read() going indefinitely.
+# The monitor therefore carries its own wall clock, and its ceiling allows for one
+# operation that was already blocked when the deadline passed.
+MONITOR_BOUND = MONITOR_DEADLINE + MONITOR_TIMEOUT
 TERMINATION_BOUND = 6                            # SIGTERM wait then SIGKILL wait
 BOUND_SECONDS = INTAKE_BOUND + DRIFT_BOUND + 2 * TERMINATION_BOUND + MONITOR_BOUND
+
+# A period record from the future would silence the work until that future arrives.
+# A little skew is ordinary; more than this is treated as malformed state.
+CLOCK_SKEW = 300
 
 # Weekly is the ordered period; the range keeps an hour's floor and a month's ceiling
 # so neither a busy loop nor an unbounded silence can be bound as an accepted period.
@@ -97,11 +106,24 @@ def monitor(config):
         headers['x-vercel-protection-bypass'] = secret(config['bypass_file'])
     opener = urllib.request.build_opener(NoRedirect())
     attempts = []
+    deadline = time.monotonic() + MONITOR_DEADLINE
     for number in range(2):
         transient = False
+        if time.monotonic() > deadline:
+            attempts.append({'error': 'monitor_bound_exceeded', 'healthy': False})
+            break
         try:
             with opener.open(urllib.request.Request(config['url'], headers=headers), timeout=MONITOR_TIMEOUT) as response:
-                raw = response.read(65537)
+                raw = b''
+                while len(raw) <= 65536:
+                    if time.monotonic() > deadline:
+                        raise TimeoutError('Health read exceeded the monitor bound')
+                    # read1, not read: read(n) blocks until it has all n bytes, so a
+                    # server trickling inside the socket timeout would never be cut.
+                    chunk = response.read1(min(8192, 65537 - len(raw)))
+                    if not chunk:
+                        break
+                    raw += chunk
                 if len(raw) > 65536:
                     raise ValueError('Oversized health response')
                 body = json.loads(raw)
@@ -376,12 +398,14 @@ def transition(home, channel, current):
     return {'receipts': receipts, 'state_error': state_error}
 
 
-def due(home, config):
+def due(home, config, run_id):
     """Is the period's work due? Read from durable state, never from the wakeup.
 
     A period missed because the host slept stays due, so the first wakeup after the
     host returns performs it. Malformed period state is preserved and treated as due:
-    silence about a week is worse than one extra reading run.
+    silence about a week is worse than one extra reading run. A record this very run
+    wrote means the run was interrupted after closing its period; it resumes as due
+    and must not close the same period a second time.
     """
     period = config['period_seconds']
     if type(period) is not int or not PERIOD_FLOOR <= period <= PERIOD_CEILING:
@@ -394,26 +418,43 @@ def due(home, config):
         return {**overdue, 'reason': 'no_period_recorded'}
     try:
         value = load_state(path)
-        if (not isinstance(value, dict) or set(value) != {'completed_at', 'sequence'}
-                or type(value['sequence']) is not int or value['sequence'] < 1):
+        if (not isinstance(value, dict) or set(value) != {'completed_at', 'sequence', 'run_id'}
+                or type(value['sequence']) is not int or value['sequence'] < 1
+                or not isinstance(value['run_id'], str)
+                or not re.fullmatch('[a-zA-Z0-9-]{1,100}', value['run_id'])):
             raise StateError('invalid_period_state')
         timestamp(value['completed_at'])
         last = datetime.fromisoformat(value['completed_at'])
-    except StateError:
+        if last > observed + timedelta(seconds=CLOCK_SKEW):
+            # A future stamp would report a skipped wakeup as success until that date,
+            # and a year like 9999 overflows the addition below. Neither hides a week.
+            raise StateError('invalid_period_state')
+        due_at = last + timedelta(seconds=period)
+    except (StateError, OverflowError, OSError, ValueError):
         path.rename(path.with_name(path.name + '.invalid-' + uuid.uuid4().hex))
         return {**overdue, 'reason': 'invalid_period_state'}
-    due_at = last + timedelta(seconds=period)
-    late = int((observed - due_at).total_seconds())
-    return {'due': late >= 0, 'reason': 'period_elapsed' if late >= 0 else 'not_due',
+    if value['run_id'] == run_id:
+        return {**overdue, 'reason': 'own_period_record', 'completed_at': value['completed_at'],
+                'sequence': value['sequence'], 'due_at': due_at.isoformat()}
+    late = observed - due_at
+    return {'due': late >= timedelta(0),
+            'reason': 'period_elapsed' if late >= timedelta(0) else 'not_due',
             'period_seconds': period, 'completed_at': value['completed_at'],
-            'due_at': due_at.isoformat(), 'overdue_seconds': max(0, late),
+            'due_at': due_at.isoformat(),
+            'overdue_seconds': max(0, int(late.total_seconds())),
             'sequence': value['sequence']}
 
 
-def record_period(home, period, completed_at):
-    """The next period is counted from this run, and only after a read-back."""
-    state = {'completed_at': completed_at, 'sequence': period['sequence'] + 1}
+def record_period(home, period, completed_at, run_id):
+    """Close the period once per run, counted from this run, after a read-back.
+
+    An interrupted run that already closed its own period re-reads that record instead
+    of closing the period again, so resuming can never advance the sequence twice.
+    """
     path = regular(home / 'period.json')
+    if period['reason'] == 'own_period_record':
+        return load_state(path)
+    state = {'completed_at': completed_at, 'sequence': period['sequence'] + 1, 'run_id': run_id}
     write(path, state)
     if load_state(path) != state:
         raise StateError('period_readback_failed')
@@ -444,11 +485,11 @@ def run(config, run_id):
             if prior.get('config_sha256') != config_sha256:
                 raise ValueError('Run identity already belongs to another configuration')
             return prior
-        # Dueness is read after the cache: a run interrupted after it recorded the
-        # period must resume its own work, not report the period it just closed.
-        interrupted = (output / 'binding.json').exists()
-        period = due(home, config) if 'period_seconds' in config else None
-        if period is not None and not period['due'] and not interrupted:
+        # Dueness is read after the cache, and it alone decides. A run interrupted
+        # after closing its own period is recognised by the record's run_id, so it
+        # resumes as due and re-reads rather than closing the period twice.
+        period = due(home, config, run_id) if 'period_seconds' in config else None
+        if period is not None and not period['due']:
             # Inside the current period this wakeup reads nothing and writes nothing,
             # so it needs no run record; the native schedule already counts the tick.
             observed = now()
@@ -511,7 +552,7 @@ def run(config, run_id):
             result['period'] = period
             if result['performed']:
                 try:
-                    result['period_recorded'] = record_period(home, period, result['started_at'])
+                    result['period_recorded'] = record_period(home, period, result['started_at'], run_id)
                 except StateError as error:
                     result['period_recorded'] = {'error_code': str(error)}
                     result['completed'] = False
