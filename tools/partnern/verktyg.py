@@ -228,8 +228,14 @@ def specifikationer(typ: str) -> list:
             'Sök i Nortropics underlag: Improvements-samtalen (original: Johnnys ord och ChatGPT-assistentens svar), '
             'ägarens ordagrant sparade ord och beställningar, kontorets beslutslogg och plan (main), andra repons '
             'dokument, förberedelsekampanjens härledda syntes och partnerns egna tidigare trådar och förståelse. '
-            'Ordsökning med prefix; formulera om med synonymer (svenska och engelska) och sök flera gånger när det '
-            'spelar roll. En träff är inte läst innehåll: öppna den med oppna innan du bygger på den.'),
+            'Ordsökning i två pass. Först hela ord och ordbörjan (ord med minst fyra tecken som prefix, "exakt fras" '
+            'inom citattecken). Sedan delord: ett sökord med minst fem tecken hittas också inuti längre ord (bevakning '
+            'hittar omvärldsbevakningen; högst tio ord per fråga); de träffarna kommer efter de andra, märks delordsträff '
+            'och får en tredjedel av platserna när de andra fyller antalet. Omvänt hittar ett sammansatt sökord inte en '
+            'post som bara har efterledet, och kortare ord, fraser och ord med bindestreck söks inte inuti ord: sök också '
+            'på efterledet eller en kortare stam, '
+            'formulera om med synonymer (svenska och engelska) och sök flera gånger när det spelar roll. En träff är '
+            'inte läst innehåll: öppna den med oppna innan du bygger på den.'),
          'inputSchema': {'type': 'object', 'properties': {
              'fraga': {'type': 'string', 'description': 'Sökord eller "exakt fras".'},
              'omfang': {'type': 'array', 'items': {'type': 'string', 'enum': [
@@ -427,6 +433,8 @@ class Verktyg:
         rader = []
         for i, t in enumerate(traffar, 1):
             status = (' · ' + t['status']) if t.get('status') else ''
+            if t.get('traff') == 'delord':
+                status += ' · delordsträff (sökordet inuti ett längre ord)'
             nr = (' ' + t['nr']) if t.get('nr') else ''
             rader.append('%d. [%s]%s %s · %s · %s · %s%s\n   %s' % (
                 i, t['kalla_id'], nr, t['kalla_klass'], (t['titel'] or '')[:90], t['talare'] or '', t['datum'] or '',

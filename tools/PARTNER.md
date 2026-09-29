@@ -211,6 +211,30 @@ beställningar som sessioner sparar blir sökbara inom tio minuter. Nya beslut o
 primärutcheckningens origin/main har uppdaterats; tjänsten hämtar inte själv från GitHub, men sessioner gör det vid
 start (`ingang.py`) och efter varje publicering. Repo-verktygen läser den senast hämtade origin/main.
 
+## Sökningen
+
+Verktyget `sok` och `/api/sok` söker i indexets tabell `sok` (titel och text) i två pass, utan modell. Första passet
+är FTS5 med hela ord: ett ord med minst fyra tecken söks som ordbörjan, ett ord med två eller tre tecken som helt ord
+(ett tecken används inte) och "en fras" inom citattecken som exakt fras. Först måste alla ord finnas, sedan räcker
+ett, och träffarna ordnas efter bm25 med titeln tre gånger tyngre. Andra passet (PARTNER-SOK-DELORD-20260930) söker
+varje ord med minst fem tecken också inuti längre ord, så att "bevakning" hittar "omvärldsbevakningen" och "vakten"
+hittar "startvakten". Det är en LIKE över samma tabell med samma omfång, och koden kontrollerar att ordet står direkt
+efter en bokstav eller siffra; `_` och `-` skiljer ord åt som i indexet. Poster som första passet redan gav och dolda
+källor i provläget räknas inte, och en raderad tråds text finns inte i tabellen. Delordsträffarna kommer efter de
+andra och märks "delordsträff" i verktygets utdata (`"traff": "delord"` i `/api/sok`, annars `"ord"`). Sinsemellan
+ordnas de efter hur många av frågans ord posten har, om träffen står i titeln och hur många gånger ordet står inuti
+ett ord. Fyller första passet antalet hålls ändå en tredjedel av platserna (minst en) för delordsträffar; annars får
+de platserna som blir över. Med antal 1 hålls ingen plats, så att den enda platsen går till en träff på hela ordet.
+Urvalet av partnerns egna bedömningar som står i sin helhet i varje tur använder samma två pass och samma fördelning
+mot det Johnny skriver.
+
+Gränser som finns kvar: omvänt hittar ett sammansatt sökord inte en post som bara har efterledet ("startvakten" hittar
+inte "vakten"), eftersom det skulle kräva ordsönderdelning. Ord under fem tecken, fraser och ord med bindestreck eller
+understreck söks inte inuti ord; indexet delar redan vid de tecknen, så delarna hittas av första passet. Rangordningen
+mellan träffar på hela ord är densamma som före delordspasset. LIKE viker bara versaler i A–Z, så ett sökord med å, ä
+eller ö hittas inte inuti ett ord där de bokstäverna står som versaler. Sökverktyget prövar högst tio ord per fråga
+inuti ord, i frågans ordning.
+
 ## Läsning i original
 
 När Johnny lämnar ett repo eller ett verktyg hämtar partnern hela filträdet först och förtecknar alla delar, läser allt

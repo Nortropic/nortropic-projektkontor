@@ -2288,5 +2288,132 @@ class StartvaktProv(Miljo):
         self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'levererad')
 
 
+class DelordProv(Miljo):
+    """PARTNER-SOK-DELORD-20260930: ett sökord med minst fem tecken hittas också inuti längre ord, efter träffarna på
+    hela ord och ordbörjan, i samma tabell och med samma omfång, dolda källor och raderade trådar."""
+
+    def setUp(self):
+        super().setUp()
+        # Kontorets fixtur är annars ingen git-katalog, och git hittar då repot runt .scratch och indexerar dess riktiga
+        # beslutslogg och plan; de nämner samma ord som proven. Ett eget tomt repo håller träfflistorna till fixturen.
+        git = lambda *a: subprocess.run(['git', '-C', str(self.k.kontor_primar), '-c', 'user.name=prov',  # noqa: E731
+                                         '-c', 'user.email=prov@example.invalid'] + list(a), check=True, capture_output=True)
+        git('init', '-q', '-b', 'main')
+        git('commit', '-q', '--allow-empty', '-m', 'tom')
+        git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        self.S.kallor.bygg()
+        self.assertEqual(self.S.lager.fraga("select kalla_id from sok where klass like 'kontor:%'"), [])
+
+    def poster(self, *stycken):
+        """Ett avsnitt per post i en privat lägesfil (id …/LAGE.md:1, :2, …); källindexet byggs om."""
+        mapp = self.k.kontor_primar / 'evidence' / 'nasta-uppdrag' / 'local' / 'prov-sok'
+        mapp.mkdir(parents=True, exist_ok=True)
+        (mapp / 'LAGE.md').write_text('\n\n'.join('# Avsnitt %d\n\n%s' % (i + 1, s) for i, s in enumerate(stycken)), 'utf-8')
+        self.S.kallor.bygg()
+        return ['privat:nasta-uppdrag/local/prov-sok/LAGE.md:%d' % (i + 1) for i in range(len(stycken))]
+
+    def traffar(self, fraga, omfang=None, antal=12):
+        return [(t['kalla_id'], t['traff']) for t in self.S.kallor.sok(fraga, omfang, antal)]
+
+    def test_ett_sokord_hittas_inuti_ett_langre_ord(self):  # K1
+        post, = self.poster('Vi talade om omvärldsbevakningen i går.')
+        t = self.S.kallor.sok('bevakning')
+        self.assertEqual([(x['kalla_id'], x['traff']) for x in t], [(post, 'delord')])
+        self.assertIn('«omvärldsbevakningen»', t[0]['utdrag'])
+        self.assertEqual(self.traffar('Bevakning'), [(post, 'delord')])  # versal i sökordet spelar ingen roll
+
+    def test_hela_ord_och_ordborjan_forst_i_dagens_ordning_sedan_delord_markta(self):  # K2
+        hel, borjan, delord = self.poster('Bevakning av marknaden sker varje vecka, bevakning är viktigt.',
+                                          'Bevakningsansvaret ligger hos kontoret.', 'Omvärldsbevakningen står still.')
+        fts = [r['kalla_id'] for r in self.S.lager.fraga(
+            "select kalla_id from sok where sok match ? order by bm25(sok, 0, 0, 3.0, 0, 0, 1.0)", ['"bevakning"*'])]
+        self.assertEqual(sorted(fts), sorted([hel, borjan]))
+        self.assertEqual(self.traffar('bevakning'), [(fts[0], 'ord'), (fts[1], 'ord'), (delord, 'delord')])
+        self.logga_in()
+        trad = self.skicka('RING sok {"fraga": "bevakning"}')['inspel']['trad']
+        s = self.vanta(trad, lambda v: self.turer(v, 'svarad'))
+        rader = [r for r in self.turer(s, 'svarad')[0]['svar'].split('\n') if 'prov-sok/LAGE.md' in r]
+        self.assertEqual(len(rader), 3, rader)
+        self.assertNotIn('delordsträff', rader[0] + rader[1])
+        self.assertIn('%s] ' % delord, rader[2])
+        self.assertIn('delordsträff (sökordet inuti ett längre ord)', rader[2])
+
+    def test_en_tredjedel_av_platserna_halls_for_delord_nar_hela_ord_fyller_taket(self):  # K3
+        poster = self.poster(*['Bevakning nummer %d.' % i for i in range(5)] + ['Omvärldsbevakningen, bara som delord.'])
+        hela, delord = set(poster[:5]), poster[5]
+        t = self.traffar('bevakning', antal=3)
+        self.assertEqual([x[1] for x in t], ['ord', 'ord', 'delord'])
+        self.assertTrue({x[0] for x in t[:2]} <= hela)
+        self.assertEqual(t[2][0], delord)
+        self.assertEqual(self.traffar('bevakning', antal=12)[-1], (delord, 'delord'))  # annars platserna som blir över
+        self.assertEqual(len(self.traffar('bevakning', antal=12)), 6)
+        self.assertEqual([x[1] for x in self.traffar('bevakning', antal=1)], ['ord'])  # den enda platsen: hela ordet
+        self.assertEqual([x[1] for x in self.traffar('bevakning', antal=2)], ['ord', 'delord'])  # minst en plats
+        t = self.traffar('bevakning', antal=6)
+        self.assertEqual([x[1] for x in t], ['ord'] * 5 + ['delord'])
+
+    def test_korta_ord_fraser_och_omfang_som_i_dag(self):  # K4
+        post, = self.poster('Startvakten och omvärldsbevakningen.')
+        self.assertEqual(self.traffar('vakt'), [])                     # fyra tecken: bara hela ord och ordbörjan
+        self.assertEqual(self.traffar('"bevakningen"'), [])             # en fras söks inte inuti ord
+        self.assertEqual(self.traffar('"omvärldsbevakningen"'), [(post, 'ord')])
+        self.assertEqual(self.traffar('vakten'), [(post, 'delord')])
+        self.assertEqual(self.traffar('vakten', ['improvements']), [])
+        self.assertEqual(self.traffar('vakten', ['kontoret']), [(post, 'delord')])
+        self.S.lager.lagg_till('trad', trad='t_x', titel='t_x')
+        f = self.S.lager.lagg_till('forstaelse', trad='t_x', tur='x', slag='slutsats', text='Kedjestartvakten väntar.',
+                                   auktoritet='modellbedomning', kallor=[], ersatter=[])
+        self.assertEqual(self.traffar('vakten', ['partner']), [('partner:' + f['id'], 'delord')])
+        self.assertEqual(self.traffar('100%_vakten'), [])                # % och _ i frågan: inget fel, inga falska träffar
+
+    def test_ord_med_bindestreck_provas_inte_inuti_ord(self):
+        post, = self.poster('Omstart-vakten väntar.')
+        self.assertEqual(self.traffar('start-vakten'), [])              # annars en delordsträff i "omstart-vakten"
+        self.assertEqual(self.traffar('vakten'), [(post, 'ord')])       # indexet delar vid bindestrecket
+
+    def test_dold_kalla_i_provlaget_doljs_ocksa_for_delord(self):  # K4, provläget
+        self.assertIn(('imp:CONV-002:m1', 'delord'), self.traffar('skåpet'))  # "kylskåpet" i provsamtal två
+        self.S.kallor.dolda = ('imp:CONV-002',)
+        self.assertEqual([t for t in self.traffar('skåpet') if t[0].startswith('imp:CONV-002')], [])
+        self.assertEqual([t for t in self.traffar('planen') if t[0].startswith('imp:CONV-002')], [])  # "Magnetplanen"
+
+    def test_raderad_trads_text_hittas_inte_heller_som_delord(self):  # K4, RADERA-TRAD-20260929
+        self.logga_in()
+        a = self.skicka('Här står kylvattenbevakningen i en tråd som ska bort.', lage='bara_spara')['inspel']
+        b = self.skicka('Och här står strömbevakningen i en tråd som blir kvar.', lage='bara_spara')['inspel']
+        traffar = {(t['kalla_id'], t['traff']) for t in self.json('GET', '/api/sok?q=bevakningen')[1]['traffar']}
+        self.assertEqual(traffar, {('partner:' + a['id'], 'delord'), ('partner:' + b['id'], 'delord')})
+        self.assertEqual(self.json('POST', '/api/trad/%s/radera' % a['trad'], {'bekraftat': True})[0], 200)
+        self.assertEqual([t['kalla_id'] for t in self.json('GET', '/api/sok?q=bevakningen')[1]['traffar']],
+                         ['partner:' + b['id']])
+        self.assertEqual([t['kalla_id'] for t in self.json('GET', '/api/sok?q=vattenbevakningen')[1]['traffar']], [])
+
+    def test_relevant_forstaelse_valjs_ocksa_pa_delord_efter_hela_ord(self):  # K5
+        from unittest import mock
+        from partnern import agent as ag
+        L = self.S.lager
+        for t in ('t_a', 't_b', 't_c'):
+            L.lagg_till('trad', trad=t, titel=t)
+        start = L.lagg_till('forstaelse', trad='t_a', tur='x', slag='slutsats', text='Startvakten startar mottagarens session.',
+                            auktoritet='modellbedomning', kallor=[], ersatter=[])
+        hel = L.lagg_till('forstaelse', trad='t_b', tur='x', slag='slutsats', text='Vakten står vid porten.',
+                          auktoritet='modellbedomning', kallor=[], ersatter=[])
+        L.lagg_till('forstaelse', trad='t_b', tur='x', slag='slutsats', text='Något helt annat om kvoten.',
+                    auktoritet='modellbedomning', kallor=[], ersatter=[])
+        inspel = L.lagg_till('inspel', trad='t_c', klient_id='klient-delord-01', text='Hur mår vakten?', lage='svara', bilagor=[])
+        korning = srv.Korning(self.S, 'tur', 't_c', [L.en('select * from inspel where id=?', (inspel['id'],))])
+        self.assertEqual(self.S.agent._relevanta_forstaelse(korning), {start['id'], hel['id']})
+        with mock.patch.object(ag, 'FORSTAELSE_RELEVANTA', 1):
+            self.assertEqual(self.S.agent._relevanta_forstaelse(korning), {hel['id']})  # hela ordet väljs före
+        fler = [L.lagg_till('forstaelse', trad='t_b', tur='x', slag='slutsats', text='Vakten nummer %d.' % i,
+                            auktoritet='modellbedomning', kallor=[], ersatter=[])['id'] for i in range(6)]
+        valda = self.S.agent._relevanta_forstaelse(korning)
+        self.assertEqual(len(valda), ag.FORSTAELSE_RELEVANTA)
+        self.assertIn(start['id'], valda)                                # en plats hålls när hela ord fyller taket
+        self.assertTrue(valda - {start['id']} <= set(fler) | {hel['id']})
+        block = self.S.agent.lagesblock(korning)                        # i sin helhet, före de övriga
+        self.assertLess(block.index('Startvakten startar mottagarens session.'), block.index('Övriga (bara första raden'))
+
+
 if __name__ == '__main__':
     unittest.main()

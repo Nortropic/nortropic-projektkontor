@@ -6782,6 +6782,9 @@ gäller.
 **Delvis ersatt av:** RADERA-TRAD-20260929, i fråga om journalen som bara läggs till: ägaren beslutade 2026-09-29 att en
 tråd ska kunna raderas för gott, och då skrivs journalen om utan trådens egna rader. Övrigt gäller.
 
+**Delvis ersatt av:** PARTNER-SOK-DELORD-20260930, i fråga om sökningen: efter ordsökningen med prefix hittar ett andra
+pass också ett sökord med minst fem tecken inuti längre ord. Övrigt gäller.
+
 
 ## FORBATTRINGSPARTNER-RESULTAT-20260928 — slutrapport för FORBATTRINGSPARTNER-20260928: förbättringspartnern är integrerad och driftsatt i kontoret, slutproven är gjorda på den införda tjänsten och rättningarna ur dem integreras med denna post; kvar för ägaren är bestående start vid inloggning och en ny fångst av Improvements efter 19 september
 
@@ -8395,3 +8398,93 @@ i Claude Codes eller Codex fil står kvar; ägaren ändrar det i programmet.
 
 **Avslut.** Steg 1a är klart när ändringen är på main, tjänsten kör den nya koden och mätningen finns i tjänstens
 datakatalog. Steg 1b, 2, 3 och 4 följer i denna ordning under samma beställning, med egen granskning för varje.
+
+
+## PARTNER-SOK-DELORD-20260930 — på Johnnys begäran hittar förbättringspartnerns sökning också ett ord inuti längre ord (delord), efter träffarna på hela ord och ordbörjan
+
+**Ursprung.** Johnny frågade förbättringspartnern i en tråd 2026-09-30 (svensk tid): "Om jag föreslår dig rätt så
+föreslår du en liten fix på dig själv? i sådant fall ge mig en prompt så huvudagenten kan fixa". Partnern skrev
+beställningen (felet, kraven K1–K7 med prov, gränser, ordning och klart-när), och Johnny lämnade den till sessionen
+nortropic-repos-60. Den står ordagrant i uppdragets privata mapp; bara meningen ovan är Johnnys egna ord, resten är
+partnerns sammanställning. Påståendena i den är stämda mot main ba1d616 innan något byggdes på dem.
+
+**Felet.** Indexets tabell `sok` delar texten i hela ord (FTS5, unicode61), och sökfrågan gör varje ord med minst fyra
+tecken till en ordbörjan. Ett ord hittades därför som eget ord eller i början av ett ord, aldrig inuti ett. Svenskan
+lägger det allmänna begreppet sist (startvakten, kedjedrivaren, omvärldsbevakning), så luckan var systematisk. Samma
+fråga väljer vilka av partnerns egna bedömningar som står i sin helhet i varje tur. Enligt beställningen gav partnerns
+körprov 2026-09-29 3 träffar för "drivaren" och 9 för "vakten". Mätt mot den levande tjänsten 2026-09-29 22:20 UTC gav
+de 8 och 14, eftersom underlaget vuxit sedan dess, och ingen av träffarna var en post där ordet bara står inuti ett
+längre ord.
+
+**Beslut.** Sökningen får ett andra pass efter dagens, i samma SQLite och utan modell:
+- Ett sökord med minst fem tecken utanför citattecken hittas också inuti längre ord: "bevakning" hittar
+  "omvärldsbevakningen", "vakten" hittar "startvakten". Passet är en LIKE över titel och text i samma tabell med
+  samma omfång, och koden kontrollerar att ordet står direkt efter en bokstav eller siffra. `_` och `-` skiljer ord åt,
+  som i indexet, så de fallen täcks redan av första passet. Ett sökord med bindestreck eller understreck prövas därför
+  inte inuti ord, och `%` och `_` blir aldrig jokrar.
+- Poster som första passet redan gav och dolda källor i provläget räknas inte. En raderad tråds text finns inte i
+  tabellen och hittas inte heller här.
+- Delordsträffarna kommer efter de andra och märks "delordsträff (sökordet inuti ett längre ord)" i verktygets utdata
+  och `"traff": "delord"` i `/api/sok` (övriga `"ord"`). Sinsemellan ordnas de efter hur många av frågans ord posten
+  har, om träffen står i titeln och hur många gånger ordet står inuti ett ord. Träffarna på hela ord behåller sin
+  inbördes ordning.
+- Fyller första passet antalet hålls ändå en tredjedel av platserna (minst en) för delordsträffar; annars får de
+  platserna som blir över. Med antal 1 hålls ingen plats. Det är sessionens val: annars skulle den enda platsen gå
+  till en delordsträff före en träff på hela ordet, tvärt emot att hela ord kommer först.
+- Urvalet av partnerns egna bedömningar per tur använder samma två pass och samma fördelning mot det Johnny skriver:
+  av sex platser hålls två för delord när träffarna på hela ord fyller dem.
+- Sökverktyget prövar högst tio ord per fråga inuti ord, så att en lång inklistrad fråga inte håller lagrets lås länge.
+- Verktygets beskrivning och `tools/PARTNER.md` (nytt avsnitt "Sökningen") säger hur sökningen fungerar och vilka
+  gränser som finns kvar.
+
+**Teknikval (sessionens, med skäl).** LIKE i samma tabell, inte ett andra FTS5-index med trigram. En LIKE över hela
+tabellen tar omkring två hundradels sekund på en ögonblickskopia av det levande indexet (5 271 rader, 14 343 596 tecken
+text). Omfång, dolda källor och radering ärvs då utan ny tabell, schemabyte eller ombyggnad, och inget andra index
+behöver hållas i takt med `sok` på de ställen där den skrivs eller töms. Trigram finns i båda tolkarna (SQLite 3.51.0 i
+tjänstens Python 3.9.6, 3.53.4 i Python 3.12.13) och hade gett bm25 och utdrag på köpet, men till priset av dubbelt
+underhåll och ett större index för en tabell som redan skannas på hundradelar. Utdragen med «» och ordningen bland
+delordsträffarna görs i koden.
+
+**Prov.** Åtta nya prov i `tools/test_partner.py` (DelordProv), ett eller flera per krav: ett ord inuti ett längre ord
+(K1); hela ord och ordbörjan först i samma ordning som indexets egen rangordning, delordsträffen sist och märkt i
+verktygets utdata (K2); antal 3 med fem träffar på hela ordet och en på delordet, och antal 1, 2, 6 och 12 (K3); korta
+ord, fraser, omfång, `%` och `_` (K4); ett ord med bindestreck (K4); dold källa i provläget och raderad tråd, båda med
+delord (K4); urvalet av egna bedömningar med och utan full lista (K5). Provklassen ger kontoret i provmiljön ett eget
+tomt git-repo; annars indexerar fixturen repots riktiga beslutslogg, som nämner samma ord. Partnerns svit är grön på
+Python 3.9.6 och 3.12.13, och kontorets hela svit är mätt i den kredentialfria profilen på exakt kandidat.
+Beteendeacceptansen har 32 frysta fall: 31 oförändrade från MODELLKARTA-20260929, och `lagesblock` är utökat till
+`lagesblock-delord` med samma utdata plus en nyckel för sökningen och urvalet.
+
+**Mätning (K6) på den verkliga korpusen.** Samma fasta frågor mot en ögonblickskopia av det levande indexet, före med
+mains kod och efter med kandidatens, i båda tolkarna:
+- "drivaren", antal 30: 8 träffar före, 30 efter.
+- "vakten", antal 30: 14 före och 30 efter. Efter är 16 av dem delordsträffar, alla poster där ordet bara står
+  inuti längre ord, och 12 av dem innehåller "startvakten"; före fanns inga sådana poster bland träffarna.
+- "bevakning" i omfånget kontoret, antal 30: 30 före och efter. Efter är 5 av dem poster där ordet bara står i en
+  sammansättning; före var de 0.
+- Träffarna på hela ord har samma inbördes ordning före och efter i alla 52 frågor i listan: 24 ord med antal 12 och
+  30, de tre frågorna ovan och "bevakning" med antal 12.
+- De tre frågorna ovan tar högst 0,034 s. Den längsta av de 52 tar högst 0,071 s, och avsiktligt tunga frågor med
+  tolv, trettio eller hundra ord tar 0,26–0,34 s.
+- Indexet ändras inte, så det har samma storlek och ingen ombyggnad.
+
+Utdragen är privata och sparas i uppdragets mapp. Efter omstarten upprepas mätningen mot den levande tjänsten.
+
+**Gränser som finns kvar.** Omvänt hittar ett sammansatt sökord inte en post som bara har efterledet: "startvakten"
+hittar inte "vakten", eftersom det skulle kräva ordsönderdelning. Ord under fem tecken, fraser och ord med bindestreck
+eller understreck söks inte inuti ord. Rangordningen mellan träffar på hela ord ändras inte. LIKE viker bara versaler
+i A–Z, så ett sökord med å, ä eller ö hittas inte inuti ett ord där de bokstäverna står som versaler. Delsträngar ger
+ibland träffar som inte hör hit ("radera" i "uppgradera"). De är märkta som delordsträffar och kommer efter träffarna
+på hela ord.
+
+**Ersätter:** ingen post helt. Posten ersätter delvis FORBATTRINGSPARTNER-20260928 i fråga om sökningen, och
+markeringen står sist i den posten.
+
+**Samordning.** nortropic-repos-d7 publicerade MODELLKARTA-20260929 (PR 139) medan denna ändring byggdes. Ändringen är
+omlagd på den main-versionen och rör andra kodfiler; i PARTNER.md, planen och beslutsloggen lägger den bara till.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main. Ändringen rör inga
+data.
+
+**Avslut.** Ändringen är klar när den är integrerad, tjänsten har startats om ur main enligt driftregeln och mätningen
+har upprepats mot den levande tjänsten. Nästa bygge i spåret kräver ett eget beslut.

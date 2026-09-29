@@ -319,8 +319,9 @@ class Agent:
         return ut
 
     def _relevanta_forstaelse(self, korning: Korning) -> set:
-        """Förståelseposter som liknar det Johnny tar upp i den här turen (ordsökning i lagrets eget index)."""
-        from .kallor import Kallindex
+        """Förståelseposter som liknar det Johnny tar upp i den här turen: ordsökning i lagrets eget index och sedan,
+        som i sökverktyget, delord (ett ord ur inspelet inuti ett längre ord i posten) enligt samma fördelning."""
+        from .kallor import Kallindex, delordsrang, delordstermer, fordela
         text = ' '.join((i.get('text') if isinstance(i, dict) else i['text']) or '' for i in korning.inspel)
         if korning.jobb:
             text += ' ' + str(korning.jobb.get('rubrik') or '') + ' ' + str(korning.jobb.get('uppdrag') or '')
@@ -331,10 +332,18 @@ class Agent:
             return set()
         try:
             rader = self.s.lager.fraga("select kalla_id from sok where sok match ? and klass='partner:forstaelse' "
-                                       "order by bm25(sok, 0, 0, 3.0, 0, 0, 1.0) limit ?", [q, FORSTAELSE_RELEVANTA])
+                                       "order by bm25(sok, 0, 0, 3.0, 0, 0, 1.0)", [q])
         except Exception:
-            return set()
-        return {r['kalla_id'][8:] for r in rader}
+            rader = []
+        helord = [r['kalla_id'][8:] for r in rader]
+        termer = delordstermer(' '.join(ord_))
+        alla_ord = list(dict.fromkeys(o.lower() for o in ord_))
+        delord = []
+        for f in self.s.lager.fraga('select id, nr, slag, text from forstaelse'):  # liten tabell; samma fält som i sok
+            rang = delordsrang(termer, alla_ord, f['slag'], f['text']) if f['id'] not in helord else None
+            if rang is not None:
+                delord.append((rang + (-f['nr'],), f['id']))  # lika rang: nyaste först
+        return set(fordela(helord, [i for _, i in sorted(delord)], FORSTAELSE_RELEVANTA))
 
     def historiktext(self, trad: str, utom: set) -> str:
         rader = self.s.historik(trad, max_tecken=40000, utom=utom)

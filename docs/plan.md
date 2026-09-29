@@ -205,6 +205,12 @@ köra Opus 5.5 och att Runtimes Codex 0.155.1 saknar gpt-6.1-sol. Därför erbju
 dit. Efter integrationen startas tjänsten om ur main enligt driftregeln. Återupptagning:
 `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
 
+Tillägg 2026-09-29 (22:39 UTC): på Johnnys begäran i en partnertråd, med en beställning som partnern skrev, hittar
+partnerns sökning nu också ett ord inuti längre ord ("vakten" i "startvakten"), efter träffarna på hela ord och
+ordbörjan (PARTNER-SOK-DELORD-20260930). Urvalet av partnerns egna bedömningar per tur gör detsamma. Efter
+integrationen startas tjänsten om ur main enligt driftregeln, och mätningen upprepas mot den levande tjänsten. Ändringen
+påverkar inte nästa handling i spåret.
+
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
 
