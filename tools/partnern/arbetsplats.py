@@ -10,8 +10,12 @@ modell anropas, ingenting skrivs i partnerns journal eller i något annat system
 - de lokala repona genom Git utan hämtning (senast hämtade origin/main);
 - Kundstarts lokala testserver genom ett enda GET av dess startsida, utan kakor eller nycklar.
 
-Kundstarts ärenden läses inte: listan kräver Digitalas interna nyckel, och den nyckeln används inte här. Varje del
-som inte går att läsa ger sin egen status i stället för att hela vyn fallerar, och okänt blir aldrig noll.
+Kundstarts ärenden visas som metadata (ägarens beslut ARBETSPLATS-KUNDSTART-ARENDEN-20260929): listan hämtas från den
+lokala testservern med Kundstarts interna nyckel, som läses ur Kundstarts `.env.local` vid varje hämtning, bara den raden,
+och aldrig sparas, loggas eller lämnar servern. Bara listans godkända fält behålls. En hämtning läser varje ärende i
+Kundstarts lagring och tar ungefär en minut, så den görs i bakgrunden, bara när Kundstart-delen visas och högst var
+15:e minut. Varje del som inte går att läsa ger sin egen status i stället för att hela vyn fallerar,
+och okänt blir aldrig noll.
 """
 from __future__ import annotations
 
@@ -23,6 +27,7 @@ import sys
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -36,9 +41,24 @@ if str(TOOLS) not in sys.path:
 import aquarium_fonster  # noqa: E402  (läser, kör och serverar ingenting vid import)
 
 KUNDSTART_ADRESS = 'http://127.0.0.1:3131'
-LOKAL = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # aldrig genom en proxy, inga kakor
+class _IngenOmdirigering(urllib.request.HTTPRedirectHandler):
+    """Följer aldrig en omdirigering: en begäran med nyckel får aldrig föras vidare till en annan adress."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise urllib.error.HTTPError(req.full_url, code, 'omdirigering följs inte', headers, fp)
+
+
+LOKAL = urllib.request.build_opener(urllib.request.ProxyHandler({}), _IngenOmdirigering())  # ingen proxy, ingen omdirigering, inga kakor
 KUNDSTART_PROV = Path(os.environ.get('KUNDSTART_PROV_DATA') or Path.home() / '.nortropic-kundstart-prov')
 MAX_KONTEXT = 6
+ARENDE_FALT = ('id', 'kund', 'testdialog', 'skapad', 'uppdaterad', 'revision', 'svar', 'material', 'senaste_inlamning',
+               'andrat_efter_inlamning')
+INLAMNING_FALT = ('tid', 'revision', 'svar', 'material')
+ARENDE_CACHE = 900   # en hämtning läser varje ärende i Blob (~1000 läsningar); högst var 15:e minut
+ARENDE_SIDOR = 20
+ARENDE_SIDTID = 30
+ARENDE_FEL_CACHE = 60  # ett misslyckat försök prövas om efter en minut
+ARENDE_MAX = 2000
 OPPNA_OVL = ('lamnad', 'mottagen', 'startad')
 REPON = (('kontoret', 'Kontoret'), ('digitala', 'Digitala'), ('kundstart', 'Kundstart'), ('runtime', 'Runtime'))
 BESLUT_ID = r'[A-ZÅÄÖ0-9][A-ZÅÄÖ0-9-]{1,119}'
@@ -78,6 +98,9 @@ class Arbetsplats:
         self._senaste_fel = None
         self._pagar = False
         self._bakgrund = False
+        self._arenden = None  # (monotonisk tid, svar) — bara ärendelistans godkända fält, aldrig nyckeln
+        self._arenden_las = threading.Lock()
+        self._arenden_pagar = False
 
     # ------------------------------------------------------------- Aquarium
     def _las_aquarium(self) -> dict:
@@ -311,6 +334,84 @@ class Arbetsplats:
                                               'Aquariums läsning (visas i Kontoret)']}
 
     # ------------------------------------------------------------- Kundstart
+    def _intern_nyckel(self):
+        """Kundstarts interna nyckel ur dess .env.local, läst nu och bara den raden; None om den saknas."""
+        rot = self.s.k.repon.get('kundstart')
+        if not rot:
+            return None
+        try:
+            for rad in (Path(rot) / '.env.local').read_text().splitlines():
+                m = re.match(r'^KUNDSTART_INTERN_NYCKEL="?([^"\s]+)"?\s*$', rad.strip())
+                if m:
+                    return m.group(1)
+        except OSError:
+            return None
+        return None
+
+    def _kundstart_get(self, vag: str, nyckel: str):
+        req = urllib.request.Request(self.kundstart_adress + vag, method='GET', headers={'Authorization': 'Bearer ' + nyckel})
+        try:
+            with LOKAL.open(req, timeout=ARENDE_SIDTID) as r:
+                return r.status, json.loads(r.read(4_000_000).decode('utf-8'))
+        except urllib.error.HTTPError as fel:
+            return fel.code, None
+        except (OSError, ValueError):
+            return None, None
+
+    def kundstart_arenden(self) -> dict:
+        """Ärendenas metadata (kundstart-arenden/1): senaste hämtning direkt, en ny i bakgrunden högst var 15:e minut."""
+        with self._arenden_las:
+            farsk = self._arenden and time.monotonic() - self._arenden[0] < (
+                ARENDE_CACHE if self._arenden[1].get('status') == 'ok' else ARENDE_FEL_CACHE)
+            if not farsk and not self._arenden_pagar:
+                self._arenden_pagar = True
+                threading.Thread(target=self._bakgrund_arenden, name='kundstart-arenden', daemon=True).start()
+            if self._arenden:
+                return dict(self._arenden[1], pagar=self._arenden_pagar)
+            return {'status': 'laser', 'lasttid': None, 'arenden': None, 'pagar': True,
+                    'skal': 'Läser ärendelistan ur Kundstart; det tar ungefär en minut.'}
+
+    def _bakgrund_arenden(self) -> None:
+        try:
+            ut = self._hamta_arenden()
+        except Exception:
+            ut = {'status': 'fel', 'lasttid': nu(), 'arenden': None, 'skal': 'Ärendelistan kunde inte läsas.'}
+        with self._arenden_las:
+            self._arenden = (time.monotonic(), ut)
+            self._arenden_pagar = False
+
+    def _hamta_arenden(self) -> dict:
+        lasttid = nu()
+        nyckel = self._intern_nyckel()
+        if not nyckel:
+            return {'status': 'ej_ansluten', 'lasttid': lasttid, 'arenden': None,
+                    'skal': 'Kundstarts interna nyckel finns inte i Kundstart-repots .env.local.'}
+        rader, cursor, olasbara = [], '', 0
+        for _ in range(ARENDE_SIDOR):
+            kod, d = self._kundstart_get('/api/intern/arenden' + ('?cursor=' + urllib.parse.quote(cursor, safe='') if cursor else ''), nyckel)
+            if kod is None:
+                return {'status': 'ej_ansluten', 'lasttid': lasttid, 'arenden': None, 'skal': 'Testservern svarar inte.'}
+            if kod == 404 or kod == 405:
+                return {'status': 'saknas', 'lasttid': lasttid, 'arenden': None,
+                        'skal': 'Testservern har inte ärendelistan än; starta om den ur Kundstarts main.'}
+            if kod != 200 or not isinstance(d, dict) or d.get('schema') != 'kundstart-arenden/1':
+                return {'status': 'fel', 'lasttid': lasttid, 'arenden': None, 'skal': 'Testservern svarade %s.' % kod}
+            for a in d.get('arenden') if isinstance(d.get('arenden'), list) else []:
+                rad = _arenderad(a)
+                if rad is None:
+                    olasbara += 1
+                elif len(rader) < ARENDE_MAX:
+                    rader.append(rad)
+            olasbara += d.get('olasbara') if type(d.get('olasbara')) is int and d.get('olasbara') >= 0 else 0
+            cursor = d.get('cursor')
+            if cursor is not None and (type(cursor) is not str or len(cursor) > 2000):
+                return {'status': 'fel', 'lasttid': lasttid, 'arenden': None, 'skal': 'Testservern gav en ogiltig sidmarkör.'}
+            cursor = cursor or ''
+            if not cursor:
+                return {'status': 'ok', 'lasttid': lasttid, 'arenden': rader, 'komplett': True, 'olasbara': olasbara}
+        return {'status': 'ok', 'lasttid': lasttid, 'arenden': rader, 'komplett': False, 'olasbara': olasbara,
+                'skal': 'Listan är avkortad efter %d sidor.' % ARENDE_SIDOR}
+
     def kundstart(self, kort: bool = False) -> dict:
         S = self.s
         lasttid = nu()
@@ -357,7 +458,30 @@ class Arbetsplats:
             ut['digitala'] = {'status': 'ok', 'verktyg': finns, 'main': (sha or '').strip() or None}
         else:
             ut['digitala'] = {'status': 'okand'}
+        ut['arenden'] = self.kundstart_arenden()
         return ut
+
+
+def _text(v, max_tecken=300):
+    return v[:max_tecken] if isinstance(v, str) else None
+
+
+def _antal(v):
+    return v if type(v) is int and v >= 0 else None
+
+
+def _arenderad(a) -> dict | None:
+    """En rad ur Kundstarts ärendelista med bara godkända fält och typer; None om raden inte är ett ärende."""
+    if not isinstance(a, dict) or not isinstance(a.get('id'), str) or not isinstance(a.get('kund'), str):
+        return None
+    inl = a.get('senaste_inlamning')
+    return {'id': a['id'][:120], 'kund': a['kund'][:200], 'testdialog': a.get('testdialog') is True,
+            'skapad': _text(a.get('skapad'), 40), 'uppdaterad': _text(a.get('uppdaterad'), 40), 'revision': _antal(a.get('revision')),
+            'svar': _antal(a.get('svar')), 'material': _antal(a.get('material')),
+            'senaste_inlamning': {'tid': _text(inl.get('tid'), 40), 'revision': _antal(inl.get('revision')),
+                                  'svar': _antal(inl.get('svar')), 'material': _antal(inl.get('material'))}
+            if isinstance(inl, dict) else None,
+            'andrat_efter_inlamning': a.get('andrat_efter_inlamning') is True}
 
 
 def _epok(tid: str) -> float:

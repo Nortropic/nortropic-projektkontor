@@ -341,3 +341,4 @@ body.presentation .kontor-scen { aspect-ratio: auto; max-height: none; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }
 details.fler summary { cursor: pointer; color: var(--dampad); font-size: 13px; margin: 6px 0; }
+.arende-prov { margin-left: 8px; }

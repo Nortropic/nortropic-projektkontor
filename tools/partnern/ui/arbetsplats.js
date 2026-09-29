@@ -512,10 +512,33 @@ async function uppdateraKsLuckor() {
   let d;
   try { d = await api('GET', '/api/arbetsplats/kundstart'); } catch { return; }
   const gammal = document.querySelector('[aria-labelledby="h-ks-luckor"]');
+  const arenden = document.querySelector('[aria-labelledby="h-ks-arenden"]');
   if (as.del !== 'kundstart' || !gammal) return;
   gammal.replaceWith(ksLuckor(d));
-  as.ksForsok = d.agarrader.status === 'laser' || d.agarrader.status === 'ingen_lasning' ? as.ksForsok + 1 : 0;
-  if (as.ksForsok && as.ksForsok <= 5) as.ksTimer = setTimeout(uppdateraKsLuckor, 3000);
+  if (arenden) arenden.replaceWith(ksArenden(d.arenden));  // bara läsningens block; fokus i övrigt lämnas orört
+  const vantar = d.agarrader.status === 'laser' || d.agarrader.status === 'ingen_lasning' || (d.arenden && d.arenden.pagar);
+  as.ksForsok = vantar ? as.ksForsok + 1 : 0;
+  if (as.ksForsok && as.ksForsok <= 30) as.ksTimer = setTimeout(uppdateraKsLuckor, 5000);
+}
+function ksArenden(a) {  // ärendenas metadata; ingen kundtext, inga svar, inget material och inga länkar
+  const huvud = el('p', { class: 'kl dampad', text: 'Metadata ur Kundstarts lagring, som testservern delar med produktionen, så även riktiga kunders ärenden syns här. Ärenden öppnas inte härifrån; ditt provärende öppnas ovan. En läsning går igenom varje ärende i lagringen och görs därför i bakgrunden, högst var 15:e minut.' });
+  if (!a || a.status !== 'ok') return sektion('h-ks-arenden', 'Ärenden', status((a && a.skal) || 'Ärendelistan kunde inte läsas.', a && a.status === 'laser' ? '' : 'varning'), huvud);
+  if (!a.arenden.length) return sektion('h-ks-arenden', 'Ärenden', el('p', { text: 'Inga ärenden i Kundstart (läst ' + nar(a.lasttid) + ').' }), huvud);
+  const rader = a.arenden.slice().sort((x, y) => String(y.uppdaterad).localeCompare(String(x.uppdaterad)));
+  const rad = (r) => {
+    const inl = r.senaste_inlamning;
+    const tal = (n) => (n === null || n === undefined ? '?' : n);
+    const lage = inl ? 'inlämnat ' + nar(inl.tid) + ' (' + tal(inl.svar) + ' svar, ' + tal(inl.material) + ' material)' + (r.andrat_efter_inlamning ? ', ändrat efter inlämning' : '') : 'inte inlämnat';
+    return el('li', null, el('span', { text: r.kund }), r.testdialog ? el('span', { class: 'chip provlage arende-prov', text: 'prov' }) : null,
+      el('div', { class: 'kl dampad' }, 'ändrat ', tidEl(r.uppdaterad), ' · skapat ' + nar(r.skapad) + ' · revision ' + tal(r.revision) + ' · ' + tal(r.svar) + ' svar · ' + tal(r.material) + ' material · ' + lage));
+  };
+  return sektion('h-ks-arenden', 'Ärenden · ' + rader.length + (a.komplett ? '' : '+'),
+    el('ul', { class: 'lista' }, rader.slice(0, 8).map(rad)),
+    rader.length > 8 ? el('details', { class: 'fler' }, el('summary', null, 'Visa ' + (rader.length - 8) + ' till'), el('ul', { class: 'lista' }, rader.slice(8).map(rad))) : null,
+    a.komplett ? null : status(a.skal || 'Listan är avkortad.', 'varning'),
+    a.pagar ? el('p', { class: 'kl dampad', text: 'En ny läsning pågår i bakgrunden.' }) : null,
+    a.olasbara ? status(a.olasbara + ' dokument i Kundstarts lagring gick inte att läsa som ärenden och saknas i listan.', 'varning') : null,
+    el('p', { class: 'kl dampad', text: 'Läst ' + nar(a.lasttid) + '.' }), huvud);
 }
 async function visaKundstart() {
   const rot = $('del-kundstart');
@@ -525,8 +548,8 @@ async function visaKundstart() {
   catch (f) { rot.replaceChildren(el('header', { class: 'del-huvud' }, el('h1', { id: 'kundstart-rubrik', tabindex: '-1' }, 'Kundstart'), status('Kundstart-läget kunde inte läsas: ' + f.message, 'fel'))); return; }
   as.kundstart = d;
   clearTimeout(as.ksTimer);
-  as.ksForsok = d.agarrader.status === 'laser' || d.agarrader.status === 'ingen_lasning' ? (as.ksForsok || 0) + 1 : 0;
-  if (as.ksForsok && as.ksForsok <= 5) as.ksTimer = setTimeout(uppdateraKsLuckor, 3000);
+  as.ksForsok = d.agarrader.status === 'laser' || d.agarrader.status === 'ingen_lasning' || (d.arenden && d.arenden.pagar) ? (as.ksForsok || 0) + 1 : 0;
+  if (as.ksForsok && as.ksForsok <= 30) as.ksTimer = setTimeout(uppdateraKsLuckor, 5000);
   const s = d.provserver, k = d.kod;
   const kodtext = k.status === 'ok' ? 'Kundstart-repot står på ' + k.head + (k.ar_main ? ' (samma som main)' : ' (main är ' + k.main + ')') + (k.byggd ? ', testservern byggdes från ' + k.byggd : '') + '.' : 'Kundstart-repots revision gick inte att läsa.';
   const kommando = (t) => el('span', { class: 'kommando' }, el('code', { text: t }), kopieraKnapp('Kopiera kommandot ' + t, () => t, (knapp) => knapp.previousElementSibling));
@@ -555,10 +578,9 @@ async function visaKundstart() {
         el('ul', { class: 'lista' },
           el('li', null, d.digitala.status === 'ok' ? (d.digitala.verktyg ? 'Digitala: verktyg/kundstart.py finns på main ' + d.digitala.main + ' och skapar och hämtar ärenden med den interna nyckeln.' : 'Digitala: verktyg/kundstart.py finns inte på main ' + d.digitala.main + '.') : 'Digitala: gick inte att läsa.'),
           el('li', null, d.overlamningar.length ? ['Överlämningar till Kundstart: ', ...d.overlamningar.map((o, n) => [n ? ', ' : '', lank(objektlank(o.id), o.rubrik || o.id), ' (' + (OVLTEXT[o.status] || o.status) + ')']).flat()] : 'Inga överlämningar från partnern till Kundstart.'),
-          el('li', null, 'Belagd import eller research för ett visst ärende syns inte här: arbetsplatsen läser inte Digitalas kundmappar eller Kundstarts ärenden. En länk här är inte bevis för att en import har körts.'))),
+          el('li', null, 'Belagd import eller research för ett visst ärende syns inte här: arbetsplatsen läser inte Digitalas kundmappar, och ärendelistan nedan visar bara metadata. En rad här är inte bevis för att en import har körts.'))),
       ksLuckor(d),
-      sektion('h-ks-arenden', 'Ärenden',
-        el('p', { text: 'Arbetsplatsen visar inte vilka ärenden som finns. Listan kräver Digitalas interna nyckel, och den används inte här. Ärenden skapas och hämtas genom Digitalas verktyg/kundstart.py.' }))));
+      ksArenden(d.arenden)));
 }
 
 // ------------------------------------------------------------------ start

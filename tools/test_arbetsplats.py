@@ -394,6 +394,127 @@ class IngaSidoeffekter(ArbetsplatsMiljo):
         self.assertEqual(self.S.lager.fraga('select count(*) as n from tur')[0]['n'], 0)
 
 
+class ArendeAtrapp(BaseHTTPRequestHandler):
+    """Kundstarts testserver: två sidor ärenden, med fält som aldrig får följa med."""
+    anrop = []
+    svar = 'ok'
+
+    def do_GET(self):
+        ArendeAtrapp.anrop.append((self.path, self.headers.get('Authorization'), self.headers.get('Cookie')))
+        if ArendeAtrapp.svar != 'ok':
+            kod = {'saknas': 404, 'nekad': 401}[ArendeAtrapp.svar]
+            self.send_response(kod); self.send_header('Content-Length', '2'); self.end_headers(); self.wfile.write(b'{}')
+            return
+        if self.path == '/api/intern/arenden':
+            d = {'schema': 'kundstart-arenden/1', 'cursor': '100', 'olasbara': 1, 'arenden': [
+                {'id': 'A1', 'kund': 'Vikskär TEST', 'testdialog': True, 'skapad': '2026-09-28T10:00:00Z', 'uppdaterad': '2026-09-29T10:00:00Z',
+                 'revision': 7, 'svar': 5, 'material': 1, 'andrat_efter_inlamning': False, 'fragor': ['HEMLIG KUNDTEXT'],
+                 'lank_hash': 'x' * 64, 'senaste_inlamning': {'tid': '2026-09-29T09:00:00Z', 'revision': 7, 'svar': 5, 'material': 1, 'text': 'HEMLIG'}}]}
+        else:
+            d = {'schema': 'kundstart-arenden/1', 'cursor': None, 'arenden': [
+                {'id': 'A2', 'kund': 'Riktig kund AB', 'testdialog': False, 'skapad': '2026-09-27T10:00:00Z', 'uppdaterad': '2026-09-27T11:00:00Z',
+                 'revision': 2, 'svar': 1, 'material': 0, 'andrat_efter_inlamning': False, 'senaste_inlamning': None, 'kontakt': 'kund@example.invalid'}]}
+        kropp = json.dumps(d).encode()
+        self.send_response(200); self.send_header('Content-Length', str(len(kropp))); self.end_headers(); self.wfile.write(kropp)
+
+    def log_message(self, *a):
+        pass
+
+
+class KundstartArenden(ArbetsplatsMiljo):
+    NYCKEL = 'k' * 43
+
+    def setUp(self):
+        super().setUp()
+        ks = self.rot / 'kundstart'
+        ks.mkdir()
+        (ks / '.env.local').write_text('BLOB_READ_WRITE_TOKEN="annat-hemligt"\nKUNDSTART_INTERN_NYCKEL="%s"\n' % self.NYCKEL)
+        self.S.k.repon['kundstart'] = ks
+        port = tp.fri_port()
+        self.atrapp = ThreadingHTTPServer(('127.0.0.1', port), ArendeAtrapp)
+        threading.Thread(target=self.atrapp.serve_forever, daemon=True).start()
+        self.addCleanup(self.atrapp.shutdown)
+        self.S.arbetsplats.kundstart_adress = 'http://127.0.0.1:%d' % port
+        ArendeAtrapp.anrop, ArendeAtrapp.svar = [], 'ok'
+        self.forsta_lasning()
+
+    def test_listan_bara_godkanda_falt_nyckeln_stannar_pa_servern_och_en_hamtning_per_kvart(self):
+        kod, huvud, kropp = self.anrop('GET', '/api/arbetsplats/kundstart')
+        self.assertEqual((kod, json.loads(kropp)['arenden']['status']), (200, 'laser'), 'listan hämtas i bakgrunden, vyn väntar inte')
+        slut = time.time() + 10
+        while time.time() < slut:
+            kod, huvud, kropp = self.anrop('GET', '/api/arbetsplats/kundstart')
+            if json.loads(kropp)['arenden']['status'] != 'laser' and not json.loads(kropp)['arenden']['pagar']:
+                break
+            time.sleep(0.1)
+        d = json.loads(kropp)['arenden']
+        self.assertEqual((d['status'], d['komplett'], d['olasbara'], [a['id'] for a in d['arenden']]), ('ok', True, 1, ['A1', 'A2']))
+        self.assertEqual(set(d['arenden'][0]), set(ap.ARENDE_FALT))
+        self.assertEqual(set(d['arenden'][0]['senaste_inlamning']), set(ap.INLAMNING_FALT))
+        text = kropp.decode('utf-8')
+        for hemligt in (self.NYCKEL, 'annat-hemligt', 'HEMLIG', 'lank_hash', 'kund@example'):
+            self.assertNotIn(hemligt, text)
+        self.assertEqual([a for a in ArendeAtrapp.anrop if a[0] != '/'],
+                         [('/api/intern/arenden', 'Bearer ' + self.NYCKEL, None), ('/api/intern/arenden?cursor=100', 'Bearer ' + self.NYCKEL, None)])
+        self.assertTrue(all(a == ('/', None, None) for a in ArendeAtrapp.anrop if a[0] == '/'), 'statusprovet går utan nyckel')
+        self.json('GET', '/api/arbetsplats/kundstart')
+        self.assertEqual(len([a for a in ArendeAtrapp.anrop if a[0] != '/']), 2, 'högst en hämtning av listan per kvart')
+        self.assertNotIn('arenden', self.json('GET', '/api/arbetsplats/hem')[1]['kundstart'], 'Hem hämtar aldrig listan')
+
+    def test_utan_nyckel_utan_lista_och_nekad_ger_egen_status_aldrig_tom_lista(self):
+        (self.S.k.repon['kundstart'] / '.env.local').write_text('BLOB_READ_WRITE_TOKEN="x"\n')
+        self.assertEqual(self.S.arbetsplats._hamta_arenden()['status'], 'ej_ansluten')
+        self.assertEqual(ArendeAtrapp.anrop, [])
+        (self.S.k.repon['kundstart'] / '.env.local').write_text('KUNDSTART_INTERN_NYCKEL=%s\n' % self.NYCKEL)
+        for svar, status in (('saknas', 'saknas'), ('nekad', 'fel')):
+            ArendeAtrapp.svar = svar
+            d = self.S.arbetsplats._hamta_arenden()
+            self.assertEqual((d['status'], d['arenden']), (status, None))
+        self.atrapp.shutdown()
+        self.atrapp.server_close()
+        ArendeAtrapp.svar = 'ok'
+        self.assertEqual(self.S.arbetsplats._hamta_arenden()['status'], 'ej_ansluten')
+
+    def test_en_omdirigering_foljs_aldrig_och_nyckeln_lamnar_aldrig_127001(self):
+        ArendeAtrapp.anrop = []
+        andra = []
+
+        class Mal(BaseHTTPRequestHandler):
+            def do_GET(self):
+                andra.append(self.headers.get('Authorization'))
+                self.send_response(200); self.send_header('Content-Length', '2'); self.end_headers(); self.wfile.write(b'{}')
+
+            def log_message(self, *a):
+                pass
+        mal = ThreadingHTTPServer(('127.0.0.1', tp.fri_port()), Mal)
+        threading.Thread(target=mal.serve_forever, daemon=True).start()
+        self.addCleanup(mal.shutdown)
+
+        class Omdirigerar(BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(307); self.send_header('Location', 'http://localhost:%d/stold' % mal.server_address[1])
+                self.send_header('Content-Length', '0'); self.end_headers()
+
+            def log_message(self, *a):
+                pass
+        om = ThreadingHTTPServer(('127.0.0.1', tp.fri_port()), Omdirigerar)
+        threading.Thread(target=om.serve_forever, daemon=True).start()
+        self.addCleanup(om.shutdown)
+        self.S.arbetsplats.kundstart_adress = 'http://127.0.0.1:%d' % om.server_address[1]
+        d = self.S.arbetsplats._hamta_arenden()
+        self.assertEqual((d['status'], d['arenden']), ('fel', None))
+        self.assertEqual(andra, [], 'omdirigeringens mål fick ingen begäran och ingen nyckel')
+
+    def test_fel_typer_och_storlek_rensas_bort(self):
+        rad = ap._arenderad({'id': 'A', 'kund': {'hemligt': 'x'}, 'svar': 3})
+        self.assertIsNone(rad)
+        rad = ap._arenderad({'id': 'A', 'kund': 'K', 'svar': {'x': 'HEMLIG'}, 'material': -1, 'revision': '7', 'testdialog': 'ja',
+                             'skapad': ['x'], 'senaste_inlamning': {'tid': 't', 'svar': 'HEMLIG', 'extra': 'HEMLIG'}})
+        self.assertEqual(rad, {'id': 'A', 'kund': 'K', 'testdialog': False, 'skapad': None, 'uppdaterad': None, 'revision': None,
+                               'svar': None, 'material': None, 'senaste_inlamning': {'tid': 't', 'revision': None, 'svar': None, 'material': None},
+                               'andrat_efter_inlamning': False})
+
+
 class NortropicApp(unittest.TestCase):
     """Nortropic.app: ett paket med fasta sökvägar som startar och öppnar arbetsplatsen, utan nyckel."""
 

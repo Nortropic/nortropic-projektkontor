@@ -64,8 +64,18 @@ provläget, om testservern på `127.0.0.1:3131` svarar (ett GET av startsidan, u
 revision och vad testservern byggdes från, Kundstarts beslut ur beslutsloggen, Digitalas `verktyg/kundstart.py` på main,
 överlämningar till Kundstart och planens öppna ägarrader om Kundstart. **Öppna ditt provärende** går till
 `127.0.0.1:3131/samtal`, som öppnar det ärende webbläsaren redan är inloggad i; kommandona för testservern kan kopieras.
-Arbetsplatsen skapar inga ärenden, hanterar inga länknycklar och läser inga kundärenden: listan kräver Digitalas interna
-nyckel, som inte används här. En länk här är inget bevis för att en import har körts.
+
+**Ärenden** (ägarens beslut ARBETSPLATS-KUNDSTART-ARENDEN-20260929): en lista över ärendenas metadata — kundens namn,
+provmärkning, skapad, senast ändrad, antal svar och material och senaste inlämning — hämtad från testserverns interna
+`GET /api/intern/arenden`. Testservern delar lagring med produktionen, så även riktiga kunders ärenden syns, men bara som
+metadata: ingen kundtext, inga svar, inget material och inga länkar. Partnerns tjänst läser Kundstarts interna nyckel ur
+Kundstart-repots `.env.local` vid varje hämtning, bara den raden, och skickar den bara till 127.0.0.1 utan att följa
+omdirigeringar; nyckeln sparas inte, loggas inte, lämnar aldrig servern
+och ges aldrig till partnerns modell. Bara listans godkända fält behålls. En hämtning läser varje ärende i lagringen (vid
+införandet omkring 930 provärenden, tio sidor, ungefär 70 sekunder), så den görs i bakgrunden, bara när Kundstart-delen
+visas och högst var 15:e minut; Hem hämtar den aldrig. Saknas nyckeln, svarar testservern inte eller har den inte listan än visas det i stället för en tom
+lista. Ärenden öppnas inte härifrån, och arbetsplatsen skapar inga ärenden. En rad här är inget bevis för att en import
+har körts.
 
 ## Vad arbetsplatsen inte gör
 
