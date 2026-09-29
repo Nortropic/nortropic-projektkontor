@@ -111,22 +111,23 @@ Parallellt uppdrag med eget skrivansvar. Blocken ovanför ersätter inte detta b
 Skrivansvar: sessionen nortropic-repos-f1 (Claude Code) för Kundstart-repot, Digitalas `verktyg/kundstart.py` med
 dess prov, Kundstart-delarna av `verktyg/overfor_steg.py` och `kunskap/kundintervju.md`, detta block och postens beslut.
 
-Läge när blocket skrevs (29 september 2026, 08:37 svensk tid / 06:37 UTC): uppdraget är levererat. Kundstarts main
-`6f078cf` (PR 2) är skyddad: ändringar går via PR, och kontrollen `kontroll` måste vara grön. Produktionen kör
-main sedan 2026-09-29 06:28 UTC. Kundvyn har fått en samtalstjänsts form enligt ägarens besked 2026-09-29. Adressen nås
-utan Vercel-inloggning, och ett ärende öppnas bara med sin personliga länk. Digitalas main `c2144be` (PR 17) tar emot kundens tillval, domänkontroll och
-citerade uppgifter, och briefen kräver svar på kundens tillval. Kundstarts skyddsbegränsning (403- och planhindret),
-som daterade avsnitt längre ned nämner, är passerad sedan repona blev publika 2026-09-28.
+Läge när blocket skrevs (29 september 2026, 10:46 svensk tid / 08:46 UTC): Kundstarts main `48dceca` (PR 3) är skyddad.
+Ändringar går via PR, och kontrollen `kontroll` måste vara grön. Produktionen kör main sedan 2026-09-29 08:36 UTC.
+Enligt ägarens beslut (KUNDSTART-TESTLAGE-20260929) används Kundstart nu bara för prov. Produktionen anropar ingen
+språkmodell och ställer standardlistans frågor. Claude körs bara i det lokala testläget på ägarens inloggning, som
+förbättringspartnern: `npm run prov -- start` i Kundstarts primärutcheckning på main, på 127.0.0.1:3131, med modell och
+ansträngning i skrivrutan. Testservern startas om efter varje sammanfogning. Kundvyn har en samtalstjänsts form.
+Adressen nås utan Vercel-inloggning, och ett ärende öppnas bara med sin personliga länk. Digitalas main `c2144be`
+(PR 17) tar emot kundens tillval, domänkontroll och citerade uppgifter. Kundstarts skyddsbegränsning
+(403- och planhindret), som daterade avsnitt längre ned nämner, är passerad sedan repona blev publika 2026-09-28.
 
-Nästa handling: ingen i detta spår; nästa bygge kräver ett eget beslut. Ägarens punkter står i posten: Claude på
-servern kräver en API-nyckel, en verklig kundinbjudan kräver ett kunduppdrag, bevarandetiden är obeslutad och
+Nästa handling: ingen i detta spår; nästa bygge kräver ett eget beslut. Ägarens punkter står i posterna. En verklig
+kundinbjudan kräver ett kunduppdrag och ett eget beslut om AI i kundens samtal. Bevarandetiden är obeslutad, och
 automatisk import kräver Runtime-mandat.
 
-Arbetsgrenar: Kundstarts `dialog/uppdrag-20260928` är sammanfogad i PR 1 och `vy/samtalsvy-20260929` i PR 2.
-Digitalas `kundstart/dialog-tillval-20260928` är publicerad, och dess innehåll är integrerat i PR 17. Kontorets gren
-publiceras med denna ändring. De lokala arbetsytorna tas bort efter publiceringen. Undantaget är ägarens lokala
-provserver (127.0.0.1:3131, kod `12f1684` i testläget claude-cli). Den står kvar tills ägaren är klar med sitt prov;
-koden finns i mains historik genom PR 1.
+Arbetsgrenar: Kundstarts `dialog/uppdrag-20260928`, `vy/samtalsvy-20260929` och `prov/lokalt-lage-20260929` är
+sammanfogade i PR 1, 2 och 3. Digitalas `kundstart/dialog-tillval-20260928` är integrerad i PR 17. Kontorets gren
+publiceras med denna ändring. De lokala arbetsytorna tas bort efter publiceringen.
 
 Återupptagning: `evidence/nasta-uppdrag/local/kundstart-dialog-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid.
@@ -974,7 +975,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27) och FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28) är elva rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28) och KUNDSTART-TESTLAGE-20260929 (2026-09-29) är tio rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
@@ -983,7 +984,6 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [beslut] Digitala: underhållsform för levererade sajter; du skrev "vi ska arbete fram åt slags underhåll tänker jag, ja", och tills den är beslutad är varje ändring en beställning (OMBYGGNAD-AGARSVAR-20260927) — sedan 2026-09-27
 - [beslut] Digitala: nästa fiktiva fall — välj och beställ det med dina ändringar från Norrglänta (DIGITALA-1-AGARBEDOMNING-20260927) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: kundredo kräver att förhandsvisningens inloggningsskydd lyfts för kundlänkar, en delbar länk till utomstående enligt MANDAT §2; beställ när ett kunduppdrag finns (KUNDSTART-20260927) — sedan 2026-09-27
-- [beslut] Digitala Kundstart: modell på servern är OpenAI-familjen på AI Gateways fria nivå; Claude på servern kräver köpta AI Gateway-krediter, en betalväg (KUNDSTART-20260927) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: bevarandetid och radering för kundmaterial i Blob-lagret är inte beslutade (KUNDSTART-20260927) — sedan 2026-09-27
 - [beslut] Digitala: schemalagd driftkontroll (drift_kontroll.py) genom Runtime kräver ett eget Runtime-mandat med release och övergång (AP-10:s schema är hårdkodat till bedömningen; inga generella schemalagda kommandon) — beställ eller avstå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [beslut] Digitala: externa aktiveringar bara vid verklig kund — Google Cloud-projekt med OAuth eller tjänstekonto för Search Console, Google Ads-utvecklartoken, Meta-token, företagsprofil genom behörig människa; inget av det ingår i uppdraget (HELHET-RESULTAT-20260927) — sedan 2026-09-27

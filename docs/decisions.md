@@ -6435,6 +6435,10 @@ kräver köpta AI Gateway-krediter; bevarandetid och radering för kundmaterial)
 
 **Ersätter:** ingen post. Kompletterar HELHET-20260927 och HELHET-TILLAGG-20260927 (intervjuvägen) utan att ändra dem.
 
+**Delvis ersatt av:** KUNDSTART-TESTLAGE-20260929, i fråga om modellen på servern (OpenAI-familjen på AI Gateways fria
+nivå) och ÄGARENS TUR-raden om Claude på servern: produktionen anropar ingen språkmodell, raden är besvarad och
+borttagen, och Claude körs bara i ett lokalt testläge på ägarens inloggning. Övrigt gäller.
+
 ## HELHET-RESULTAT-20260927 — slutrapport för HELHET-20260927 med tilläggen: etapp 2–6 genomförda; Digitala har en professionell kedja från beställning till privat leverans, prövad i ett märkt testfall; kvar för ägaren är externa aktiveringar och ett Runtime-mandat för schemalagd drift
 
 **Före och efter.** Före (registreringen HELHET-20260927): Digitala hade ett repo med laddning, mätning, kritik och
@@ -7106,6 +7110,10 @@ i en tidigare session) berörs inte av detta arbete och står kvar där.
 **Avslut.** Uppdraget är fullgjort när denna post är integrerad. Nästa bygge kräver ett eget beslut. Planen äger nästa
 handling.
 
+**Delvis ersatt av:** KUNDSTART-TESTLAGE-20260929, i fråga om AI-stödet: produktionen anropar varken AI Gateway eller
+någon annan språkmodell, beroende 1 (Claude på servern med egen API-nyckel) gäller inte längre, och ägarens provserver
+körs med `npm run prov` ur Kundstarts main. Övrigt gäller.
+
 
 ## FORBATTRINGSPARTNER-BESTALLNINGSKONTROLL-20260929 — partnern godtar ägarens beställningar som han skriver dem: korta hela satser, avgränsande "inte" och beställning och avgränsning i två meddelanden
 
@@ -7135,3 +7143,102 @@ två överlämningar. De två meningarna är provexempel, inte beställningar av
 inte att du genomför det här nu.", och nya fall prövar "genomför inte …", "kör det", "ja", en avgränsning och en
 beställning över två meddelanden. Det ger 46 partnerprov. Ändringen integreras genom den ordinarie skyddade vägen
 efter separat granskning, och tjänsten startas sedan om ur main enligt driftregeln. Planen äger nästa handling.
+
+
+## KUNDSTART-TESTLAGE-20260929 — ägaren tar bort kostnads-AI och API-nyckel ur Kundstart: produktionen ställer standardlistans frågor utan språkmodell, och Claude körs bara i ett lokalt testläge på ägarens inloggning, som förbättringspartnern
+
+**Status:** registrerat 2026-09-29 (08:46 UTC) av sessionen nortropic-repos-f1 (Claude Code) i Kundstart-dialogens
+spår (KUNDSTART-DIALOG-20260928). Ägarens ord står ordagrant i
+`evidence/nasta-uppdrag/local/kundstart-dialog-20260928/AGARBESLUT-TESTLAGE-20260929.md`. Villkoren som sessionen
+läste står i `villkor-claude-prenumeration-20260929.md` i samma katalog.
+
+**Ägarens besked.** Efter att kundvyn driftsatts skrev ägaren: "jag skulle vilja att vi tar bort allt med kostnads ai
+och api-nyckel och köra som förbättringspartnern funkar, det borde vi väl kunna ha samma för kundstart eller?"
+Sessionen läste då Anthropics villkor. Inloggning med en Claude-prenumeration är avsedd för vanlig egen användning, och
+Anthropic tillåter inte att förfrågningar går genom en Free-, Pro- eller Max-inloggning "on behalf of their users".
+Sessionen frågade därför hur kundernas samtal skulle gå. Ägaren valde inget av de tre alternativen utan svarade: "nu
+är det för testning bara därför kan vi göra som förbättringagenten, samma slags kopplingar och UI".
+
+**Beslutet.**
+- Kundstart används nu bara för prov.
+- Ingen kostnads-AI och ingen API-nyckel. Produktionen anropar varken AI Gateway eller någon annan språkmodell, och
+  frågorna följer standardlistan.
+- Claude körs bara i ett lokalt testläge på ägarens dator, med Claude Code på ägarens inloggning, som
+  förbättringspartnern. Ägaren väljer modell och ansträngning i skrivrutan.
+
+Testläget är bara för ägarens egna prov. Villkoren tillåter inte att ägarens inloggning svarar verkliga kunder, och
+testläget går inte att starta på Vercel. Om en verklig kund ska få AI i samtalet krävs ett eget beslut när ett
+kunduppdrag finns.
+
+**Byggt.** Kundstart PR 3 (main `48dceca`):
+- AI Gateway anropas bara om servern startas med `KUNDSTART_AI=gateway`. Det gäller också äldre ärenden som sparats
+  med gateway-läget, och ett okänt läge ger standardlistan. Kostnadsspärren står kvar oanvänd. Vercel-projektet saknar
+  `KUNDSTART_AI`, så produktionen körs utan modell.
+- Testläget kräver `KUNDSTART_AI=claude-cli` och en server utanför Vercel. Varje agenttur kör `claude -p` med modell och
+  ansträngning ur fasta listor: Opus 5.5 (standard), Fable 5.1, Sonnet 5, Opus 5 och Haiku 4.5, med ansträngning från
+  low (standard) till max. Ägaren väljer i en meny i skrivrutan eller med `/model` och `/effort`. Kommandona sparas
+  aldrig som svar.
+- Valet sparas i en privat fil (0600) med atomär skrivning, och en oläsbar fil skrivs aldrig över. Inställningsvägen
+  finns bara i testläget och svarar annars 404. Den kräver ärendets session och ett eget huvud.
+- `claude`-processen får inga nycklar (Anthropic, AI Gateway, Blob, Vercel och Kundstart), inga verktyg och inga
+  MCP-servrar.
+- `npm run prov -- start`, `oppna`, `status` och `stopp` sköter testservern som partnerns startkommando gör. Servern
+  lyssnar bara på 127.0.0.1:3131, byggs om när koden ändrats och har privata logg-, pid- och länkfiler.
+- `/om` och sidfoten anger det faktiska läget. I produktionen står det att inget AI-stöd används och att svaren inte
+  skickas till någon språkmodell.
+
+**Prov** på `3d089fb`:
+- lint, typkontroll, 42 kärnprov och bygge; de nya proven fångade tre medvetet felaktiga kodändringar
+- webbläsarsviten lokalt utan `KUNDSTART_AI`: 26 godkända och 6 avsiktligt överhoppade
+- testläget på mobil och dator: 4 godkända prov, varav två verkliga turer med Opus 5.5 på low
+  på ägarens inloggning (sidan väntade 18–19 s) och två prov av modellvalet
+- CI-kontrollen `kontroll` på PR 3
+
+Sista commiten `f14d036` ändrar bara startkommandot. Där gick kontrollerna och CI igenom, och startkommandot prövades
+mot en främmande process. Mot förhandsvisningen av `c42fae8` gav sviten 26 godkända och 6 avsiktligt överhoppade prov.
+Den visade texten om att inget AI-stöd används, och inställningsvägen svarade 404.
+
+Efter driftsättningen svarar sidorna, och `/om` säger att inget AI-stöd används. Inställningsvägen svarar 404.
+Hela sviten mot produktionen gav 26 godkända och 6 avsiktligt överhoppade prov. Tjänstens reskontra visade
+59 modellanrop för september både före driftsättningen och efter sviten, alltså inga nya anrop.
+
+**Granskning** (Runtimes läsarprofil, `claude-opus-5`, bara läsning). Runda 7 godkände `c42fae8` utan blockerande
+fynd, med sju restnoter. Sex av dem rättades i `3d089fb`:
+- kommandona fångas i själva sändningen, så ingen knapp sparar dem som svar
+- ett okänt läge ger standardlistan
+- AI Gateway-nyckeln ärvs inte av `claude`
+- varje skrivruta har egna radiogrupper
+- menyn håller sig inom fönstret
+- de verkliga turerna kördes om på `3d089fb`
+
+Den sjunde noten gällde turens lås mot `maxDuration`. Den gäller inte här: Next.js läser `maxDuration` bara vid
+bygget, och testläget körs aldrig på Vercel.
+
+Runda 8 godkände `3d089fb` utan blockerande fynd. En av dess noter gällde startkommandot: efter en omstart kunde
+pid-numret tillhöra en annan process, som stoppkommandot då skulle ha avslutat. Det rättades i `f14d036`, där pid-filen
+bär processens starttid och bara servern själv räknas. Runda 9 godkände `f14d036` utan blockerande fynd. Övriga
+restnoter gäller testläget och står i den privata arbetsloggen.
+
+**Drift.** Produktionen driftsattes ur main 2026-09-29 08:36 UTC (`dpl_3Ep5Ygfd7PAjcvX563m8R4nPu3bV`).
+Ägarens lokala provserver med den äldre koden `12f1684` är stoppad. Testläget startas nu ur Kundstarts
+primärutcheckning på main med `npm run prov -- start`, och ägarens provärende öppnas med `npm run prov -- oppna`. Som
+för partnern startas servern om efter varje sammanfogning. Efter bytet gick en verklig tur med Opus 5.5 igenom på den
+nya servern; sidan väntade 17 s på nästa fråga.
+
+**ÄGARENS TUR.** Raden om modell på servern (KUNDSTART-20260927) är besvarad: servern har ingen modell, och inga
+krediter eller nycklar behövs. Raden tas bort, och räknemeningen anger tio öppna rader. Kvar i Kundstarts spår:
+- en verklig kundinbjudan kräver ett kunduppdrag
+- bevarandetiden är obeslutad
+- automatisk import kräver Runtime-mandat
+
+Punkterna har egna rader eller står i KUNDSTART-DIALOG-20260928.
+
+**Plan:** Kundstart-dialogens block visar det nya läget. Daterade avsnitt längre ned som nämner AI Gateway och
+gpt-5-mini är historik och ändras inte.
+
+**Ersätter:** delar av två poster, som får raden "Delvis ersatt av" med pekare hit. Den ena är KUNDSTART-20260927:s
+val av modell på servern (OpenAI-familjen på AI Gateways fria nivå). Den andra är beroende 1 i KUNDSTART-DIALOG-20260928
+(Claude på servern med egen API-nyckel). Övrigt i båda posterna gäller.
+
+**Avslut.** Ägarens besked är genomfört när denna post är integrerad. Nästa bygge kräver ett eget beslut. Planen äger
+nästa handling.
