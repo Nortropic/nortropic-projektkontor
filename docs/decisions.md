@@ -9105,3 +9105,98 @@ kodövergångens status (`tools/partnern/konfig.py`, `tools/partnern/modellkarta
 
 **Avslut.** Klart när ändringen är integrerad och partnerns tjänst har startats om ur main enligt driftregeln. Johnnys två
 block står som rader i ÄGARENS TUR, och nästa handling i spåret är att läsa tillbaka efter vart och ett.
+
+**Delvis ersatt av:** FULL-AUTONOMI-AKTIV-20260930, i fråga om att Johnnys två block väntar (båda är körda, 12:56Z och
+13:09Z) och om att övergång 20 är den sista kodövergången han kör själv: D045 ändrade aktiveraren, och Johnny körde
+övergång 21 14:53Z. Övrigt gäller.
+
+## FULL-AUTONOMI-AKTIV-20260930 — Johnny körde provanvändarens installation, övergång 20 och övergång 21; provanvändaren mäter, aktiveraren går, och en läcka i partnerns prov är rättad
+
+**Status:** registrerat 2026-09-30 av sessionen nortropic-repos-07 (Claude Code). Johnnys terminalutskrifter är sparade
+ordagrant i `evidence/nasta-uppdrag/local/full-autonomi-20260930/OWNER-INSTALL-TERMINAL-A.txt`,
+`.../overgang-20/OWNER-ACTIVATION-TERMINAL-20.txt` och `.../overgang-21/OWNER-ACTIVATION-TERMINAL-21.txt`. Talen nedan räknas fram av `.../i-inforande/kvitton.py`, med
+utfallet i `KVITTON.json` bredvid. Läget med kvitton står i
+`evidence/nasta-uppdrag/local/full-autonomi-20260930/LAGE.md`.
+
+**Provanvändaren (D042), 12:56Z.** Johnny körde installationsblocket.
+- Mätskriptets och sudoers-regelns sha256 i hans utskrift är desamma som i den granskade D042-merge `cf78dbe`, och det
+  installerade skriptet har samma sha256. visudo godtog regeln.
+- Gränsproben som provanvändaren gav `kredentialfri: true`: App-nyckeln, Claude- och Codex-inloggningarna, GitHub, SSH,
+  nyckelringen och `~/.nortropic-hemligheter` nekades. Svepet fann bara två publika CA-buntar med nyckelnamn.
+- Läsbart utanför listan: `~/.claude.json` (0644) och katalogen `~/.codex/`. `auth.json` i den nekades. Johnny avgör om
+  de ska begränsas.
+- macOS ignorerade hemkatalogen för rollkontot och satte `/var/empty`; kontot fick gruppen staff och är inte admin. Det
+  fasta skriptet använder aldrig kontots hemkatalog: det arbetar i `/Users/_nortropicprov` och sätter HOME per mätning.
+
+**Övergång 20 (D042 och D043), 13:09Z.** Johnny körde blocket (`check && activate`). Sessionens egen återläsning
+13:11Z (`overgang-20/LASNING-EFTER-AKTIVERING.json`) med den aktiva releasens kod:
+- pekaren och tjänsten står på den stegade konfigurationen `3d72b010` (Runtime `a4fcdb3`, kontoret `df5ed5dc`), och
+  tjänstens tre processer lever;
+- releasens egna kontroller godtar den, och vakterna är lika den stegade konfigurationens, utan avvikelser;
+- AP10:s schema är bundet till den nya konfigurationen och inte pausat, nästa körning 2026-10-01 07:00Z;
+- samma modeller, utförare, ansträngning och bevakning som förut; AP-11 står på sekvens 144 med samma slutpost som när
+  det avslutades;
+- agentfilen är exakt den den nya koden skriver.
+
+**De första mätningarna som provanvändaren.** Agenten tog den första köade begäran 13:11:47Z och mätte de tre i tur och
+ordning till 13:25:12Z, utan nycklar, utan sammansatt väg och utan Johnny:
+- Digitala (`995bb5a`): 321 av 321 gröna.
+- Runtime (`a4fcdb3`): 830 av 831. Provet `test_usage_is_refused_without_the_test_user` förutsatte att det inte körs av
+  provanvändaren: som provanvändaren slutade den riktiga gränsproben med kod 0 i stället för den väntade vägran (kod 2).
+- Kontoret (`d100583`): 539 av 633. 94 prov föll, med sammanlagt 187 felposter: 93 prov gav två poster (felet och
+  städningens fel) och ett gav en. 177 poster slutar i `Too many open files` (Errno 24), 9 i `unable to open database
+  file` och 1 i `Broken pipe`; de två sista är följder av samma brist. Agenten kör under launchd, som ger en process 256
+  fildeskriptorer. Partnerns prov startar många servrar i samma process, och varje servers lager höll sin
+  SQLite-anslutning öppen, eftersom jobbarbetarens tråd höll servern vid liv. I en vanlig körning av main växte de
+  öppna fildeskriptorerna från 5 före första provet till 535 efter det sista, och 535 var också toppen.
+
+**Rättelsen här.** `tools/partnern/lager.py` får `Lager.stang()`, och `Miljo.starta_server` i proven registrerar
+stängningen av varje servers lager när provet städar. Tjänsten har ett lager per process och anropar inte stängningen.
+Mätt i en vanlig körning med rättelsen: högst 23 öppna fildeskriptorer efter något prov och 7 efter det sista. Med
+gränsen 256 gick hela sviten 633 av 633, och som provanvändaren likaså (samma kod i de tidigare kandidaterna `d450d85`
+och `ab72fa2`).
+
+**Runtimes rättelse av provet, och aktiveraren.**
+- D044 (Runtime PR 78, merge `a4393e6`) rättar provet: det kör inte gränsproben när provanvändaren kör sviten. Kandidaten
+  mättes som provanvändaren, 831 av 831. Det är den första Runtime-publiceringen genom en hel svit mätt som
+  provanvändaren, utan sammansatt väg.
+- Agentens första automatiska kodövergång (`a4fcdb3` → `a4393e6`) vägrade 14:08:36Z i övningen: `asyncio.run() cannot be
+  called from a running event loop`. Övningen startar en egen händelseloop, men agentens titt körs redan i en. Inget
+  stoppades, och den aktiva releasen är orörd.
+- D045 (Runtime PR 79, merge `cddaf49`) kör övningen i en egen tråd. Kandidaten mättes som provanvändaren, 832 av 832,
+  och övades genom samma söm på den riktiga värden före publiceringen.
+- D045 ändrar aktiveraren (`code_transition.py`), och en sådan version aktiverar agenten aldrig själv. Agenten
+  rapporterade `owner_needed` 14:32:36Z, och Runtimekortet visar det läget för Johnny som "kräver dig"
+  (`tools/partnern/ui/karta.js`). Övergång 21 (D044 och D045) stegades, kontrollerades, övades i en isolerad kopia och
+  granskades separat (`evidence/nasta-uppdrag/local/full-autonomi-20260930/overgang-21/`).
+
+**Övergång 21 (D044 och D045), 14:53Z.** Johnny körde blocket (`check && activate`). Sessionens egen återläsning
+14:54Z (`overgang-21/LASNING-EFTER-AKTIVERING.json`) med den aktiva releasens kod:
+- pekaren och tjänsten står på den stegade konfigurationen `4d1eb1d1` (Runtime `cddaf49`, kontoret `df5ed5dc`), och
+  tjänstens tre processer lever;
+- releasens egna kontroller godtar den, och vakterna är lika den stegade konfigurationens, utan avvikelser;
+- AP10:s schema är bundet till den nya konfigurationen och inte pausat, nästa körning 2026-10-01 07:00Z;
+- samma modeller, utförare, ansträngning och bevakning som förut; AP-11 står kvar på sekvens 144 med samma slutpost;
+- agentfilen är exakt den den nya koden skriver.
+
+Agentens första titt under den nya releasen, 15:01:46Z: valet `none`, kodövergången `current` och mätkön `idle`
+(`overgang-21/FORSTA-TITTEN.json`). En senare Runtime-version som inte rör ägarfilerna aktiverar agenten själv, om den är
+integrerad och granskad och dess övning går igenom.
+
+**Rättelse av ett tidigare besked.** FULL-AUTONOMI-AB-20260930 sa att övergång 20 var den sista kodövergången Johnny
+kör själv. Det var fel. En release som ändrar aktiveraren, dess övning, kedjebeviset, kontrollutfärdaren, mätkön eller
+tjänstens definition blir alltid hans egen övergång, som samma post säger under "Kvar som ägarsteg", och det kan hända
+igen. Den gamla posten är märkt.
+
+**ÄGARENS TUR.** Raderna om provanvändarens installation och om övergång 20 stängs. Övergång 21 kördes innan denna
+ändring integrerades och får ingen rad. Åtta rader är öppna.
+
+**Oförändrat.** Här ändras bara planen, beslutsloggen (den nya posten och markeringen sist i
+FULL-AUTONOMI-AB-20260930), `tools/partnern/lager.py` (en metod som tjänsten inte anropar) och `tools/test_partner.py`.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om partnerns tjänst ur main.
+
+**Avslut.** Klart när ändringen är integrerad och partnerns tjänst har startats om ur main enligt driftregeln. Då är
+beställningen FULL AUTONOMI UTAN ROOT levererad: de tre sviterna mäts gröna som provanvändaren utan sammansatt väg och
+utan Johnny, och aktiveraren tar integrerade och granskade Runtime-versioner själv. Vad som är kvar som Johnnys steg står
+under "Kvar som ägarsteg" i FULL-AUTONOMI-AB-20260930, som fortfarande gäller.

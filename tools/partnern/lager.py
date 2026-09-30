@@ -79,6 +79,13 @@ class Lager:
         self._db = self._oppna_index()
         self._ikapp()
 
+    def stang(self) -> None:
+        """Stänger indexets anslutning. Tjänsten har ett lager per process och behöver den inte; ett prov som startar
+        många servrar i samma process stänger varje lager efter sig, annars tar fildeskriptorerna slut (under launchd
+        får en process 256)."""
+        with self._las:
+            self._db.close()
+
     # ------------------------------------------------------------------ index
     def _oppna_index(self) -> sqlite3.Connection:
         ny = not self.index_fil.exists()
