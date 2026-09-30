@@ -8825,3 +8825,75 @@ D040, och båda bär raden om det.
 
 **Avslut.** Steg 2 är klart när övergång 19 är aktiv och aktiveraren går. Nästa steg under beställningen är steg 4:
 automatiska uppdateringar av Claude Code och Codex.
+
+## SMA-ANDRINGAR-FORSLAG-20260930 — förslag: en lättare väg för små kontorsändringar och färre publiceringar; väntar på att Johnny lägger det i backloggen och släpper det
+
+**Status:** föreslaget 2026-09-30 av sessionen nortropic-repos-07 (Claude Code) på ägarens beställning FULL AUTONOMI UTAN
+ROOT, del C (ordagrant i `evidence/nasta-uppdrag/local/full-autonomi-20260930/owner-words-full-autonomi-20260930.md`).
+**Inte infört.** Ingenting här används förrän Johnny har släppt beställningen ur förbättringspartnerns backlog eller
+sagt till en session att den gäller (se "Hur det införs").
+
+**Ägarens ord** (ordagrant): "C. Snabbare små ändringar. Föreslå en lättare väg för små kontorsändringar: en
+granskningsrunda räcker, och anteckningar som inte blockerar tas i nästa ändring. Föreslå också hur småändringar samlas i
+färre publiceringar. Skriv det som beslut innan det används. Jag föreslår det läggs i backloggen för förbättringspartnern
+så jag kan säga, se backlog och arbeta efter den"
+
+**Varför.** Av de tio kontorsändringar 29–30 september som gick exakt två granskningsrundor (PR 133–143, utom 136)
+hade sju en godkänd första runda. Granskningskvittot binder exakta byte, så varje rättelse efter en godkänd runda, även
+av en anteckning som inte blockerade, ger en ny kandidat och kräver en ny runda. En runda tog 3–10 minuter granskning,
+och varje ny kandidat kräver en ny kredentialfri helsvit (630 prov i dag) och ett nytt acceptansprov. Sedan 27 september har 46 kontorsändringar
+publicerats. En extra runda kan också komma av att main flyttar medan en ändring granskas, eftersom förseglingen vägrar
+en kandidat som byggts på en äldre main. Siffrorna och deras källor står i
+`evidence/nasta-uppdrag/local/full-autonomi-20260930/KOSTNAD.md`.
+
+**Förslaget.**
+1. En *liten ändring* är en kontorsändring där allt detta gäller:
+   - bara kontorets repo;
+   - den rör inte publiceringsvägen (försegling, acceptans, granskningsverktyget), krokarna och vakterna, behörigheter,
+     `AGENTS.md`, blocket ÄGARENS TUR eller reglerna för granskning;
+   - inget nytt beroende, ingen ny extern tjänst eller kostnad, ingen flytt av partnerns data;
+   - högst 150 ändrade rader utöver prov och poster, i högst sex filer.
+   Är något av detta osäkert är det ingen liten ändring.
+2. *En granskningsrunda.*
+   - Godkänd: ändringen publiceras på exakt de granskade bytena. Anteckningar som inte blockerar rättas inte i samma
+     ändring. De skrivs ordagrant i `docs/noter.md` med källa och filer, och tas i nästa ändring som rör samma filer
+     eller i nästa samling.
+   - Underkänd: bara de blockerande fynden rättas, och en andra runda prövar rättelsen. Underkänns den också går
+     ändringen över till den vanliga vägen eller tillbaka till backloggen. Den går aldrig vidare i fler små rundor.
+3. *Samlade publiceringar.*
+   - Små ändringar som väntar samlas på en samlingsgren (`kontor/samling-<datum>`) i en egen worktree. Varje ändring är
+     en egen commit och en egen rad i en gemensam post.
+   - Samlingen publiceras en gång per dag, när tre ändringar väntar, när Johnny vill ha något i drift nu, eller innan en
+     vanlig ändring rör samma filer.
+   - En samling får en kredentialfri helsvit, ett acceptansprov (högst 32 fall totalt), en granskning enligt punkt 2, en
+     försegling, en publicering och en omstart av tjänsten.
+   - Samlingen byggs på aktuell main precis före granskningen, så att main inte flyttar under den. Anteckningarna i
+     `docs/noter.md` tas först i nästa samling.
+4. *"Se backlog och arbeta efter den".* När Johnny säger det till en session:
+   - sparar sessionen hans ord ordagrant och svarar med backloggens vilande poster, var och en med sitt id;
+   - Johnny släpper de poster han vill i partnerns egen tråd, som i dag (`släpp OVL-…` med postens id);
+   - sessionen arbetar de släppta posterna i datumordning, var och en med sin egen granskning och skyddade integration.
+   Partnerns regel för släpp ändras inte: bara Johnnys egna ord med postens id i partnerns tråd släpper en post. En
+   vilande post som han inte släpper ligger kvar.
+5. *Oförändrat.* Separat granskning och skyddad integration gäller före varje publicering. Runtime, Digitala och
+   kundrepona följer sina egna regler. En ändring som inte är liten går den vanliga vägen.
+
+**Hur det införs.**
+- Johnny lägger beställningen i förbättringspartnerns backlog med texten nedan, i en ny tråd i Förbättringar. En session
+  kan inte själv lägga något i backloggen: partnern gör en vilande beställning bara av hans egna ord i en tråd.
+- Beställningen används först när han släpper den (`släpp OVL-…`) eller säger till en session "se backlog och arbeta
+  efter den".
+- Då registrerar sessionen ett beslut som hänvisar hit, lägger till `docs/noter.md` och använder vägen från och med
+  nästa lilla ändring.
+
+Text till backloggen, att klistra in:
+
+> beställ, vilande i backloggen: inför förslaget SMA-ANDRINGAR-FORSLAG-20260930 i docs/decisions.md som beslut, alltså en
+> granskningsrunda för små kontorsändringar, anteckningar som inte blockerar tas i nästa ändring, små ändringar samlas i
+> en publicering per dag, och "se backlog och arbeta efter den" betyder att sessionen visar de vilande posterna med id och
+> arbetar dem jag släpper i datumordning. Klart när beslutet står i docs/decisions.md och docs/noter.md finns.
+
+**Oförändrat nu.** Planen får en rad i ÄGARENS TUR. Ingen kod, ingen regel och ingen granskningsväg ändras av den här
+posten.
+
+**Ersätter:** ingen post.
