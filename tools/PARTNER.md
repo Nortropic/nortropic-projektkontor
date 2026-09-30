@@ -262,11 +262,14 @@ Urvalet av partnerns egna bedömningar som står i sin helhet i varje tur använ
 mot det Johnny skriver.
 
 Gränser som finns kvar: omvänt hittar ett sammansatt sökord inte en post som bara har efterledet ("startvakten" hittar
-inte "vakten"), eftersom det skulle kräva ordsönderdelning. Ord under fem tecken, fraser och ord med bindestreck eller
-understreck söks inte inuti ord; indexet delar redan vid de tecknen, så delarna hittas av första passet. Rangordningen
+inte "vakten"), eftersom det skulle kräva ordsönderdelning. Bindestreck i början och slutet tas bort före
+femteckensgränsen och rangordningen: "vakten-", "-vakten" och "vakten--" söks som "vakten", medan "vakt-" är för kort.
+Ord under fem tecken, fraser och ord med bindestreck inuti eller understreck söks inte inuti ord; indexet delar redan
+vid de tecknen, så delarna hittas av första passet. Rangordningen
 mellan träffar på hela ord är densamma som före delordspasset. LIKE viker bara versaler i A–Z, så ett sökord med å, ä
-eller ö hittas inte inuti ett ord där de bokstäverna står som versaler. Sökverktyget prövar högst tio ord per fråga
-inuti ord, i frågans ordning.
+eller ö hittas inte inuti ett ord där de bokstäverna står som versaler. Sökverktyget och urvalet av egna bedömningar
+prövar högst tio ord inuti ord, med samma `kallor.DELORD_TERMER`: i frågans ordning respektive inspelets ordning efter
+stopporden. Urvalets första pass är oförändrat.
 
 ## Läsning i original
 
@@ -396,6 +399,12 @@ paket i sin egen data (`overlamningar/`), inte i beställningsvägen: den vanlig
 där som Johnnys ord, och provtext i hans namn får aldrig hamna där.
 
 ## Prov
+
+`DelordProv` prövar ett sökord inuti ett längre ord; hela ord och ordbörjan först med delordsträffen sist och märkt;
+fördelningen vid antal 1, 2, 3, 6 och 12; korta ord, fraser, omfång, `%` och `_`; bindestreck inuti ett ord och i början
+eller slutet, även flera frågeords rangordning; dold källa i provläget; raderad tråd; urvalet av egna bedömningar med
+kantbindestreck och samma delordstak som sökverktyget, också när konstanten ändras i provet. Verktygsbeskrivningen
+prövas för både tur och jobb: understreck, bindestreck inuti ord och versala Å, Ä och Ö.
 
 `python3 -B -m unittest tools.test_partner` kör en riktig server i processen mot en fejkad `claude` som talar
 Claude Codes strömformat, startar den riktiga MCP-bryggan och kör den riktiga webbkroken: lager och återbyggnad,

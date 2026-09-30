@@ -8406,6 +8406,8 @@ datakatalog. Steg 1b, 2, 3 och 4 följer i denna ordning under samma beställnin
 
 ## PARTNER-SOK-DELORD-20260930 — på Johnnys begäran hittar förbättringspartnerns sökning också ett ord inuti längre ord (delord), efter träffarna på hela ord och ordbörjan
 
+**Delvis SUPERSEDED av PARTNER-SOK-KANTER-OCH-ORDTAK-20260930:** bindestreck i början/slutet och det gemensamma taket för urvalet; övrigt gäller fortsatt.
+
 **Ursprung.** Johnny frågade förbättringspartnern i en tråd 2026-09-30 (svensk tid): "Om jag föreslår dig rätt så
 föreslår du en liten fix på dig själv? i sådant fall ge mig en prompt så huvudagenten kan fixa". Partnern skrev
 beställningen (felet, kraven K1–K7 med prov, gränser, ordning och klart-när), och Johnny lämnade den till sessionen
@@ -9200,3 +9202,16 @@ FULL-AUTONOMI-AB-20260930), `tools/partnern/lager.py` (en metod som tjänsten in
 beställningen FULL AUTONOMI UTAN ROOT levererad: de tre sviterna mäts gröna som provanvändaren utan sammansatt väg och
 utan Johnny, och aktiveraren tar integrerade och granskade Runtime-versioner själv. Vad som är kvar som Johnnys steg står
 under "Kvar som ägarsteg" i FULL-AUTONOMI-AB-20260930, som fortfarande gäller.
+
+
+## PARTNER-SOK-KANTER-OCH-ORDTAK-20260930 — kantbindestreck och gemensamt delordstak
+
+Beställningskälla: OVL-20260930-a40482, K1–K5, i förbättringspartnerns privata paket. Genomförandet ingår i backlogplanens omgång A och sessionens senare genomförandemandat. Detta är sessionens ändringspost, inte ett ägarcitat eller ett registrerat släpp i partnern.
+
+Sökningen tar bort bindestreck i början och slutet innan femteckensgränsen och delordens rangordning prövas. `vakten-`, `-vakten` och `vakten--` behandlas därför som `vakten`, medan `vakt-` fortfarande är för kort. Bindestreck inuti ord, understreck, fraser och LIKE:s gräns för versala Å, Ä och Ö fungerar som förut. Verktygets beskrivning redovisar gränserna.
+
+Urvalet av egna bedömningar läser samma `kallor.DELORD_TERMER` som sökverktyget: högst tio delordsord i inspelets ordning efter stopporden. Första passets ordsökning, indexet och `kallor.fordela` ändras inte. PARTNER.md beskriver beteendet och DelordProv:s fall.
+
+Prov: nya fall fångar kantbindestreck, rangordning med flera ord, urvalets elfte ord, en ändrad gemensam konstant och verktygstexten för tur/jobb. Nya prov visade fel före kodrättningen; DelordProv är därefter grön med Python 3.9 och 3.12. Helsvit, separat granskning, skyddad publicering och driftåterläsning redovisas med sina faktiska kvitton i `evidence/nasta-uppdrag/local/backlog-plan-20260930/a40482/`. En kodkandidat eller denna post ensam är ingen verifiering av drift.
+
+Ersätter endast ovan angivna delar av PARTNER-SOK-DELORD-20260930. Ingen stamning, ny fördelning, ny behörighet, Runtime-ändring eller ändring i reserverade modellkartsfiler ingår.

@@ -134,18 +134,19 @@ MEDDELANDE = re.compile(r'^## Meddelande (\d+) — (.+?) \((användare|assistent
 
 # Delord (PARTNER-SOK-DELORD-20260930): indexet delar texten i hela ord, så första passet hittar ett sökord bara som
 # eget ord eller ordbörjan. Svenskan lägger det allmänna begreppet sist (omvärldsbevakning, startvakten), så ett andra
-# pass söker sökord med minst DELORD_MIN tecken inuti längre ord i samma tabell. Sökverktyget prövar högst
-# DELORD_TERMER sådana ord per fråga, så att en lång inklistrad fråga inte håller lagrets lås länge.
+# pass söker sökord med minst DELORD_MIN tecken inuti längre ord i samma tabell. Sökverktyget och urvalet av egna
+# bedömningar prövar högst DELORD_TERMER sådana ord per fråga/inspel, så att en lång text inte håller låset länge.
 DELORD_MIN = 5
 DELORD_TERMER = 10
 
 
 def delordstermer(fraga: str) -> list:
     """Sökorden som också prövas inuti längre ord: ord utanför citattecken med minst DELORD_MIN tecken, i gemener. Ett
-    ord med bindestreck eller understreck prövas inte: indexet delar redan där, så delarna hittas av första passet."""
+    bindestreck i kanterna tas bort före längdprövningen. Ord med bindestreck inuti eller understreck prövas inte:
+    indexet delar redan där, så delarna hittas av första passet."""
     ut = []
     for o in re.findall(r'[\w\-]+', re.sub(r'"[^"]*"', ' ', fraga), re.UNICODE):
-        o = o.lower()
+        o = o.strip('-').lower()
         if len(o) >= DELORD_MIN and o not in ut and re.fullmatch(r'[^\W_]+', o):
             ut.append(o)
     return ut
@@ -603,7 +604,8 @@ class Kallindex:
             m = '%' + t.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_') + '%'
             monster += [m, m]
         alla_ord = [f.lower() for f in re.findall(r'"([^"]+)"', fraga)] + list(dict.fromkeys(
-            o.lower() for o in re.findall(r'[\w\-]+', re.sub(r'"[^"]*"', ' ', fraga), re.UNICODE) if len(o) >= 2))
+            o.strip('-').lower() for o in re.findall(r'[\w\-]+', re.sub(r'"[^"]*"', ' ', fraga), re.UNICODE)
+            if len(o.strip('-')) >= 2))
         try:
             rader = self.lager.fraga(
                 "select kalla_id, klass, titel, talare, datum, text from sok where (" +
