@@ -8638,6 +8638,10 @@ tas bort genom att ta bort filen i Runtimes inkorg; Runtimes aktiverare gör då
 **Avslut.** Steg 2 är klart när Runtimes D040 och denna ändring är på main, tjänsten kör den nya koden, övergång 19 är
 aktiv och aktiveraren går. Nästa steg under beställningen är steg 3 (läsarna i Digitala och kontorets granskning).
 
+**Delvis ersatt av:** RUNTIME-OVERGANG-19-20260930, i fråga om läget för Runtimes D040 och vad som återstår före det
+första automatiska bytet: ägaren har beslutat hur sviten mäts, D040 och D041 är på Runtimes main, och kvar är ägarens
+engångsblock med övergång 19 och aktiveraren. Övrigt gäller.
+
 ## LASARNAS-VAL-20260930 — steg 3 av MODELLKARTA-20260929: kontorets granskning och Digitalas kritik och provare följer läsarnas val i Flödet
 
 **Status:** registrerat 2026-09-30 av sessionen nortropic-repos-d7 (Claude Code) på ägarens beställning
@@ -8728,6 +8732,20 @@ heller. Inget annat Digitala-prov kör kritik eller provare utan återhämtning.
 partnerns, men mekanismen är densamma, och partnerns text prövas i sviten och acceptansen. Digitalas kandidat är
 oförändrad. Rättelserna prövas i en andra runda.
 
+Den andra rundan (tillagd här i RUNTIME-OVERGANG-19-20260930) godkände båda kandidaterna utan blockerande fynd, med åtta
+anteckningar. Fyra tas i en senare kontorsändring:
+- `granska.py` nekar ett okänt Claude-namn bara när det anges med `--modell`. Ett handredigerat läsarval med ett
+  felstavat Claude-namn körs som Codex, så meningen ovan är vidare än koden.
+- Det skarpa granskningskvittot togs på den första kandidatens `granska.py`. Den andra kandidatens ändringar rör inte
+  den väg som prövades.
+- Sonden gör båda läsarnivåerna okända när bara en av de två profilfilerna saknas.
+- Regeln att läsarkortet inte är valbart utan något att erbjuda är bara enhetsprövad.
+De övriga fyra kräver ingen ändring:
+- Meningen om Digitalas övriga prov kunde granskaren inte pröva i underlaget.
+- Kvittots git-kolumner för D040 är sessionens egna uppgifter.
+- Den första rundans anteckningar 3 och 10 står som posten beskriver dem.
+- `granska.py` skriver om `schema.json` i katalogen, vilket verktygets text säger.
+
 **Ersätter:** ingen post.
 
 **Återgång.** Återställ integrationscommitarna med `git revert` (Digitalas först) och starta om tjänsten ur main. Ett
@@ -8736,3 +8754,74 @@ läsarval tas bort i Flödet, så väljer sessionen igen.
 **Avslut.** Steg 3 är klart när denna ändring och Digitalas del är på main och tjänsten kör den nya koden. Nästa steg
 under beställningen är steg 4 (automatiska uppdateringar av Claude Code och Codex). Det återanvänder aktiveringen från
 steg 2 och väntar alltså på D040.
+
+**Delvis ersatt av:** RUNTIME-OVERGANG-19-20260930, i fråga om att D040 väntade på ägarens beslut om mätningen: beslutet
+är fattat, och D040 och D041 är på Runtimes main. Steg 4 väntar nu på att ägaren aktiverar övergång 19. Övrigt gäller.
+
+## RUNTIME-OVERGANG-19-20260930 — steg 2 av MODELLKARTA-20260929, Runtimes del: D040 och D041 är på Runtimes main, och övergång 19 med aktiveraren väntar på ägarens engångsblock
+
+**Status:** registrerat 2026-09-30 av sessionen nortropic-repos-d7 (Claude Code) på ägarens beställning
+MODELLKARTA-20260929 och hans två svar 2026-09-30. Båda står ordagrant i
+`evidence/nasta-uppdrag/local/modellkarta-20260929/`: `owner-words-runtime-matning-20260930.md` och
+`owner-words-fixa-bada-20260930.md`. Hans nyaste beställning, FULL AUTONOMI UTAN ROOT (ordagrant i
+`evidence/nasta-uppdrag/local/full-autonomi-20260930/owner-words-full-autonomi-20260930.md`), säger att detta görs klart
+först.
+
+**Ägarens ord** (ordagrant).
+
+- Sessionen frågade hur Runtimes svit ska mätas utan nycklar. Den första av tre vägar var ett smalt undantag: de tre
+  prov som inte kan köras i en sandlåda körs en gång direkt på datorn och resten i sandlådan. Hans svar: "1".
+- Om vaktdriften nedan: "fixa båda".
+- Ur den nyaste beställningen: "gör först klart det som pågår (D041, övergång 19 med startövning, och underlaget för
+  mina steg: check, activate och agent install). Ingenting här får störa det."
+
+**Mätningen av D040.** Runtimes svit mättes i den kredentialfria profilen: 733 prov. Exakt de tre prov som startar Codex
+egen sandlåda föll, eftersom en sandlåda inte går att starta inuti en annan. De tre kördes en gång direkt på datorn på
+exakt kandidat och gick igenom. D040 publicerades sedan genom en separat granskad engångsadapter i utfärdarens
+förseglade begäran, som i Runtimes PR 73: Runtime PR 74, merge `bcbe63f`. Ett fjärde prov föll först bara på
+språkinställningen (`LC_ALL=C`) och går igenom med UTF-8. Sessionens tidigare anmärkning om det provet är rättad i
+`ANMARKNING-runtime-matning-20260930.md` i samma mapp.
+
+**Vaktdriften.** 05:27Z valde Johnny en annan ansträngning för Codex under Dina sessioner i Flödet. Flödet skrev då
+`~/.codex/config.toml`, som den aktiva releasen binder i sin helhet. Releasen vägrade därefter nya modellanrop, och
+övergång 19 kunde inte stegas. Johnny satte själv tillbaka valet 05:57Z; filen var åter den bundna, och bevakningen
+kl. 09:00 kunde gå. Samma sak hade hänt vid varje byte av Codex-sessionernas modell eller ansträngning.
+
+**D041** (Runtimes beslut, med egen granskning och skyddad integration: Runtime PR 75, merge `faf3cfb`). Vakten för
+`~/.codex/config.toml` bortser från de två raderna `model = "…"` och `model_reasoning_effort = "…"` överst i filen,
+eftersom varje Runtime-körning med en Codex-modell sätter båda själv. Allt annat i filen är bundet som förut. En fil
+som läsningen inte säkert kan tolka binds hel, och en release som stegats före D041 kontrolleras fortfarande mot hela
+filen. D041 mättes enligt samma val (743 prov, samma tre prov direkt på datorn, gröna). En gemensam separat granskning av
+kod, adapter och bevis godkände den utan blockerande fynd.
+
+**Övergång 19.** Det privata underlaget står i `evidence/nasta-uppdrag/local/modellkarta-20260929/overgang-19/`.
+
+- Skriptet är härlett ur den övergång ägaren aktiverade 28 september, med samma stegning, backup, stopp, start och
+  väg tillbaka.
+- Det byter releasen från Runtime `af78312` till `faf3cfb`: 16 filer, D040:s fjorton och D041:s två.
+- Kontoret, modellerna, kontexten och vakterna följer med oförändrade. Den enda vakt som byter form är Codex-filen, och
+  bytet godtas bara när båda formerna räknas på samma, oförändrade fil.
+- Stegad 06:26Z; `check` grön 06:27Z.
+- Ett gränsprov av skriptets egna funktioner gick igenom, 60 av 60.
+- En isolerad startövning på en kopia körde den nya releasens daemon två gånger. Alla elva vilande utvecklingsflöden
+  svarade utan fel och utan nya händelser, och aktiveraren gav rätt läge utan att byta något.
+- Den separata granskningen av skriptet, manifestet, stegningen, gränsprovet, startövningen och ägarens text:
+  godkänd utan blockerande fynd (claude-opus-5, Runtimes läsarprofil), med tio anteckningar som står i
+  `overgang-19/review.json`.
+
+**Ägarens engångssteg.** Ett block i hans egen Terminal, `overgang-19/OPERATORSSTEG-19.md`: `check`, sedan `activate`
+och sedan `model_choice.py agent install`, som startar aktiveraren. Varje steg körs bara om det förra lyckades. Innan
+dess ska Codex-sessionernas modell och ansträngning inte bytas. Blocket körs inte 08:40–09:10 svensk tid, eftersom
+bevakningen går 09:00. Sessioner får inte köra `launchctl`.
+
+**Oförändrat.** Den aktiva releasen är Runtime `af78312` tills ägaren aktiverar. Här ändras bara planen, beslutsloggen och
+`tools/ARBETSPLATS.md`. Inga modellanrop gjordes utöver granskningarna.
+
+**Ersätter:** ingen post. RUNTIME-VAL-I-FLODET-20260930 och LASARNAS-VAL-20260930 är delvis ersatta i fråga om läget för
+D040, och båda bär raden om det.
+
+**Återgång.** Återställ integrationscommiten med `git revert`. D040 och D041 återställs i Runtime, och en aktiverad
+övergång 19 har sin egen väg tillbaka.
+
+**Avslut.** Steg 2 är klart när övergång 19 är aktiv och aktiveraren går. Nästa steg under beställningen är steg 4:
+automatiska uppdateringar av Claude Code och Codex.

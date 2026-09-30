@@ -196,8 +196,10 @@ mätningen (`python3 -B tools/partner.py matmodeller`) erbjuds. Runtimes och bev
 1b. partnern på Codex: en Codex-drivare bredvid Claude Code-drivaren (levererat, se tillägget 2026-09-30 00:00 UTC);
 2. Runtime: ansträngning och utförare som val i releasen, bevakningen med Claude eller Codex, arbetsplatsens
    automatiska aktivering när Runtime är ledig och startvakten som följer Runtimes val; ägaren aktiverar den releasen
-   en gång;
-3. Digitalas kritik och provare och kontorets granskning hämtar läsarnas val;
+   en gång (kontorets del levererad; Runtimes del på Runtimes main, och ägarens block väntar, se tillägget
+   2026-09-30 06:46 UTC);
+3. Digitalas kritik och provare och kontorets granskning hämtar läsarnas val (levererat, se tillägget 2026-09-30
+   03:26 UTC);
 4. automatiska uppdateringar av Claude Code och Codex, ägarens beställning samma kväll (ordagrant i samma mapp), som
    återanvänder steg 2:s aktivering.
 Startvakten är avstängd tills ägaren säger annat. Mätningen visade att Runtimes fastlåsta Claude Code 2.1.257 inte kan
@@ -224,17 +226,29 @@ D040). Flödet väljer Runtime och bevakningen, bara bland det som fungerade i m
 skriver valet som ett önskemål i Runtimes inkorg. Runtime aktiverar det själv när Runtime är ledigt. Startvakten följer
 Runtimes ansträngning. Innan det första automatiska bytet kan ske ska Runtimes D040 vara på Runtimes main och två
 engångssteg göras av ägaren i hans egen Terminal: Runtimes övergång 19 och aktiveraren (`model_choice.py agent install`).
-D040 är granskad men inte integrerad. Runtimes svit kan inte bli helt grön i den kredentialfria profilen på den här
-datorn, eftersom tre prov startar egna sandlådor. Hur det löses är ägarens beslut. Därefter följer steg 3 (läsarna) och
-steg 4 (automatiska uppdateringar). Återupptagning: `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
+D040 var då granskad men inte integrerad, eftersom Runtimes svit inte kan bli helt grön i den kredentialfria profilen
+på den här datorn (tre prov startar egna sandlådor). Ägarens beslut om det och integrationen står i tillägget 2026-09-30
+(06:46 UTC). Återupptagning: `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
 
-Tillägg 2026-09-30 (03:26 UTC): steg 3 av MODELLKARTA-20260929 byggs medan Runtimes D040 väntar på ägarens beslut om
-mätningen (LASARNAS-VAL-20260930 här och en egen ändring i Digitala). Kontorets granskning (`tools/granska.py`) och
+Tillägg 2026-09-30 (03:26 UTC): steg 3 av MODELLKARTA-20260929 byggdes medan Runtimes D040 väntade på ägarens beslut
+om mätningen (LASARNAS-VAL-20260930 här och en egen ändring i Digitala); det är levererat. Kontorets granskning
+(`tools/granska.py`) och
 Digitalas kritik och provare (`verktyg/kor_profil.py`) följer läsarnas val i Flödet, och finns ett val nekas en annan
 modell. Digitala hämtar valet med kontorets `python3 -B tools/partner.py lasare`, så kontorets ändring publiceras först. Läsarnas ansträngning följer Runtimes läsarprofiler; att välja den kräver en ändring i Runtime efter D040.
 Samma ändring rättar anteckningarna från steg 1b:s och steg 2:s granskningar, bland dem en reservrad för partnerns krok
-på Claude. Nästa handling i spåret: granska och publicera steg 3, sedan ägarens beslut om Runtimes mätning (D040),
-sedan steg 4. Återupptagning: `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
+på Claude. Nästa handling i spåret står i tillägget 2026-09-30 (06:46 UTC). Återupptagning:
+`evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
+
+Tillägg 2026-09-30 (06:46 UTC): steg 3 av MODELLKARTA-20260929 är levererat (kontoret PR 143, Digitala PR 19). Runtimes del
+av steg 2 är på Runtimes main (RUNTIME-OVERGANG-19-20260930): D040 (PR 74), mätt enligt ägarens beslut om ett smalt
+undantag för de tre prov som inte kan köras i en sandlåda, och D041 (PR 75). Med D041 aktiv stoppar Johnnys val av
+modell och ansträngning för Codex-sessionerna i Flödet inte längre Runtime; ett sådant val gjorde det 05:27Z, tills han
+satte tillbaka det 05:57Z. Övergång 19 är stegad, kontrollerad, övad i en isolerad kopia och separat granskad. Nästa
+handling i spåret är ägarens: blocket i `evidence/nasta-uppdrag/local/modellkarta-20260929/overgang-19/OPERATORSSTEG-19.md`
+i hans egen Terminal (check, activate och `agent install`). Till dess byter han inte Codex-sessionernas modell eller
+ansträngning. Därefter följer steg 4. Ägarens beställning FULL AUTONOMI UTAN ROOT (ordagrant i
+`evidence/nasta-uppdrag/local/full-autonomi-20260930/`) tar vid efter detta. Återupptagning:
+`evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
@@ -1149,7 +1163,7 @@ accepterat (RUNTIME-GRANSKNINGSBUDGET-ACCEPT-20260925) och ägarprovet i etapp 3
 (DIGITALA-1-LEVERANS-20260926). Rader som vid en kvartalsgenomgång är äldre än ett kvartal tas upp i
 genomgångsposten för sitt område enligt förfallsregeln: de lyfts som en av högst tre beslutspunkter eller bokförs som
 obeslutade och vilande; operatörshandlingar och säkerhetspunkter förfaller inte
-(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28), KUNDSTART-TESTLAGE-20260929 (2026-09-29), DIGITALA-UNDERHALL-20260929 (2026-09-29), FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 (2026-09-29) och FORBATTRINGSPARTNER-BACKLOG-20260929 (2026-09-29) är sju rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. DIGITALA-UNDERHALL-20260929 stängde raderna om Digitalas underhållsform och taket för stående arbete: ägaren beslutade båda 2026-09-29, och lade till raden om en medarbetare som slutat. FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 stängde raden om Codex-CLI:n: den är uppdaterad. FORBATTRINGSPARTNER-BACKLOG-20260929 stängde raden om partnerns bestående start: ägaren lade LaunchAgent-filen 16:21Z, och tjänsten startade 16:21Z. Förklarande text står
+(FORVALTNINGAR-LOPANDE-UTVECKLING-BESLUT-3-20260926). Efter OMBYGGNAD-AGARSVAR-20260927 (2026-09-27), DIGITALA-1-AGARBEDOMNING-20260927 (2026-09-27), KUNDSTART-20260927 (2026-09-27), HELHET-RESULTAT-20260927 (2026-09-27), FORBATTRINGSPARTNER-RESULTAT-20260928 (2026-09-28), KUNDSTART-TESTLAGE-20260929 (2026-09-29), DIGITALA-UNDERHALL-20260929 (2026-09-29), FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 (2026-09-29), FORBATTRINGSPARTNER-BACKLOG-20260929 (2026-09-29) och RUNTIME-OVERGANG-19-20260930 (2026-09-30) är åtta rader öppna; källposten och datumet står i varje rad under rubriken; nästa kvartalsgenomgång enligt förfallsregeln är i januari 2027. DIGITALA-UNDERHALL-20260929 stängde raderna om Digitalas underhållsform och taket för stående arbete: ägaren beslutade båda 2026-09-29, och lade till raden om en medarbetare som slutat. FORBATTRINGSPARTNER-STARTVAKT-KLAR-20260929 stängde raden om Codex-CLI:n: den är uppdaterad. FORBATTRINGSPARTNER-BACKLOG-20260929 stängde raden om partnerns bestående start: ägaren lade LaunchAgent-filen 16:21Z, och tjänsten startade 16:21Z. RUNTIME-OVERGANG-19-20260930 lade till raden om Runtimes övergång 19 och aktiveraren. Förklarande text står
 i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket vid första rad som varken börjar med
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
@@ -1161,6 +1175,7 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 - [beslut] Digitala: externa aktiveringar bara vid verklig kund — Google Cloud-projekt med OAuth eller tjänstekonto för Search Console, Google Ads-utvecklartoken, Meta-token, företagsprofil genom behörig människa; inget av det ingår i uppdraget (HELHET-RESULTAT-20260927) — sedan 2026-09-27
 - [beslut] Förbättringspartnern: Improvements-samtal efter 2026-09-19 finns inte i partnerns underlag; en ny fångst genom Intake kräver din ChatGPT-inloggning i en webbläsare som en session får styra — beställ eller avstå (FORBATTRINGSPARTNER-RESULTAT-20260928) — sedan 2026-09-28
 - [beslut] Digitala: hör en medarbetare som slutat till stående mandat? Den text du godtog räknar upp den som faktarättelse, men Digitalas gällande mandat lägger personuppgifter i förslagsvägen (MANDAT.md §2, sedan tidigare), en fri textrad går inte att skilja från att någon tillkommit, och Kundstart tar inte emot en sådan rättelse alls (404, prövat). Tills du avgör är en personaländring ett förslag (DIGITALA-UNDERHALL-20260929) — sedan 2026-09-29
+- [operatörshandling] Runtime: övergång 19 (D040 och D041) och aktiveraren — kör blocket i evidence/nasta-uppdrag/local/modellkarta-20260929/overgang-19/OPERATORSSTEG-19.md i din egen Terminal, inte 08:40–09:10 svensk tid, och byt inte Codex-sessionernas modell eller ansträngning innan (RUNTIME-OVERGANG-19-20260930) — sedan 2026-09-30
 
 LOKALA GRENAR MED NAMNGIVET SKÄL (rutinen överst). De behålls som spår av granskningarna, och inget återupptas från dem:
 `aquarium/agarprov-godkant-r1-reviewed` (granskad första version av ägarprovets registrering, ersatt av den publicerade
