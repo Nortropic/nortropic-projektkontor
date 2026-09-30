@@ -13,6 +13,13 @@ Johnnys släpp eller avslag av en vilande överlämning bokför partnern på han
 i en egen fil i paketet; paketet i övrigt lämnas orört. Mottagaren kvitterar de senare stegen (`partner.py kvittera`),
 men aldrig en vilande överlämning: en kvittens väcker den inte. Samma beställning ger högst en överlämning per
 mottagare, och varje överlämning får ett eget id; ett befintligt paket flyttas eller skrivs aldrig över.
+
+Bara en byggklar beställning skapas: varje krav har ett prov, klart-när finns och allt underlag är löst till filer;
+annars vägras den med luckorna uppräknade och inget skrivs. En vilande beställning är rätt när den läggs men skrivs
+aldrig om, så ett släpp prövas mot partnerns senare poster: nämner en gällande post från en senare tur beställningens
+id släpps den bara när partnern har prövat varje sådan post och anger den som prövad, och posterna följer då med
+ordagrant i paketet (SENARE-POSTER-*.md). Ändrar en post beställningen avslås den och läggs om. Backloggen visar
+posterna (PARTNER-BACKLOG-AKTUALITET-20260930).
 """
 from __future__ import annotations
 
@@ -20,6 +27,8 @@ import hashlib
 import json
 import os
 import re
+import shutil
+import sqlite3
 import subprocess
 import sys
 import threading
@@ -53,6 +62,10 @@ BESLUT = {'slapp': ('lamnad', SLAPPORD, 'SLAPP', 'släpp', '"släpp OVL-…" ell
 # Runtime-uppgiftens tekniska fält: mottagaren fyller i dem mot aktuell main när beställningen släpps.
 VANTANDE_KODER = ('task_field_missing', 'task_field_empty')
 TESTMETOD_VANTAR = 'Väljs av mottagaren i acceptansen när beställningen släpps (partnern har angett det observerbara provet).'
+# Bara en byggklar beställning skapas (PARTNER-BACKLOG-AKTUALITET-20260930).
+INTE_BYGGKLAR = ('Nekat: beställningen är inte byggklar, och ingen skapades. Luckor: %s. Fyll dem ur samtalet (ett '
+                 'observerbart prov per krav, klart_nar och underlag som går att öppna) eller fråga Johnny, och anropa '
+                 'sedan igen.')
 
 
 def _sha(p: Path) -> str:
@@ -68,7 +81,7 @@ def _en_rad(varde, langd: int = 400) -> str:
 
 
 def _krav(varde) -> list:
-    """Kraven i beställningen: [{id, text, prov, metod}]. Fel form vägras; ett krav utan prov gör den ofullständig."""
+    """Kraven i beställningen: [{id, text, prov, metod}]. Fel form vägras; ett krav utan prov gör att beställningen inte är byggklar."""
     if varde in (None, '', []):
         return []
     if not isinstance(varde, list):
@@ -217,7 +230,8 @@ class Overlamning:
                             'skriv i målet vad som skiljer den från %s.' % (
                                 'vilande' if o['status'] == 'vilande' else 'öppen', mottagare, o['id'], d.get('rubrik'),
                                 o['status'], d.get('katalog_visning'), o['id'])}
-        # Innehållet prövas innan något skrivs: fel form vägras, och underlag som inte kan öppnas tappas aldrig tyst.
+        # Innehållet prövas innan något skrivs: fel form vägras, underlag som inte kan öppnas tappas aldrig tyst, och
+        # en beställning som inte är byggklar skapas inte.
         krav = _krav(a.get('krav'))
         filer = _filer(a.get('berorda_filer'))
         underlag_id = [str(x).strip() for x in (a.get('underlag') or []) if str(x).strip()]
@@ -228,18 +242,20 @@ class Overlamning:
         for kid in underlag_id:
             text, fel = self._underlag(kid)
             (losta if text else olosta).append((kid, text) if text else {'id': kid, 'skal': fel or 'tomt innehåll'})
-        if olosta and a.get('godta_olost_underlag') is not True:
+        if olosta:
             raise Verktygsfel('Nekat: underlag som inte går att öppna tappas inte tyst, och ingen beställning skapades. '
                               'Går inte att öppna: %s. Underlag anges som id som går att öppna: F-…, partner:…, t_…, en '
                               'sökträffs id, repo:<repo>[@ref]:<sökväg> eller github:<API-sökväg>. Beskriv fri text i '
-                              'målet, fyndet eller kraven i stället, eller anropa igen med godta_olost_underlag: true, så '
-                              'står posterna kvar ordagrant och beställningen märks ofullständig.' % '; '.join(
+                              'målet, fyndet eller kraven i stället.' % '; '.join(
                                   '"%s" (%s)' % (u['id'], u['skal']) for u in olosta))
         rubrik = _en_rad(a.get('rubrik'), 160)
         mal = _text(a.get('mal'))
         granser = [_en_rad(x, 1000) for x in (a.get('granser') or []) if _en_rad(x)][:20]
         nasta = _text(a.get('nasta_handling'), 2000)
         klart_nar = _text(a.get('klart_nar'), 2000)
+        luckor = _formluckor(krav, klart_nar)
+        if luckor:
+            raise Verktygsfel(INTE_BYGGKLAR % '; '.join(luckor))
         ordning = _text(a.get('ordning_och_beroenden'), 2000)
         resursram = _text(a.get('resursram'), 1000)
         fynd = _text(a.get('fynd'), 1000)
@@ -263,6 +279,9 @@ class Overlamning:
         ap06 = self._ap06(kat, oid, rubrik, mal, citat, granser, nasta, underlag, krav, klart_nar, filer, ordning,
                           resursram, motivering)
         markning = _markning(krav, klart_nar, olosta, ap06)
+        if markning['luckor']:  # formen prövades innan något skrevs; här återstår bara AP-06-beredningens luckor
+            shutil.rmtree(kat)  # katalogen skapades nyss av det här anropet (exist_ok=False) och har ingen överlämning
+            raise Verktygsfel(INTE_BYGGKLAR % '; '.join(markning['luckor']))
         order = ['# %s' % rubrik, '',
                  '*Överlämning %s från Projektkontorets förbättringspartner, %s %s. Sammanställt av partnern ur '
                  'samtalet; bara citatet och AGARENS-ORD.md är Johnnys ordagranna ord.*' % (
@@ -287,9 +306,6 @@ class Overlamning:
                   '## Motivering', '', motivering or '(inte angiven)', '',
                   '## Underlag', '']
         order += ['- `%s` → %s' % (u['id'], u['fil']) for u in underlag] or ['- (inget underlag angivet)']
-        if olosta:
-            order += ['', 'Underlag som inte kunde lösas upp (står kvar ordagrant; beställningen är ofullständig):']
-            order += ['- "%s": %s' % (u['id'], u['skal']) for u in olosta]
         order += ['', '## Gränser', '']
         order += ['- ' + g for g in granser] or ['- Inga särskilda gränser angivna utöver kontorets gällande regler.']
         order += ['', '## Föreslagen nästa handling', '', nasta, '',
@@ -318,7 +334,7 @@ class Overlamning:
         order.append('')
         self._skriv(kat / 'ARBETSORDER.md', '\n'.join(order))
         status = 'vilande' if vilande else 'lamnad'
-        tillstand = {'id': oid, 'status': status, 'lamnad': tid, 'mottagare': mottagare,
+        tillstand = {'id': oid, 'status': status, 'lamnad': tid, 'tur': korning.id, 'mottagare': mottagare,
                      'mottagare_text': MOTTAGARE[mottagare], 'trad': korning.trad, 'trad_titel': trad.get('titel'),
                      'inspel': inspel['id'], 'citerade_inspel': [c['id'] for c in citerade if c],
                      'rubrik': rubrik, 'fynd': fynd, 'motivering': motivering, 'krav': krav, 'klart_nar': klart_nar,
@@ -332,7 +348,8 @@ class Overlamning:
         (kat / 'KVITTENS.jsonl').touch(mode=0o600)
         visning = (('provinstansens data: overlamningar/partner-%s/' if getattr(self.s.k, 'prov_dolj', ())
                     else 'kontoret/evidence/nasta-uppdrag/local/partner-%s/') % oid)
-        self.s.lager.lagg_till('overlamning', overlamning=oid, status=status, trad=korning.trad, inspel=inspel['id'],
+        self.s.lager.lagg_till('overlamning', overlamning=oid, status=status, trad=korning.trad, tur=korning.id,
+                               inspel=inspel['id'],
                                nyckel='%s:%s' % (inspel['id'], mottagare), rubrik=rubrik, mal=mal, mottagare=mottagare,
                                katalog=str(kat), katalog_visning=visning, ap06=ap06, granser=granser,
                                nasta_handling=nasta, agarcitat=citat, skild_fran=[o['id'] for o in oppna],
@@ -345,9 +362,6 @@ class Overlamning:
                  'Paket: %s (ARBETSORDER.md, AGARENS-ORD.md, %d underlagsfiler, %d krav, AP-06-utkast: %s).' % (
                      visning, len(underlag), len(krav), ap06.get('status')),
                  'Märkning: ' + _markningstext(markning)]
-        if olosta:
-            rader.append('VARNING: underlag som inte kunde öppnas står kvar ordagrant i ARBETSORDER.md: %s.' % '; '.join(
-                '"%s" (%s)' % (u['id'], u['skal']) for u in olosta))
         return {'text': '\n'.join(rader)}
 
     def _nytt_id(self, inspel_id: str, mottagare: str) -> tuple:
@@ -495,6 +509,23 @@ class Overlamning:
             if not (tidigare and rad['status'] == 'vilande' and lage['status'] == ny_status):
                 raise Verktygsfel('%s är inte vilande (status %s); bara en vilande beställning släpps eller avslås här. '
                                   'En lämnad överlämning avslutas av mottagaren med en kvittens.' % (oid, lage['status']))
+        # Ett paket skrivs aldrig om: partnerns senare poster om beställningen prövas före släppet och följer med den.
+        senare = []
+        if beslut == 'slapp' and not tidigare:
+            senare = senare_poster(self.s.lager.fraga, lage['paket'])
+            provade = {str(x).strip().upper() for x in (a.get('provade_poster') or [])}
+            oprovade = [f for f in senare if f['nr'] not in provade]
+            if oprovade:
+                raise Verktygsfel(
+                    'Nekat: %s släpps inte ännu, och inget ändrades. Efter att den lades har partnern sparat %s som '
+                    'nämner den: %s. Beställningen skrivs aldrig om, så pröva varje post mot den. Ändrar en post den (ett '
+                    'senare beslut som går emot den, ett krav som redan är gjort eller en överlappning med en annan '
+                    'beställning) släpps den inte: säg det till Johnny, och vill han ha arbetet gjort avslår du den på '
+                    'hans ord (beslut avslag) och lägger en ny beställning som tar hänsyn till posten. Ändrar ingen post '
+                    'den, säg det kort till Johnny och anropa igen med provade_poster: [%s]; posterna följer då med i '
+                    'paketet till mottagaren.' % (
+                        oid, 'en gällande post' if len(senare) == 1 else '%d gällande poster' % len(senare),
+                        '; '.join(_posttext(f) for f in oprovade), ', '.join('"%s"' % f['nr'] for f in senare)))
         if tidigare:
             post = tidigare[-1]
         else:
@@ -514,6 +545,10 @@ class Overlamning:
                     'bevis': 'Johnnys ord (inspel %s): "%s" — ordagrant i %s' % (inspel['id'], citat[:300], fil),
                     'inspel': inspel['id'], 'citerade_inspel': [c['id'] for c in citerade if c], 'trad': korning.trad,
                     'agarord': fil, 'agarord_sha256': _sha(kat / fil), 'kvitterad': nu()}
+            if senare:
+                sfil = 'SENARE-POSTER-%s.md' % stampel
+                self._skriv(kat / sfil, _senare_poster_fil(oid, lage['paket'], senare, post['kvitterad']))
+                post.update(senare_poster=[f['nr'] for f in senare], senare_poster_fil=sfil)
             with open(kat / 'KVITTENS.jsonl', 'a', encoding='utf-8') as f:
                 f.write(json.dumps(post, ensure_ascii=False) + '\n')
         self.s.lager.lagg_till('overlamning_status', overlamning=oid, trad=rad['trad'], status=ny_status, beslut=beslut,
@@ -523,8 +558,11 @@ class Overlamning:
         if beslut == 'slapp':
             text = ('Överlämningen %s är SLÄPPT på Johnnys ord och nu LÄMNAD till %s (inte mottagen eller startad). '
                     'Startvakten startar mottagarens session när skrivplatsen är ledig; mottagaren fyller i Runtime-'
-                    'uppgiftens tekniska fält mot aktuell main. Hans ord står ordagrant i %s i paketet.' % (
-                        oid, d.get('mottagare'), post['agarord']))
+                    'uppgiftens tekniska fält mot aktuell main. Hans ord står ordagrant i %s i paketet.%s' % (
+                        oid, d.get('mottagare'), post['agarord'],
+                        (' Partnerns senare poster om den (%s) följer med ordagrant i %s; mottagaren läser dem före '
+                         'arbetet.' % (', '.join(post['senare_poster']), post['senare_poster_fil']))
+                        if post.get('senare_poster') else ''))
         else:
             text = ('Överlämningen %s är AVSLAGEN på Johnnys ord, direkt ur backloggen; den startas aldrig och står kvar som '
                     'historik. Hans ord står ordagrant i %s i paketet.' % (oid, post['agarord']))
@@ -552,15 +590,20 @@ class Overlamning:
         return nya
 
 
-def _markning(krav: list, klart_nar: str, olosta: list, ap06: dict) -> dict:
-    """Byggklar när varje krav har ett prov, klart-när finns och allt underlag är löst till filer (och AP-06 inte har
-    någon annan lucka); annars ofullständig med luckorna uppräknade. Runtime-uppgiftens tekniska fält är väntande."""
-    luckor = []
-    if not krav:
-        luckor.append('inga krav')
+def _formluckor(krav: list, klart_nar: str) -> list:
+    """Det som fattas i beställningens form för att den ska vara byggklar: krav, ett prov per krav och klart-när."""
+    luckor = [] if krav else ['inga krav']
     luckor += ['krav %s saknar prov' % k['id'] for k in krav if not k['prov']]
     if not klart_nar:
         luckor.append('klart-när saknas')
+    return luckor
+
+
+def _markning(krav: list, klart_nar: str, olosta: list, ap06: dict) -> dict:
+    """Byggklar när varje krav har ett prov, klart-när finns och allt underlag är löst till filer (och AP-06 inte har
+    någon annan lucka); annars ofullständig med luckorna uppräknade, och då skapas beställningen inte.
+    Runtime-uppgiftens tekniska fält är väntande."""
+    luckor = _formluckor(krav, klart_nar)
     luckor += ['underlaget "%s" är inte löst till en fil' % u['id'] for u in olosta]
     if ap06.get('avvisad'):
         luckor.append('AP-06-beredningen avvisade indata')
@@ -620,13 +663,67 @@ def kvittera(k, oid: str, status: str, av: str, bevis: str = '') -> Path:
     return fil
 
 
+# ------------------------------------------------------------------- aktualitet
+def senare_poster(fraga, paket: dict) -> list:
+    """Partnerns gällande (inte ersatta) poster som nämner beställningens id och sparades efter att den lades, i en
+    annan tur än den som lade den; den turens egen bokföring av beställningen räknas inte. fraga är lagrets
+    fraga(sql, args). Ett paket från före PARTNER-BACKLOG-AKTUALITET-20260930 bär inte sin tur; den slås då upp som
+    trådens senast startade tur före läggningen, och går den inte att hitta räknas varje senare post."""
+    oid = str(paket.get('id') or '')
+    lagd = str(paket.get('lamnad') or '')
+    tur = paket.get('tur') or _lagande_tur(fraga, paket.get('trad'), lagd)
+    ut = []
+    for r in fraga('select nr, slag, auktoritet, text, tid, tur from forstaelse where ersatt_av is null and tid > ? '
+                   'and instr(lower(text), lower(?)) > 0 order by nr', (lagd, oid)):
+        if r.get('tur') != tur and oid.casefold() in ovl_i_citat(r.get('text') or ''):  # exakt id, inte -digitala
+            ut.append({'nr': 'F-%d' % r['nr'], 'slag': r.get('slag'), 'auktoritet': r.get('auktoritet'),
+                       'tid': r.get('tid'), 'utdrag': _en_rad(r.get('text'), 240), 'text': r.get('text') or ''})
+    return ut
+
+
+def _senare_poster_fil(oid: str, paket: dict, senare: list, slappt: str) -> str:
+    return ('# Partnerns senare poster om %s\n\nSparade av förbättringspartnern efter att beställningen lades (%s), i '
+            'senare turer, och gällande när Johnny släppte den (%s). Partnern prövade dem före släppet och fann att '
+            'ingen av dem ändrar beställningen. De är partnerns poster, inte Johnnys ord; en post med auktoriteten '
+            'agarens_ord återger hans beslut med citat. Posterna är nyare än ARBETSORDER.md: läs dem före arbetet och '
+            'bedöm arbetsordern mot dem. Johnnys ord i AGARENS-ORD*.md går före allt annat.\n' % (
+                oid, paket.get('lamnad'), slappt)
+            + ''.join('\n## %s · %s · %s · sparad %s\n\n%s\n' % (f['nr'], f['slag'], f['auktoritet'], f['tid'], f['text'])
+                      for f in senare))
+
+
+def _lagande_tur(fraga, trad, lagd: str):
+    if not trad or not lagd:
+        return None
+    r = fraga('select id from tur where trad=? and startad<=? order by startad desc limit 1', (trad, lagd))
+    return r[0]['id'] if r else None
+
+
+def _posttext(f: dict) -> str:
+    return '%s (%s, %s, sparad %sZ): "%s"' % (f['nr'], f['slag'], f['auktoritet'], str(f['tid'] or '')[:16].replace('T', ' '),
+                                            f['utdrag'])
+
+
+def _indexfraga(k):
+    """(fraga, stäng) mot partnerns index, bara läsning (för kommandoraden, som inte har tjänstens lager); (None, None)
+    när indexet inte går att öppna."""
+    try:
+        db = sqlite3.connect((Path(k.data) / 'index.sqlite').resolve().as_uri() + '?mode=ro', uri=True)
+    except (sqlite3.Error, OSError, ValueError):
+        return None, None
+    db.row_factory = sqlite3.Row
+    return (lambda sql, args=(): [dict(r) for r in db.execute(sql, args).fetchall()]), db.close
+
+
 # ------------------------------------------------------------------- backloggen
-def backlog(k, alla: bool = False) -> dict:
+def backlog(k, alla: bool = False, fraga=None) -> dict:
     """De vilande beställningarna, lästa ur paketen i beställningsvägen (bara läsning, ingen modell).
 
     {'status': 'ok' | 'ofullstandig' | 'okand', 'poster': [...], 'olasbara': [...], 'rot', 'last', 'skal'?}. Går
     beställningsvägen inte att läsa är backloggen okänd, aldrig tom; ett paket som inte går att läsa räknas upp, och då
-    är backloggen inte känd i sin helhet."""
+    är backloggen inte känd i sin helhet. Varje vilande beställning prövas mot partnerns senare poster (senare_poster)
+    genom fraga, lagrets fraga(sql, args), eller utan den direkt ur indexet: 'senare' är posterna (en tom lista när
+    inga finns) eller None när indexet inte gick att läsa."""
     rot = paketrot(k)
     ut = {'status': 'ok', 'poster': [], 'olasbara': [], 'rot': str(rot), 'last': nu(), 'alla': bool(alla)}
     try:
@@ -634,6 +731,21 @@ def backlog(k, alla: bool = False) -> dict:
     except OSError as fel:
         ut.update(status='okand', skal='beställningsvägen %s gick inte att läsa (%s)' % (rot, type(fel).__name__))
         return ut
+    stang = None
+    if fraga is None:
+        fraga, stang = _indexfraga(k)
+    try:
+        _las_backlog(ut, rot, namn, alla, fraga)
+    finally:
+        if stang:
+            stang()
+    if ut['olasbara']:
+        ut['status'] = 'ofullstandig'
+    ut['poster'].sort(key=lambda x: str(x.get('datum') or ''))
+    return ut
+
+
+def _las_backlog(ut: dict, rot: Path, namn: list, alla: bool, fraga) -> None:
     for n in namn:
         oid = n[len('partner-'):]
         if not n.startswith('partner-') or not OVL_ID.match(oid):
@@ -649,24 +761,29 @@ def backlog(k, alla: bool = False) -> dict:
         if p.get('status') != 'vilande' or (lage['status'] != 'vilande' and not alla):
             continue
         m = p.get('markning') if isinstance(p.get('markning'), dict) else {}
+        senare = None  # okänt tills partnerns poster har lästs
+        if lage['status'] == 'vilande' and fraga:
+            try:
+                senare = [{nyckel: f[nyckel] for nyckel in ('nr', 'slag', 'auktoritet', 'tid', 'utdrag')}
+                          for f in senare_poster(fraga, p)]
+            except sqlite3.Error:  # ett index utan partnerns tabeller: okänt, aldrig "inga poster"
+                pass
         ut['poster'].append({'id': oid, 'status': lage['status'], 'mottagare': p.get('mottagare'),
                              'rubrik': p.get('rubrik'), 'datum': p.get('lamnad'), 'trad': p.get('trad'),
                              'trad_titel': p.get('trad_titel'), 'fynd': p.get('fynd'), 'motivering': p.get('motivering'),
                              'markning': m.get('varde') or 'okänd', 'luckor': m.get('luckor') or [],
-                             'vantande': m.get('vantande') or [],
+                             'vantande': m.get('vantande') or [], 'senare': senare,
                              'beslut': (lage['overgangar'][0] if lage['overgangar'] else None)})
-    if ut['olasbara']:
-        ut['status'] = 'ofullstandig'
-    ut['poster'].sort(key=lambda x: str(x.get('datum') or ''))
-    return ut
 
 
 def backlogtext(b: dict) -> str:
     if b['status'] == 'okand':
         return 'Backloggen är OKÄND, inte tom: %s.' % b.get('skal')
     vilande = [p for p in b['poster'] if p['status'] == 'vilande']
-    rader = ['Backloggen (vilande beställningar, läst %sZ ur %s): %d vilande%s.' % (
+    namnda = [p for p in vilande if p.get('senare')]
+    rader = ['Backloggen (vilande beställningar, läst %sZ ur %s): %d vilande%s%s.' % (
         b['last'][:16], b['rot'], len(vilande),
+        (', varav %d nämns i senare poster' % len(namnda)) if namnda else '',
         (', %d släppta eller avslagna visas också' % (len(b['poster']) - len(vilande))) if b.get('alla') else '')]
     if b['olasbara']:
         rader.append('OBS: backloggen är inte känd i sin helhet: %d paket gick inte att läsa (%s).' % (
@@ -678,11 +795,17 @@ def backlogtext(b: dict) -> str:
         rader.append('  Ursprung: tråd %s%s; fynd: %s' % (p.get('trad'), (' "%s"' % p['trad_titel']) if p.get('trad_titel') else '',
                                                           p.get('fynd') or '(inte angivet)'))
         rader.append('  Motivering: %s' % (p.get('motivering') or '(inte angiven)'))
+        if p['status'] == 'vilande' and p.get('senare'):
+            rader.append('  Nämns i senare poster, som prövas före ett släpp: %s. Ändrar en post beställningen avslås den '
+                         'och läggs om.' % '; '.join(_posttext(f) for f in p['senare']))
+        elif p['status'] == 'vilande' and p.get('senare') is None:
+            rader.append('  Senare poster är okända: partnerns index gick inte att läsa.')
         if p.get('beslut'):
             rader.append('  %s %s: %s' % ('Släppt' if p['beslut'].get('beslut') == 'slapp' else 'Avslagen',
                                           str(p['beslut'].get('kvitterad') or '')[:16], p['beslut'].get('bevis')))
     if not b['poster'] and b['status'] == 'ok':
         rader.append('Inga vilande beställningar.')
     rader.append('Johnny släpper en vilande beställning i partnertråden ("släpp OVL-…" eller "genomför OVL-…") eller '
-                 'avslår den där; utan hans egna ord ändras inget.')
+                 'avslår den där; utan hans egna ord ändras inget. Ett släpp prövas mot partnerns senare poster om '
+                 'beställningen; ändrar en av dem den avslås den och läggs om.')
     return '\n'.join(rader)

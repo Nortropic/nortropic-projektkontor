@@ -175,7 +175,8 @@ Tillägg 2026-09-29 (20:14 UTC): på ägarens beställning är partnern rättad 
 repo eller verktyg som ägaren lämnar läses i original och i sin helhet med redovisad täckning, och `github` läser hela
 filträd, stora filer i delar och säkerhetsmeddelanden. Ägarens "beställ" ger en vilande beställning i backloggen, som
 startvakten aldrig startar förrän han släpper den med sina egna ord i en tråd; en beställning bär krav med prov,
-klart-när och underlag löst till filer och märks byggklar eller ofullständig; och utredaren kör samma modell och
+klart-när och underlag löst till filer och märks byggklar eller ofullständig (sedan tillägget 2026-09-30 08:46 UTC
+skapas bara byggklara); och utredaren kör samma modell och
 ansträngning som svaret. Dagens tre vilande 20e7b1-överlämningar är avslagna på ägarens ord. Backloggen redovisas inte
 här: dess enda källa är `python3 -B tools/partner.py backlog`, som knappen Backlog i Förbättringar visar. Efter
 integrationen startas tjänsten om ur main enligt driftregeln. Nästa handling i spåret är ägarens nya beställning
@@ -257,6 +258,15 @@ aktivitetens livstecken uteblev; tung samtidig last från två sessioner är den
 bevakning är 2026-10-01 07:00Z. Nästa handling i spåret är steg 4
 (automatiska uppdateringar av Claude Code och Codex), i samordning med del B i FULL AUTONOMI UTAN ROOT. Återupptagning:
 `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
+
+Tillägg 2026-09-30 (08:46 UTC): på Johnnys beställning ("åtgärda detta", ordagrant i
+`evidence/nasta-uppdrag/local/partner-backlog-aktualitet-20260930/`) skapar partnern bara byggklara beställningar, och
+ett släpp prövas mot partnerns senare poster om beställningen (PARTNER-BACKLOG-AKTUALITET-20260930). En beställning
+utan krav, med ett krav utan prov, utan klart-när eller med underlag som inte går att öppna vägras och skrivs inte.
+Backloggen visar för varje vilande beställning de senare poster som nämner den; ett släpp vägras tills partnern har
+prövat varje sådan post, och de prövade posterna följer med ordagrant i paketet till mottagaren. Efter integrationen
+startas tjänsten om ur main enligt driftregeln. Ändringen påverkar inte nästa handling i spåret. Återupptagning:
+`evidence/nasta-uppdrag/local/partner-backlog-aktualitet-20260930/LAGE.md`.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.

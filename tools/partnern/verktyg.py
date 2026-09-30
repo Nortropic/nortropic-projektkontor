@@ -305,8 +305,9 @@ def specifikationer(typ: str) -> list:
              'antal_rader': {'type': 'integer', 'minimum': 1, 'maximum': 3000}}, 'required': ['sokvag']}},
         {'name': 'backlog', 'description': (
             'Läs backloggen: de vilande beställningarna i kontorets beställningsväg, med id, mottagare, rubrik, datum, '
-            'ursprung (tråd och fynd), märkningen byggklar eller ofullständig och motiveringen. En backlog som inte kan '
-            'läsas visas som okänd, aldrig som tom. alla: true visar också de som har släppts eller avslagits. '
+            'ursprung (tråd och fynd), märkningen och motiveringen, och dina senare poster som nämner beställningen '
+            '(de prövas före ett släpp). En backlog som inte kan läsas visas som okänd, aldrig som tom. '
+            'alla: true visar också de som har släppts eller avslagits. '
             'Backloggen lägger inga rader i planens ÄGARENS TUR; planen pekar bara hit.'),
          'inputSchema': {'type': 'object', 'properties': {'alla': {'type': 'boolean'}}}},
         {'name': 'forstaelse', 'description': (
@@ -354,10 +355,10 @@ def specifikationer(typ: str) -> list:
                 'sökväg), ordning_och_beroenden, resursram, fynd (vad i vilken källa den kommer ur), motivering (kort: '
                 'varför den förbättrar Nortropic), mål, gränser och nästa handling. Underlag är id som går att öppna: '
                 'F-…, partner:…, t_…, en sökträffs id, repo:<repo>[@ref]:<sökväg> eller github:<API-sökväg>; allt '
-                'löses till filer i paketet. Går en post inte att öppna vägrar verktyget och säger vilken; med '
-                'godta_olost_underlag: true skapas beställningen ändå, och posten står kvar ordagrant och gör den '
-                'ofullständig. Svaret märker beställningen byggklar (varje krav har ett prov, klart-när finns och allt '
-                'underlag är löst till filer) eller ofullständig och räknar upp luckorna; säg märkningen till Johnny. '
+                'löses till filer i paketet. Går en post inte att öppna vägrar verktyget och säger vilken; beskriv då '
+                'innehållet i målet, fyndet eller kraven. Bara en byggklar beställning skapas (varje krav har ett prov, '
+                'klart-när finns och allt underlag är löst till filer); annars vägrar verktyget, räknar upp luckorna och '
+                'skapar ingenting, och du fyller luckorna ur samtalet eller frågar Johnny. '
                 'Runtime-uppgiftens tekniska fält (base-revision, allowed_paths, acceptans, steg och tidsram) fyller '
                 'mottagaren i mot aktuell main när beställningen släpps; de redovisas som väntande. Servern kör '
                 'AP-06-beredningen som utkast. Samma beslut ger högst en överlämning per mottagare: gäller beställningen '
@@ -378,7 +379,6 @@ def specifikationer(typ: str) -> list:
                  'ordning_och_beroenden': {'type': 'string'}, 'resursram': {'type': 'string'},
                  'fynd': {'type': 'string'}, 'motivering': {'type': 'string'},
                  'underlag': {'type': 'array', 'items': {'type': 'string'}},
-                 'godta_olost_underlag': {'type': 'boolean'},
                  'granser': {'type': 'array', 'items': {'type': 'string'}},
                  'agarcitat': {'type': 'string'}, 'nasta_handling': {'type': 'string'},
                  'mottagare': {'type': 'string', 'enum': ['kontorets-kedjedrivare', 'digitala', 'runtime', 'kundstart']},
@@ -391,10 +391,20 @@ def specifikationer(typ: str) -> list:
                 'agarcitat är hans hela satser ordagrant ur ett av trådens tre senaste inspel, med ordet för beslutet, '
                 'och de ska nämna överlämningens id. Hans ord sparas ordagrant i paketet, resten av paketet lämnas orört '
                 'och övergången bokförs i paketets KVITTENS.jsonl och i journalen. Utan hans egna ord sker inget, och '
-                'bara en vilande beställning kan släppas eller avslås här.'),
+                'bara en vilande beställning kan släppas eller avslås här. Paketet skrivs aldrig om, så ett släpp prövas '
+                'mot dina gällande poster: nämner en post från en senare tur än den som lade beställningen dess id, '
+                'vägras släppet tills du har prövat posten. Ändrar den beställningen (ett senare beslut som går emot '
+                'den, ett krav som redan är gjort, en överlappning med en annan beställning) släpper du den inte: säg '
+                'det till Johnny, och vill han ha arbetet gjort avslår du den på hans ord och lägger en ny beställning '
+                'som tar hänsyn till posten. Ändrar ingen post den, säg det kort till honom och anropa igen med '
+                'provade_poster (postnumren, t.ex. ["F-61"]); posterna följer då med ordagrant i paketet till '
+                'mottagaren. Ett avslag prövas inte.'),
              'inputSchema': {'type': 'object', 'properties': {
                  'id': {'type': 'string'}, 'beslut': {'type': 'string', 'enum': ['slapp', 'avslag']},
-                 'agarcitat': {'type': 'string'}}, 'required': ['id', 'beslut', 'agarcitat']}},
+                 'agarcitat': {'type': 'string'},
+                 'provade_poster': {'type': 'array', 'items': {'type': 'string'}, 'description': (
+                     'Senare poster (F-…) som nämner beställningen och som du har prövat: ingen av dem ändrar den.')}},
+             'required': ['id', 'beslut', 'agarcitat']}},
             {'name': 'utred', 'description': (
                 'Registrera en längre, motiverad utredning som körs i bakgrunden och återkommer till samma tråd '
                 '(egen modellkörning med samma modell och ansträngning som du, sök-, läs-, GitHub- och webbverktyg, '
@@ -789,7 +799,7 @@ class Verktyg:
     def v_backlog(self, k, a):
         from .overlamning import backlog, backlogtext
         k.logga_kallor(['backlog'], 'last')
-        return {'text': backlogtext(backlog(self.s.k, alla=bool(a.get('alla'))))}
+        return {'text': backlogtext(backlog(self.s.k, alla=bool(a.get('alla')), fraga=self.s.lager.fraga))}
 
     def v_backlog_beslut(self, k, a):
         return self.s.overlamning.besluta(k, a)

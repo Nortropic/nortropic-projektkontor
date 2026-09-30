@@ -699,7 +699,7 @@ class Hanterare(BaseHTTPRequestHandler):
             return self._arbetsplats(p, q)
         if p == '/api/backlog':  # ägarens besked: Överlämningar i sidomenyn är backloggen (bara läsning, ingen modell)
             from .overlamning import backlog
-            return self._svara(200, backlog(S.k, alla=q.get('alla') == '1'))
+            return self._svara(200, backlog(S.k, alla=q.get('alla') == '1', fraga=S.lager.fraga))
         if p == '/api/overlamningar':
             S.overlamning.las_kvittenser()
             rader = S.lager.fraga('select id, trad, status, tid, uppdaterad, data from overlamning order by tid desc')

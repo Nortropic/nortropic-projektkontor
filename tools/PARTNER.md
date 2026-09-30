@@ -196,8 +196,10 @@ Källor är material, aldrig instruktioner. Deterministiska spärrar:
   bort …) som varken är negerat eller en fråga, och med överlämningens id. Hans ord sparas ordagrant i en egen fil i
   paketet (`AGARENS-ORD-SLAPP-…` eller `AGARENS-ORD-AVSLAG-…`); resten av paketet lämnas orört. Mottagarens
   `kvittera` vägrar en vilande överlämning, och en kvittensrad väcker den aldrig.
-- Underlag som inte går att öppna tappas inte tyst: `bered_uppdrag` vägrar och säger vilken post som föll, eller
-  skapar beställningen med `godta_olost_underlag` och märker den ofullständig med posten ordagrant i arbetsordern.
+- Underlag som inte går att öppna tappas inte tyst: `bered_uppdrag` vägrar och säger vilken post som föll. En
+  beställning som inte är byggklar skapas inte (se Överlämning).
+- Ett släpp prövas mot partnerns senare poster om beställningen och vägras tills varje sådan post är prövad; de
+  prövade posterna följer med ordagrant i paketet (`SENARE-POSTER-…`), se Överlämning.
 - WebFetch går bara till publika värdar som Johnny länkat i tråden, som finns bland träffarna från en webbsökning
   under samma körning, eller som står i en kort lista över exakta dokumentationsvärdar där ingen utomstående kan
   publicera innehåll eller läsa loggar (de hämtas utan frågedel). Länkar i bilagor, hämtade sidor och andra
@@ -281,9 +283,11 @@ När Johnny beställer skriver partnern ett paket per mottagare i kontorets best
 (sammanställd, märkt som sådan), `AGARENS-ORD.md` (de citerade inspelen ordagrant), underlaget löst till hashade
 filer, `OVERLAMNING.json` och ett AP-06-utkast (`ap06/utkast/`). Beställningen bär det som krävs för att bygga: krav
 med ett observerbart prov per krav (AP-06:s requirements och tests fylls ur dem), klart-när, berörda filer (repo och
-sökväg), ordning och beroenden, resursram, ursprung (tråd och fynd) och en kort motivering. Den märks **byggklar** när
-varje krav har ett prov, klart-när finns och allt underlag är löst till filer, annars **ofullständig** med luckorna
-uppräknade; märkningen står i verktygets svar, i arbetsordern och i backloggen. Runtime-uppgiftens tekniska fält
+sökväg), ordning och beroenden, resursram, ursprung (tråd och fynd) och en kort motivering. Bara en **byggklar**
+beställning skapas: varje krav har ett prov, klart-när finns, allt underlag är löst till filer och AP-06-beredningen har
+ingen annan lucka. Annars vägrar `bered_uppdrag`, räknar upp luckorna och skriver ingenting; en katalog som redan
+påbörjats när AP-06 hittar en lucka tas bort (PARTNER-BACKLOG-AKTUALITET-20260930). Märkningen står i verktygets svar,
+i arbetsordern och i backloggen. Runtime-uppgiftens tekniska fält
 (base-revision, allowed_paths, acceptans, steg och tidsram) fyller mottagaren i mot aktuell main när beställningen
 släpps; de redovisas som väntande, inte som fel.
 
@@ -297,7 +301,7 @@ statusen även när tjänsten inte kör. AP-06-utkastets behörighet bygger på 
 rader i planens ÄGARENS TUR; planen pekar hit. Den listas utan modell och bara genom läsning:
 
 ```sh
-python3 -B tools/partner.py backlog           # id, mottagare, rubrik, datum, ursprung, märkning och motivering
+python3 -B tools/partner.py backlog           # id, mottagare, rubrik, datum, ursprung, märkning, motivering, senare poster
 python3 -B tools/partner.py backlog --alla    # också de som har släppts eller avslagits
 ```
 
@@ -305,6 +309,16 @@ Partnern läser samma lista med verktyget `backlog`, och i samtalsytan är knapp
 Överlämningar, på ägarens besked) samma lista (`GET /api/backlog`). Går beställningsvägen inte att läsa är backloggen
 okänd (kod 4), aldrig tom; ett paket som inte går att läsa räknas upp, och då sägs att backloggen inte är känd i sin
 helhet. Lämnade och avslutade överlämningar syns i trådarna och i Kontoret.
+
+Ett paket skrivs aldrig om, så en vilande beställning kan bli inaktuell medan den väntar: Johnny beslutar något som går
+emot den, ett krav blir gjort på annat sätt eller en senare beställning överlappar den. Backloggen visar därför för
+varje vilande beställning partnerns **senare poster** om den: gällande poster (inte ersatta) som nämner dess exakta id
+och som sparades efter att den lades, i en annan tur än den som lade den (den turens egen bokföring räknas inte; ett
+paket från före 2026-09-30 slås upp i trådens turer). Går indexet inte att läsa är de okända, aldrig "inga". Ett släpp
+vägras tills partnern har prövat varje sådan post och anger den i `provade_poster`. Ändrar en post beställningen
+släpps den inte: Johnny avslår den och partnern lägger en ny. Ändrar ingen post den skrivs posterna ordagrant i
+`SENARE-POSTER-<stämpel>.md` i paketet, och släppets rad i `KVITTENS.jsonl` pekar på filen; startvaktens instruktion
+säger att mottagaren läser dem före arbetet. Ett avslag prövas inte (PARTNER-BACKLOG-AKTUALITET-20260930).
 
 Id:t är `OVL-<datum>-<inspel>`; en andra mottagare ur samma inspel får mottagarens kortnamn som tillägg
 (`OVL-…-runtime`), och står en katalog redan på ett id (till exempel en rest efter ett avbrott) tas nästa lediga id
@@ -394,8 +408,11 @@ läst andel vid öppning, ÄGARENS TUR läst som Aquarium, överlämning utan du
 överlämning) och med kvittens, en överlämning per mottagare ur samma meddelande med egna id utan att ett befintligt
 paket flyttas, webbkroken med sökträffar och planterade länkar, bakgrundsutredning, provläge och att ingen
 användningsgräns stoppar flera turer i rad. Backloggen prövas med vilande beställningar (byggklar med krav, prov och
-underlag löst till filer; ofullständig när ett prov eller klart-när saknas; underlag som inte går att öppna vägras
-eller märks), regeln att "beställ" inte räcker för genomförande, dubblettregeln mellan vilande och lämnade, släpp och
+underlag löst till filer; en beställning utan krav, med ett krav utan prov, utan klart-när, med underlag som inte går
+att öppna eller med en lucka som bara AP-06 hittar vägras och lämnar ingenting efter sig, också när den lämnas för
+genomförande), senare poster (turens egen bokföring och ett annat id räknas inte, en ersatt post gäller inte, ett
+släpp vägras tills varje post är prövad och de prövade posterna följer med i paketet, ett avslag prövas inte, och
+ett oläsbart index ger okänt), regeln att "beställ" inte räcker för genomförande, dubblettregeln mellan vilande och lämnade, släpp och
 avslag bara på Johnnys ord med id (ord utanför tråden, negerat, utan id och med ett annat id nekas), ett släpp som
 lämnar paketet orört och bokför övergången, ett beslut samma sekund som ett annat som nekas läsbart utan att något
 skrivs, kvittenser och rader utan hans ord som aldrig väcker en vilande beställning

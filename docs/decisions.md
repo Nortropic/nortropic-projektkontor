@@ -8226,6 +8226,10 @@ lade LaunchAgent-filen 16:21:22Z och tjänsten startade 16:21:28Z (kvitto `KVITT
 **Avslut.** Klart när ändringen är på main, partnertjänsten kör den nya koden och de tre 20e7b1-överlämningarna är
 avslagna. Nästa bygge i spåret kräver ett eget beslut.
 
+**Delvis ersatt av:** PARTNER-BACKLOG-AKTUALITET-20260930, i fråga om beställningar som inte är byggklara och om
+släpp: en beställning som inte är byggklar skapas inte (`godta_olost_underlag` finns inte längre), och ett släpp prövas
+mot partnerns senare poster om beställningen. Övrigt gäller.
+
 ## RADERA-TRAD-20260929 — ägaren vill kunna radera trådar i Förbättringar för gott; sparad förståelse och skickade överlämningar ligger kvar
 
 **Status:** registrerat 2026-09-29 (21:17 UTC) av sessionen nortropic-repos-6d (Claude Code).
@@ -8974,3 +8978,62 @@ tillbaka bara genom en ny övergång.
 **Avslut.** Steg 2 av MODELLKARTA-20260929 är klart. Nästa steg under beställningen är steg 4, automatiska uppdateringar
 av Claude Code och Codex. Det byggs i samordning med del B i ägarens beställning FULL AUTONOMI UTAN ROOT (automatiska
 kodövergångar), som nortropic-repos-07 bygger.
+
+## PARTNER-BACKLOG-AKTUALITET-20260930 — på Johnnys beställning skapar förbättringspartnern bara byggklara beställningar, och ett släpp prövas mot partnerns senare poster om beställningen
+
+**Status:** registrerat 2026-09-30 (08:46 UTC) av en Claude Code-session på ägarens beställning i sessionen. Hans ord står
+ordagrant i `evidence/nasta-uppdrag/local/partner-backlog-aktualitet-20260930/owner-words-partner-backlog-aktualitet-20260930.md`.
+
+**Ägarens ord** (ordagrant): "min fråga är det förbättringspartnern lägger som vilande beställningar i backloggen, är
+det tillräckligt bra data så att du/runtime kan sedan bygga de saker som läggs i backloggen, om inte så behöver vi ju
+självklart åtgärda det" och, efter sessionens svar, "åtgärda detta".
+
+**Vad sessionen fann.** Beställningarna i backloggen bär det som krävs för att bygga: krav med prov, klart-när, berörda
+filer, ordning och underlag löst till filer i paketet. Två luckor fanns. Märkningen byggklar var bara en märkning: en
+beställning utan prov eller klart-när, eller med underlag som inte gick att öppna (med `godta_olost_underlag`), lades
+ändå i backloggen, märkt ofullständig. Och ett paket skrivs aldrig om, så en vilande beställning kunde bli inaktuell
+medan den väntade utan att något visade det. OVL-20260930-b35d4f lades 06:16Z med krav C3 att göra backuprepot privat,
+"och hans släpp av den här beställningen är beslutet"; 06:20Z sa Johnny att alla repon är publika tills han säger annat
+(F-42), men beställningen låg kvar oförändrad och märkt byggklar.
+
+**Beslut.**
+- *Bara byggklart skapas.* `bered_uppdrag` skapar en beställning, vilande eller lämnad, bara när varje krav har ett
+  prov, klart-när finns, allt underlag är löst till filer och AP-06-beredningen inte har någon annan lucka. Annars
+  vägrar verktyget med luckorna uppräknade och skriver ingenting; en paketkatalog som redan påbörjats när AP-06 hittar
+  luckan tas bort. `godta_olost_underlag` finns inte längre. Partnern fyller luckorna ur samtalet eller frågar Johnny.
+- *Senare poster.* För en vilande beställning är partnerns senare poster de gällande (inte ersatta) poster som nämner
+  dess exakta id och som sparades efter att den lades, i en annan tur än den som lade den. Den turens egen bokföring
+  räknas inte, och ett annat id (`…-digitala`) räknas inte. Ett nytt paket bär sin tur i `OVERLAMNING.json`; för ett
+  äldre slås den upp som trådens senast startade tur före läggningen, och går den inte att hitta räknas varje senare post.
+- *Backloggen visar dem.* `partner.py backlog`, verktyget `backlog` och knappen Backlog visar posterna vid varje vilande
+  beställning. Går partnerns index inte att läsa sägs att de är okända, aldrig att de saknas.
+- *Släppet prövas.* `backlog_beslut` med beslut slapp vägras, och inget skrivs, tills partnern har prövat varje senare
+  post och anger den i `provade_poster`. Ändrar en post beställningen (ett senare beslut som går emot den, ett krav som
+  redan är gjort, en överlappning med en annan beställning) släpps den inte: Johnny avslår den och partnern lägger en
+  ny. Ändrar ingen post den, skrivs posterna ordagrant i `SENARE-POSTER-<stämpel>.md` i paketet, släppets rad i
+  `KVITTENS.jsonl` pekar på filen, och startvaktens instruktion säger att mottagaren läser dem före arbetet. Ett avslag
+  prövas inte.
+- Partnerns rolltext säger att ett senare beslut som berör en vilande beställning ska nämna dess id, och att partnern
+  då föreslår Johnny att den avslås och läggs om.
+
+**Varför en prövning och inte en spärr (sessionens val, med skäl).** Mekaniskt går det att se att en senare post nämner
+en beställning, men inte om den säger emot den. Mot den levande backloggen 2026-09-30 08:46Z nämndes fyra av nio vilande
+beställningar i senare poster (kvitto `KVITTO-backlog-mot-levande-data.txt` i uppdragets mapp). Tre av dem ändrades av
+posterna: b35d4f (F-42 går emot C3, och F-61 säger att OVL-20260930-dbbdd8 ersätter den), 1225ac (F-65: ett krav är
+delvis gjort på Runtimes main) och 1225ac-kontoret (F-62: den överlappar dbbdd8). Den fjärde, b35d4f-digitala, nämns
+bara i F-61 som att den "låg redan vilande och ändrades inte". En spärr hade tvingat Johnny att avslå och lägga om
+också den. Prövningen tvingar partnern att läsa varje post före ett släpp, och den som bygger får alltid posterna i
+paketet.
+
+**Kvar för Johnny.** Sessionens rekommendation är att han avslår OVL-20260930-b35d4f i partnertråden ("avslå
+OVL-20260930-b35d4f"); ersättaren dbbdd8 ligger redan vilande. Om 1225ac och 1225ac-kontoret ska avslås och läggas om
+avgör han när han vill att de byggs. Paketen ändras inte: bara hans ord flyttar en vilande beställning.
+
+**Ersätter:** ingen post helt. Posten ersätter delvis FORBATTRINGSPARTNER-BACKLOG-20260929 i fråga om beställningar som
+inte är byggklara och om släpp; markeringen står sist i den posten.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main. Paket som lagts under
+tiden bär fältet `tur`, som den gamla koden inte läser; inget annat i data ändras.
+
+**Avslut.** Klart när ändringen är integrerad och tjänsten har startats om ur main enligt driftregeln. Nästa bygge i
+spåret kräver ett eget beslut.
