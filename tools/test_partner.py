@@ -1962,8 +1962,8 @@ def ut(o):
     sys.stdout.write(json.dumps(o) + '\n'); sys.stdout.flush()
 tradar = Path(__file__).with_name('codextradar')
 tradar.mkdir(exist_ok=True)
-if args[:2] == ['exec', 'resume']:
-    trad = args[2]
+if args[0] == 'exec' and 'resume' in args:
+    trad = args[args.index('resume') + 1]
     if not (tradar / trad).exists():
         ut({'type': 'error', 'message': 'thread not found'}); sys.exit(1)
 else:
@@ -2007,6 +2007,32 @@ ut({'type': 'turn.completed', 'usage': {'input_tokens': 1, 'output_tokens': 1}})
 """
 
 
+class StartConfigDigestProv(unittest.TestCase):
+    def test_bara_entydiga_topniva_model_och_effort_undantas(self):
+        from partnern import start_installningar as si
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as td:
+            p = Path(td)/'config.toml'
+            def digest(text):
+                p.write_text(text); return si.codex_config_digest(p)
+            base = 'model = "a"\nmodel_reasoning_effort = "high"\nx = [\n [1, 2],\n]\n[profile.x]\nmodel = "a"\n'
+            expected = digest(base)
+            self.assertEqual(digest(base.replace('model = "a"', 'model = "b"', 1).replace('"high"', '"low"')), expected)
+            for changed in (base.replace('[1, 2]', '[1, 3]'), base.replace('[profile.x]\nmodel = "a"', '[profile.x]\nmodel = "b"'),
+                            base+'approval_policy = "never"\n', base.replace('model = "a"', 'model = "a" # comment', 1)):
+                self.assertNotEqual(digest(changed), expected)
+
+    def test_osaker_syntax_binds_hel_och_installningar_ar_stabila(self):
+        import hashlib
+        from partnern import start_installningar as si
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as td:
+            p = Path(td)/'config.toml'
+            for raw in (b'model = "a"\n\xff\n', b'notes = """\nmodel = "a"\n"""\n'):
+                p.write_bytes(raw); self.assertEqual(si.codex_config_digest(p), hashlib.sha256(raw).hexdigest())
+            settings = si.claude_installningar([td, td], Path(td)/'paket')
+            self.assertEqual(si.avtryck(settings), si.avtryck(si.claude_installningar([td], Path(td)/'paket')))
+            self.assertTrue(all(si.DENY.values()))
+
+
 class StartvaktProv(Miljo):
     """Startvakten med en fejkad mottagarsession som kör det riktiga kvitteringskommandot ur sin instruktion."""
 
@@ -2014,6 +2040,12 @@ class StartvaktProv(Miljo):
         super().setUp()
         from partnern import start
         self.start = start
+        from unittest import mock
+        self.start_config = self.rot / 'start-codex.toml'
+        self.start_config.write_text('model = "prov"\nmodel_reasoning_effort = "high"\nservice_tier = "priority"\n')
+        for patcher in (mock.patch.object(start.skydd, 'codex_home_config', return_value=self.start_config),
+                        mock.patch.object(start.skydd, 'CODEX_CONFIG_SHA256', start.skydd.codex_config_digest(self.start_config))):
+            patcher.start(); self.addCleanup(patcher.stop)
         for namn in ('OMPROVA_UPPTAGET', 'KVOT_VANTAN'):
             fore = getattr(start, namn)
             self.addCleanup(setattr, start, namn, fore)
@@ -2278,16 +2310,69 @@ class StartvaktProv(Miljo):
         self.assertEqual([a.get('codex') for a in anrop], [True, True])
         forsta, andra = anrop[0]['argv'], anrop[1]['argv']
         rot = str((self.rot / 'runtime').resolve())
-        self.assertEqual(forsta, ['exec', '--json', '--approve-for-me', '-C', rot, '--add-dir', str(kat), '-m',
+        self.assertEqual(forsta, ['exec', '--approve-for-me', '--sandbox', 'workspace-write', '--add-dir', str(kat), '--json', '-C', rot, '-m',
                                   'gpt-6-astra', '-c', 'model_reasoning_effort="high"', '-'])
         trad = self.start.codex_trad(kat)
-        self.assertEqual(andra, ['exec', 'resume', trad, '--json', '-m', 'gpt-6-astra', '-c',
+        strommar = [[e['thread_id'] for e in self.start._handelser_i(f) if e.get('type') == 'thread.started']
+                    for f in sorted((kat / 'session').glob('korning-*.jsonl'))]
+        self.assertEqual(strommar, [[trad], [trad]])
+        self.assertEqual(andra, ['exec', '--approve-for-me', '--sandbox', 'workspace-write', '--add-dir', str(kat), 'resume', trad, '--json', '-m', 'gpt-6-astra', '-c',
                                  'model_reasoning_effort="high"', '-'])
         self.assertIn('Fortsätt arbetet med överlämningen %s' % oid, anrop[1]['prompt'])
         self.assertNotIn('OPENAI_API_KEY', anrop[0]['env'])
         self.assertEqual([h['utforare'] for h in self.start.handelser(kat) if h['typ'] == 'startad'], ['codex', 'codex'])
         self.S.overlamning.las_kvittenser()
         self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'levererad')
+
+    def test_codex_config_andring_hindrar_men_modellval_tillats(self):
+        from unittest import mock
+        (oid, kat), = self.overlamningar('runtime')
+        self.bemanning = ('codex', 'gpt-6-astra')
+        original = self.start_config.read_text()
+        for changed in (original.replace('priority', 'flex'), '[profiles.x]\nmodel = "annan"\n', ''):
+            self.start_config.write_text(changed)
+            with mock.patch.object(self.start.subprocess, 'Popen') as spawn:
+                self.vakt.granska()
+                spawn.assert_not_called()
+            self.assertEqual(self.start.handelser(kat)[-1]['typ'], 'hindrad')
+            self.assertEqual(self.start.handelser(kat)[-1]['kod'], 'codex_config')
+        self.start_config.write_text(original.replace('"prov"', '"annan"').replace('"high"', '"ultra"'))
+        self.mottagarmanus('LEVERERA', repo='codex')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        events = self.vanta_pa(kat, 'klar')
+        event = next(h for h in events if h['typ'] == 'startad')
+        self.assertEqual(event['codex_config_bindning']['sha256'], self.start.skydd.CODEX_CONFIG_SHA256)
+        self.assertEqual(event['codex_config_bindning_sha256'], self.start.skydd.avtryck(event['codex_config_bindning']))
+        self.assertEqual(len(event['installningar_sha256']), 64)
+
+    def test_claude_inline_settings_och_sha_i_startkvittot(self):
+        (oid, kat), = self.overlamningar('runtime')
+        self.mottagarmanus('LEVERERA')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        events = self.vanta_pa(kat, 'klar')
+        argv = next(a['argv'] for a in self.mottagarlogg() if 'argv' in a)
+        settings = json.loads(argv[argv.index('--settings')+1])
+        self.assertEqual(settings['permissions']['deny'], list(self.start.skydd.DENY))
+        environment = '\n'.join(settings['autoMode']['environment'])
+        for required in ('public', 'evidence/**/local/', '~/.nortropic-hemligheter/', str(kat), str(self.rot/'runtime')):
+            self.assertIn(required, environment)
+        event = next(h for h in events if h['typ'] == 'startad')
+        self.assertEqual(event['installningar_sha256'], self.start.skydd.avtryck(settings))
+        self.assertNotIn('codex_config_bindning', event)
+
+    def test_config_guard_reads_again_before_spawn_and_rejects_links(self):
+        from unittest import mock
+        (oid, kat), = self.overlamningar('runtime')
+        record = dict(self.S.lager.en('select * from overlamning where id=?', (oid,)))
+        data = json.loads(record['data'])
+        self.start_config.write_text('service_tier = "changed"\n')
+        with mock.patch.object(self.start.subprocess, 'Popen') as spawn:
+            event = self.vakt._starta(record, data, kat, False, 1, 'codex', 'gpt-6-astra')
+            spawn.assert_not_called()
+        self.assertEqual((event['typ'], event['kod']), ('hindrad', 'codex_config'))
+        target = self.rot/'linked-config.toml'; target.write_text('model = "prov"\nmodel_reasoning_effort = "high"\nservice_tier = "priority"\n')
+        self.start_config.unlink(); self.start_config.symlink_to(target)
+        with self.assertRaises(ValueError): self.start.skydd.bindning(self.start_config)
 
     def test_anstrangningen_ar_runtimes_och_en_fortsattning_behaller_sin(self):
         # D040: startvakten följer Runtimes val, också ansträngningen, ur samma läsning som bemanningen
@@ -2360,7 +2445,8 @@ class StartvaktProv(Miljo):
         self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
         self.vanta_pa(kat, 'klar')
         anrop = [a['argv'] for a in self.mottagarlogg() if 'argv' in a]
-        self.assertEqual([a[:2] for a in anrop], [['exec', '--json'], ['exec', 'resume']])
+        self.assertEqual(['resume' in a for a in anrop], [False, True])
+        self.assertTrue(all(a[:5] == ['exec', '--approve-for-me', '--sandbox', 'workspace-write', '--add-dir'] for a in anrop))
 
     def test_olast_bemanning_ger_synlig_vantan_utan_reservvag(self):
         (oid, kat), = self.overlamningar('kontorets-kedjedrivare')

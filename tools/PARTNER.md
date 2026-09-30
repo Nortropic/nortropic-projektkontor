@@ -327,6 +327,33 @@ Id:t är `OVL-<datum>-<inspel>`; en andra mottagare ur samma inspel får mottaga
 (`OVL-…-runtime`), och står en katalog redan på ett id (till exempel en rest efter ett avbrott) tas nästa lediga id
 med löpnummer. Ett befintligt paket byter aldrig namn, flyttas aldrig och skrivs aldrig över.
 
+**Startvaktens inställningar (OVL-20260930-dbbdd8 C1).** Claude får `--settings` som inline JSON från
+`partnern/start_installningar.py`, även vid fortsättning. `autoMode.environment` beskriver mottagarrepona,
+paketet som privat arbetsunderlag och att Nortropic-repon behandlas som publika vid informationshantering.
+`evidence/**/local/` och `~/.nortropic-hemligheter/` får inte publiceras. Detta är miljökontext för klassificeraren;
+det förbjuder inte att läsa beställningen lokalt. Den korta deny-listan har en motivering per regel i `DENY`:
+`gh repo edit … --visibility`, API-anrop med `visibility` eller `private=` samt `gh repo delete` blockeras.
+Reglerna är ett golv för dessa kommandoformer, ingen fullständig spärr för alla shell- och API-varianter.
+En PreToolUse-krok införs inte här; behov av en sådan blir en separat beslutspunkt om det levande provet visar brist.
+
+Codex läser alltid den verkliga hemfilen `~/.codex/config.toml`, inte en alternativ modellinställningsfil i
+partnerns provkatalog. Före varje ny start och fortsättning, och igen precis före processstart, jämförs dess
+SHA-256 med den granskade bindningen i `start_installningar.py`. Läsningen följer Runtime D041:
+bara entydiga dubbelt citerade tilldelningar av `model` och `model_reasoning_effort` på toppnivå undantas,
+eftersom kommandot sätter dem. Tabeller, arrayer och övrigt innehåll är bundna; osäker syntax binds helt.
+Saknad fil, symlänk eller avvikelse ger `hindrad`, kod `codex_config`, utan start. En ändrad bindning kräver
+en separat granskad kodändring; vakten lär aldrig automatiskt in en ny kontrollsumma vid omstart.
+Både ny och återupptagen Codex-körning anger `--approve-for-me --sandbox workspace-write` på `exec`.
+Inga globala inställningar skrivs. Detta binder hemfilen och kommandots behörighetsval, inte alla andra
+instruktions- och konfigurationslager som Codex kan läsa.
+
+Varje `startad`-rad i `START.jsonl` bär `installningar_sha256`; Codex bär även `codex_config_bindning`
+och dess `codex_config_bindning_sha256`. Värden ur hemkonfigurationen kopieras aldrig till kvittot.
+Källor, lästa 2026-09-30: [Claude auto mode](https://code.claude.com/docs/en/auto-mode-config),
+[Claude permissions](https://code.claude.com/docs/en/permissions),
+[Codex konfigurationsordning](https://learn.chatgpt.com/docs/config-file/config-basic) samt den fastlåsta
+Codex 0.155.1-binärens `exec --help` och `exec --approve-for-me resume --help`.
+
 **Startvakten** (`partnern/start.py`) gör att en lämnad överlämning startar arbetet av sig själv. Varje minut, och
 direkt när tjänsten startar, går den igenom öppna överlämningar. För en lämnad överlämning som ingen har kvitterat
 startar den en session i mottagarens repo: kontorets primärutcheckning för kontorets kedjedrivare,

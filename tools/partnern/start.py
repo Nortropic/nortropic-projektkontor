@@ -41,6 +41,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .lager import nu
+from . import start_installningar as skydd
 from .overlamning import KVITTENSER, MOTTAGARE, mottagarens, paketlage
 
 NAMNRYMD = uuid.UUID('6f1c2a57-3d4e-5b8a-9c0f-1e2d3c4b5a69')
@@ -419,6 +420,11 @@ class Startvakt:
         if self._binar_sha(Path(binar)) != sha:
             return ('den fastlåsta binären %s saknas eller har ändrats; ingen start' % Path(binar).name,
                     'hindrad', 'binar')
+        if utforare == 'codex':
+            try:
+                skydd.bindning(skydd.codex_home_config())
+            except (OSError, ValueError):
+                return 'Codex config.toml saknas, ar en lank eller avviker fran granskad bindning; ingen start', 'hindrad', 'codex_config'
         rot = self._rot(d)
         if not rot or not (rot / '.git').exists():
             return 'mottagarens repo finns inte på den här datorn', 'hindrad', 'repo'
@@ -459,19 +465,27 @@ class Startvakt:
         prompt = PROMPT.format(oid=o['id'], rubrik=rubrik, katalog=kat, kvittera=kvittera, namn=namn,
                                mottagare_text=MOTTAGARE.get(d.get('mottagare') or 'kontorets-kedjedrivare', ''))
         effort = anstrangning or self.k.startvakt_anstrangning
+        config = None
+        if utforare == 'codex':
+            try:
+                config = skydd.bindning(skydd.codex_home_config())
+            except (OSError, ValueError):
+                return self._logga(o, kat, 'hindrad', kod='codex_config', skal='Codex config.toml avviker fran granskad bindning; ingen start')
         if utforare == 'claude':
             sid = sessions_id(o['id'])
             finns = session_fil(rot, sid).exists()
-            argv = [binar, '-p', '--model', modell, '--effort', effort, '--permission-mode', 'auto',
+            settings = skydd.claude_installningar([self.k.kontor_primar, *(self.k.repon or {}).values()], kat)
+            argv = [binar, '-p', '--settings', skydd.kodad(settings), '--model', modell, '--effort', effort, '--permission-mode', 'auto',
                     '--output-format', 'stream-json', '--verbose', '--name', 'Överlämning ' + o['id'],
                     '--add-dir', str(kat)] + (['--resume', sid] if finns else ['--session-id', sid])
         else:  # Codex: tråden får sitt id av Codex; det står i paketets första ström och binder sessionen
             sid = codex_trad(kat)
             finns = sid is not None
             installning = ['-m', modell, '-c', 'model_reasoning_effort=%s' % json.dumps(effort)]
-            argv = ([binar, 'exec', 'resume', sid, '--json'] + installning + ['-'] if finns else
-                    [binar, 'exec', '--json', '--approve-for-me', '-C', str(rot), '--add-dir', str(kat)]
-                    + installning + ['-'])
+            settings = {'approval': 'approve-for-me', 'sandbox': 'workspace-write', 'modell': modell, 'anstrangning': effort}
+            common = [binar, 'exec', '--approve-for-me', '--sandbox', 'workspace-write', '--add-dir', str(kat)]
+            argv = (common + ['resume', sid, '--json'] + installning + ['-'] if finns else
+                    common + ['--json', '-C', str(rot)] + installning + ['-'])
         if fortsatt and finns:
             prompt = ('Fortsätt arbetet med överlämningen %s där du slutade; sessionen stoppades av kvot, åtkomst eller '
                       'ett avbrott. Samma instruktion gäller:\n\n%s' % (o['id'], prompt))
@@ -499,7 +513,8 @@ class Startvakt:
         self._processer[o['id']] = proc
         return self._logga(o, kat, 'startad', session=sid, pid=proc.pid, nr=nr, utforare=utforare,
                            cli=Path(binar).name, modell=modell, anstrangning=effort, repo=rot.name,
-                           fortsatt=fortsatt, namn=namn)
+                           fortsatt=fortsatt, namn=namn, installningar_sha256=skydd.avtryck(settings),
+                           codex_config_bindning=config, codex_config_bindning_sha256=skydd.avtryck(config) if config else None)
 
     def _lever(self, oid: str, sista: dict, kat: Path | None = None) -> bool:
         proc = self._processer.get(oid)
