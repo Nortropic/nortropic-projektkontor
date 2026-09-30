@@ -970,6 +970,37 @@ def _git(office_root, arguments):
     return result.stdout
 
 
+def parse_owner_turn(plan: str, *, raw: bool = False) -> list:
+    """Pure shared plan parser; raw=True preserves the partner's stripped text rows.
+
+    Keep the existing grammar: any mention opens a block, the first other row
+    closes it, and only a trailing YYYY-MM-DD since suffix is separated.
+    No Git, filesystem or network access.
+    """
+    turns, inside = [], False
+    for line in plan.splitlines():
+        stripped = line.strip()
+        if 'ÄGARENS TUR' in stripped:
+            inside = True
+            continue
+        if not inside:
+            continue
+        kind = ('beslut' if stripped.startswith('- [beslut] ') else
+                'operatörshandling' if stripped.startswith('- [operatörshandling] ') else None)
+        if kind is None:
+            inside = False
+            continue
+        if raw:
+            turns.append(stripped)
+            continue
+        text = stripped.split('] ', 1)[1].strip()
+        since = _SINCE.search(text)
+        turns.append({'kind': kind, 'text': _SINCE.sub('', text).strip(),
+                      'since': since.group(1) if since else None})
+
+    return turns
+
+
 def office_reader(office_root):
     """Read the published office only: `origin/main`, never the working tree."""
     ref = 'refs/remotes/origin/main'
@@ -995,23 +1026,7 @@ def office_reader(office_root):
         title = next((line[2:].strip() for line in text.splitlines() if line.startswith('# ')), '')
         notes.append({'ap': found.group(1).upper(), 'title': title, 'text': text})
 
-    turns, inside = [], False
-    for line in _git(office_root, ['show', ref + ':docs/plan.md']).splitlines():
-        stripped = line.strip()
-        if 'ÄGARENS TUR' in stripped:
-            inside = True
-            continue
-        if not inside:
-            continue
-        kind = ('beslut' if stripped.startswith('- [beslut] ') else
-                'operatörshandling' if stripped.startswith('- [operatörshandling] ') else None)
-        if kind is None:
-            inside = False
-            continue
-        text = stripped.split('] ', 1)[1].strip()
-        since = _SINCE.search(text)
-        turns.append({'kind': kind, 'text': _SINCE.sub('', text).strip(),
-                      'since': since.group(1) if since else None})
+    turns = parse_owner_turn(_git(office_root, ['show', ref + ':docs/plan.md']))
 
     return {'main': _git(office_root, ['rev-parse', ref]).strip(),
             'main_date': _git(office_root, ['log', '-1', '--format=%cI', ref]).strip(),

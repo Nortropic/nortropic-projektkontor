@@ -12,12 +12,62 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import aquarium
 
 SCRATCH = Path(__file__).absolute().parents[1] / '.scratch'
 NOW = datetime(2026, 9, 24, 12, 0, tzinfo=timezone.utc)
 READ_AT = '2026-09-24T12:00:00+00:00'
+
+
+class OwnerTurnParser(unittest.TestCase):
+    def test_both_readers_keep_boundary_cases_and_raw_rows(self):
+        from partnern.systemlage import agarens_tur
+        cases = [
+            ('ÄGARENS TUR\nProsa\n- [beslut] Utanför', [], []),
+            ('Prosa nämner ÄGARENS TUR här\n- [beslut] Bevaras',
+             ['- [beslut] Bevaras'], [{'kind': 'beslut', 'text': 'Bevaras', 'since': None}]),
+            ('ÄGARENS TUR\n- [beslut] Första\n- [annat] Stopp\n- [beslut] Utanför',
+             ['- [beslut] Första'], [{'kind': 'beslut', 'text': 'Första', 'since': None}]),
+            ('ÄGARENS TUR\n\n- [beslut] Utanför', [], []),
+            ('ÄGARENS TUR\n- [beslut] Fall — sedan 2026-09-30 mer\n'
+             '- [operatörshandling]  Bevara  —  sedan  2026-09-30  ',
+             ['- [beslut] Fall — sedan 2026-09-30 mer',
+              '- [operatörshandling]  Bevara  —  sedan  2026-09-30'],
+             [{'kind': 'beslut', 'text': 'Fall — sedan 2026-09-30 mer', 'since': None},
+              {'kind': 'operatörshandling', 'text': 'Bevara', 'since': '2026-09-30'}]),
+        ]
+        for plan, raw, records in cases:
+            with self.subTest(plan=plan):
+                self.assertEqual(aquarium.parse_owner_turn(plan), records)
+                self.assertEqual(aquarium.parse_owner_turn(plan, raw=True), raw)
+                actual = agarens_tur(plan)
+                self.assertEqual(actual, raw)
+                self.assertEqual(aquarium.parse_owner_turn('ÄGARENS TUR\n' + '\n'.join(actual)), records)
+
+    def test_office_reader_delegates_to_pure_parser(self):
+        expected = [{'kind': 'beslut', 'text': 'Märkt', 'since': None}]
+        with patch.object(aquarium, '_git', return_value='plantext'), \
+                patch.object(aquarium, 'parse_owner_turn', return_value=expected) as parser:
+            self.assertEqual(aquarium.office_reader(Path('/ingen-git'))['plan_owner_turn'], expected)
+            parser.assert_called_once_with('plantext')
+
+    def test_partner_import_is_inert_without_git_or_network(self):
+        import subprocess
+        import sys
+        code = '''import subprocess, socket, sys
+from unittest.mock import patch
+sys.path.insert(0, 'tools')
+def forbidden(*a, **k):
+    raise AssertionError('import attempted IO')
+with patch.object(subprocess, 'Popen', forbidden), patch.object(socket, 'socket', forbidden):
+    import partnern.systemlage
+    assert 'aquarium' in sys.modules
+'''
+        result = subprocess.run([sys.executable, '-B', '-c', code], cwd=SCRATCH.parent,
+                                capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 def values():

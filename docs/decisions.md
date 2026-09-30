@@ -9215,3 +9215,19 @@ Urvalet av egna bedömningar läser samma `kallor.DELORD_TERMER` som sökverktyg
 Prov: nya fall fångar kantbindestreck, rangordning med flera ord, urvalets elfte ord, en ändrad gemensam konstant och verktygstexten för tur/jobb. Nya prov visade fel före kodrättningen; DelordProv är därefter grön med Python 3.9 och 3.12. Helsvit, separat granskning, skyddad publicering och driftåterläsning redovisas med sina faktiska kvitton i `evidence/nasta-uppdrag/local/backlog-plan-20260930/a40482/`. En kodkandidat eller denna post ensam är ingen verifiering av drift.
 
 Ersätter endast ovan angivna delar av PARTNER-SOK-DELORD-20260930. Ingen stamning, ny fördelning, ny behörighet, Runtime-ändring eller ändring i reserverade modellkartsfiler ingår.
+
+## PARTNER-DELAD-AGARTUR-20260930 — En gemensam tolkning av ÄGARENS TUR
+
+Genomför OVL-20260930-b17920 efter genomförandemandatet i den aktuella backlogsessionen.
+Ursprung: F-85 och tråd `t_1a0f2b8dbd94d9d5c4d`; originalbeställningens A1–A5.
+
+Aquariums rena `parse_owner_turn(plan, raw=False)` äger den befintliga grammatiken.
+`office_reader` anropar funktionen för `{kind, text, since}`. Partnerns `agarens_tur`
+anropar samma funktion med `raw=True` och behåller de ursprungliga strippade textraderna,
+även intern blankstegssättning. Ingen ny grammatik eller datumform införs.
+
+Gränsfallsproven jämför båda läsarna; ersatt delad funktion prövar faktisk delegering.
+Ett importprov förbjuder subprocess och nätanslutning medan partnerns systemläge importeras.
+Frusen main-plan, avsiktlig filtermutation och återställda prov bevaras privat tillsammans
+med helsvitens och den separata granskningens kvitton i beställningens genomförandeunderlag.
+Denna post påstår ingen ändrad partnerstatus, driftåterläsning eller ägarens ord.

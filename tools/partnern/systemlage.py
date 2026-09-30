@@ -14,6 +14,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+import aquarium
+
 from .lager import nu
 
 CACHE_SEKUNDER = 300
@@ -122,7 +124,7 @@ class Systemlage:
                 'agarens_tur': '\n'.join(rader)[:4000] if rader else '(tom: inga öppna rader)',
                 'agarens_tur_antal': len(rader),
                 'not': 'Planen på kontorets origin/main. Planen ensam äger nästa handling i kontoret. ÄGARENS TUR läses '
-                       'med samma regel som Aquarium: raderna "- [beslut] …" och "- [operatörshandling] …" efter en '
+                       'med den delade funktionen aquarium.parse_owner_turn: raderna "- [beslut] …" och "- [operatörshandling] …" efter en '
                        'rad som nämner ÄGARENS TUR, fram till första andra raden.'}
 
     def _pr(self) -> dict:
@@ -155,20 +157,8 @@ class Systemlage:
 
 
 def agarens_tur(plan: str) -> list:
-    """Ägarens öppna rader i planen, lästa som Aquarium läser dem (tools/aquarium.py, office_reader)."""
-    rader, inne = [], False
-    for rad in plan.splitlines():
-        r = rad.strip()
-        if 'ÄGARENS TUR' in r:
-            inne = True
-            continue
-        if not inne:
-            continue
-        if r.startswith('- [beslut] ') or r.startswith('- [operatörshandling] '):
-            rader.append(r)
-        else:
-            inne = False
-    return rader
+    """Ägarens råa textrader genom den delade, rena aquarium.parse_owner_turn."""
+    return aquarium.parse_owner_turn(plan, raw=True)
 
 
 def _komprimera(x, djup: int = 0):

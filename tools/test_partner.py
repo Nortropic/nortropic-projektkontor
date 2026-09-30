@@ -431,6 +431,14 @@ class WebbpolicyProv(unittest.TestCase):
 
 
 class SystemlageProv(unittest.TestCase):
+    def test_agarens_tur_calls_shared_parser(self):
+        import aquarium
+        from unittest.mock import patch
+        from partnern.systemlage import agarens_tur
+        with patch.object(aquarium, 'parse_owner_turn', return_value=['märkt rå rad']) as parser:
+            self.assertEqual(agarens_tur('plantext'), ['märkt rå rad'])
+            parser.assert_called_once_with('plantext', raw=True)
+
     def test_agarens_tur_lases_som_aquarium(self):
         from partnern.systemlage import agarens_tur
         plan = textwrap.dedent('''\
