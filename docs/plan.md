@@ -320,6 +320,13 @@ aktiveraren, så övergång 21 (D044 och D045) var Johnnys; han körde den 14:53
 tillägget 10:15 att övergång 20 är den sista kodövergången han kör själv var fel. Med denna ändring är beställningen
 FULL AUTONOMI UTAN ROOT levererad. Återupptagning: `evidence/nasta-uppdrag/local/full-autonomi-20260930/LAGE.md`.
 
+Tillägg 2026-09-30 (21:14 UTC): Opus 5.5 går att välja för Runtime (RUNTIME-BINARER-20260930). Runtimes D046 fäste
+Claude Code 2.1.285, kvalificerad på nytt, och agenten aktiverade den själv 21:01Z, den första genomförda automatiska
+kodövergången. Modellerna mättes om med den: 134 av 134 fungerade. Kontoret följer nu Runtimes fästa Claude Code, och
+läsarnas nivå är ett val med modellen; uppgiften i tillägget 03:26 att det kräver en ändring i Runtime är överspelad.
+Kvar: Codex 0.159.2 i en egen Runtime-ändring med Johnnys övergång, och Digitalas del av läsarnivån. Återupptagning:
+`evidence/nasta-uppdrag/local/runtime-binarer-20260930/LAGE.md`.
+
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
 

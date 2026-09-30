@@ -6,6 +6,7 @@ kaknyckeln läses ur en egen 0600-katalog.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -56,9 +57,33 @@ class Modell:
 
 # Startvaktens utförare: Runtimes fastlåsta binärer med de kontrollsummor Runtime själv binder (claude_profile.py och
 # evidence/v0.1/dependencies.json). Vilken som startar, och med vilken modell, väljs i Runtimes bemanning (rollen driver).
-RUNTIME_BIN = HEM / 'nortropic-repos/Nortropic Runtime/.runtime/bin'
+RUNTIME = HEM / 'nortropic-repos/Nortropic Runtime'
+RUNTIME_BIN = RUNTIME / '.runtime/bin'
+# Senast kända Claude-pinne (Runtime D046), när den aktiva releasen inte går att läsa.
+RUNTIME_CLAUDE_SENAST = ('2.1.285', '51f09bd1e021d9fa8a1864c179799bd37cb39962a937935c5cf6823398e86db4')
+
+
+def runtime_claude_pinne(runtime: Path = RUNTIME) -> tuple:
+    """(sökväg, sha256) för Runtimes fästa Claude Code, läst ur den aktiva releasens egen runtime/claude_profile.py
+    (VERSION och BINARY_SHA256), så att startvakten och modellmätningen följer Runtimes pinne utan en kontorsändring
+    när agenten aktiverar en ny (RUNTIME-BINARER-20260930): startvakten från partnerns nästa start, modellmätningen vid
+    varje körning. Går releasen inte att läsa, eller stämmer konfigurationen inte med pekarens sha256, gäller den senast
+    kända."""
+    try:
+        pekare = json.loads((runtime / '.runtime/ap10/active.json').read_text('utf-8'))
+        config = Path(pekare['config'])
+        if hashlib.sha256(config.read_bytes()).hexdigest() != pekare['sha256']:   # som kontorets andra releaseläsningar
+            raise ValueError('active.json pekar på en konfiguration med annan sha256')
+        text = (config.parent / 'runtime/runtime/claude_profile.py').read_text('utf-8')
+        version = re.search(r"^VERSION = '([0-9][0-9.]{0,15})'$", text, re.M).group(1)
+        sha = re.search(r"^BINARY_SHA256 = '([0-9a-f]{64})'$", text, re.M).group(1)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        version, sha = RUNTIME_CLAUDE_SENAST
+    return str(runtime / '.runtime/bin' / ('claude-' + version)), sha
+
+
 STARTVAKT_BINARER = {
-    'claude': (str(RUNTIME_BIN / 'claude-2.1.257'), '64590d7d9d9c189d33fb3dfa58c5408eaf2a10fe556bd84155d95efaab46b60e'),
+    'claude': runtime_claude_pinne(),
     'codex': (str(RUNTIME_BIN / 'codex-0.155.1'), '8eaf1ad12fe6bf89b1710330f58900014322c7c5af677e43be116d8ac5fc0a9e'),
 }
 

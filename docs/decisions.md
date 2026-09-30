@@ -8767,6 +8767,9 @@ steg 2 och väntar alltså på D040.
 **Delvis ersatt av:** RUNTIME-OVERGANG-19-AKTIV-20260930, i fråga om meningen att `tools/ARBETSPLATS.md` säger att D040 inte är på Runtimes
 main: D040 och D041 är aktiva sedan övergång 19, och ARBETSPLATS.md säger det. Övrigt gäller.
 
+**Delvis ersatt av:** RUNTIME-BINARER-20260930, i fråga om att läsarnas ansträngning följer Runtimes läsarprofil och att
+ett val av den kräver en ändring i Runtime: Runtimes D046 gjorde ändringen, och nivån väljs nu med modellen. Övrigt gäller.
+
 ## RUNTIME-OVERGANG-19-20260930 — steg 2 av MODELLKARTA-20260929, Runtimes del: D040 och D041 är på Runtimes main, och övergång 19 med aktiveraren väntar på ägarens engångsblock
 
 **Status:** registrerat 2026-09-30 av sessionen nortropic-repos-d7 (Claude Code) på ägarens beställning
@@ -9252,3 +9255,51 @@ tillsammans med originalkällorna för strömmarnas format. Nyckellös helsvit,
 separat granskningskvitto och skyddad publicering binds till exakt kandidat av
 värden. Originalpartnerdata skrivs inte som del av detta genomförande och
 aktivering av tjänsten är inte bevisad genom kodintegration.
+
+## RUNTIME-BINARER-20260930 — Opus 5.5 går att välja för Runtime; kontoret följer Runtimes fästa Claude Code, och läsarnas nivå är ett val
+
+**Status:** registrerat 2026-09-30 av sessionen nortropic-repos-07 (Claude Code). Johnnys ord är sparade ordagrant i
+`evidence/nasta-uppdrag/local/runtime-binarer-20260930/owner-words-runtime-binarer-20260930.md`. Läget med kvitton står i
+`evidence/nasta-uppdrag/local/runtime-binarer-20260930/LAGE.md`.
+
+**Beställningen.** "fixa opus 5.5 för runtime vid tillfälle, hur kan det inte vara uppdaterat? jag tror även codex har
+uppdateringar." och "jag kan bara välja medium på läsarna också, inte högre än så."
+
+**Varför Opus 5.5 saknades.** Runtime kör en fäst Claude Code, bunden med sha256, så att en release alltid kör samma
+byte. Den var 2.1.257, och arbetsplatsens mätning 2026-09-29 fick för Opus 5.5 på varje nivå "version 2.1.280 or newer is
+required". Ingenting uppdaterade den fästa versionen.
+
+**Runtime D046 (PR 80, merge `bbe2246`).** Claude Code 2.1.285 är fäst och kvalificerad på nytt på samma sätt som
+2.1.257 (Runtimes D019). Kvalificeringen hittade att 2.1.285 startar två inbyggda tillägg även under `--restricted`,
+något varje terminalkontroll i Runtime vägrar, och profilen slår av dem. Kritik- och provarprofilen tar en nivå
+(`--anstrangning`); utan den bygger de samma kommando som förut. D046 rör ingen av ägarens filer och inte AP-10:s
+kommando, så agenten aktiverade den själv 2026-09-30 21:01Z efter en isolerad övning. Det är den första genomförda
+automatiska kodövergången; den första, av D044 samma dag, vägrades i övningen. Sessionens återläsning 21:01:33Z: releasen och tjänsten på konfigurationen `6c72e39e`, vakterna utan
+avvikelser, Johnnys modellval (Fable 5.1, max) och bevakningens val oförändrade, AP10 bundet och inte pausat.
+
+**Modellmätningen 21:02–21:05Z.** Arbetsplatsens egen mätning (`tools/partnern/modellmatning.mat`) kördes med Runtimes
+fästa 2.1.285 som Runtimes program: 134 av 134 kombinationer fungerade, och Opus 5.5 fungerar på alla nivåer i Runtimes
+program. Kvittot (`evidence/partner/local/modellmatning.json`) namnger varje program med sökväg och version.
+
+**Kontoret här.**
+- `tools/partnern/konfig.py`: startvaktens och modellmätningens Claude-pinne läses ur den aktiva releasens
+  `runtime/claude_profile.py` (`runtime_claude_pinne`), så att de följer Runtime när agenten aktiverar en ny pinne:
+  startvakten från partnerns nästa start, modellmätningen vid varje körning. Går releasen inte att läsa, eller stämmer
+  konfigurationen inte med pekarens sha256, gäller den senast kända (2.1.285). Codex-pinnen är oförändrad.
+- Läsarnas nivå: när den aktiva releasen tar emot en nivå erbjuder kortet varje modells nivåer som fungerade i Runtimes
+  program, och valet sparas med nivån (`lasare.anstrangning`). `partner.py lasare` skriver nivån, och kontorets
+  granskning (`tools/granska.py`) skickar den till läsarprofilen och bokför den. Utan nivå följer nivån läsarprofilens
+  egen som förut. Tar den aktiva releasen ingen nivå, till exempel efter en återgång, används ingen sparad nivå: kortet
+  visar profilens egen och granskningen skickar ingen. Digitalas kritik och provare skickar nivån först när Digitala gör
+  det.
+
+**Kvar.** Codex 0.159.2: Codex-sökvägen sitter i aktiveraren (`model_choice.py`, en ägarfil) och en ny sökväg ändrar
+AP-10:s kommando, så den blir en egen Runtime-ändring med Johnnys övergång. Digitalas del av läsarnivån.
+
+**Oförändrat.** Här ändras bara planen, beslutsloggen (den nya posten och markeringen sist i LASARNAS-VAL-20260930),
+`tools/ARBETSPLATS.md`, `tools/PARTNER.md`, `tools/partnern/konfig.py`, `tools/partnern/modellkarta.py`,
+`tools/partnern/ui/karta.js`, `tools/partner.py`, `tools/granska.py` och deras prov.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om partnerns tjänst ur main.
+
+**Avslut.** Klart när ändringen är integrerad och partnerns tjänst har startats om ur main enligt driftregeln.

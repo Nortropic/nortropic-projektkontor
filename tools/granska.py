@@ -9,7 +9,9 @@ kopierar underlaget till en arbetsyta utanför alla repon, läser bara, kör och
 granskningens schema (verdict, blocking_findings, summary, residual_notes). Claude eller Codex kör efter modellen.
 
 Modellen är läsarnas val i Flödet, läst i processen med samma funktion som `partner.py lasare`. Finns ett val nekas en
-annan --modell, och finns inget anger sessionen --modell. Ansträngningen följer Runtimes läsarprofil. Verktyget skriver
+annan --modell, och finns inget anger sessionen --modell. Bär valet en nivå går den till läsarprofilen som
+--anstrangning, men bara när den aktiva releasen tar emot en (Runtime D046, `web_common.reader_effort`); annars, och
+utan nivå i valet, följer ansträngningen Runtimes läsarprofil och en sparad nivå bokförs som oanvänd. Verktyget skriver
 granskningens svarsform i KATALOG/schema.json. Utfallet skrivs i KATALOG/review.json, aldrig över ett tidigare. Det
 innehåller modellen, utföraren och varifrån modellen kom, Runtimes körkatalog med kvittot (varje kopierad fil med
 sha256) och svaret. Runtime hittas genom NR_HOST_ROOT eller kontorets Runtime-repo. Ett avbrott skickas vidare till
@@ -47,7 +49,8 @@ class Nekad(Exception):
 
 
 def modell_och_utforare(k, begard: str | None) -> tuple:
-    """(modell, utförare, varifrån): läsarnas val går först och en annan begärd modell nekas; utan val krävs --modell."""
+    """(modell, utförare, varifrån, sparad nivå): läsarnas val går först och en annan begärd modell nekas; utan val krävs
+    --modell. Valet läses en gång, så modell och nivå kommer ur samma val."""
     try:
         val = modellkarta.lasarval(k)
     except ValueError as fel:
@@ -56,7 +59,7 @@ def modell_och_utforare(k, begard: str | None) -> tuple:
         if begard and begard != val['modell']:
             raise Nekad('Läsarnas val i Flödet är %s, så en annan modell (%s) nekas. Ändra valet i Flödet eller ta bort '
                         'det, så väljer sessionen igen.' % (val['modell'], begard))
-        return val['modell'], val['utforare'], 'readers'
+        return val['modell'], val['utforare'], 'readers', val['anstrangning']
     if not begard:
         raise Nekad('Läsarna har inget val i Flödet; ange --modell.')
     if begard.startswith('claude') and begard not in modellkarta.MODELL_ID:
@@ -66,7 +69,7 @@ def modell_och_utforare(k, begard: str | None) -> tuple:
     utforare = modellkarta.utforare_for(begard)
     if utforare is None:
         raise Nekad('Okänd modell: %r' % begard)
-    return begard, utforare, 'argument'
+    return begard, utforare, 'argument', None
 
 
 def runtime_rot(k) -> Path:
@@ -89,8 +92,12 @@ def aktiv_release(rot: Path) -> dict:
     kod = config.parent / 'runtime'
     if not (kod / 'runtime/web_critique.py').is_file():
         raise Nekad('Den aktiva releasen saknar läsarprofilen (runtime/web_critique.py): %s' % kod)
+    try:   # Runtime D046: kritikprofilen tar en nivå; en äldre release vägrar ett okänt argument
+        tar_niva = re.search(r'^def reader_effort\(', (kod / 'runtime/web_common.py').read_text('utf-8'), re.M) is not None
+    except OSError:
+        tar_niva = False
     return {'config': str(config), 'config_sha256': active['sha256'], 'code': str(kod),
-            'python': str(rot / '.runtime/temporal-venv/bin/python')}
+            'python': str(rot / '.runtime/temporal-venv/bin/python'), 'tar_niva': tar_niva}
 
 
 def miljo(rot: Path) -> dict:
@@ -173,15 +180,17 @@ def granska(katalog: Path, begard: str | None, tid: int) -> int:
     if not 60 <= tid <= 2700:
         raise Nekad('--tid är 60-2700 sekunder (Runtimes gräns för läsarprofilen)')
     k = kf.ladda()
-    modell, utforare, ur = modell_och_utforare(k, begard)
+    modell, utforare, ur, sparad_niva = modell_och_utforare(k, begard)
     rot = runtime_rot(k)
     release = aktiv_release(rot)
+    niva = sparad_niva if release['tar_niva'] else None
     schema.write_text(json.dumps(SCHEMA, indent=1) + '\n')
     cmd = [release['python'], '-B', '-m', 'runtime.web_critique', '--underlag', str(underlag), '--fraga', str(fraga),
            '--schema', str(schema), '--utforare', utforare, '--modell', modell, '--etikett', etikett(katalog),
-           '--tid', str(tid)]
-    print('Granskar med %s (%s; %s) genom Runtimes läsarprofil.'
-          % (modell, utforare, 'läsarnas val i Flödet' if ur == 'readers' else 'sessionens --modell'), flush=True)
+           '--tid', str(tid)] + (['--anstrangning', niva] if niva else [])
+    print('Granskar med %s%s (%s; %s) genom Runtimes läsarprofil.'
+          % (modell, ' · ' + niva if niva else '', utforare,
+             'läsarnas val i Flödet' if ur == 'readers' else 'sessionens --modell'), flush=True)
     borjan = time.monotonic()
     kod, ut, fel, avbruten = kor(cmd, release['code'], miljo(rot))
     rad = {}
@@ -194,6 +203,8 @@ def granska(katalog: Path, begard: str | None, tid: int) -> int:
         # Runtime nekade före körningen (till exempel underlagets form): ingen läsare startade och katalogen kan användas igen
         raise Nekad('Runtimes läsarprofil nekade: %s' % rad.get('reason'))
     post = {'schema': 'kontorsgranskning/1', 'model': modell, 'executor': utforare, 'model_from': ur,
+            'effort': niva, 'effort_saved': sparad_niva,
+            'effort_from': 'readers' if niva else ('profile: the active release takes no level' if sparad_niva else 'profile'),
             'runtime': {'host_root': str(rot), 'release_config_sha256': release['config_sha256'], 'code': release['code']},
             'argv': cmd, 'exit': kod, 'seconds': round(time.monotonic() - borjan, 1), 'interrupted': avbruten,
             'outcome': rad.get('outcome'), 'reason': rad.get('reason'), 'run': rad.get('run'), 'answer': None,

@@ -114,9 +114,11 @@ function valrad(nyckel, etikett, v, erbjud, medNiva, program) {  // modell- och 
       nivaer.map((n) => el('option', { value: n, text: n, selected: n === u.anstrangning }))));
   } else if (v.anstrangning || (m && m.nivaer.length)) rad.append(el('span', { class: 'fv-fast liten', title: 'Fast i Runtimes läsarprofil', text: (m && m.nivaer[0]) || v.anstrangning }));
   const andrad = !!kt.utkast[nyckel] && (u.modell !== (v.modell || '') || (medNiva && u.anstrangning !== (v.anstrangning || '')));
-  const klar = !medNiva || (m && nivaer.includes(u.anstrangning)) || (nyckel === 'lasare');
+  // Läsarna utan val ("sessionen väljer") behöver ingen nivå; med ett val och en release som tar nivån krävs en bevisad.
+  const klar = !medNiva || (nyckel === 'lasare' && !u.modell) || (m && nivaer.includes(u.anstrangning));
   if (andrad || kt.sparar === nyckel) rad.append(el('button', { type: 'button', id: 'fv-spara-' + nyckel, class: 'knapp primar fv-spara', disabled: !klar || kt.sparar === nyckel,
-    onclick: () => sparaVal(nyckel, u) }, kt.sparar === nyckel ? 'Sparar…' : 'Spara'));
+    // utan nivåmeny skickas ingen nivå: den som visas är då profilens egen och inget val
+    onclick: () => sparaVal(nyckel, medNiva ? u : Object.assign({}, u, { anstrangning: '' })) }, kt.sparar === nyckel ? 'Sparar…' : 'Spara'));
   if (andrad) rad.append(el('button', { type: 'button', class: 'lank', onclick: () => { delete kt.utkast[nyckel]; ritaFlodet('fv-kort-' + (nyckel === 'claude_code' || nyckel === 'codex' ? 'sessioner' : nyckel)); } }, 'Ångra'));
   const delar = [rad];
   if (v.bevisad === false) delar.push(status('Nuvarande värde har inte fungerat i senaste mätningen.', 'varning'));
@@ -200,7 +202,7 @@ function valkort(k) {
   } else if (v.valbar) {
     // Runtime och bevakningen utgår från det önskade valet när ett väntar på att aktiveras
     const bas = v.onskat ? Object.assign({}, v, { modell: v.onskat.modell, anstrangning: v.onskat.anstrangning, bevisad: null }) : v;
-    kort.append(...valrad(k, v.namn, bas, v.erbjud || [], k !== 'lasare'));
+    kort.append(...valrad(k, v.namn, bas, v.erbjud || [], k !== 'lasare' || !!v.niva_valbar));
     if (k === 'runtime' || k === 'bevakning') kort.append(...aktiveringsrader(v));
   } else {
     kort.append(el('div', { class: 'fv-varde', text: vardetext(v) }));
