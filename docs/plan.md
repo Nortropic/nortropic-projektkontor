@@ -1,3 +1,37 @@
+# Backlog: advisoryintag, förbrukning och beroenden
+
+Direkt sessionmandat 2026-09-30: implementera hela backloggen autonomt. Denna omgång
+samlar OVL-20260930-ac1914 C2, OVL-20260930-82c52c K1–K3 och
+OVL-20260930-5fabe2 K1–K5. Originalbeställningar och partnerstatus ändras inte.
+Arbetsyta `../nortropic-kontor-backlog-samlad-20260930`, gren `backlog/samlad-20260930`.
+Sökning S1–S4 är integrerad genom PR153; denna kandidat utgår från dess main.
+
+Nästa: exakt slutkandidat mäts med nyckellös helsvit, varje orders oberoende
+acceptans och separat helhetsgranskning. Därefter skyddad integration.
+Ingen aktivering eller ny ägarkvittens följer av kodintegrationen. C2:s frysta
+AP10-policy måste kvalificeras och aktiveringssteget beredas i ett Johnny-block.
+Övriga steg/krav finns kvar i privat `backlog-plan-20260930/GENOMFORANDE.md`.
+
+---
+
+# Gällande återupptagning — backloggens förbrukning och avgöranden
+
+OVL-20260930-82c52c K1–K3 genomförs inom sessionens uttryckliga mandat att
+implementera backloggen autonomt. Kodens omfattning och strömformat står i
+`tools/PARTNER.md`, avsnitt Förbrukning och avgöranden per överlämning;
+beslutspost `PARTNER-FORBRUKNING-AVGORANDEN-20260930` anger gränserna.
+Detta block äger återupptagning bara för denna beställning.
+
+Nästa handling: pröva exakt kandidat i nyckellös helsvit, separat granskning
+utan blockerande fynd och skyddad integration. Förbrukningens provdata är
+syntetiska; ingen verklig mottagarsession eller partneromstart ingår. Original-
+paketens status och kvittenser lämnas orörda. Den samlade genomföranderedovisningen
+finns privat i `evidence/nasta-uppdrag/local/backlog-plan-20260930/GENOMFORANDE.md`.
+Efter integration är nästa handling att redovisa eventuell driftaktivering
+separat, utan att likställa main med aktiv tjänst.
+
+---
+
 # Gällande återupptagning — Digitalas underhållsform och tak, 2026-09-29
 
 DIGITALA-UNDERHALL-20260929 är registrerad: ägaren beslutade underhållsformen för riktiga kunder och taket 20 läsande

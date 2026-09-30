@@ -496,3 +496,94 @@ fel och avbrott utan en andra session, ändrad binär, en vilande beställning s
 den (inte heller med en kvittensrad eller ett felaktigt index), att prov- och utvecklingsinstanser aldrig startar något och att
 processer, färska worktrees och raderade arbetskataloger bedöms rätt. Kopieringen prövas i en riktig webbläsare
 (se beslutet).
+
+
+### Förbrukning och avgöranden per överlämning
+
+OVL-20260930-82c52c K1–K3: efter en avslutad startvaktskörning räknas
+`session/korning-NN.jsonl` utan modell till paketets privata `FORBRUKNING.json`.
+`python3 -B tools/partner.py forbrukning OVL-ID` räknar om samma fil; saknad
+ström ger utfall 1 och skäl. Kommandot startar ingen session och ändrar ingen
+kvittens. `backlog --alla` och verktyget backlog med `alla: true` visar sparade
+tal, okänt för saknade uppgifter eller inte räknad. Läsningen skriver ingenting;
+ett kvitto vars källhash inte längre stämmer visas som inte räknad.
+
+Varje tal bär fil, SHA256 och rad där talet kommer från en händelse. Tokens in
+är Claude usage.input_tokens respektive Codex input_tokens minus
+cached_input_tokens; cache läst och skrivet redovisas som egna rapporterade
+fält. Codex cache_write_input_tokens är en särredovisad del, ingen extra summa
+läggs ovanpå. Output tokens läses direkt; reasoning_output_tokens läggs inte
+ovanpå. Saknat eller ogiltigt fält blir null/okänt, aldrig en antagen nolla.
+Ingen dollarberäkning eller uppskattning av abonnemangets återstående kvot görs.
+Omfattningen är den sparade huvudloopen, inte oredovisade underagenters arbete.
+
+Claude-resultatets usage summeras per tur, inte dess kumulativa modelUsage eller
+kostnadsfält. Synliga huvudsvar räknas per unikt message.id, så parallella
+innehållsblock inte dubbleras. Komprimering räknas ur system/compact_boundary
+i en avslutad ström. Codex exec 0.155.1:s turn.completed skriver i implementationen
+trådens usage.total: senaste värdet per thread_id används över fortsättningar,
+inte summan av samma kumulativa värde flera gånger. Sjunkande räknare ger okänt.
+Synliga agent_message räknas per item.id i varje körning; det är inte antalet
+interna modellanrop. Codex-formatet redovisar inte komprimeringar, så de är okända.
+Väggtid är skillnaden mellan startvaktens start- och avslutsobservation i START.jsonl;
+den kan inkludera tiden till nästa uppföljning och är inte exakt processtid.
+Körningar räknas ur sparade strömmar; saknas en ström som START.jsonl namnger
+blir summeringen okänd. Ofullständiga strömmar påstås inte ha fulla totalsiffror.
+
+Fortsättning börjar med kontroll av git log/status i repo och worktrees,
+push, PR och KVITTENS.jsonl före uppmaningen att fortsätta; gjort arbete görs
+inte om. Nya starter markerar `avgoranden_kravs` i START.jsonl före prompten når
+mottagaren. Före levererad krävs då en läsbar, icke tom `AVGORANDEN.md` med
+varje avgörande på Johnnys vägnar och kostnaden om det är fel, eller texten
+"inga avgöranden". Det är sessionens redovisning. Kvittensen binder filnamn och
+SHA256; frånvaro ger utfall 1 utan kvittensrad. Äldre starter utan markeringen
+har samma leveransregel som tidigare. Innehållets kvalitet bedöms vid granskning;
+filkontrollen kan inte avgöra om sessionen verkligen redovisat alla avgöranden.
+
+Källor för strömtolkningen, lästa 2026-09-30:
+[Claude SDK:s usage och meddelande-id](https://code.claude.com/docs/en/agent-sdk/cost-tracking),
+[Claude compact boundary](https://code.claude.com/docs/en/agent-sdk/streaming-output),
+[Codex 0.155.1 events](https://github.com/openai/codex/blob/rust-v0.155.1/sdk/typescript/src/events.ts)
+och [dess användning av usage.total](https://github.com/openai/codex/blob/rust-v0.155.1/codex-rs/exec/src/event_processor_with_jsonl_output.rs).
+Ingen levande Claude-körning krävs för att räkna befintliga strömmar.
+
+
+### Strukturerade beroenden i backloggen
+
+OVL-20260930-5fabe2 K1–K5: `bered_uppdrag` tar fältet `beroenden`, en lista med
+`overlamning` (ett befintligt OVL-id), `slag` (`blockerar`, standard, eller
+`beror`), valfria `krav` och en kort `vad`. Id:t ska finnas i lagret eller som
+paket; ogiltig form, okända id och dubbletter vägras före paketet skapas.
+Varje OVL-id i `ordning_och_beroenden` måste också vara klassat i listan.
+Nya paket bär alltid fältet, även som tom lista; arbetsordern och AP06-utkastet
+visar det andra uppdragets rubrik före id. Krav-id är upplysning, inte delkvittens.
+
+`backlog`, kommandoraden och Backlog-panelen visar samma Släppbar-rad och räknar
+vilande, släppbara nu, blockerade och okända. Läget räknas bara ur paketens sista
+gällande kvittenser, aldrig ur Git, PR, planen eller indexets status:
+
+- släppbar nu: alla blockerande beroenden är levererade, eller inga finns;
+- blockerad: ett blockerande beroende är vilande, lämnat, mottaget eller startat;
+- blockerad: beroendet avslaget: ett blockerande beroende är avslaget;
+- okänd: ett paket/journalen inte går att läsa, beroendeformen är felaktig eller
+  det äldre paketet saknar fältet, med skälet **beroenden i fri text**.
+
+Okänt räknas aldrig som släppbar. `beror` visas men blockerar inte när paketets
+status går att läsa. Okända paket ger okänt läge även om en annan blockerare är
+känd; skälet bevarar också de kända blockerarna. Indexfel gör senare poster
+okända men hindrar inte den separata paketläsningen. `backlog --alla` räknar
+även släppta och avslagna beställningars läge vid läsningen. Varje vilande post
+räknas i sammanfattningen, även stödposter som andra beställningar beror på.
+
+Ett uttryckligt släpp vägras inte på grund av beroendeläget. Släppsvaret och
+släppets egen KVITTENS-rad bevarar läget med rubrik, id och status för varje
+beroende. Den vanliga prövningen av senare poster gäller fortfarande. Mottagarens
+instruktion använder denna ögonblicksbild; om läget inte var släppbart ska
+förutsättningarna kontrolleras och mottagaren avsluta med avslagen och skäl om
+det som behövs saknas, utan att bygga runt det. Ett avslag får ingen sådan
+beroendeprövning eller rad. Ingen annan befintlig paketfil skrivs om. Äldre
+paket får inte fältet i efterhand, och en vilande beställning startas aldrig.
+
+Källa: OVL-20260930-5fabe2 K1–K5. Syntetiska prov använder partnerns avskilda
+provinstans. Kodintegration och tjänsteomstart är skilda; ingen omstart eller
+första verklig nyskapad beställning påstås genom dessa prov.

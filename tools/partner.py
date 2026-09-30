@@ -183,13 +183,26 @@ def backlog(k, args) -> int:
 
 
 def kvittera(k, args) -> int:
-    from partnern.overlamning import kvittera as kv
+    from partnern.overlamning import kvittera as kv, AvgorandenSaknas
     try:
         fil = kv(k, args.id, args.status, args.av, args.bevis or '')
     except (ValueError, FileNotFoundError) as fel:
         print('Ingen kvittens skrevs: %s' % fel, file=sys.stderr)
-        return 2
+        return 1 if isinstance(fel, AvgorandenSaknas) else 2
     print('Kvitterat %s som %s i %s. Partnern visar statusen i tråden (inom 30 s när tjänsten kör).' % (args.id, args.status, fil))
+    return 0
+
+
+def forbrukning(k, args) -> int:
+    from partnern.overlamning import OVL_ID, paketrot
+    from partnern.forbrukning import spara
+    try:
+        if not OVL_ID.fullmatch(args.id):raise ValueError('ogiltigt överlämnings-id')
+        result=spara(paketrot(k)/('partner-'+args.id))
+    except (OSError,ValueError,UnicodeError):
+        print('Förbrukning inte räknad: sparad körningsström saknas eller går inte att läsa.',file=sys.stderr)
+        return 1
+    print(json.dumps(result,ensure_ascii=False,indent=2))
     return 0
 
 
@@ -274,6 +287,8 @@ def main(argv=None) -> int:
     bl.add_argument('--alla', action='store_true', help='visa också släppta och avslagna beställningar ur backloggen')
     sub.add_parser('matmodeller')
     sub.add_parser('lasare')
+    fb = sub.add_parser('forbrukning')
+    fb.add_argument('id')
     kv = sub.add_parser('kvittera')
     kv.add_argument('id')
     kv.add_argument('status', choices=['mottagen', 'startad', 'levererad', 'avslagen'])
@@ -283,7 +298,7 @@ def main(argv=None) -> int:
     k = kf.ladda()
     return {'start': start, 'kor': kor, 'stopp': stopp, 'status': status, 'oppna': oppna, 'index': index,
             'overlamningar': overlamningar, 'backlog': backlog, 'kvittera': kvittera, 'autostart': autostart,
-            'app': app, 'matmodeller': matmodeller, 'lasare': lasare}[args.kommando](k, args)
+            'app': app, 'matmodeller': matmodeller, 'lasare': lasare, 'forbrukning':forbrukning}[args.kommando](k, args)
 
 
 if __name__ == '__main__':

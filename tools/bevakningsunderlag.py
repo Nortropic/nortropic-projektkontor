@@ -13,6 +13,7 @@ import re
 import stat
 import urllib.request
 import zlib
+from urllib.parse import urlencode
 
 
 LOCAL_FILES = (
@@ -30,10 +31,17 @@ PYTHON_INDEX = "https://www.python.org/downloads/source/"
 TEMPORAL_BASE = "https://api.github.com/repos/temporalio/sdk-python/releases"
 TEMPORAL_INDEX = TEMPORAL_BASE + "?per_page=20"
 VERSION = r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)"
+LOCK_FILE = 'config/temporal-probe-requirements.lock'
+LOCK_VERSION = r'[0-9]+(?:\.[0-9]+){1,3}'
+PACKAGE = r'[a-z0-9](?:[a-z0-9.-]{0,198}[a-z0-9])?'
+ADVISORIES = 'https://api.github.com/advisories'
+MAX_PACKAGES = 50
 COVERAGE = (
     "Python: vald installerad major/minor-linje samt installerad utgåva. "
     "Temporal: stabila utgåvor bland de första 20 indexposterna samt installerad "
     "utgåva via tagg. Namngivna lokala filer i active och working. "
+    "GitHub-granskade, ej återkallade pip-advisories för varje exakt paket/version i aktiva låsfilen; "
+    "inte malware/unreviewed. Högst 50 paket, en sida om 100 per paket; sidtak ger okänt. "
     "Ingen garanti för fullständigt källurval, sakgodkännande eller befogenhet."
 )
 
@@ -47,6 +55,8 @@ def _allowed(url):
         url in (PYTHON_INDEX, TEMPORAL_INDEX)
         or re.fullmatch(r"https://www\.python\.org/downloads/release/python-[0-9]+/", url)
         or re.fullmatch(re.escape(TEMPORAL_BASE) + r"/tags/" + VERSION, url)
+        or re.fullmatch(re.escape(ADVISORIES) + r'\?ecosystem=pip&affects=' + PACKAGE + r'%40' + LOCK_VERSION
+                        + r'&type=reviewed&is_withdrawn=false&per_page=100', url)
     )
 
 
@@ -69,6 +79,10 @@ def fetch(url):
         with opener.open(request, timeout=TIMEOUT) as response:
             if response.status != 200 or response.geturl() != url:
                 raise IntakeError("http_or_redirect_error")
+            if url.startswith(ADVISORIES+'?') and any(
+                re.search(r'rel\s*=\s*"?next\b', link, re.I) for link in response.headers.get_all('Link', [])
+            ):
+                raise IntakeError('advisory_pagination_required')
             encodings = response.headers.get_all("Content-Encoding", [])
             if len(encodings) > 1:
                 raise IntakeError("content_encoding_unsupported")
@@ -294,6 +308,72 @@ def _record(identity, url=None):
     return record
 
 
+def _package_name(name):
+    return re.sub(r'[-_.]+', '-', name).lower()
+
+
+def _locked_packages(raw):
+    """Read exact numeric pip pins and SHA-256 hashes; unfamiliar syntax is unknown."""
+    packages = {}
+    for line in raw.decode('utf-8').replace('\\\n', ' ').splitlines():
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        match = re.fullmatch(r'([A-Za-z0-9][A-Za-z0-9._-]*)==(' + LOCK_VERSION + r')'
+                             + r'(?:[ \t]+--hash=sha256:[0-9a-f]{64})+', line)
+        if not match:
+            raise IntakeError('unsupported_lock_syntax')
+        name, version = _package_name(match[1]), match[2]
+        if not re.fullmatch(PACKAGE, name) or name in packages:
+            raise IntakeError('invalid_or_duplicate_package')
+        packages[name] = version
+    if not packages or len(packages) > MAX_PACKAGES:
+        raise IntakeError('empty_or_oversize_lock')
+    return sorted(packages.items())
+
+
+def _advisory_url(name, version):
+    url = ADVISORIES + '?' + urlencode({'ecosystem':'pip', 'affects':name+'@'+version,
+                                       'type':'reviewed', 'is_withdrawn':'false', 'per_page':100})
+    if not _allowed(url):
+        raise IntakeError('url_denied')
+    return url
+
+
+def _advisories(raw, package, version):
+    rows = json.loads(raw)
+    if not isinstance(rows, list) or len(rows) >= 100:
+        raise IntakeError('advisory_malformed_or_page_limit')
+    result, seen = [], set()
+    for row in rows:
+        if (not isinstance(row, dict) or not isinstance(row.get('ghsa_id'), str)
+                or not re.fullmatch(r'GHSA-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}', row['ghsa_id'])
+                or row['ghsa_id'] in seen or row.get('type') != 'reviewed' or row.get('withdrawn_at') is not None
+                or row.get('severity') not in ('unknown', 'low', 'medium', 'high', 'critical')
+                or not isinstance(row.get('vulnerabilities'), list)):
+            raise IntakeError('advisory_malformed')
+        matching = []
+        for v in row['vulnerabilities']:
+            if not isinstance(v, dict) or not isinstance(v.get('package'), dict):
+                raise IntakeError('advisory_malformed')
+            p = v['package']
+            if p.get('ecosystem') != 'pip' or not isinstance(p.get('name'), str) or _package_name(p['name']) != package:
+                continue
+            fixed = v.get('first_patched_version')
+            affected = v.get('vulnerable_version_range')
+            if ((fixed is not None and (not isinstance(fixed, str) or not fixed.strip() or len(fixed) > 200))
+                    or not isinstance(affected, str) or not affected.strip() or len(affected) > 1000):
+                raise IntakeError('advisory_malformed')
+            matching.append({'affected_range': affected, 'first_patched_version': fixed})
+        if not matching:
+            raise IntakeError('advisory_package_mismatch')
+        seen.add(row['ghsa_id'])
+        result.append({'ghsa_id': row['ghsa_id'], 'severity': row['severity'], 'package': package,
+                       'locked_version': version, 'patches': matching,
+                       'applicability': 'GitHub affects=package@version; each listed patch belongs to its stated range'})
+    return result, None
+
+
 def _fingerprint(packet):
     basis = {"versions": packet["versions"]}
     for group in ("sources", "local"):
@@ -359,6 +439,7 @@ def collect(output, local_roots, versions, previous=None, fetcher=None):
         for version in dict.fromkeys(v for v in (temporal_latest, versions["temporalio"]) if v):
             source("temporal-" + version, TEMPORAL_BASE + "/tags/" + version,
                    lambda raw, v=version: _temporal_notes(raw, v))
+        active_lock = None
         for root_name in ("active", "working"):
             for relative in LOCAL_FILES:
                 record = _record(root_name + ":" + relative)
@@ -371,6 +452,33 @@ def collect(output, local_roots, versions, previous=None, fetcher=None):
                 name = root_name + "-" + relative.replace("/", "_")
                 _write(destination, name, raw)
                 record.update(status="available", sha256=sha256(raw).hexdigest(), path=name)
+                if root_name == 'active' and relative == LOCK_FILE:
+                    active_lock = raw
+        try:
+            packages = _locked_packages(active_lock) if active_lock is not None else []
+            if not packages:
+                raise IntakeError('active_lock_unavailable')
+        except (IntakeError, UnicodeError):
+            record = _record('advisory-lock')
+            record['error'] = 'active_lock_unavailable_or_unsupported'
+            packet['sources'].append(record)
+            packages = []
+        for package, version in packages:
+            identity = 'advisories-' + package + '-' + version
+            observations = source(identity, _advisory_url(package, version),
+                                  lambda raw, p=package, v=version: _advisories(raw, p, v))
+            if observations is None:
+                continue
+            # Separate observations reach the existing policy via ordinary hashed sources.
+            # Timestamp stays in record metadata, so identical findings can reuse prior review.
+            for item in observations or [{'package':package, 'locked_version':version, 'state':'inga_kanda_granskade'}]:
+                rid = identity + '-' + item.get('ghsa_id', 'none')
+                observation = _record(rid, _advisory_url(package, version))
+                name = rid + '.json'
+                raw = (json.dumps(dict(item, derived_from=identity), sort_keys=True, ensure_ascii=True) + '\n').encode()
+                _write(destination, name, raw)
+                observation.update(status='available', path=name, sha256=sha256(raw).hexdigest(), derived_from=identity)
+                packet['sources'].append(observation)
         packet["complete"] = all(r["status"] == "available" for r in packet["sources"] + packet["local"])
         if packet["complete"]:
             packet["fingerprint"] = _fingerprint(packet)

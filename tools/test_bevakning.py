@@ -18,6 +18,18 @@ def write(path, value):
 
 
 class PolicyTests(unittest.TestCase):
+    def test_advisory_observation_reaches_existing_analysis_and_review_workspaces(self):
+        self.fixture.responses[intake._advisory_url('temporalio','1.8.0')]=intake_tests.encoded([intake_tests.advisory()])
+        home,_=self.round();self.stages(home)
+        identity='advisories-temporalio-1.8.0-GHSA-2345-6789-cfgh'
+        for role in ('analysis','review'):
+            dest=self.base/('advisory-'+role);dest.mkdir()
+            policy.workspace(dest,home,self.context,role)
+            info=json.loads((dest/'INPUT.json').read_bytes())
+            value=json.loads((dest/info['records'][identity]).read_bytes())
+            self.assertEqual((value['ghsa_id'],value['severity']),('GHSA-2345-6789-cfgh','high'))
+        self.assertFalse(self.finish(home)['action_executed'])
+
     def setUp(self):
         self.fixture = intake_tests.CollectionTests()
         self.fixture.setUp()

@@ -1212,6 +1212,112 @@ class BacklogProv(Miljo):
 
     svar = VerktygProv.svar
 
+    def test_strukturerade_beroenden_bereds_och_otydliga_referenser_vagras(self):
+        from partnern.overlamning import paketrot
+        from partnern.verktyg import specifikationer
+        _,_,aid,_=self.ny_bestallning(**BYGGKLAR)
+        _,answer,cid,kat=self.ny_bestallning('Beställ uppdraget som använder statusraden.',
+            **dict(BYGGKLAR,beroenden=[{'overlamning':aid,'krav':['K1']}],ordning_och_beroenden='Efter '+aid))
+        self.assertIn('VILANDE',answer)
+        data=json.loads((kat/'OVERLAMNING.json').read_text())
+        self.assertEqual(data['beroenden'],[{'overlamning':aid,'slag':'blockerar','krav':['K1'],'vad':''}])
+        order=(kat/'ARBETSORDER.md').read_text().split('## Ordning och beroenden')[1]
+        self.assertIn('Statusrad i Aquarium ('+aid+') — blockerar; krav K1',order)
+        self.assertLess(order.index('Statusrad i Aquarium'),order.index('Efter '+aid))
+        self.assertIn(aid,json.dumps(json.loads((kat/'ap06/spec.json').read_text())['export']['context']))
+        schema=next(s for s in specifikationer('tur') if s['name']=='bered_uppdrag')['inputSchema']
+        self.assertEqual(set(schema['properties']['beroenden']['items']['properties']),{'overlamning','slag','krav','vad'})
+        old=set(paketrot(self.k).iterdir())
+        for i,(extra,word) in enumerate([
+            ({'beroenden':[{'overlamning':'OVL-20260930-zzzzzz'}]},'okänt beroende OVL-20260930-zzzzzz'),
+            ({'beroenden':[{'overlamning':'OVL-x'}]},'ogiltig beroendeform: OVL-x'),
+            ({'beroenden':[{'overlamning':aid},{'overlamning':aid}]},'dubblett bland beroenden: '+aid),
+            ({'ordning_och_beroenden':'Efter '+aid},'fritexten nämner '+aid+' som inte står bland beroendena')]):
+            text='Beställ ett nytt syntetiskt uppdrag nummer %d.'%i
+            trad=self.skicka(text)['inspel']['trad'];self.svar(trad,1)
+            answer=self.bered(trad,2,agarcitat=text,vilande=True,**dict(BYGGKLAR,**extra))
+            self.assertIn(word,answer);self.assertEqual(set(paketrot(self.k).iterdir()),old)
+
+    def test_beroendelagen_ur_kvittenser_ar_lika_i_cli_api_och_verktyg_utan_skrivning(self):
+        import shutil,types
+        from partnern.overlamning import paketrot,kvittera,backlog,backlogtext
+        self.logga_in();rot=paketrot(self.k);rot.mkdir(parents=True,exist_ok=True)
+        def package(letter,status='vilande',deps=None,legacy=False):
+            oid='OVL-20260930-'+letter*6;kat=rot/('partner-'+oid);kat.mkdir()
+            data={'id':oid,'rubrik':'Stöd '+letter,'status':status,'lamnad':'2026-09-30T00:00:00Z','mottagare':'kontorets-kedjedrivare'}
+            if not legacy:data['beroenden']=deps or []
+            (kat/'OVERLAMNING.json').write_text(json.dumps(data));(kat/'KVITTENS.jsonl').write_text('')
+            return oid,kat
+        aid,akat=package('a','lamnad');kvittera(self.k,aid,'levererad','syntetisk','prov')
+        bid,bkat=package('b')
+        fid,fkat=package('f','lamnad');kvittera(self.k,fid,'avslagen','syntetisk','prov')
+        def dep(oid,slag='blockerar'):return {'overlamning':oid,'slag':slag}
+        cid,_=package('c',deps=[dep(aid),dep(bid,'beror')]);gid,_=package('g')
+        did,_=package('d',deps=[dep(bid)]);eid,_=package('e',deps=[dep(fid)])
+        xid,xkat=package('x','lamnad');hid,_=package('h',deps=[dep(xid)]);shutil.rmtree(xkat)
+        lid,_=package('l',legacy=True)
+        before={str(p):p.read_bytes() for p in rot.rglob('*') if p.is_file()}
+        view=backlog(self.k,fraga=self.S.lager.fraga);rows={p['id']:p['slappbar'] for p in view['poster']}
+        for oid in (bid,cid,gid):self.assertEqual(rows[oid]['varde'],'släppbar nu')
+        self.assertEqual(rows[did]['varde'],'blockerad');self.assertIn('Stöd b ('+bid+'): vilande',rows[did]['skal'])
+        self.assertEqual(rows[eid]['varde'],'blockerad: beroendet avslaget')
+        self.assertEqual(rows[hid]['varde'],'okänd');self.assertEqual(rows[lid]['skal'],'beroenden i fri text')
+        self.assertEqual(rows[cid]['beroenden'][1]['slag'],'beror')
+        # B is itself a new empty-dependency dormant order, so it is also counted.
+        self.assertEqual(view['sammanfattning'],{'vilande':7,'slappbara':3,'blockerade':2,'okanda':2})
+        code,output=self.kommando('backlog');self.assertEqual(code,0)
+        self.assertIn('7 vilande, varav 3 släppbara nu, 2 blockerade, 2 okända',output)
+        self.assertEqual(output.count('Släppbar: '),7)
+        code,api=self.json('GET','/api/backlog');self.assertEqual(code,200)
+        self.assertEqual({p['id']:p['slappbar'] for p in api['poster']},rows)
+        self.assertEqual({p['id']:p['slappbar'] for p in backlog(self.k)['poster']},rows)
+        k=types.SimpleNamespace(kontor_primar=self.k.kontor_primar,data=self.rot/'missing-index',prov_dolj=())
+        # Same package root, but an unreadable index never changes dependency state.
+        k.kontor_primar=self.k.kontor_primar
+        if getattr(self.k,'prov_dolj',()):
+            k.prov_dolj=True;k.data=self.k.data
+        from unittest.mock import patch
+        with patch('partnern.overlamning._indexfraga',return_value=(None,None)):
+            self.assertEqual({p['id']:p['slappbar'] for p in backlog(k)['poster']},rows)
+        self.assertIn('Släppbar: ',backlogtext(view))
+        self.assertEqual(before,{str(p):p.read_bytes() for p in rot.rglob('*') if p.is_file()})
+        js=(Path(srv.__file__).parent/'ui/app.js').read_text()
+        for word in ('p.slappbar.varde','p.slappbar.skal','samman.slappbara','släppbara nu'):self.assertIn(word,js)
+
+    def test_slapp_bokfor_beroendelage_och_mottagarens_instruktion_men_avslag_gor_det_inte(self):
+        from partnern.start import beroendeinstruktion
+        _,_,bid,_=self.ny_bestallning(**BYGGKLAR)
+        for i,decision in enumerate(('slapp','avslag','slapp')):
+            deps=[{'overlamning':bid}] if i<2 else []
+            trad,_,oid,kat=self.ny_bestallning('Beställ syntetiskt beroendeprov %d.'%i,**dict(BYGGKLAR,beroenden=deps))
+            before={str(p.relative_to(kat)):p.read_bytes() for p in kat.rglob('*') if p.is_file()}
+            words=('Släpp' if decision=='slapp' else 'Avslå')+' '+oid+'.'
+            self.manus('RING backlog_beslut '+json.dumps({'id':oid,'beslut':decision,'agarcitat':words}))
+            self.skicka(words,trad=trad);answer=self.svar(trad,3)
+            self.assertIn('backlog_beslut:OK',answer)
+            last=json.loads((kat/'KVITTENS.jsonl').read_text().splitlines()[-1])
+            if decision=='avslag':self.assertNotIn('beroenden_lage',last)
+            else:
+                self.assertEqual(last['beroenden_lage']['varde'],'blockerad' if deps else 'släppbar nu')
+                instruction=beroendeinstruktion(kat)
+                if deps:
+                    for word in ('Statusrad i Aquarium',bid,'vilande'):self.assertIn(word,answer)
+                    self.assertIn(bid,instruction);self.assertIn('avsluta med avslagen',instruction)
+                else:self.assertEqual(instruction,'')
+            for name,raw in before.items():
+                if name!='KVITTENS.jsonl':self.assertEqual((kat/name).read_bytes(),raw)
+
+    def test_beroendedokumentation_och_felaktig_kvittens_forblir_okand(self):
+        from partnern.overlamning import slappbar
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as td:
+            rot=Path(td);oid='OVL-20260930-aaaaaa';kat=rot/('partner-'+oid);kat.mkdir()
+            (kat/'OVERLAMNING.json').write_text(json.dumps({'id':oid,'status':'lamnad'}))
+            (kat/'KVITTENS.jsonl').write_text('{broken\n')
+            self.assertEqual(slappbar({'beroenden':[{'overlamning':oid}]},rot)['varde'],'okänd')
+        text=(REPO/'tools/PARTNER.md').read_text()
+        for word in ('beroenden i fri text','aldrig som släppbar','släppbar nu'):self.assertIn(word,text)
+        self.assertIn('beroenden',(REPO/'tools/partnern/roll.md').read_text())
+
     def bered(self, trad, n, **args):
         """Partnern bereder i tur n med de givna argumenten; svaret på den turen."""
         bas = {'rubrik': 'Statusrad i Aquarium', 'mal': 'Aquarium visar partnerns tjänst.', 'nasta_handling': 'Bered',
@@ -1398,7 +1504,8 @@ class BacklogProv(Miljo):
         self.assertIn('forstaelse:OK', post(4, 'Johnny vill att raden i %s också visar kön.' % oid))
         self.assertEqual(senare(), ['F-3'])
         text_ = backlogtext(backlog(self.k, fraga=self.S.lager.fraga))
-        self.assertIn('1 vilande, varav 1 nämns i senare poster', text_)
+        self.assertIn('1 vilande, varav 1 släppbara nu, 0 blockerade, 0 okända', text_)
+        self.assertIn('1 nämns i senare poster', text_)
         self.assertIn('Nämns i senare poster, som prövas före ett släpp: F-3 (slutsats, modellbedomning', text_)
         self.assertIn('också visar kön', text_)
         kod, d = self.json('GET', '/api/backlog')
@@ -1935,7 +2042,11 @@ for d in steg.split():
         kvittera('mottagen')
     elif d == 'STARTAD':
         kvittera('startad')
+    elif d == 'LEVERERA_UTAN_AVGORANDEN':
+        kvittera('mottagen'); kvittera('startad'); kvittera('levererad', '--bevis \"PR 997\"')
     elif d == 'LEVERERA':
+        package = Path(re.search(r'^Paketet: (.+)$', prompt, re.M).group(1))
+        (package / 'AVGORANDEN.md').write_text('inga avgöranden\n')
         kvittera('mottagen'); kvittera('startad'); kvittera('levererad', '--bevis "PR 999"')
     elif d in ('KVOT', 'INLOGGNING'):
         text = "You've reached your usage limit" if d == 'KVOT' else 'Not logged in · Please run /login'
@@ -1994,7 +2105,11 @@ for d in steg.split():
         kvittera('mottagen')
     elif d == 'STARTAD':
         kvittera('startad')
+    elif d == 'LEVERERA_UTAN_AVGORANDEN':
+        kvittera('mottagen'); kvittera('startad'); kvittera('levererad', '--bevis \"PR 997\"')
     elif d == 'LEVERERA':
+        package = Path(re.search(r'^Paketet: (.+)$', prompt, re.M).group(1))
+        (package / 'AVGORANDEN.md').write_text('inga avgöranden\n')
         kvittera('mottagen'); kvittera('startad'); kvittera('levererad', '--bevis "PR 998"')
     elif d == 'FELMEDDELANDE':
         ut({'type': 'error', 'message': 'Reconnecting... 1/5'})
@@ -2005,6 +2120,113 @@ for d in steg.split():
         ut({'type': 'turn.failed', 'error': {'message': "You've hit your usage limit. Try again later."}}); sys.exit(1)
 ut({'type': 'turn.completed', 'usage': {'input_tokens': 1, 'output_tokens': 1}})
 """
+
+
+class ForbrukningProv(unittest.TestCase):
+    def setUp(self):
+        from partnern import forbrukning
+        self.f = forbrukning
+        self.tmp = tempfile.TemporaryDirectory(dir=SCRATCH)
+        self.addCleanup(self.tmp.cleanup)
+        self.kat = Path(self.tmp.name)
+        (self.kat/'session').mkdir()
+
+    def stream(self, number, events):
+        path = self.kat/'session'/('korning-%02d.jsonl' % number)
+        path.write_text(''.join(json.dumps(e)+'\n' for e in events))
+        return path
+
+    def test_claude_cache_svar_komprimering_och_vaggtid_med_kallor(self):
+        self.stream(1, [
+            {'type':'system','subtype':'init'},
+            {'type':'assistant','message':{'id':'one'}},
+            {'type':'assistant','message':{'id':'one'}},
+            {'type':'assistant','message':{'id':'two'}},
+            {'type':'system','subtype':'compact_boundary'},
+            {'type':'result','usage':{'input_tokens':120,'output_tokens':35,'cache_read_input_tokens':80,'cache_creation_input_tokens':10}}])
+        (self.kat/'START.jsonl').write_text(json.dumps({'typ':'startad','nr':1,'tid':'2026-09-30T00:00:00Z'})+'\n'+
+                                          json.dumps({'typ':'klar','tid':'2026-09-30T00:00:04.5Z'})+'\n')
+        r=self.f.spara(self.kat);values={k:v['varde'] for k,v in r['tal'].items()}
+        self.assertEqual(values,dict(tokens_in=120,tokens_ut=35,cache_lasta=80,cache_skrivna=10,modellsvar=2,komprimeringar=1,vaggsekunder=4.5,korningar=1))
+        for value in r['tal'].values():
+            self.assertTrue(value['kallor'])
+            for source in value['kallor']:
+                self.assertEqual(len(source['sha256']),64)
+        self.assertEqual(r['tal']['tokens_ut']['kallor'][0]['rad'],6)
+        self.assertEqual((self.kat/'FORBRUKNING.json').stat().st_mode&0o777,0o600)
+        before=(self.kat/'session/korning-01.jsonl').read_bytes()
+        self.assertEqual(self.f.rakna(self.kat),r)
+        self.assertEqual((self.kat/'session/korning-01.jsonl').read_bytes(),before)
+
+    def test_codex_resume_anvander_senaste_kumulativa_tal_utan_dubbelrakning(self):
+        for nr,usage in [(1,{'input_tokens':1200,'cached_input_tokens':800,'output_tokens':40,'cache_write_input_tokens':3,'reasoning_output_tokens':10}),
+                         (2,{'input_tokens':1500,'cached_input_tokens':1000,'output_tokens':55,'cache_write_input_tokens':5,'reasoning_output_tokens':15})]:
+            self.stream(nr,[{'type':'thread.started','thread_id':'same-thread'},
+                            {'type':'item.completed','item':{'id':'item_0','type':'agent_message','text':'private not copied'}},
+                            {'type':'turn.completed','usage':usage}])
+        r=self.f.rakna(self.kat)
+        self.assertEqual([r['tal'][k]['varde'] for k in ('tokens_in','tokens_ut','cache_lasta','cache_skrivna','modellsvar','korningar')],[500,55,1000,5,2,2])
+        self.assertIsNone(r['tal']['komprimeringar']['varde'])
+        self.assertIsNone(r['tal']['vaggsekunder']['varde'])
+        self.assertEqual(r['tal']['tokens_ut']['kallor'][0]['fil'],'session/korning-02.jsonl')
+        self.assertNotIn('private not copied',json.dumps(r))
+
+    def test_saknade_falt_trasig_strom_och_saknad_korning_blir_okant(self):
+        path=self.stream(1,[{'type':'result','usage':{'input_tokens':0,'output_tokens':5}}])
+        r=self.f.rakna(self.kat)
+        self.assertEqual(r['tal']['tokens_in']['varde'],0)  # observed zero is valid
+        self.assertIsNone(r['tal']['cache_lasta']['varde'])
+        with path.open('a') as f:f.write('{broken\n')
+        self.assertIsNone(self.f.rakna(self.kat)['tal']['tokens_ut']['varde'])
+        self.stream(1,[{'type':'result','usage':{'input_tokens':4,'output_tokens':5}}])
+        (self.kat/'START.jsonl').write_text(json.dumps({'typ':'startad','nr':2})+'\n')
+        r=self.f.rakna(self.kat)
+        self.assertEqual(r['saknade_strommar'],[2]);self.assertIsNone(r['tal']['korningar']['varde'])
+        self.assertIsNone(r['tal']['tokens_in']['varde'])
+
+    def test_cli_saknad_strom_ger_ett_och_backlog_laser_bara_sparade_tal(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        import contextlib,io,partner
+        from partnern.overlamning import backlog,backlogtext
+        k=SimpleNamespace(kontor_primar=self.kat,data=self.kat,prov_dolj=True)
+        oid='OVL-20260930-abcdef';kat=self.kat/'overlamningar'/('partner-'+oid);kat.mkdir(parents=True)
+        (kat/'OVERLAMNING.json').write_text(json.dumps({'id':oid,'status':'vilande','rubrik':'Prov'}))
+        (kat/'KVITTENS.jsonl').write_text('')
+        with patch.object(partner.kf,'ladda',return_value=k),contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(partner.main(['forbrukning',oid]),1)
+        self.assertFalse((kat/'FORBRUKNING.json').exists())
+        (kat/'session').mkdir()
+        (kat/'session/korning-01.jsonl').write_text(json.dumps({'type':'result','usage':{'input_tokens':7,'output_tokens':9}})+'\n')
+        with patch.object(partner.kf,'ladda',return_value=k),contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(partner.main(['forbrukning',oid]),0)
+        before={str(p):p.read_bytes() for p in kat.rglob('*') if p.is_file()}
+        view=backlog(k,alla=True,fraga=lambda *a:[])
+        self.assertIn('tokens ut 9',backlogtext(view));self.assertIn('cache lästa okänt',backlogtext(view))
+        self.assertEqual(before,{str(p):p.read_bytes() for p in kat.rglob('*') if p.is_file()})
+        with (kat/'session/korning-01.jsonl').open('a') as f:f.write('{}\n')
+        self.assertIn('Förbrukning: inte räknad',backlogtext(backlog(k,alla=True,fraga=lambda *a:[])))
+
+    def test_avgoranden_kravs_for_nya_starter_aldre_fungerar_som_forut(self):
+        from types import SimpleNamespace
+        from partnern.overlamning import kvittera,AvgorandenSaknas
+        import hashlib
+        k=SimpleNamespace(kontor_primar=self.kat,data=self.kat,prov_dolj=True)
+        oid='OVL-20260930-abcdef';kat=self.kat/'overlamningar'/('partner-'+oid);kat.mkdir(parents=True)
+        (kat/'OVERLAMNING.json').write_text(json.dumps({'id':oid,'status':'lamnad'}))
+        receipt=kat/'KVITTENS.jsonl';receipt.write_text('')
+        kvittera(k,oid,'levererad','syntetisk','tidigare session')
+        before=receipt.read_bytes()
+        (kat/'START.jsonl').write_text(json.dumps({'typ':'startad','avgoranden_kravs':True})+'\n')
+        with self.assertRaises(AvgorandenSaknas):kvittera(k,oid,'levererad','syntetisk','prov')
+        self.assertEqual(receipt.read_bytes(),before)
+        (kat/'AVGORANDEN.md').write_text('   ')
+        with self.assertRaises(AvgorandenSaknas):kvittera(k,oid,'levererad','syntetisk','prov')
+        (kat/'AVGORANDEN.md').write_text('inga avgöranden\n')
+        kvittera(k,oid,'levererad','syntetisk','prov')
+        last=json.loads(receipt.read_text().splitlines()[-1])
+        self.assertEqual(last['avgoranden'],'AVGORANDEN.md')
+        self.assertEqual(last['avgoranden_sha256'],hashlib.sha256((kat/'AVGORANDEN.md').read_bytes()).hexdigest())
 
 
 class StartConfigDigestProv(unittest.TestCase):
@@ -2124,6 +2346,10 @@ class StartvaktProv(Miljo):
         self.assertEqual(omstartad.granska(), [])
         hist = self.vanta_pa(kat, 'klar')
         self.assertEqual([h['typ'] for h in hist], ['startad', 'klar'])
+        self.assertTrue(hist[0]['avgoranden_kravs'])
+        measured = json.loads((kat/'FORBRUKNING.json').read_text())
+        self.assertEqual(measured['tal']['korningar']['varde'], 1)
+        self.assertIsNone(measured['tal']['tokens_in']['varde'])
         anrop = [a for a in self.mottagarlogg() if 'argv' in a]
         self.assertEqual(len(anrop), 1)
         a = anrop[0]
@@ -2135,6 +2361,8 @@ class StartvaktProv(Miljo):
         self.assertEqual(Path(a['cwd']).resolve(), self.k.kontor_primar.resolve())
         self.assertNotIn('ANTHROPIC_API_KEY', a['env'])
         self.assertIn(oid, a['prompt'])
+        self.assertNotIn('Kontrollera först vad som redan är gjort', a['prompt'])
+        self.assertIn('AVGORANDEN.md', a['prompt'])
         self.assertIn('AGARENS-ORD.md är Johnnys ord ordagrant', a['prompt'])
         self.assertIn('"%s" -B "' % sys.executable, a['prompt'])      # kvitteringen med tjänstens egen tolk
         self.assertNotIn('Genomför det', a['prompt'])               # Johnnys ord läses i paketet, inte i instruktionen
@@ -2224,6 +2452,24 @@ class StartvaktProv(Miljo):
         self.vanta_pa(bkat, 'klar')
         self.assertEqual(self.vakt.starter_i_dag(), 2)
 
+    def test_aldre_omarkerad_session_fortsatter_och_levererar_utan_nytt_filkrav(self):
+        (oid, kat), = self.overlamningar('kontorets-kedjedrivare')
+        self.mottagarmanus('MOTTAGEN KVOT', 'LEVERERA_UTAN_AVGORANDEN')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        history=self.vanta_pa(kat,'vantar')
+        # Preserved old-version fixture: same session, but its original start has no new marker.
+        for row in history:row.pop('avgoranden_kravs',None)
+        history[-1]['till']='2000-01-01T00:00:00Z'
+        (kat/'START.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in history))
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        history=self.vanta_pa(kat,'klar')
+        self.assertFalse((kat/'AVGORANDEN.md').exists())
+        starts=[r for r in history if r['typ']=='startad']
+        self.assertNotIn('avgoranden_kravs',starts[0]);self.assertFalse(starts[1]['avgoranden_kravs'])
+        self.assertTrue(starts[1]['fortsatt'])
+        self.assertEqual(json.loads((kat/'KVITTENS.jsonl').read_text().splitlines()[-1])['status'],'levererad')
+        self.assertIn('inget nytt krav', [a for a in self.mottagarlogg() if 'prompt' in a][-1]['prompt'])
+
     def test_kvot_och_atkomst_ger_synlig_vantan_och_samma_session_fortsatter(self):
         (oid, kat), = self.overlamningar('runtime')
         self.mottagarmanus('MOTTAGEN KVOT', 'INLOGGNING', 'STARTAD LEVERERA')
@@ -2243,7 +2489,8 @@ class StartvaktProv(Miljo):
         h = self.vanta_pa(kat, 'vantar')
         self.assertIn('Not logged in', h[-1]['skal'])
         self.assertEqual(self.vakt.granska(), [(oid, 'startad')])  # KVOT_VANTAN är negativ i provet
-        self.vanta_pa(kat, 'klar')
+        hist=self.vanta_pa(kat, 'klar')
+        self.assertTrue(all(r['avgoranden_kravs'] for r in hist if r['typ']=='startad'))
         anrop = [a for a in self.mottagarlogg() if 'argv' in a]
         self.assertEqual(len(anrop), 3)
         sid = self.start.sessions_id(oid)
@@ -2251,6 +2498,9 @@ class StartvaktProv(Miljo):
         for a in anrop[1:]:
             self.assertEqual(a['argv'][a['argv'].index('--resume') + 1], sid)   # samma session, ingen ny
             self.assertIn('Fortsätt arbetet med överlämningen %s' % oid, a['prompt'])
+            self.assertLess(a['prompt'].index('git log'), a['prompt'].index('Fortsätt arbetet'))
+            for word in ('git status', 'worktrees', 'pushats', 'PR:', 'KVITTENS.jsonl', 'gör inte om'):
+                self.assertIn(word, a['prompt'])
         for a in anrop:
             self.assertEqual(a['argv'][a['argv'].index('--model') + 1], 'claude-opus-5')  # inget modellbyte
         self.assertEqual(self.vakt.starter_i_dag(), 1)

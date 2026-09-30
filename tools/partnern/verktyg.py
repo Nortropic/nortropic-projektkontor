@@ -312,7 +312,8 @@ def specifikationer(typ: str) -> list:
             'Läs backloggen: de vilande beställningarna i kontorets beställningsväg, med id, mottagare, rubrik, datum, '
             'ursprung (tråd och fynd), märkningen och motiveringen, och dina senare poster som nämner beställningen '
             '(de prövas före ett släpp). En backlog som inte kan läsas visas som okänd, aldrig som tom. '
-            'alla: true visar också de som har släppts eller avslagits. '
+            'Strukturerade beroenden ger släppbar nu, blockerad, blockerad: beroendet avslaget eller okänd ur paketens kvittenser. '
+            'alla: true visar också de som har släppts eller avslagits, med källbunden sparad förbrukning eller inte räknad. '
             'Backloggen lägger inga rader i planens ÄGARENS TUR; planen pekar bara hit.'),
          'inputSchema': {'type': 'object', 'properties': {'alla': {'type': 'boolean'}}}},
         {'name': 'forstaelse', 'description': (
@@ -357,7 +358,8 @@ def specifikationer(typ: str) -> list:
                 'säger det ("genomför", "kör", "bygg", "starta" …): ett "beställ" räcker inte, och "vilande" eller '
                 '"backlog" i hans ord gör den alltid vilande. En beställning ska ha det som krävs för att bygga: krav '
                 '(id, text och ett observerbart prov per krav, gärna metod), klart_nar, berorda_filer (repo och '
-                'sökväg), ordning_och_beroenden, resursram, fynd (vad i vilken källa den kommer ur), motivering (kort: '
+                'sökväg), strukturerade beroenden (befintliga OVL-id med slag blockerar eller beror; rubrik före id), '
+                'ordning_och_beroenden som fri text för övriga beroenden, resursram, fynd (vad i vilken källa den kommer ur), motivering (kort: '
                 'varför den förbättrar Nortropic), mål, gränser och nästa handling. Underlag är id som går att öppna: '
                 'F-…, partner:…, t_…, en sökträffs id, repo:<repo>[@ref]:<sökväg> eller github:<API-sökväg>; allt '
                 'löses till filer i paketet. Går en post inte att öppna vägrar verktyget och säger vilken; beskriv då '
@@ -382,6 +384,9 @@ def specifikationer(typ: str) -> list:
                      'repo': {'type': 'string', 'enum': ['kontoret', 'runtime', 'digitala', 'kundstart']},
                      'sokvag': {'type': 'string'}}, 'required': ['repo', 'sokvag']}},
                  'ordning_och_beroenden': {'type': 'string'}, 'resursram': {'type': 'string'},
+                 'beroenden': {'type':'array','items':{'type':'object','properties':{
+                     'overlamning':{'type':'string'}, 'slag':{'type':'string','enum':['blockerar','beror'],'default':'blockerar'},
+                     'krav':{'type':'array','items':{'type':'string'}},'vad':{'type':'string'}},'required':['overlamning']}},
                  'fynd': {'type': 'string'}, 'motivering': {'type': 'string'},
                  'underlag': {'type': 'array', 'items': {'type': 'string'}},
                  'granser': {'type': 'array', 'items': {'type': 'string'}},

@@ -73,7 +73,8 @@ underlaget. Därför:
   sparas ordagrant i paketet, och utan hans egna ord i tråden sker inget. `backlog` listar backloggen. Den lägger
   inga rader i planens ÄGARENS TUR; planen pekar bara dit.
 - En beställning ska ha det som krävs för att bygga: krav med ett observerbart prov per krav, klart-när, berörda
-  filer (repo och sökväg), ordning och beroenden, resursram, ursprung (tråd och fynd) och en kort motivering.
+  filer (repo och sökväg), strukturerade beroenden (rubrik före id, slag blockerar eller beror), övrig ordning
+  som fri text, resursram, ursprung (tråd och fynd) och en kort motivering.
   Underlag anges som id som går att öppna, och allt löses till filer i paketet. Verktyget skapar bara en byggklar
   beställning; fattas något räknar det upp luckorna och skapar ingenting, och du fyller dem ur samtalet eller frågar
   Johnny. Runtime-uppgiftens tekniska fält (base-revision, allowed_paths, acceptans, steg och tidsram) fyller
