@@ -90,11 +90,27 @@ faktiskt styr dem:
 | --- | --- | --- |
 | Partnern | arbetsplatsens `installningar.json` (samma som samtalsytans /model) | ja, gäller från nästa svar; en Claude-modell kör Claude Code, en Codex-modell Codex |
 | Dina sessioner | Claude Codes `~/.claude/settings.json` och Codex `~/.codex/config.toml` | ja, i båda programmen (ägarens besked 2026-09-29) |
-| Runtime | den aktiva releasen, läst med releasens egen kod (samma avgränsade väg som Aquarium) | inte än: steg 2 |
+| Runtime | den aktiva releasen, läst med releasens egen kod (samma avgränsade väg som Aquarium) | ja; modellen avgör utföraren för alla roller, och bytet aktiveras av sig självt när Runtime är ledigt (se nedan) |
 | Läsarna | arbetsplatsens `installningar.json` (`lasare`); utan val väljer sessionen | ja; ansträngningen följer Runtimes läsarprofil |
-| Bevakningen | Runtimes Codex-profil i den aktiva releasen | inte än: steg 2 |
+| Bevakningen | den aktiva releasens val för bevakningen (utförare, modell, ansträngning); före det valet Runtimes Codex-profil | ja, med Claude eller Codex; aktiveras av sig självt som Runtime |
 
-Startvakten visas vid Arbetssession: Runtimes drivande roll (utförare och modell) och startvaktens egen ansträngning.
+Startvakten visas vid Arbetssession: Runtimes drivande roll med utförare, modell och ansträngning. En release före
+Runtimes D040 har ingen ansträngning i valet; då gäller startvaktens egen (`installningar.json`, `startvakt.anstrangning`).
+
+**Runtime och bevakningen aktiveras av sig självt** (steg 2, Runtimes D040, när den är integrerad och aktiv; se
+beslutet RUNTIME-VAL-I-FLODET-20260930 för vad som återstår). Spara skriver ett önskemål i Runtimes
+inkorg, `.runtime/ap10/workplace-choice.json`, med ett nytt id: Runtimes val (utförare, modell, ansträngning) och
+bevakningens. Kortet man inte ändrade behåller sitt väntande värde, annars det som kör. Bara det som fungerade i
+mätningen av Runtimes egna program erbjuds och godtas. Runtimes eget verktyg läser önskemålet var femte minut
+(`model_choice.py auto`) och prövar det mot mätningen igen. Det gör ingenting om valet redan kör och väntar medan Runtime
+arbetar: när bevakningen kör eller kör inom 20 minuter, när arbete pågår i motorn, när en webbprofil kör, eller när
+tjänsten inte svarar som väntat. Annars byter det release med samma väg tillbaka som ett handbyte. Kortet visar det
+önskade valet och Runtimes status (`automatic-choice-status.json`) för just det önskemålet: väntar och varför, aktiveras
+inte och varför, aktiverades, den förra versionen återställd, misslyckat eller avbrutet; en status om ett tidigare
+önskemål visas som att valet väntar på Runtimes nästa titt. Aktiveraren är en LaunchAgent i Johnnys eget
+sammanhang, eftersom sessioner inte får köra `launchctl`. Johnny startar den en gång, efter Runtimes övergång 19, med
+`model_choice.py agent install`; tills dess säger kortet att valet väntar. En prov- eller utvecklingsinstans skriver
+önskemålet i sin egen datakatalog och kan aldrig utlösa ett verkligt byte.
 
 **Bara det som bevisligen fungerar erbjuds.** `python3 -B tools/partner.py matmodeller` prövar varje modell och nivå med
 ett kort anrop ("Svara bara med ordet ok.", inga verktyg, inga MCP-servrar) i programmet som kör hållplatsen: Johnnys
@@ -139,5 +155,7 @@ att läsning varken anropar modellen eller skriver i journalen, och att en nekad
 samma anslutning. Användarresorna provas i Chromium mot en provinstans (se beslutet).
 `python3 -B -m unittest tools.test_modellkarta` prövar Flödet: varje val ur sin källa, att bara det uppmätta erbjuds och
 godtas, exakt vilka rader som skrivs i Claude Codes och Codex filer, att en okänd form och en samtidig skrivning inte
-skriver något, läsarna, partnern, adresserna, att en provinstans aldrig rör de riktiga filerna, och mätverktyget mot falska
-program.
+skriver något, läsarna, partnern, Runtimes och bevakningens önskemål (formen, att det andra kortets väntande värde står
+kvar, att ett obevisat val och en länkad inkorg aldrig skrivs, statusen och om aktiveraren går), startvaktens
+ansträngning ur Runtimes val, adresserna, att en provinstans aldrig rör de riktiga filerna eller Runtimes inkorg, och
+mätverktyget mot falska program.

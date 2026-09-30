@@ -330,18 +330,21 @@ Paketet bär instruktionens material, men bara Johnnys ord är beslut.
   worktree-regeln, eftersom sessionens egna worktrees inte är en annan skrivare. Vakten tar aldrig över och startar
   aldrig bredvid.
 - **Utföraren väljs som i dag:** i Runtimes bemanning, rollen `driver`, så som Johnny valt den i Runtimes modellval
-  (D028–D030). Bemanningen läses genom Aquariums befintliga sond. Claude Code körs med Runtimes fastlåsta
+  (D028–D030, D040, som han sedan steg 2 gör i Flödet). Bemanningen läses genom Aquariums befintliga sond. Claude Code körs med Runtimes fastlåsta
   `.runtime/bin/claude-2.1.257` i behörighetsläget `auto`; i dag anger bemanningen Claude med modellen
   `claude-opus-5`. Codex körs med den fastlåsta `.runtime/bin/codex-0.155.1` (`exec --json --approve-for-me`, och
-  `exec resume <tråd>` för att fortsätta). Båda får bemanningens modell och ansträngningen `high`, och binärens
-  kontrollsumma prövas mot den som Runtime själv binder före varje start. De kör på Johnnys abonnemang (Claude
+  `exec resume <tråd>` för att fortsätta). Båda får bemanningens modell och Runtimes ansträngning för samma utförare,
+  ur samma läsning; en release före Runtimes D040 har ingen sådan, och då gäller startvaktens egen (`high`). En
+  fortsättning behåller den ansträngning sessionen startade med. Binärens kontrollsumma prövas mot den som Runtime
+  själv binder före varje start. De kör på Johnnys abonnemang (Claude
   Code-inloggningen respektive Codex ChatGPT-inloggning) i en miljö som byggs från grunden utan API-nycklar. Det finns
   ingen reservväg. Går bemanningen inte att läsa väntar starten synligt. Saknas kvot eller åtkomst väntar den också
   synligt och fortsätter samma session, med samma utförare och modell, tidigast en timme senare. Ett senare byte i
   bemanningen gäller bara nya överlämningar.
 - **Tak:** högst sex nya automatiska starter per dygn (UTC, `gransar.startvakt_per_dygn` i
   `data/installningar.json`). En fortsättning av samma session räknas inte. Startvakten stängs av med
-  `{"startvakt": {"pa": false}}` i samma fil, och ansträngningen kan ändras där (`{"startvakt": {"anstrangning": "…"}}`).
+  `{"startvakt": {"pa": false}}` i samma fil. Startvaktens egen ansträngning (`{"startvakt": {"anstrangning": "…"}}`)
+  gäller bara när Runtimes release inte bär ett ansträngningsval.
 - **Sover datorn eller kör inte tjänsten** sker starten när tjänsten kör igen; ingen överlämning hoppas över.
 - Startvakten kör bara i den ordinarie tjänsten, aldrig i en prov- eller utvecklingsinstans (egen `PARTNER_DATA`,
   `PARTNER_PORT` eller `PARTNER_PROV_DOLJ`), och den startar ingenting annat än mottagarsessioner.
@@ -413,7 +416,8 @@ när den fungerat i mätningen.
 Startvakten prövas med en fejkad mottagarsession som kör det riktiga kvitteringskommandot ur sin instruktion: exakt
 en session per överlämning (även efter en omstart av tjänsten), väntan när skrivplatsen är upptagen och sedan start,
 egen session i samma repo och dygnstaket, kvot och saknad inloggning med synlig väntan och samma session, Codex ur
-bemanningen med kvot och fortsättning i samma tråd utan byte när bemanningen ändras, en levande Codex-session som
+bemanningen med kvot och fortsättning i samma tråd utan byte när bemanningen ändras, Runtimes ansträngning i starten
+och samma ansträngning i en fortsättning, en ogiltig eller saknad ansträngning i sonden, en levande Codex-session som
 känns igen efter en omstart av vakten, ett kvotbesked utan avslutat varv, en fortsättning som väntar på en annan
 skrivare, oläst bemanning utan reservväg,
 fel och avbrott utan en andra session, ändrad binär, en vilande beställning som aldrig startas förrän Johnny släpper

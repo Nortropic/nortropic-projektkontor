@@ -65,6 +65,8 @@ class KartaMiljo(tp.Miljo):
         super().setUp()
         self.k.claude_installningar = self.rot / 'claude-settings.json'
         self.k.codex_installningar = self.rot / 'codex-config.toml'
+        self.k.runtime_onskemal = self.rot / 'runtime-workplace-choice.json'
+        self.k.runtime_status = self.rot / 'runtime-automatic-choice-status.json'
         self.claude_fore = (json.dumps(CLAUDE_CODE, ensure_ascii=False, indent=2) + '\n').encode()
         self.k.claude_installningar.write_bytes(self.claude_fore)
         self.k.codex_installningar.write_text(CODEX, 'utf-8')
@@ -108,12 +110,12 @@ class LasningAvValen(KartaMiljo):
         self.assertEqual((cx['modell'], cx['anstrangning'], cx['bevisad']), ('gpt-6-astra', 'ultra', True))
         self.assertEqual((v['runtime']['utforare'], v['runtime']['modell'], v['runtime']['anstrangning'],
                           v['runtime']['config'], v['runtime']['valbar'], v['runtime']['bevisad']),
-                         ('claude', 'claude-opus-5', 'medium', 'ec6ecbd9', False, True))
+                         ('claude', 'claude-opus-5', 'medium', 'ec6ecbd9', True, True))
         self.assertEqual((v['bevakning']['utforare'], v['bevakning']['modell'], v['bevakning']['anstrangning']),
                          ('codex', 'gpt-6-astra', 'high'))
         self.assertEqual((v['lasare']['status'], v['lasare']['modell']), ('sessionen', None))
         self.assertEqual(d['startvakt'], {'pa': False, 'utforare': 'claude', 'modell': 'claude-opus-5',
-                                          'anstrangning': 'high', 'bevisad': True})
+                                          'anstrangning': 'high', 'anstrangning_ur': 'kontoret', 'bevisad': True})
         self.assertEqual(d['matning']['program']['claude_runtime'], '2.1.257 (Claude Code)')
 
     def test_bara_det_som_fungerade_i_programmet_som_kor_hallplatsen_erbjuds(self):
@@ -372,10 +374,10 @@ class PartnernOchLasarna(KartaMiljo):
         self.assertEqual((kod, d['val']['lasare']['status']), (200, 'sessionen'))
         self.assertNotIn('lasare', json.loads((Path(self.k.data) / 'installningar.json').read_text()))
 
-    def test_runtime_och_bevakningen_valjs_inte_har_an(self):
-        for val in ('runtime', 'bevakning', 'okant'):
-            kod, d = self.valj(val, 'claude-opus-5', 'medium')
-            self.assertEqual(kod, 400, val)
+    def test_ett_okant_val_nekas(self):
+        # Runtime och bevakningen väljs sedan steg 2 (klassen RuntimeOchBevakningen); ett okänt val nekas alltid
+        kod, d = self.valj('okant', 'claude-opus-5', 'medium')
+        self.assertEqual(kod, 400, d)
 
     def test_skrivning_kraver_samtalsytans_huvud(self):
         kod, _, _ = self.anrop('POST', '/api/arbetsplats/karta', {'val': 'claude_code', 'modell': 'claude-opus-5',
@@ -452,17 +454,142 @@ class RuntimeLasningenMotEnFalskRelease(unittest.TestCase):
         self.assertEqual(self.las(filer)['status'], 'olasbar')
 
 
+class RuntimeOchBevakningen(KartaMiljo):
+    """Steg 2 (Runtimes D040): Runtime och bevakningen väljs här, bara bland det Runtimes egna program klarade, och valet
+    skrivs som ett önskemål i Runtimes inkorg; Runtime aktiverar det själv och kartan visar Runtimes status."""
+
+    def inkorg(self):
+        return json.loads(self.k.runtime_onskemal.read_text('utf-8'))
+
+    def status(self, lage, alder=0, **extra):
+        from datetime import datetime, timedelta, timezone
+        tid = (datetime.now(timezone.utc) - timedelta(seconds=alder)).isoformat()
+        self.k.runtime_status.write_text(json.dumps({'schema': 'automatic-choice-status/1', 'checked_at': tid,
+                                                     'state': lage, **extra}), 'utf-8')
+
+    def test_runtime_och_bevakningen_ar_valbara_med_runtimes_egna_program(self):
+        v = self.karta()['val']
+        for namn in ('runtime', 'bevakning'):
+            with self.subTest(val=namn):
+                self.assertTrue(v[namn]['valbar'])
+                self.assertEqual([m['id'] for m in v[namn]['erbjud']],
+                                 ['claude-fable-5-1', 'claude-sonnet-5', 'claude-opus-5', 'claude-haiku-4-5-20251001',
+                                  'gpt-6-astra', 'gpt-6-sol'])        # Opus 5.5 och gpt-6.1-sol klarade inte Runtimes program
+                self.assertIsNone(v[namn]['onskat'])
+
+    def test_ett_runtimeval_blir_ett_onskemal_och_bevakningen_ar_den_som_kor(self):
+        kod, d = self.valj('runtime', 'gpt-6-sol', 'ultra')
+        self.assertEqual(kod, 200, d)
+        o = self.inkorg()
+        self.assertEqual(set(o), {'schema', 'id', 'requested_at', 'runtime', 'watch'})
+        self.assertEqual(o['schema'], 'workplace-choice/1'); self.assertRegex(o['id'], r'\Aw\d{8}T\d{6}Z-[0-9a-f]{6}\Z')
+        self.assertEqual(o['runtime'], {'executor': 'codex', 'model': 'gpt-6-sol', 'effort': 'ultra'})
+        self.assertEqual(o['watch'], {'executor': 'codex', 'model': 'gpt-6-astra', 'effort': 'high'})
+        v = d['val']
+        self.assertEqual(v['runtime']['onskat'], {'utforare': 'codex', 'modell': 'gpt-6-sol', 'anstrangning': 'ultra'})
+        self.assertEqual((v['runtime']['modell'], v['runtime']['anstrangning']), ('claude-opus-5', 'medium'), 'det som kör är oförändrat')
+        self.assertIsNone(v['bevakning']['onskat'])
+        journal = self.modellval_i_journalen()
+        self.assertEqual(journal[-1]['val'], 'runtime'); self.assertEqual(journal[-1]['efter']['runtime']['model'], 'gpt-6-sol')
+
+    def test_ett_bevakningsval_behaller_det_vantande_runtimevalet(self):
+        self.valj('runtime', 'gpt-6-sol', 'ultra'); forsta = self.inkorg()['id']
+        kod, d = self.valj('bevakning', 'claude-opus-5', 'high')
+        self.assertEqual(kod, 200, d)
+        o = self.inkorg()
+        self.assertEqual(o['runtime'], {'executor': 'codex', 'model': 'gpt-6-sol', 'effort': 'ultra'})
+        self.assertEqual(o['watch'], {'executor': 'claude', 'model': 'claude-opus-5', 'effort': 'high'})
+        self.assertNotEqual(o['id'], forsta, 'varje sparat val är ett nytt önskemål')
+        self.assertEqual(d['val']['bevakning']['onskat'], {'utforare': 'claude', 'modell': 'claude-opus-5', 'anstrangning': 'high'})
+
+    def test_ett_obevisat_val_nekas_och_inget_skrivs(self):
+        for val, modell, niva in (('runtime', 'claude-opus-5-5', 'high'), ('bevakning', 'gpt-6.1-sol', 'high'),
+                                  ('runtime', 'gpt-6-sol', 'minimal'), ('bevakning', '--flagga', 'high')):
+            with self.subTest(val=val, modell=modell, niva=niva):
+                kod, d = self.valj(val, modell, niva)
+                self.assertEqual(kod, 400, d)
+        self.assertFalse(self.k.runtime_onskemal.exists())
+
+    def test_ett_val_som_redan_kor_visas_inte_som_onskat(self):
+        kod, d = self.valj('runtime', 'claude-opus-5', 'medium')
+        self.assertEqual(kod, 200, d)
+        self.assertIsNone(d['val']['runtime']['onskat'])
+        self.assertEqual(self.inkorg()['runtime'], {'executor': 'claude', 'model': 'claude-opus-5', 'effort': 'medium'})
+
+    def test_utan_inkorg_kan_runtime_inte_valjas(self):
+        self.k.runtime_onskemal = None
+        v = self.karta()['val']
+        self.assertFalse(v['runtime']['valbar']); self.assertIn('inkorg', v['runtime']['varfor_inte'])
+        self.assertEqual(self.valj('runtime', 'gpt-6-sol', 'ultra')[0], 400)
+
+    def test_en_lankad_inkorg_skrivs_aldrig(self):
+        mal = self.rot / 'annan.json'; mal.write_text('{}', 'utf-8')
+        self.k.runtime_onskemal.symlink_to(mal)
+        self.assertEqual(self.valj('runtime', 'gpt-6-sol', 'ultra')[0], 400)
+        self.assertEqual(mal.read_text('utf-8'), '{}')
+
+    def test_aktiveringens_status_och_om_aktiveraren_gar(self):
+        self.valj('runtime', 'gpt-6-sol', 'ultra')
+        self.assertIsNone(self.karta()['val']['runtime']['aktivering'], 'ingen status: aktiveraren har aldrig tittat')
+        self.status('waiting', reason='REFUSED: an AP10 watch run is in progress; activate later', request_id='w1')
+        a = self.karta()['val']['runtime']['aktivering']
+        self.assertEqual((a['lage'], a['igang'], a['onskemal']), ('waiting', True, 'w1')); self.assertIn('AP10', a['skal'])
+        self.status('activated', alder=3600, activated_at='2026-09-30T03:00:00+00:00')
+        a = self.karta()['val']['bevakning']['aktivering']
+        self.assertEqual((a['lage'], a['igang'], a['aktiverad']), ('activated', False, '2026-09-30T03:00:00+00:00'))
+        self.status('nagot-nytt')
+        self.assertEqual(self.karta()['val']['runtime']['aktivering']['lage'], 'okant')
+
+    def test_en_samtidig_skrivning_skriver_inget(self):
+        with mock.patch.object(mk, '_skriv_atomart', lambda *a: False):
+            kod, d = self.valj('runtime', 'gpt-6-sol', 'ultra')
+        self.assertEqual(kod, 400, d); self.assertFalse(self.k.runtime_onskemal.exists())
+
+    def test_en_trasig_eller_okand_status_ar_ingen_status(self):
+        self.valj('runtime', 'gpt-6-sol', 'ultra')
+        for innehall in ('inte json', json.dumps({'schema': 'annan/1', 'state': 'activated'}), json.dumps(['activated'])):
+            with self.subTest(innehall=innehall):
+                self.k.runtime_status.write_text(innehall, 'utf-8')
+                self.assertIsNone(self.karta()['val']['runtime']['aktivering'])
+
+    def test_kortet_bar_onskemalets_id_sa_att_en_aldre_status_kan_skiljas_ut(self):
+        self.valj('runtime', 'gpt-6-sol', 'ultra')
+        v = self.karta()['val']
+        self.assertEqual(v['runtime']['onskemal_id'], self.inkorg()['id']); self.assertEqual(v['bevakning']['onskemal_id'], self.inkorg()['id'])
+
+    def test_ett_varde_utanfor_runtimes_form_skrivs_aldrig(self):
+        kvitto = matning()
+        kvitto['resultat'] += resultat('codex_runtime', 'gpt-6-astra', ['Ultra'])      # ett kvitto med en udda nivå
+        self.skriv_matning(kvitto)
+        self.assertEqual(self.valj('bevakning', 'gpt-6-astra', 'Ultra')[0], 400)
+        self.assertFalse(self.k.runtime_onskemal.exists())
+
+    def test_startvakten_foljer_runtimes_anstrangning_nar_releasen_bar_valet(self):
+        valt = dict(RUNTIME, efforts={'claude': 'max', 'codex': 'low'}, efforts_source='release')
+        self.S.runtime_val = mk.RuntimeLasning(self.k, korare=lambda: valt)
+        s = self.karta()['startvakt']
+        self.assertEqual((s['anstrangning'], s['anstrangning_ur']), ('max', 'runtime'))
+
+
 class ProvInstanser(unittest.TestCase):
     def test_en_prov_eller_utvecklingsinstans_ror_aldrig_de_riktiga_filerna(self):
         with mock.patch.dict(os.environ, {'PARTNER_DATA': '/tmp/prov-data', 'PARTNER_KONTOR_PRIMAR': '/tmp/kontor'}):
             k = kf.ladda()
         self.assertEqual((k.claude_installningar, k.codex_installningar),
                          (Path('/tmp/prov-data/claude-code-installningar.json'), Path('/tmp/prov-data/codex-installningar.toml')))
+        self.assertEqual((k.runtime_onskemal, k.runtime_status),
+                         (Path('/tmp/prov-data/runtime-workplace-choice.json'),
+                          Path('/tmp/prov-data/runtime-automatic-choice-status.json')))
         with mock.patch.dict(os.environ, {'PARTNER_KONTOR_PRIMAR': '/tmp/kontor', 'HOME': '/tmp/ett-hem'}):
             os.environ.pop('PARTNER_DATA', None)
             os.environ.pop('PARTNER_PORT', None)
             k = kf.ladda()
         self.assertEqual(k.claude_installningar, Path('/tmp/ett-hem/.claude/settings.json'))
+        # bara den ordinarie tjänsten skriver i Runtimes egen inkorg (D040)
+        self.assertEqual(k.runtime_onskemal, Path(k.repon['runtime']) / '.runtime/ap10/workplace-choice.json')
+        self.assertEqual(k.runtime_status, Path(k.repon['runtime']) / '.runtime/ap10/automatic-choice-status.json')
+        self.assertIsNone(kf.Konfig(data=Path('/tmp/x'), hemligheter=Path('/tmp/y')).runtime_onskemal,
+                          'en konfiguration som inte laddats har ingen inkorg alls')
 
 
 FEJK_CLAUDE = r'''#!/usr/bin/env python3

@@ -588,6 +588,26 @@ class Sockeln(unittest.TestCase):
             {'role': 'utvecklare', 'executor': 'claude', 'model': 'claude-opus-5'}])
         self.assertEqual(result['watch_staffing'], {'executor': 'codex', 'model': 'gpt-5-codex'})
 
+    def test_a_release_with_the_watch_choice_names_the_watch_executor(self):
+        # Runtimes D040: the release names the watch's executor, model and effort, and each executor's effort
+        staffing = dict(values()['staffing'], watch_model='claude-opus-5', watch_executor='claude', watch_effort='high',
+                        efforts_run={'claude': 'max', 'codex': 'high'})
+        result = aquarium.project(readings(staffing=staffing), NOW)
+        self.assertEqual(result['sockeln']['watch_staffing'], {'executor': 'claude', 'model': 'claude-opus-5'})
+        self.assertEqual((result['utkiken']['model']['executor'], result['utkiken']['model']['model']),
+                         ('claude', 'claude-opus-5'))
+
+    def test_an_unknown_watch_executor_is_not_read(self):
+        # the probe part is refused when it is read, and the live read then counts the staffing as unavailable
+        with self.assertRaises(ValueError):
+            aquarium._staffing_value(dict(values()['staffing'], watch_executor='gemini'))
+        with self.assertRaises(ValueError):
+            aquarium._staffing_value(dict(values()['staffing'], efforts_run={'claude': 3}))
+        read = aquarium._staffing_value(dict(values()['staffing'], watch_executor='claude', watch_effort='high',
+                                             efforts_run={'claude': 'max'}))
+        self.assertEqual((read['watch_executor'], read['watch_effort'], read['efforts_run']), ('claude', 'high', {'claude': 'max'}))
+        self.assertNotIn('watch_executor', aquarium._staffing_value(values()['staffing']), 'a release before D040 names none')
+
 
 class Headline(unittest.TestCase):
     def test_calm_only_when_everything_is_read_and_empty(self):

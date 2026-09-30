@@ -8574,3 +8574,61 @@ Codex-modell väljer han en Claude-modell igen i ytan eller i Flödet.
 
 **Avslut.** Steg 1b är klart när ändringen är på main och tjänsten kör den nya koden. Nästa steg under beställningen är
 steg 2 (Runtime).
+
+## RUNTIME-VAL-I-FLODET-20260930 — steg 2 av MODELLKARTA-20260929: Runtime och bevakningen väljs i Flödet och aktiveras av sig självt när Runtime är ledigt
+
+**Status:** registrerat 2026-09-30 av sessionen nortropic-repos-d7 (Claude Code) på ägarens beställning
+MODELLKARTA-20260929 och hans tillägg om Codex, ordagrant i
+`evidence/nasta-uppdrag/local/partner-backlog-20260929/owner-words-modellval-i-dashboarden-20260929.md` och
+`evidence/nasta-uppdrag/local/modellkarta-20260929/owner-words-modellkarta-codex-20260929.md`.
+
+**Ägarens ord** (ordagrant): "jag vill att aktiveringarna sker per automatik utifrån modell och effort nivåer jag väljer i
+arbetsplatsen", och ur tillägget: "Runtime: väljer jag en Codex-modell ska rollerna köra Codex, och väljer jag en
+Claude-modell ska de köra Claude. Utförarna byts alltså i releasen. Ta med det i steg 2, så att även det bytet aktiveras
+av sig självt när Runtime är ledig." och "Bevakningen ska kunna köra antingen Codex eller Claude."
+
+**Problemet.** Efter steg 1a visade Flödet Runtimes och bevakningens val men kunde inte ändra dem. De gjordes i Runtimes
+release med ett verktyg som ägaren körde i sin egen Terminal (Runtimes D029). Ansträngningen och bevakningens utförare
+var låsta i Runtimes kod, och startvakten hade en egen ansträngning.
+
+**Runtimes del** (Runtimes D040, med egen granskning och integration; när detta skrivs granskad men inte integrerad,
+se nedan): ansträngningen och bevakningens utförare,
+modell och ansträngning blir val i releasen; modellvalets verktyg tar hela valet, så att den valda modellens utförare
+driver alla roller; `auto` tillämpar arbetsplatsens registrerade val när Runtime är ledigt, med samma väg tillbaka som
+ett handbyte; en LaunchAgent som ägaren startar en gång kör `auto` var femte minut.
+
+**Genomfört, här:**
+- Flödets kort för Runtime och bevakningen är valbara, bara bland det som fungerade i mätningen av Runtimes egna program
+  (`claude_runtime`, `codex_runtime`). Spara skriver ett önskemål med ett nytt id i Runtimes inkorg,
+  `.runtime/ap10/workplace-choice.json` (`partnern/modellkarta.py`). Kortet man inte ändrade behåller sitt väntande
+  värde, annars det som kör. Inkorgen är okänd för en konfiguration som inte laddats, och en prov- eller
+  utvecklingsinstans skriver i sin egen datakatalog (`konfig.ladda`). Ett prov kan därför aldrig utlösa ett verkligt byte.
+  En länkad inkorg skrivs aldrig.
+- Kortet visar det önskade valet och Runtimes status för aktiveringen (`automatic-choice-status.json`) på svenska, men
+  bara en status om just det önskemålet; en äldre status väntar på Runtimes nästa titt. Medan ett val väntar varnar
+  kortet när aktiveraren inte går: en status som är äldre än 15 minuter, eller ingen alls.
+- Startvakten tar Runtimes ansträngning för den drivande rollens utförare, ur samma läsning som bemanningen. En
+  fortsättning behåller den ansträngning sessionen startade med. En release före D040 ger startvaktens egen
+  (`partnern/start.py`, `partnern/modellkarta.py`).
+- Aquariums sond läser ansträngningarna och bevakningens utförare när releasen bär dem, och kapacitetskontrollen för
+  bevakningen använder dess utförare (`tools/aquarium.py`).
+
+**Oförändrat.** Partnerns, programmens och läsarnas val gäller som förut. Ingen Runtime-release byts av denna ändring, och
+ingen modell anropas. Webbprofilernas modell och ansträngning (läsarna) är nästa steg.
+
+**Vad som återstår före det första automatiska bytet.** Runtimes D040 på Runtimes main, Runtimes övergång 19 med den
+nya Runtime-revisionen, och aktiveraren. D040 är granskad men inte integrerad: utfärdaren kräver en kredentialfri helsvit
+med alla prov gröna, och Runtimes svit kan inte bli det i den kredentialfria profilen på den här datorn (tre prov startar
+egna sandlådor, som inte kan kapslas; samma fyra fel på oförändrad main). Hur det löses är ägarens beslut. Övergången och
+aktiveraren är ägarens engångssteg i hans egen Terminal, eftersom sessioner inte får köra `launchctl`. Tills allt detta
+är gjort säger Flödet att valet väntar.
+
+**Granskning.** Separat granskning före integration; utfallet står här efter granskningen.
+
+**Ersätter:** ingen post.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main. Ett registrerat önskemål
+tas bort genom att ta bort filen i Runtimes inkorg; Runtimes aktiverare gör då ingenting.
+
+**Avslut.** Steg 2 är klart när Runtimes D040 och denna ändring är på main, tjänsten kör den nya koden, övergång 19 är
+aktiv och aktiveraren går. Nästa steg under beställningen är steg 3 (läsarna i Digitala och kontorets granskning).
