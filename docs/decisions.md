@@ -9303,3 +9303,72 @@ AP-10:s kommando, så den blir en egen Runtime-ändring med Johnnys övergång. 
 **Återgång.** Återställ integrationscommiten med `git revert` och starta om partnerns tjänst ur main.
 
 **Avslut.** Klart när ändringen är integrerad och partnerns tjänst har startats om ur main enligt driftregeln.
+
+**Delvis ersatt av:** RUNTIME-CODEX-20261001, i fråga om vad som är kvar: Codex 0.159.2 är publicerad i Runtime (D047)
+och väntar på Johnnys övergång 22, och Digitalas del av läsarnivån är publicerad. Övrigt gäller.
+
+## RUNTIME-CODEX-20261001 — Runtimes Codex 0.159.2 väntar på Johnnys övergång 22; kontoret följer Runtimes fästa Codex, och Digitalas kritik och provare tar läsarnas nivå
+
+**Status:** registrerat 2026-10-01 av sessionen nortropic-repos-07 (Claude Code). Johnnys ord är sparade ordagrant i
+`evidence/nasta-uppdrag/local/runtime-binarer-20260930/owner-words-runtime-binarer-20260930.md`. Läget med kvitton står i
+`evidence/nasta-uppdrag/local/runtime-binarer-20260930/LAGE.md`.
+
+**Beställningen.** "jag tror även codex har uppdateringar." och "jag kan bara välja medium på läsarna också, inte högre
+än så." RUNTIME-BINARER-20260930 gjorde Opus 5.5 valbart för Runtime och läsarnivån valbar i kontoret. Det här är resten.
+
+**Runtime D047 (PR 82, merge `3cbb00b`).** Codex 0.159.2, den senaste utgåvan (openai/codex `rust-v0.159.2`), är fäst på
+ett ställe: `runtime/codex_pin.py` (version, sökväg, sha256, bevismapp). Sökvägen stod tidigare utskriven på sju ställen.
+Binären och kodlägesvärden av samma utgåva ligger i en egen katalog. Båda arkivens sha256 är lika GitHubs, och
+signaturen gäller samma team som 0.155.1. Mätt med de fästa bytena:
+- config/read tar modellargumentet ordagrant, före ägarens egen konfiguration;
+- standardkommandona, också den interaktiva sessionen, skiljer mot den aktiva releasens bara i binären;
+- sandlådans gräns är densamma;
+- bevakningens egen väg (exec, gpt-6-astra, high) ger en giltig terminal med rätt svar.
+
+`exec --help` och `exec --approve-for-me resume --help` är identiska med 0.155.1:s, så startvaktens flaggor gäller
+oförändrade. Hela sviten, 848 prov, är mätt grön som provanvändaren. Två separata granskningar godkände utan blockerande
+fynd. Den första hade tio noter; sju rättades i kandidaten, bland dem att en fil kallades ägarfil fast den inte är det
+och att Johnnys namn stod i en bevisfil. Den andra godkände med tio noter.
+
+**Varför övergång 22 är Johnnys.** D047 ändrar två ägarfiler (`scripts/model_choice.py`, `runtime/check_issuer.py`) och
+AP-10:s kommando (dess Codex-binär). Sådant aktiverar agenten aldrig själv; den rapporterade `owner_needed` för `3cbb00b`
+2026-09-30 23:56:12Z. Övergång 22 är härledd ur övergång 21. Den godtar exakt en skillnad i AP-10:s kommando: binären från
+0.155.1 till 0.159.2, och bara om den nya binären är de uppmätta bytena. Kommandot prövas i checken och före aktiveringen,
+binären också vid stegningen, och båda igen i återläsningen. Blocket, när det ska köras och underlaget står i
+`evidence/nasta-uppdrag/local/runtime-binarer-20260930/overgang-22/OPERATORSSTEG-22.md`. Underlaget:
+- stegning 2026-09-30 23:42:36Z, konfiguration `b349797b`;
+- check med exit 0;
+- gränsprovet 64 av 64 i sin sandlåda;
+- startövningen: motorn, två starter och stopp av den nya releasen, webbfaserna W1 och W3 med den nya Codex-binären
+  och agentens verktyg (13 av 13); de två första W1-körningarna hade tillsammans tre steg med ett webbläsarfel, och de
+  fyra senare gick igenom med både den nya och den aktiva koden;
+- separat granskning i två omgångar: den första godkände skriptet och manifestet utan blockerande fynd, med femton
+  noter. Tre meningar i operatörstexten rättades, och den andra omgången godkände rättelserna utan blockerande fynd
+  (`overgang-22/review.json`).
+
+**Kontoret här.** `tools/partnern/konfig.py`: startvaktens och modellmätningens Codex läses nu ur den aktiva releasens
+`runtime/codex_pin.py` (`runtime_codex_pinne`), på samma sätt som Claude-pinnen. En release utan filen är äldre än D047 och
+fäster 0.155.1; går releasen inte att läsa gäller den senast kända (0.159.2). Före övergång 22 ger den alltså 0.155.1 som
+i dag. Efter den ger den 0.159.2: för startvakten från partnerns nästa start, för modellmätningen vid nästa körning.
+`tools/PARTNER.md` säger samma sak och anger bemanningens modell som den är 2026-10-01 (`claude-fable-5-1`, max).
+
+**Digitala (PR 26, merge `75e658a`).** Kritiken och provaren skickar läsarnas nivå som `--anstrangning` när den aktiva
+Runtime-releasen tar en, som kontorets granskning; annars kör profilen sin egen nivå. Körposten bokför nivån och
+varifrån den kom. Hela sviten, 363 prov, är mätt grön som provanvändaren, och en separat granskning godkände utan
+blockerande fynd.
+
+**Efter övergång 22.** Modellerna mäts om med Runtimes Codex 0.159.2 (partnerns modellmätning), så att nya modeller som
+gpt-6.1-sol kan erbjudas. Partnern startas om så att startvakten använder 0.159.2. Till dess gäller planens anteckning att
+Runtimes Codex 0.155.1 saknar gpt-6.1-sol.
+
+**Iakttaget, Johnnys beslut.** Granskningarna av D047 och av Digitalas ändring såg att provanvändaren kan läsa
+`~/.claude.json` och lista `~/.codex/`; nycklarna är nekade. Det är filrättigheter i Johnnys hemkatalog, och sessionerna rör dem inte.
+
+**Oförändrat.** Här ändras bara planen (en rad i ÄGARENS TUR, räkningen under rubriken och ett tillägg), beslutsloggen
+(den nya posten och markeringen sist i RUNTIME-BINARER-20260930), `tools/PARTNER.md`, `tools/partnern/konfig.py` och
+`tools/test_modellkarta.py`.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om partnerns tjänst ur main.
+
+**Avslut.** Klart när ändringen är integrerad och partnerns tjänst har startats om ur main enligt driftregeln. Raden i
+ÄGARENS TUR stängs när Johnny har kört övergång 22.

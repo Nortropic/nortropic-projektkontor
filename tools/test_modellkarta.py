@@ -523,10 +523,12 @@ D040_RELEASE = dict(FALSK_RELEASE, **{
 class RuntimesClaudePinne(unittest.TestCase):
     """RUNTIME-BINARER-20260930: startvakten och modellmätningen följer den aktiva releasens fästa Claude Code."""
 
-    def runtime(self, rot, claude_profile):
+    def runtime(self, rot, claude_profile, codex_pin=None):
         rel = rot / '.runtime/ap10/releases/r1'
         (rel / 'runtime/runtime').mkdir(parents=True)
         (rel / 'runtime/runtime/claude_profile.py').write_text(claude_profile)
+        if codex_pin is not None:
+            (rel / 'runtime/runtime/codex_pin.py').write_text(codex_pin)
         (rel / 'config.json').write_text('{}')
         import hashlib
         (rot / '.runtime/ap10/active.json').write_text(json.dumps({'config': str(rel / 'config.json'),
@@ -549,9 +551,34 @@ class RuntimesClaudePinne(unittest.TestCase):
                 with self.subTest(trasig=trasig):
                     self.assertEqual(kf.runtime_claude_pinne(rot)[1], kf.RUNTIME_CLAUDE_SENAST[1])
 
+    def test_codexpinnen_lases_ur_den_aktiva_releasen_och_en_aldre_release_faster_0_155_1(self):
+        import tempfile
+        pin = "BINARY = '.runtime/bin/codex-0.999.0/codex'\nSHA256 = '%s'\n" % ('cd' * 32)
+        with tempfile.TemporaryDirectory(prefix='pinne-') as t:
+            rot = Path(t)
+            self.assertEqual(kf.runtime_codex_pinne(rot),
+                             (str(rot / kf.RUNTIME_CODEX_SENAST[0]), kf.RUNTIME_CODEX_SENAST[1]), 'ingen release: senast kända')
+            self.runtime(rot, "VERSION = '2.1.999'\nBINARY_SHA256 = '%s'\n" % ('ab' * 32))
+            self.assertEqual(kf.runtime_codex_pinne(rot),
+                             (str(rot / '.runtime/bin/codex-0.155.1'), kf.RUNTIME_CODEX_FORE_D047[1]), 'en release före D047')
+            (rot / '.runtime/ap10/releases/r1/runtime/runtime/codex_pin.py').write_text(pin)
+            self.assertEqual(kf.runtime_codex_pinne(rot), (str(rot / '.runtime/bin/codex-0.999.0/codex'), 'cd' * 32))
+            (rot / '.runtime/ap10/releases/r1/config.json').write_text('{"annan": 1}')   # stämmer inte med pekaren
+            self.assertEqual(kf.runtime_codex_pinne(rot)[1], kf.RUNTIME_CODEX_SENAST[1])
+            (rot / '.runtime/ap10/releases/r1/config.json').write_text('{}')
+            for trasig in ("BINARY = '../x/codex'\nSHA256 = '%s'\n" % ('cd' * 32),
+                           "BINARY = '/usr/local/bin/codex'\nSHA256 = '%s'\n" % ('cd' * 32),
+                           "BINARY = '.runtime/bin/codex-0.999.0/codex'\n",
+                           "BINARY = '.runtime/bin/codex-0.999.0/codex'\nSHA256 = 'kort'\n"):
+                (rot / '.runtime/ap10/releases/r1/runtime/runtime/codex_pin.py').write_text(trasig)
+                with self.subTest(trasig=trasig):
+                    self.assertEqual(kf.runtime_codex_pinne(rot), (str(rot / kf.RUNTIME_CODEX_SENAST[0]), kf.RUNTIME_CODEX_SENAST[1]))
+
     def test_startvakten_anvander_pinnen(self):
         self.assertEqual(kf.STARTVAKT_BINARER['claude'][0].rsplit('/', 1)[-1][:7], 'claude-')
         self.assertRegex(kf.STARTVAKT_BINARER['claude'][1], r'\A[0-9a-f]{64}\Z')
+        self.assertEqual(kf.STARTVAKT_BINARER['codex'], kf.runtime_codex_pinne())
+        self.assertRegex(kf.STARTVAKT_BINARER['codex'][1], r'\A[0-9a-f]{64}\Z')
 
 
 class RuntimeLasningenMotEnFalskRelease(unittest.TestCase):
