@@ -525,6 +525,15 @@ const ALIAS = { opus: 'claude-opus-5-5', 'opus-5-5': 'claude-opus-5-5', fable: '
   'opus-5': 'claude-opus-5', haiku: 'claude-haiku-4-5-20251001' };
 const mv = { data: null, modell: 0, niva: 2 };
 function modellnamn(id) { const m = mv.data && mv.data.modeller.find((x) => x.id === id); return m ? m.namn : id; }
+function nivaerFor(id) {  // varje modell bär sina egna nivåer (Codex har andra än Claude); annars de gemensamma
+  const m = mv.data && mv.data.modeller.find((x) => x.id === id);
+  return (m && m.nivaer && m.nivaer.length) ? m.nivaer : mv.data.nivaer;
+}
+function markerad() { return mv.data.modeller[mv.modell] ? mv.data.modeller[mv.modell].id : mv.data.huvud; }
+function nivaForModell(id, niva) {  // samma nivå om modellen har den; annars high, och annars modellens mittersta
+  const lv = nivaerFor(id);
+  return lv.includes(niva) ? niva : (lv.includes('high') ? 'high' : lv[Math.floor(lv.length / 2)]);
+}
 function ritaModellrad() { if (mv.data) $('modellrad').textContent = modellnamn(mv.data.huvud) + ' · ' + mv.data.anstrangning + ' ⌄'; }
 async function laddaModellval() { mv.data = await api('GET', '/api/installningar'); ritaModellrad(); return mv.data; }
 async function sparaModellval(huvud, anstrangning) {
@@ -535,7 +544,7 @@ async function sparaModellval(huvud, anstrangning) {
 async function oppnaModellval() {
   const d = mv.data || await laddaModellval();
   mv.modell = Math.max(0, d.modeller.findIndex((m) => m.id === d.huvud));
-  mv.niva = Math.max(0, d.nivaer.indexOf(d.anstrangning));
+  mv.niva = Math.max(0, nivaerFor(d.huvud).indexOf(d.anstrangning));
   ritaModellval(); $('modellval').hidden = false; $('modellrad').setAttribute('aria-expanded', 'true');
   placeraModellval(); $('modellval').focus();
 }
@@ -551,23 +560,29 @@ function stangModellval() { $('modellval').hidden = true; $('modellrad').setAttr
 function ritaModellval() {
   const d = mv.data;
   $('modellval').replaceChildren(el('div', { class: 'mv-rubrik', text: 'Modell' }),
-    ...d.modeller.map((m, i) => el('button', { type: 'button', class: 'mv-modell' + (i === mv.modell ? ' vald' : ''), onclick: () => { mv.modell = i; valjModell(); } },
+    ...d.modeller.map((m, i) => el('button', { type: 'button', class: 'mv-modell' + (i === mv.modell ? ' vald' : ''), onclick: () => { const niva = nivaerFor(markerad())[mv.niva]; mv.modell = i; mv.niva = Math.max(0, nivaerFor(markerad()).indexOf(nivaForModell(markerad(), niva))); valjModell(); } },
       el('span', { class: 'mv-namn', text: m.namn }), el('span', { class: 'mv-om', text: m.om }), m.id === d.huvud ? el('span', { class: 'mv-nu', text: '✓' }) : null)),
     el('div', { class: 'mv-niva' }, el('span', { class: 'etikett', text: 'Ansträngning' }),
-      el('div', { class: 'mv-nivaer', role: 'group', 'aria-label': 'Ansträngning' }, ...d.nivaer.map((n, i) => el('button', {
+      el('div', { class: 'mv-nivaer', role: 'group', 'aria-label': 'Ansträngning' }, ...nivaerFor(markerad()).map((n, i) => el('button', {
         type: 'button', class: 'mv-n' + (i === mv.niva ? ' vald' : ''), onclick: async () => { mv.niva = i; ritaModellval(); $('modellval').focus();
-          try { await sparaModellval(d.huvud, d.nivaer[i]); ritaModellval(); } catch (f) { $('utkaststatus').textContent = 'Kunde inte byta: ' + f.message; } } }, n)))),
+          try { await sparaModellval(markerad(), n); mv.modell = Math.max(0, mv.data.modeller.findIndex((m) => m.id === mv.data.huvud)); mv.niva = Math.max(0, nivaerFor(mv.data.huvud).indexOf(mv.data.anstrangning)); ritaModellval(); } catch (f) { $('utkaststatus').textContent = 'Kunde inte byta: ' + f.message; } } }, n)))),
     el('div', { class: 'mv-fot', text: '↑↓ modell · ←→ ansträngning · Enter · Esc · /model, /effort' }));
 }
 async function valjModell() {
   const d = mv.data; stangModellval();
-  try { await sparaModellval(d.modeller[mv.modell].id, d.nivaer[mv.niva]); } catch (f) { $('utkaststatus').textContent = 'Kunde inte byta: ' + f.message; }
+  const ny = markerad();
+  try { await sparaModellval(ny, nivaerFor(ny)[mv.niva] || nivaForModell(ny, d.anstrangning)); } catch (f) { $('utkaststatus').textContent = 'Kunde inte byta: ' + f.message; }
 }
 $('modellval').addEventListener('keydown', (e) => {
   const d = mv.data; if (!d) return;
-  if (e.key === 'ArrowDown') mv.modell = (mv.modell + 1) % d.modeller.length;
-  else if (e.key === 'ArrowUp') mv.modell = (mv.modell - 1 + d.modeller.length) % d.modeller.length;
-  else if (e.key === 'ArrowRight') mv.niva = Math.min(d.nivaer.length - 1, mv.niva + 1);
+  const flytta = (steg) => {  // nivåraden följer den markerade modellen och behåller nivån när den finns där
+    const niva = nivaerFor(markerad())[mv.niva];
+    mv.modell = (mv.modell + steg + d.modeller.length) % d.modeller.length;
+    mv.niva = Math.max(0, nivaerFor(markerad()).indexOf(nivaForModell(markerad(), niva)));
+  };
+  if (e.key === 'ArrowDown') flytta(1);
+  else if (e.key === 'ArrowUp') flytta(-1);
+  else if (e.key === 'ArrowRight') mv.niva = Math.min(nivaerFor(markerad()).length - 1, mv.niva + 1);
   else if (e.key === 'ArrowLeft') mv.niva = Math.max(0, mv.niva - 1);
   else if (e.key === 'Enter') { e.preventDefault(); valjModell(); return; }
   else if (e.key === 'Escape') { e.preventDefault(); stangModellval(); return; }
@@ -584,12 +599,12 @@ async function kommando(text) {
   const arg = ((m && m[2]) || '').toLowerCase();
   if (!arg) { await oppnaModellval(); return; }
   if (m[1].toLowerCase() === 'effort') {
-    if (!d.nivaer.includes(arg)) { $('utkaststatus').textContent = 'Nivåerna är ' + d.nivaer.join(', ') + '.'; return; }
+    if (!nivaerFor(d.huvud).includes(arg)) { $('utkaststatus').textContent = 'Nivåerna är ' + nivaerFor(d.huvud).join(', ') + '.'; return; }
     await sparaModellval(d.huvud, arg); return;
   }
   const id = ALIAS[arg] || (d.modeller.some((x) => x.id === arg) ? arg : null);
   if (!id) { $('utkaststatus').textContent = 'Okänd modell: ' + arg + '. Välj med /model.'; return; }
-  await sparaModellval(id, d.anstrangning);
+  await sparaModellval(id, nivaForModell(id, d.anstrangning));
 }
 $('filval').addEventListener('change', (e) => { laggTillFiler([...e.target.files]); e.target.value = ''; });
 document.addEventListener('paste', (e) => {

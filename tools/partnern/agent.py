@@ -9,6 +9,16 @@ skrivverktyg.
 En modell till allt (Johnnys besked 2026-09-29, FORBATTRINGSPARTNER-BACKLOG-20260929): svaret, utredaren och de
 registrerade utredningarna kör den modell och den ansträngning som Johnny har valt i ytan. Utredaren får samma modell
 och ansträngning i sin definition, och kroken nekar ett anrop som väljer en annan agenttyp eller en annan modell.
+
+Codex (MODELLKARTA-20260929 steg 1b, "Arbetsmodellen ska aldrig spela roll"): väljer Johnny en Codex-modell kör
+partnern i stället `codex exec` på hans Codex-inloggning, utan hans egen konfiguration (`--ignore-user-config`), utan
+skal (`shell_tool`, `unified_exec` av), utan underagenter och tillägg, i läsläge och utan godkännandefrågor. Varje
+verktygsanrop, också de som modellen gör genom Codex kodläge, passerar samma krok som på Claude (PreToolUse, `krok.py`),
+och servern tillåter bara partnerns egna verktyg och klockan, prövar webbverktyget mot webbpolicyn och nekar allt
+annat (webbpolicy.prova_codex). Kodlägets JavaScript har ingen fil- eller nätåtkomst (prövat 2026-09-29). Körningen
+sparar ingen session (`--ephemeral`): varje tur börjar med trådens historik ur partnerns lager, så att Johnnys egen
+Codex-historik inte fylls av partnerns turer. En utredning i turen görs genom verktyget utred (en registrerad
+utredning på samma modell), eftersom underagenter är avstängda.
 """
 from __future__ import annotations
 
@@ -28,6 +38,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from . import bilagor as bil
+from .konfig import ar_claude
 from .lager import nu, nytt_id
 
 PAKET = Path(__file__).resolve().parent
@@ -44,6 +55,29 @@ MELLANRAD_MAX = 400   # en kortare text före fler verktygsanrop räknas som mel
 SVAR_MIN = 600
 STATUS_TEXT = {'mottaget': 'mottaget', 'sparat': 'sparat', 'i_ko': 'i kö', 'undersoker': 'undersöker',
                'svarad': 'svarat', 'begransad': 'begränsat', 'avbruten': 'avbrutet', 'fel': 'fel'}
+# Codex funktioner som stängs av för partnern: skal, multi_agent, mål, appar, tillägg, dator- och webbläsarstyrning,
+# bildgenerering, bildläsning från disk (view_image) och väntan (sleep). Det partnern inte behöver stängs av vid källan och
+# inte bara i kroken, eftersom Codex kör verktyget om kroken dör eller inte hinner svara (prövat 2026-09-30). Kvar blir
+# kodläget (V8 utan fil- och nätåtkomst), partnerns MCP-verktyg, webbverktyget, klockan, apply_patch (som den
+# skrivskyddade sandlådan stoppar) och agentverktygen (collaboration.*), som inte går att stänga av i Codex 0.159;
+# kroken nekar dem.
+CODEX_AVSTANGT = ('shell_tool', 'unified_exec', 'multi_agent', 'goals', 'apps', 'plugins', 'computer_use', 'browser_use',
+                  'browser_use_external', 'browser_use_full_cdp_access', 'in_app_browser', 'image_generation',
+                  'view_image', 'sleep_tool')
+# Startar kroken inte alls svarar skalets reservrad nej; hänger servern svarar kroken själv nej före tidsgränsen
+# (krok.FRIST).
+KROK_RESERV = json.dumps({'hookSpecificOutput': {'hookEventName': 'PreToolUse', 'permissionDecision': 'deny',
+                                                 'permissionDecisionReason': 'Partnerns krok kunde inte köras; anropet nekas.'}})
+CODEX_NOT = ('\n\n## Den här körningen (Codex)\n\nDu kör på Codex. Det finns ingen underagent: behöver något utredas '
+             'separat registrerar du en utredning med verktyget utred, som körs på samma modell. Webbverktyget prövas av '
+             'partnerns server med samma regler som webbsökning och webbhämtning; ett nekat anrop kommer med skälet. '
+             'Lokala filer läses bara genom partnerns egna verktyg.')
+CODEX_VARNING = 'dangerously-bypass-hook-trust'  # Codex eget besked om att partnerns granskade krok körs utan tillit
+BILDTYPER = {'image/png': '.png', 'image/jpeg': '.jpg', 'image/gif': '.gif', 'image/webp': '.webp'}
+UUID_FORM = re.compile(r'\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z')
+# Systemprompten går som utvecklarinstruktion i argumenten; blir den ovanligt stor läggs den först i prompten i stället,
+# så att argumentlistan aldrig slår i systemets gräns.
+CODEX_INSTRUKTION_MAX = 120_000
 UTREDARE_PROMPT = (
     'Du är en avgränsad utredare åt Projektkontorets förbättringspartner i Nortropic. Du får en självbärande '
     'fråga. Undersök den med dina verktyg (sök och läs Nortropics underlag, GitHub, webbsökning och '
@@ -91,6 +125,8 @@ class Korning:
         self.url_varder = set()
         self.sokvardar = set()
         self.soksanrop = set()   # tool_use-id för WebSearch; bara deras resultat ger tillåtna värdar
+        self.utforare = 'claude'
+        self.codex_ref = {}      # Codex sökträffars ref_id → värd, ur körningens egen ström (för webbpolicyn)
         self.proc = None
         self.avbruten_av = None
         self.session = None
@@ -195,7 +231,8 @@ class Agent:
     def systemprompt(self, korning: Korning) -> str:
         roll = (PAKET / 'roll.md').read_text('utf-8')
         orientering = (PAKET / 'orientering.md').read_text('utf-8')
-        return roll + '\n\n' + orientering + '\n\n' + self.lagesblock(korning)
+        return (roll + '\n\n' + orientering + '\n\n' + self.lagesblock(korning)
+                + (CODEX_NOT if korning.utforare == 'codex' else ''))
 
     def lagesblock(self, korning: Korning) -> str:
         nu_utc = datetime.now(timezone.utc)
@@ -489,12 +526,17 @@ class Agent:
         for i in self.s.lager.fraga('select text from inspel where trad=?', (korning.trad,)):
             texter.append(i['text'])
         korning.url_varder = _url_varder(texter)
+        if session and not UUID_FORM.match(session):  # t.ex. en Codex-turs: Claude Code får en egen, ny session
+            session = None
         ny = not session or not _session_fil(self.arbetsyta, session).exists()
         if not session:
             session = str(uuid.uuid4())
         korning.session = session
         korning.modell = self.k.modell.huvud
         korning.anstrangning = self.k.modell.anstrangning  # samma värden i processens argument och i journalen
+        korning.utforare = 'claude' if ar_claude(korning.modell) else 'codex'  # modellen avgör utföraren
+        if korning.utforare == 'codex':
+            return self._kor_codex(korning)
         (korning.katalog / 'system.md').write_text(self.systemprompt(korning), 'utf-8')
         os.chmod(korning.katalog / 'system.md', 0o600)
         redan = set()
@@ -554,6 +596,184 @@ class Agent:
         strom.close()
         fel_ut.close()
         return self._slutstatus(korning, resultat, proc.returncode, start)
+
+    # ---------------------------------------------------------------- Codex
+    def argv_codex(self, korning: Korning, systemtext: str, bilder: list) -> list:
+        """codex exec för en partnerkörning. Körningens nyckel går bara genom miljön: MCP-bryggan får den genom
+        env_vars och kroken ärver Codex miljö, så den står aldrig i processargumenten."""
+        g = self.k.gransar
+        python = sys.executable
+        krok = '%s -B %s || printf %s %s' % (_citera(python), _citera(str(PAKET / 'krok.py')), _citera('%s\\n'),
+                                             _citera(KROK_RESERV))
+        argv = [self.k.codex, 'exec', '--json', '--ephemeral', '--skip-git-repo-check', '--ignore-user-config',
+                '--dangerously-bypass-hook-trust', '-s', 'read-only', '-m', korning.modell,
+                '-c', 'model_reasoning_effort=' + json.dumps(korning.anstrangning),
+                '-c', 'approval_policy="never"', '-c', 'web_search="live"',
+                '-c', 'developer_instructions=' + json.dumps(systemtext if len(systemtext) <= CODEX_INSTRUKTION_MAX else
+                                                             'Partnerns instruktioner står först i prompten.'),
+                '-c', 'mcp_servers.partner.command=' + json.dumps(python),
+                '-c', 'mcp_servers.partner.args=' + json.dumps(['-B', str(PAKET / 'mcp_brygga.py')]),
+                '-c', 'mcp_servers.partner.env_vars=["PARTNER_URL", "PARTNER_KORNING"]',
+                '-c', 'mcp_servers.partner.default_tools_approval_mode="approve"',
+                '-c', 'hooks.PreToolUse=[{matcher=".*", hooks=[{type="command", command=%s, timeout=20}]}]'
+                      % json.dumps(krok)]
+        for funktion in CODEX_AVSTANGT:
+            argv += ['--disable', funktion]
+        for bild in bilder:
+            argv += ['-i', str(bild)]
+        korning.maxtid = g.tur_max_sekunder if korning.typ == 'tur' else g.jobb_max_sekunder
+        return argv + ['-C', str(self.arbetsyta), '-']
+
+    def _codex_indata(self, korning: Korning, meddelande: dict) -> tuple:
+        """(text, bildfiler) ur samma meddelande som Claude får: bilderna skrivs som filer i körningens katalog."""
+        text, bilder = [], []
+        for n, b in enumerate(meddelande['message']['content']):
+            if b.get('type') == 'text':
+                text.append(b['text'])
+            elif b.get('type') == 'image':
+                fil = korning.katalog / ('bild-%02d%s' % (n, BILDTYPER.get(b['source']['media_type'], '.bin')))
+                fd = os.open(fil, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+                with os.fdopen(fd, 'wb') as f:
+                    f.write(base64.b64decode(b['source']['data']))
+                bilder.append(fil)
+        return '\n\n'.join(text), bilder
+
+    def _kor_codex(self, korning: Korning) -> dict:
+        systemtext = self.systemprompt(korning)
+        (korning.katalog / 'system.md').write_text(systemtext, 'utf-8')
+        os.chmod(korning.katalog / 'system.md', 0o600)
+        # Ingen session sparas: varje körning får trådens historik ur lagret, som en ny Claude-session.
+        meddelande = self.anvandarmeddelande(korning, historik=True)
+        text, bilder = self._codex_indata(korning, meddelande)
+        if len(systemtext) > CODEX_INSTRUKTION_MAX:
+            text = '[Partnerns instruktioner]\n' + systemtext + '\n\n[Slut på instruktionerna]\n\n' + text
+        korning.session = 'codex-' + korning.id  # ett eget id, aldrig en Claude-sessions (se _kor)
+        argv = self.argv_codex(korning, systemtext, bilder)
+        env = self.miljo(korning, False)
+        korning.handelse('start', 'Startar ny modellsession (%s, Codex)' % korning.modell)
+        if korning.avbruten_av:
+            return self._avsluta(korning, 'avbruten', orsak=korning.avbruten_av, start=time.time())
+        strom = open(korning.katalog / 'strom.jsonl', 'ab')
+        os.chmod(korning.katalog / 'strom.jsonl', 0o600)
+        fel_ut = open(korning.katalog / 'stderr.txt', 'ab')
+        start = time.time()
+        try:
+            proc = subprocess.Popen(argv, cwd=str(self.arbetsyta), env=env, stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE, stderr=fel_ut, start_new_session=True)
+        except OSError as e:
+            return self._avsluta(korning, 'fel', orsak='Codex kunde inte startas (%s).' % type(e).__name__, start=start)
+        with korning._las:
+            korning.proc = proc
+        if korning.avbruten_av:
+            try:
+                os.killpg(proc.pid, signal.SIGINT)
+            except OSError:
+                pass
+        threading.Thread(target=self._vakt, args=(korning,), daemon=True).start()
+        try:
+            proc.stdin.write(text.encode('utf-8'))
+            proc.stdin.close()
+        except OSError:
+            pass
+        utfall = {'usage': None, 'fel': []}
+        skrivet, sparat = '', time.time()
+        for rad in proc.stdout:
+            strom.write(rad)
+            try:
+                ev = json.loads(rad)
+            except ValueError:
+                continue
+            if isinstance(ev, dict):
+                self._tolka_codex(korning, ev, utfall)
+            if time.time() - sparat > 2 and korning.delsvar != skrivet:
+                skrivet, sparat = korning.delsvar, time.time()
+                try:
+                    self.s.lager.spara_privat_fil(korning.katalog / 'delsvar.txt', skrivet.encode('utf-8'))
+                except OSError:
+                    pass
+        proc.wait()
+        proc.stdout.close()
+        strom.close()
+        fel_ut.close()
+        return self._slutstatus_codex(korning, utfall, proc.returncode, start)
+
+    def _tolka_codex(self, korning: Korning, ev: dict, utfall: dict) -> None:
+        typ = ev.get('type')
+        item = ev.get('item') if isinstance(ev.get('item'), dict) else {}
+        slag = item.get('type')
+        if typ == 'thread.started' and re.match(r'\A[A-Za-z0-9-]{1,80}\Z', str(ev.get('thread_id') or '')):
+            korning.session = 'codex-' + ev['thread_id']
+        elif typ == 'item.started' and slag in ('mcp_tool_call', 'web_search'):
+            for t in korning.svarstext:  # en kort text före verktyg är en mellanrad (som på Claude)
+                t['fore_verktyg'] = True
+            if slag == 'mcp_tool_call':
+                korning.handelse('verktyg', _beskriv_verktyg('mcp__partner__' + str(item.get('tool') or ''),
+                                                             item.get('arguments') or {}))
+        elif typ == 'item.completed' and slag == 'agent_message':
+            text = str(item.get('text') or '')
+            if text.strip():
+                korning.svarstext.append({'text': text, 'fore_verktyg': False})
+                with korning._las:
+                    korning.delsvar += ('\n\n' if korning.delsvar.strip() else '') + text
+        elif typ == 'item.completed' and slag == 'web_search':
+            handling = item.get('action') if isinstance(item.get('action'), dict) else {}
+            if handling.get('type') == 'open_page':
+                korning.handelse('verktyg', 'Hämtar webbsida: %s' % str(handling.get('url') or '')[:200])
+            else:
+                korning.handelse('verktyg', 'Webbsökning: "%s"' % str(item.get('query') or '')[:200])
+            oppnad = (urlparse(str(handling.get('url') or '')).hostname or '').lower() if handling.get('type') == 'open_page' else None
+            for r in item.get('results') or []:
+                if not isinstance(r, dict):
+                    continue
+                vard = str(r.get('domain') or '').lower().strip('.')
+                if oppnad is not None and vard != oppnad:
+                    continue   # en öppnad sida gör aldrig en annan värd öppningsbar; bara en sökning gör det, som på Claude
+                if vard and oppnad is None and len(korning.sokvardar) < 400:
+                    korning.sokvardar.add(vard)
+                if r.get('ref_id') and vard and len(korning.codex_ref) < 2000:
+                    korning.codex_ref[str(r['ref_id'])[:80]] = vard
+        elif typ == 'item.completed' and slag == 'mcp_tool_call' and item.get('status') == 'failed':
+            fel = item.get('error') if isinstance(item.get('error'), dict) else {}
+            korning.handelse('nekat', str(fel.get('message') or 'Verktyget %s gav ett fel.' % str(item.get('tool') or '')[:40])[:300])
+        elif typ == 'item.completed' and slag == 'error':
+            text = str(item.get('message') or '')
+            if CODEX_VARNING not in text:
+                korning.handelse('varning', text[:300])
+        elif typ == 'turn.completed':
+            utfall['usage'] = ev.get('usage') if isinstance(ev.get('usage'), dict) else {}
+        elif typ == 'turn.failed':
+            fel = ev.get('error') if isinstance(ev.get('error'), dict) else {}
+            utfall['fel'].append(str(fel.get('message') or typ)[:500])
+        elif typ == 'error':  # t.ex. "Reconnecting... (403)": räknas som omförsök, som Claudes api_retry
+            korning.forsok += 1
+            text = str(ev.get('message') or 'fel')[:300]
+            utfall.setdefault('tillfalliga', []).append(text)
+            korning.handelse('omforsok', 'Codex: %s' % text)
+
+    def _slutstatus_codex(self, korning: Korning, utfall: dict, returkod: int, start: float) -> dict:
+        forbrukning = {'modellanrop': True, 'sekunder': round(time.time() - start, 1), 'omforsok': korning.forsok,
+                       'modell': korning.modell, 'anstrangning': korning.anstrangning, 'utforare': 'codex'}
+        u = utfall.get('usage')
+        if u is not None:
+            forbrukning.update(tokens_in=int(u.get('input_tokens') or 0),
+                               tokens_ut=int(u.get('output_tokens') or 0) + int(u.get('reasoning_output_tokens') or 0),
+                               listpris_usd=0.0)
+        svar = svarstext(korning.svarstext)
+        delsvar = korning.delsvar.strip() or svar
+        if korning.avbruten_av:
+            return self._avsluta(korning, 'avbruten', orsak=korning.avbruten_av, delsvar=delsvar,
+                                 forbrukning=forbrukning, start=start)
+        fel = ' '.join(utfall.get('fel') or [])
+        if u is None and not fel:  # turen slutade aldrig: det senaste tillfälliga felet är skälet
+            fel = ' '.join((utfall.get('tillfalliga') or [])[-1:])
+        if u is not None and not fel and svar.strip():
+            return self._avsluta(korning, 'svarad', svar=svar, forbrukning=forbrukning, start=start)
+        if re.search(r'(?i)usage limit|rate limit|limit reached|reached your .* limit|quota', fel):
+            return self._avsluta(korning, 'begransad', orsak='Modellkvoten eller en hastighetsgräns nåddes: %s' % fel[:300],
+                                 delsvar=delsvar, forbrukning=forbrukning, start=start)
+        orsak = ('Modellkörningen slutade med fel: %s' % fel[:400]) if fel else \
+            'Modellkörningen slutade utan svar (kod %s).' % returkod
+        return self._avsluta(korning, 'fel', orsak=orsak, delsvar=delsvar, forbrukning=forbrukning, start=start)
 
     def _vakt(self, korning: Korning) -> None:
         proc = korning.proc

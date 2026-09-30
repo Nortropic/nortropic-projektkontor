@@ -8488,3 +8488,89 @@ data.
 
 **Avslut.** Ändringen är klar när den är integrerad, tjänsten har startats om ur main enligt driftregeln och mätningen
 har upprepats mot den levande tjänsten. Nästa bygge i spåret kräver ett eget beslut.
+
+## PARTNER-CODEX-20260930 — steg 1b av MODELLKARTA-20260929: förbättringspartnern kan köra på Codex, lika avgränsad som på Claude, och modellen Johnny väljer avgör vilket program som kör
+
+**Status:** registrerat 2026-09-30 (00:00 UTC) av sessionen nortropic-repos-d7 (Claude Code) på ägarens tillägg till
+MODELLKARTA-20260929, ordagrant i `evidence/nasta-uppdrag/local/modellkarta-20260929/owner-words-modellkarta-codex-20260929.md`.
+
+**Ägarens ord** (ordagrant): "Arbetsmodellen ska aldrig spela roll. Både Claude och Codex ska kunna driva allt." och
+"Partnern: bygg så att den också kan köra på Codex. Går en del inte att bygga nu, säg exakt vad det kräver i stället för
+att hoppa över det."
+
+**Problemet.** Partnern körde bara Claude Code. Dess avgränsning byggde på Claude Codes egna flaggor: inga fil-, skal-
+eller skrivverktyg, och en krok före webbanrop och underagenter.
+
+**Prövat före bygget** (kvitton i `evidence/nasta-uppdrag/local/modellkarta-20260929/steg1b/`, Codex 0.159.0 på
+Johnnys inloggning, 2026-09-29):
+- Codex krokar är byggda för att fungera som Claude Codes. Varje verktyg passerar PreToolUse, också de som modellen
+  anropar genom Codex kodläge: webbverktyget `webrun`, partnerns MCP-verktyg (`mcp__partner__…`), `view_image`,
+  `apply_patch`, agentstarter och klockan. En krok som nekar allt stoppade alla.
+- Kodlägets JavaScript har ingen fil- eller nätåtkomst: `require`, `import`, `fetch`, `process`, Deno och Bun saknas,
+  och en provfil utanför arbetskatalogen läckte inte.
+- MCP-bryggan får körningens nyckel genom `env_vars`, och kroken ärver den, så nyckeln står aldrig i argumenten.
+  Partnerns MCP-verktyg behöver `default_tools_approval_mode = "approve"`.
+
+**Genomfört.**
+- Modellen avgör programmet (`konfig.ar_claude`): en modell i arbetsplatsens Claude-lista kör Claude Code som förut, och
+  en uppmätt Codex-modell kör `codex exec` (`agent._kor_codex`). En Codex-modell eller -nivå kan bara sparas om den
+  fungerat i mätningen, i ytan (`/api/installningar`) och i Flödet. Samtalsytans väljare visar den markerade modellens
+  egna nivåer.
+- Körningen på Codex: `--ignore-user-config` (Johnnys MCP-servrar och tillägg laddas inte), `--ephemeral`, läsläge,
+  inga godkännandefrågor, skal (`shell_tool`, `unified_exec`), `multi_agent`, mål, appar, tillägg, dator- och
+  webbläsarstyrning, bildgenerering, bildläsning från disk (`view_image`) och väntan (`sleep_tool`) avstängda,
+  partnerns systemprompt som utvecklarinstruktion, bilder som filer (`-i`), och kroken med matcher ".*".
+- Kroken blir aldrig tyst: den svarar själv nej om servern inte svarat inom 17 sekunder (Codex tidsgräns för kroken är
+  20), och startar Python inte alls svarar skalets reservrad i krokens kommando nej.
+- Servern prövar varje Codex-verktyg (`webbpolicy.prova_codex`): partnerns egna verktyg och klockan tillåts;
+  `webrun` prövas med webbpolicyns regler för sökning (också domänbegränsning som `site:`) och hämtning, och en
+  sökträff öppnas bara genom en hänvisning ur körningens egen ström; allt annat nekas med skäl.
+- Strömmen (`codex exec --json`) blir partnerns steg, svar och förbrukning (tokens, modell, ansträngning, utförare).
+- Två anteckningar från granskningen av steg 1a är rättade: sessionernas värde är okänt, inte obevisat, när programmets
+  fil saknar modell eller ansträngning, och mätkvittot skrivs med fsync och utan kvarlämnad tillfällig fil.
+
+**Prövat efter bygget.** Två riktiga turer i en provinstans med Codex (gpt-6-astra, low; kvitto
+`steg1b/KVITTO-codex-turer.txt`): sökning i underlaget, webbsökning och ett försök att läsa `/etc/hosts` genom partnerns
+repoverktyg, som vägrade; därefter `view_image` på `/etc/hosts`, som servern nekade med skäl. En webbadress som stod i
+Johnnys eget meddelande släpptes igenom, enligt samma regel som på Claude. En tredje tur efter granskningen, med den
+slutliga kroken (kvitto `steg1b/prov/KVITTO-livetur-k3.txt`): sökningen i underlaget släpptes igenom, en webbsökning
+begränsad till pypi.org nekades enligt webbpolicyn, `view_image` fanns inte och en agentstart nekades.
+
+**Skillnader mot Claude, och vad de kräver.** Ingen underagent i turen, eftersom servern nekar Codex agentverktyg
+(`collaboration.*`, som inte går att stänga av i Codex 0.159): en utredning registreras med verktyget utred och körs på
+samma modell. Att öppna agentstarter skulle kräva en egen grind för Codex agentverktyg, och det finns inget behov av
+det i dag. Ingen sparad session: varje tur får trådens historik ur journalen, så att Johnnys egen Codex-historik inte
+fylls av partnerns turer (kvitto `steg1b/KVITTO-ephemeral.txt`: en tur med en unik markör lämnade ingen fil i
+`~/.codex/sessions`). En Codex-tur får ett eget sessions-id (`codex-…`), och väljer Johnny Claude igen börjar Claude
+Code en ny session med trådens hela historik, så att inget från Codex-turerna försvinner. Kroken körs med
+`--dangerously-bypass-hook-trust`, som Codex anger för automatisering med granskade krokar; kroken är partnerns egen.
+
+**Oförändrat.** Partnern kör det Johnny valt; ändringen byter ingen modell. Startvakten, Runtime och Digitala är
+orörda. Claude-vägen är oförändrad utom att den gemensamma kroken nu svarar nej av sig själv om servern inte svarat
+inom 17 sekunder.
+
+**Granskning.** Den första separata granskningen (claude-opus-5, läsarprofil) godkände kandidaten utan blockerande fynd.
+Av dess tio anteckningar är dessa rättade:
+- En sökträff från en redan öppnad sida kunde bli öppningsbar utan sökvärdsregeln; nu gäller en öppnad sidas träffar
+  bara samma sida.
+- Ett tillfälligt fel från Codex (till exempel en återanslutning) fällde en tur som lyckades; nu blir det ett omförsök.
+- En Codex-tur ärvde den förra Claude-sessionens id, så att en senare Claude-tur kunde återuppta den och tappa
+  Codex-turernas meddelanden; nu har Codex-turen ett eget id och Claude börjar om med historiken.
+- En ovanligt stor systemprompt läggs först i prompten i stället för i argumenten.
+- Väljarens nivårad följer den markerade modellen.
+- De två rättelserna från steg 1a har fått egna prov, och två rader i PARTNER.md är preciserade.
+Funktionsnamnen som stängs av finns alla i Codex egen lista (kvitto `steg1b/KVITTO-codex-funktioner.txt`).
+Anteckningen om en krok som dör prövades med riktiga Codex (kvitto `steg1b/KVITTO-krokfel.txt`): Codex kör verktyget
+om kroken dör utan svar eller inte hinner svara. Därför svarar kroken nu själv nej före tidsgränsen och skalets
+reservrad nej när Python inte startar (samma kvitto: reservraden stoppade en webbsökning), och det partnern inte behöver
+är avstängt vid källan (kvitto `steg1b/KVITTO-verktyg.txt`: med de nya flaggorna saknas `view_image` och väntan). Kvar
+finns `apply_patch`, som läsläget stoppade också när kroken släppte igenom, och agentverktygen, som kroken nekar;
+`agents.max_threads=0` vägras av Codex. Rättelserna prövas i en andra runda.
+
+**Ersätter:** ingen post.
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om tjänsten ur main. Har Johnny valt en
+Codex-modell väljer han en Claude-modell igen i ytan eller i Flödet.
+
+**Avslut.** Steg 1b är klart när ändringen är på main och tjänsten kör den nya koden. Nästa steg under beställningen är
+steg 2 (Runtime).

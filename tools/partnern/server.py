@@ -30,7 +30,7 @@ from .agent import Agent, Korning, _session_fil, prova_underagent
 from .arbetsplats import Arbetsplats
 from .jobb import Jobb
 from .kallor import Kallindex, KLASSER
-from .konfig import ANSTRANGNING, MODELLER, Konfig, spara_modellval
+from .konfig import ANSTRANGNING, MODELLER, Konfig, ar_claude, spara_modellval
 from .lager import Lager, nu, nytt_id
 from .modellkarta import RuntimeLasning, bevisad, erbjud, karta, spara as spara_kartval
 from .modellmatning import las as mm_las
@@ -38,7 +38,7 @@ from .overlamning import Overlamning
 from .start import Startvakt
 from .systemlage import Systemlage
 from .verktyg import Verktyg, Verktygsfel, specifikationer
-from .webbpolicy import prova
+from .webbpolicy import prova, prova_codex
 
 UI = Path(__file__).resolve().parent / 'ui'
 KAKA = 'partner'
@@ -451,10 +451,16 @@ class Server:
 
     def modellval(self) -> dict:
         # En modell till allt: valet gäller svaret, utredaren och de registrerade utredningarna. Finns en mätning erbjuds
-        # bara modellerna som fungerade i Johnnys Claude Code (MODELLKARTA-20260929), samma som i Flödet.
-        matt = {m['id'] for m in erbjud(self.k, 'claude_egen')} if mm_las(self.k.data) else None
+        # bara det som fungerade i Johnnys Claude Code och Codex (MODELLKARTA-20260929), samma som i Flödet, och varje
+        # modell bär sina egna nivåer; en Codex-modell kör partnern genom Codex (steg 1b).
+        if not mm_las(self.k.data):
+            modeller = [dict(m, utforare='claude', nivaer=list(ANSTRANGNING)) for m in MODELLER]
+        else:
+            om = {m['id']: m['om'] for m in MODELLER}
+            modeller = [dict(m, om=om.get(m['id'], 'Codex')) for m in erbjud(self.k, 'claude_egen') + erbjud(self.k, 'codex_egen')]
         return {'huvud': self.k.modell.huvud, 'anstrangning': self.k.modell.anstrangning, 'galler': GALLER,
-                'modeller': [m for m in MODELLER if matt is None or m['id'] in matt], 'nivaer': list(ANSTRANGNING)}
+                'utforare': 'claude' if ar_claude(self.k.modell.huvud) else 'codex', 'modeller': modeller,
+                'nivaer': list(ANSTRANGNING)}
 
     def lagevy(self) -> dict:
         with self._las:
@@ -465,7 +471,7 @@ class Server:
                 'forbrukning': self.agent.dygnsforbrukning(), 'gransar': self.k.gransar.__dict__,
                 'tackning': self.tackningstext(), 'aktiva': aktiva, 'prov_dolj': list(self.k.prov_dolj),
                 'beroende': ('Tjänsten körs lokalt på Johnnys Mac (127.0.0.1:%d) och nås bara när den är igång. '
-                             'Modellen är Claude genom Johnnys egen Claude Code-inloggning; ingen annan leverantör '
+                             'Modellen är Claude eller Codex genom Johnnys egna inloggningar; ingen annan leverantör '
                              'och inga köpta krediter.' % self.k.port),
                 'jobb': self.lager.fraga("select status, count(*) as n from jobb group by status"),
                 'overlamningar': self.lager.fraga("select status, count(*) as n from overlamning group by status"),
@@ -842,7 +848,8 @@ class Hanterare(BaseHTTPRequestHandler):
         if p == '/api/installningar':
             fore = {'huvud': S.k.modell.huvud, 'anstrangning': S.k.modell.anstrangning}
             huvud, niva = str(d.get('huvud') or fore['huvud']), str(d.get('anstrangning') or fore['anstrangning'])
-            if mm_las(S.k.data) and not bevisad(S.k, 'claude_egen', huvud, niva):  # samma prövning som i Flödet
+            program = 'claude_egen' if ar_claude(huvud) else 'codex_egen'
+            if (mm_las(S.k.data) or program == 'codex_egen') and not bevisad(S.k, program, huvud, niva):
                 raise ValueError('%s med ansträngningen %s har inte fungerat i senaste mätningen.' % (huvud, niva))
             ny = spara_modellval(S.k, huvud, niva)
             if ny != fore:
@@ -915,7 +922,9 @@ class Hanterare(BaseHTTPRequestHandler):
             return self._fel(400, 'felaktig begäran')
         if p == '/intern/krok':
             verktyg = str(d.get('verktyg'))
-            if verktyg in ('Agent', 'Task'):  # en modell till allt: bara utredaren, med svarets modell
+            if k.utforare == 'codex':  # varje Codex-verktyg passerar kroken: partnerns egna, klockan och webben
+                beslut, skal = prova_codex(k, verktyg, d.get('indata') or {}, self.S.hemligheter())
+            elif verktyg in ('Agent', 'Task'):  # en modell till allt: bara utredaren, med svarets modell
                 beslut, skal = prova_underagent(k, d.get('indata') or {})
             else:
                 beslut, skal = prova(k, verktyg, d.get('indata') or {}, self.S.hemligheter())

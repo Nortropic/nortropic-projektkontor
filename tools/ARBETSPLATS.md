@@ -88,7 +88,7 @@ faktiskt styr dem:
 
 | Val | Källa | Valbart här |
 | --- | --- | --- |
-| Partnern | arbetsplatsens `installningar.json` (samma som samtalsytans /model) | ja, gäller från nästa svar; bara Claude tills partnerns Codex-drivare finns |
+| Partnern | arbetsplatsens `installningar.json` (samma som samtalsytans /model) | ja, gäller från nästa svar; en Claude-modell kör Claude Code, en Codex-modell Codex |
 | Dina sessioner | Claude Codes `~/.claude/settings.json` och Codex `~/.codex/config.toml` | ja, i båda programmen (ägarens besked 2026-09-29) |
 | Runtime | den aktiva releasen, läst med releasens egen kod (samma avgränsade väg som Aquarium) | inte än: steg 2 |
 | Läsarna | arbetsplatsens `installningar.json` (`lasare`); utan val väljer sessionen | ja; ansträngningen följer Runtimes läsarprofil |

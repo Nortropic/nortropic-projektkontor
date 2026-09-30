@@ -48,7 +48,7 @@ const kt = { data: null, fokus: null, vald: 'forbattringar', utkast: {}, sparar:
 function allaModeller() {  // namn för alla modeller som servern nämner
   const d = kt.data, ut = {};
   const lagg = (lista) => (lista || []).forEach((m) => { ut[m.id] = m.namn; });
-  lagg(d.val.partner.erbjud); lagg(d.val.partner.kommer); lagg(d.val.lasare.erbjud);
+  lagg(d.val.partner.erbjud); lagg(d.val.lasare.erbjud);
   for (const p of PROGRAMORDNING) lagg(d.val.sessioner.program[p].erbjud);
   return ut;
 }
@@ -95,7 +95,7 @@ function ritaFlodet(fokusEfter) {
 }
 
 // ------------------------------------------------------------------ valen
-function valrad(nyckel, etikett, v, erbjud, medNiva, kommer, program) {  // modell- och nivåmeny med egen Spara-knapp
+function valrad(nyckel, etikett, v, erbjud, medNiva, program) {  // modell- och nivåmeny med egen Spara-knapp
   const u = kt.utkast[nyckel] || { modell: v.modell || '', anstrangning: v.anstrangning || '' };
   const m = erbjud.find((x) => x.id === u.modell);
   const nivaer = m ? m.nivaer : [];
@@ -106,8 +106,7 @@ function valrad(nyckel, etikett, v, erbjud, medNiva, kommer, program) {  // mode
   } },
   nyckel === 'lasare' ? el('option', { value: '', text: 'sessionen väljer', selected: !u.modell }) : null,
   m || !u.modell ? null : el('option', { value: u.modell, text: modellnamn(u.modell) + ' (ej bevisad)', selected: true, disabled: true }),
-  grupper(erbjud).map(([utf, lista]) => el('optgroup', { label: UTFORARNAMN[utf] }, lista.map((x) => el('option', { value: x.id, text: x.namn, selected: x.id === u.modell })))),
-  kommer && kommer.length ? el('optgroup', { label: 'Codex (kräver partnerns Codex-drivare)' }, kommer.map((x) => el('option', { value: x.id, text: x.namn, disabled: true }))) : null);
+  grupper(erbjud).map(([utf, lista]) => el('optgroup', { label: UTFORARNAMN[utf] }, lista.map((x) => el('option', { value: x.id, text: x.namn, selected: x.id === u.modell })))));
   const rad = el('div', { class: 'fv-varden' }, program ? el('span', { class: 'fv-program', text: etikett }) : null, mval);
   if (medNiva) {
     rad.append(el('select', { 'aria-label': etikett + ', ansträngning', disabled: !m, onchange: (e) => satt({ anstrangning: e.target.value }) },
@@ -139,18 +138,17 @@ function valkort(k) {
   if (k === 'sessioner') {
     for (const p of PROGRAMORDNING) {
       const pv = v.program[p];
-      if (v.valbar && pv.status !== 'olasbar') kort.append(...valrad(p, pv.namn, pv, pv.erbjud || [], true, null, true));
+      if (v.valbar && pv.status !== 'olasbar') kort.append(...valrad(p, pv.namn, pv, pv.erbjud || [], true, true));
       else kort.append(el('div', { class: 'fv-varden' }, el('span', { class: 'fv-program', text: pv.namn }), el('span', { class: 'fv-varde', text: vardetext(pv) })));
       if (pv.skal) kort.append(status(pv.namn + ': ' + pv.skal, 'varning'));
     }
   } else if (v.valbar) {
-    kort.append(...valrad(k, v.namn, v, v.erbjud || [], k !== 'lasare', k === 'partner' ? v.kommer : null));
+    kort.append(...valrad(k, v.namn, v, v.erbjud || [], k !== 'lasare'));
   } else {
     kort.append(el('div', { class: 'fv-varde', text: vardetext(v) }));
     if (v.bevisad === false) kort.append(status('Har inte fungerat i senaste mätningen.', 'varning'));
   }
   kort.append(el('p', { class: 'fv-var', text: 'I dag: ' + v.var }));
-  if (k === 'partner' && v.kraver) kort.append(el('p', { class: 'fv-var', text: v.kraver }));
   if (v.skal) kort.append(status(v.skal, 'varning'));
   if (!v.valbar && v.varfor_inte) kort.append(el('p', { class: 'fv-var', text: v.varfor_inte }));
   return kort;

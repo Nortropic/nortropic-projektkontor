@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import threading
 from dataclasses import dataclass, field, asdict
@@ -71,6 +72,14 @@ MODELLER = (
     {'id': 'claude-haiku-4-5-20251001', 'namn': 'Haiku 4.5', 'om': 'snabbast, svagast på djup förståelse'},
 )
 ANSTRANGNING = ('low', 'medium', 'high', 'xhigh', 'max')
+# Codex egna ansträngningsnivåer (model_reasoning_effort), i Codex ordning. Vilka en viss modell tar står i mätningen.
+CODEX_ANSTRANGNING = ('minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra')
+MODELLNAMN_FORM = re.compile(r'\A[A-Za-z0-9][A-Za-z0-9._-]{0,63}\Z')
+
+
+def ar_claude(modell) -> bool:
+    """En modell i arbetsplatsens Claude-lista körs av Claude Code; varje annan (uppmätt) modell körs av Codex."""
+    return modell in {m['id'] for m in MODELLER}
 _SPARLAS = threading.Lock()
 
 
@@ -80,6 +89,7 @@ class Konfig:
     hemligheter: Path
     port: int = 4760
     claude: str = ''
+    codex: str = ''          # Johnnys Codex, för partnern när han valt en Codex-modell (MODELLKARTA-20260929 steg 1b)
     modell: Modell = field(default_factory=Modell)
     gransar: Gransar = field(default_factory=Gransar)
     kontor: Path = KONTOR
@@ -123,6 +133,7 @@ def ladda() -> Konfig:
     if os.environ.get('PARTNER_PORT'):
         k.port = int(os.environ['PARTNER_PORT'])
     k.claude = os.environ.get('PARTNER_CLAUDE', '') or _hitta_claude()
+    k.codex = os.environ.get('PARTNER_CODEX', '') or _hitta_codex()
     if os.environ.get('PARTNER_IMPROVEMENTS'):
         k.improvements = Path(os.environ['PARTNER_IMPROVEMENTS'])
     if os.environ.get('PARTNER_KAMPANJ'):
@@ -166,9 +177,9 @@ def ladda() -> Konfig:
 def spara_modellval(k: Konfig, huvud: str, anstrangning: str) -> dict:
     """Johnnys val i samtalsytan: skrivs i installningar.json (övriga inställningar orörda) och gäller från nästa
     modellkörning i alla trådar. En pågående körning påverkas inte."""
-    if huvud not in {m['id'] for m in MODELLER}:
+    if not isinstance(huvud, str) or not MODELLNAMN_FORM.match(huvud):
         raise ValueError('Okänd modell.')
-    if anstrangning not in ANSTRANGNING:
+    if anstrangning not in (ANSTRANGNING if ar_claude(huvud) else CODEX_ANSTRANGNING):
         raise ValueError('Okänd ansträngningsnivå.')
     fil = Path(k.data) / 'installningar.json'
     with _SPARLAS:
@@ -192,6 +203,13 @@ def spara_modellval(k: Konfig, huvud: str, anstrangning: str) -> dict:
         os.replace(tmp, fil)
         k.modell.huvud, k.modell.anstrangning = huvud, anstrangning
     return {'huvud': huvud, 'anstrangning': anstrangning}
+
+
+def _hitta_codex() -> str:
+    for kandidat in ('/opt/homebrew/bin/codex', '/usr/local/bin/codex', str(HEM / '.local/bin/codex')):
+        if os.path.isfile(kandidat) and os.access(kandidat, os.X_OK):
+            return kandidat
+    return 'codex'
 
 
 def _hitta_claude() -> str:
