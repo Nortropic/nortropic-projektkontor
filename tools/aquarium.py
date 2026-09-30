@@ -85,9 +85,15 @@ def release_part():
 def staffing_part():
     from runtime.release import installed
     from runtime.development_model import executors, models
+    import runtime.development_model as dm
     from runtime import profile
     c = installed()
-    return {'executors': executors(c), 'models_run': models(c), 'watch_model': getattr(profile, 'MODEL', None)}
+    out = {'executors': executors(c), 'models_run': models(c), 'watch_model': getattr(profile, 'MODEL', None)}
+    if hasattr(dm, 'efforts'):
+        out['efforts_run'] = dm.efforts(c)
+    if hasattr(dm, 'watch'):
+        w = dm.watch(c); out['watch_model'] = w['model']; out['watch_executor'] = w['executor']; out['watch_effort'] = w['effort']
+    return out
 def questions_part():
     from runtime.release import installed
     from runtime.development_model import models
@@ -118,13 +124,15 @@ def engine_part():
         return {'executions': rows}
     return asyncio.run(run())
 def refusal_part():
-    from runtime.release import ROOT
+    from runtime.release import ROOT, installed
     from runtime.development_model import capacity_lost
+    import runtime.development_model as dm
     rounds = [p for p in (ROOT / '.runtime/ap10/rounds').iterdir() if (p / 'report/result.json').is_file()]
     latest = max(rounds, key=lambda p: json.loads((p / 'report/result.json').read_text()).get('reported_at') or '')
     events = latest / 'analysis/events.jsonl'
     rows = [json.loads(l) for l in events.read_text().splitlines() if l.strip()] if events.is_file() else []
-    return {'capacity': bool(capacity_lost('codex', rows))}
+    executor = dm.watch(installed())['executor'] if hasattr(dm, 'watch') else 'codex'
+    return {'capacity': bool(capacity_lost(executor, rows))}
 for name, fn in (('release', release_part), ('staffing', staffing_part), ('questions', questions_part),
                  ('service', service_part), ('engine', engine_part), ('refusal', refusal_part)):
     part(name, fn)
@@ -250,8 +258,20 @@ def _staffing_value(value):
     for name, model in models_run.items():
         _string(name)
         _optional_string(model)
-    return {'executors': dict(executors), 'models_run': dict(models_run),
-            'watch_model': _optional_string(value.get('watch_model'))}
+    out = {'executors': dict(executors), 'models_run': dict(models_run),
+           'watch_model': _optional_string(value.get('watch_model'))}
+    # D040: a release with the choice also names each executor's effort and the watch's executor and effort
+    if 'efforts_run' in value:
+        efforts = _dict(value.get('efforts_run'))
+        for name, level in efforts.items():
+            _string(name); _string(level)
+        out['efforts_run'] = dict(efforts)
+    if 'watch_executor' in value:
+        if value.get('watch_executor') not in ('claude', 'codex'):
+            _fail()
+        out['watch_executor'] = value['watch_executor']
+        out['watch_effort'] = _optional_string(value.get('watch_effort'))
+    return out
 
 
 def _questions_value(value):
@@ -570,7 +590,7 @@ def _work_and_parked(engine, titles_available, tasks):
 
 
 def _utkiken(available, watch, staffing_available, staffing, now):
-    model = {'executor': WATCH_EXECUTOR,
+    model = {'executor': (staffing.get('watch_executor') if staffing_available else None) or WATCH_EXECUTOR,
              'model': staffing['watch_model'] if staffing_available else None,
              'follows_model_choice': False}
     if not available:
@@ -676,7 +696,8 @@ def _sockeln(available, values, work, parked):
         models_run = values['staffing']['models_run']
         staffing = [{'role': role, 'executor': executor, 'model': models_run.get(executor)}
                     for role, executor in sorted(values['staffing']['executors'].items())]
-        watch_staffing = {'executor': WATCH_EXECUTOR, 'model': values['staffing']['watch_model']}
+        watch_staffing = {'executor': values['staffing'].get('watch_executor') or WATCH_EXECUTOR,
+                          'model': values['staffing']['watch_model']}
     idle = identities = busy = None
     if available['engine']:
         identities = sum(1 for execution in values['engine']['executions']

@@ -55,6 +55,7 @@ SLUTLAGEN = ('klar', 'avslutad', 'misslyckad')
 LSOF = '/usr/sbin/lsof'
 UTFORARE = ('claude', 'codex')
 MODELLNAMN = re.compile(r'\A[A-Za-z0-9][A-Za-z0-9._-]{0,63}\Z')   # samma regel som Runtimes profiler
+NIVA = re.compile(r'\A[a-z]{1,16}\Z')                                # samma regel som Runtimes ansträngningsval (D040)
 BEMANNING_SEKUNDER = 300
 PROMPT = """Du startades automatiskt av Projektkontorets förbättringspartner för att ta emot överlämningen {oid}: "{rubrik}".
 Mottagare: {mottagare_text}
@@ -268,16 +269,19 @@ class Startvakt:
         return bool(self.k.startvakt) and not getattr(self.k, 'prov_dolj', ())
 
     def lage(self) -> dict:
+        _, varde = self._bemanning
+        niva = varde[2] if varde and varde[2] else None
         return {'pa': self.paslagen(), 'i_dag': self.starter_i_dag(), 'tak': self.k.gransar.startvakt_per_dygn,
-                'utforare_ur': 'Runtimes bemanning, rollen driver', 'anstrangning': self.k.startvakt_anstrangning}
+                'utforare_ur': 'Runtimes bemanning, rollen driver', 'anstrangning': niva or self.k.startvakt_anstrangning,
+                'anstrangning_ur': 'runtime' if niva else 'kontoret'}
 
     def bemanning(self) -> tuple:
-        """(utförare, modell) för Runtimes drivande roll, så som Johnny valt den i Runtimes modellval (D028–D030), läst
-        genom Aquariums befintliga, avgränsade sond. Går den inte att läsa blir det ingen start: det finns ingen
-        reservväg till en annan utförare. Läsningen gäller i fem minuter."""
+        """(utförare, modell) för Runtimes drivande roll, så som Johnny valt den i Runtimes modellval (D028–D030, D040),
+        läst genom Aquariums befintliga, avgränsade sond. Går den inte att läsa blir det ingen start: det finns ingen
+        reservväg till en annan utförare. Läsningen gäller i fem minuter; ansträngningen läses samtidigt (anstrangning)."""
         tid, varde = self._bemanning
         if varde is not None and time.time() - tid < BEMANNING_SEKUNDER:
-            return varde
+            return varde[:2]
         tools = Path(__file__).resolve().parents[1]
         runtime = (self.k.repon or {}).get('runtime') or ''
         kod = ('import sys, json; sys.path.insert(0, %r); import aquarium; '
@@ -294,8 +298,15 @@ class Startvakt:
         modell = (v.get('models_run') or {}).get(utforare)
         if utforare not in UTFORARE or not isinstance(modell, str) or not MODELLNAMN.match(modell):
             return None, None
-        self._bemanning = (time.time(), (utforare, modell))
+        niva = (v.get('efforts_run') or {}).get(utforare) if isinstance(v.get('efforts_run'), dict) else None
+        self._bemanning = (time.time(), (utforare, modell, niva if isinstance(niva, str) and NIVA.match(niva) else None))
         return utforare, modell
+
+    def anstrangning(self) -> str:
+        """Runtimes ansträngning för den drivande rollens utförare (D040), ur samma läsning som bemanningen; en release
+        utan val (äldre än D040) ger kontorets egen startvakt_anstrangning, som förut."""
+        _, varde = self._bemanning
+        return (varde[2] if varde and varde[2] else None) or self.k.startvakt_anstrangning
 
     # ------------------------------------------------------------------ tillstånd
     def _logga(self, o: dict, kat: Path, typ: str, **falt) -> dict:
@@ -387,7 +398,9 @@ class Startvakt:
                 return self._logga(o, kat, slag, skal=skal, kod=kod)
             return None
         self._nasta.pop(o['id'], None)
-        return self._starta(o, d, kat, fortsatt, len(starter) + 1, utforare, modell)
+        # en fortsättning behåller också ansträngningen den startade med
+        niva = (starter[0].get('anstrangning') if fortsatt else None) or self.anstrangning()
+        return self._starta(o, d, kat, fortsatt, len(starter) + 1, utforare, modell, niva)
 
     def _hinder(self, d: dict, fortsatt: bool, utforare, modell) -> tuple:
         """(skäl, slag, kod). 'vantar' löser sig själv (tak, upptagen skrivplats, oläst bemanning); 'hindrad' kräver
@@ -433,7 +446,8 @@ class Startvakt:
         return Path(rot).resolve() if rot else None
 
     # ------------------------------------------------------------------ start och uppföljning
-    def _starta(self, o: dict, d: dict, kat: Path, fortsatt: bool, nr: int, utforare: str, modell: str) -> dict:
+    def _starta(self, o: dict, d: dict, kat: Path, fortsatt: bool, nr: int, utforare: str, modell: str,
+                anstrangning: str | None = None) -> dict:
         rot = self._rot(d)
         binar = self.k.startvakt_binarer[utforare][0]
         namn = 'startvakt-' + o['id']
@@ -442,7 +456,7 @@ class Startvakt:
         rubrik = ' '.join(str(d.get('rubrik') or '').split())[:160]   # en rad: rubriken kan inte lägga till rader
         prompt = PROMPT.format(oid=o['id'], rubrik=rubrik, katalog=kat, kvittera=kvittera, namn=namn,
                                mottagare_text=MOTTAGARE.get(d.get('mottagare') or 'kontorets-kedjedrivare', ''))
-        effort = self.k.startvakt_anstrangning
+        effort = anstrangning or self.k.startvakt_anstrangning
         if utforare == 'claude':
             sid = sessions_id(o['id'])
             finns = session_fil(rot, sid).exists()

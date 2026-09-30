@@ -105,6 +105,11 @@ class Konfig:
     # En prov- eller utvecklingsinstans får egna filer i sin datakatalog och rör aldrig de riktiga (se ladda).
     claude_installningar: Path = field(default_factory=lambda: Path.home() / '.claude/settings.json')
     codex_installningar: Path = field(default_factory=lambda: Path.home() / '.codex/config.toml')
+    # Runtimes inkorg för arbetsplatsens val och Runtimes status för den automatiska aktiveringen (D040). None: okänd,
+    # och då skrivs inget val. ladda() pekar den ordinarie tjänsten på Runtimes egna filer och prov- och
+    # utvecklingsinstanser på sin egen datakatalog, så att ett prov aldrig kan utlösa ett verkligt byte.
+    runtime_onskemal: Path | None = None
+    runtime_status: Path | None = None
 
     def till_json(self) -> dict:
         d = asdict(self)
@@ -154,6 +159,13 @@ def ladda() -> Konfig:
         k.codex_installningar = Path(os.environ['PARTNER_CODEX_INSTALLNINGAR'])
     elif not ordinarie:
         k.codex_installningar = data / 'codex-installningar.toml'
+    runtime = (k.repon or {}).get('runtime')
+    if ordinarie and runtime:
+        k.runtime_onskemal = Path(runtime) / '.runtime/ap10/workplace-choice.json'
+        k.runtime_status = Path(runtime) / '.runtime/ap10/automatic-choice-status.json'
+    elif not ordinarie:
+        k.runtime_onskemal = data / 'runtime-workplace-choice.json'
+        k.runtime_status = data / 'runtime-automatic-choice-status.json'
     installningar = data / 'installningar.json'
     if installningar.is_file():
         try:

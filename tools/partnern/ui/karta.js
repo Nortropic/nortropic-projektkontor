@@ -48,7 +48,7 @@ const kt = { data: null, fokus: null, vald: 'forbattringar', utkast: {}, sparar:
 function allaModeller() {  // namn för alla modeller som servern nämner
   const d = kt.data, ut = {};
   const lagg = (lista) => (lista || []).forEach((m) => { ut[m.id] = m.namn; });
-  lagg(d.val.partner.erbjud); lagg(d.val.lasare.erbjud);
+  lagg(d.val.partner.erbjud); lagg(d.val.lasare.erbjud); lagg(d.val.runtime && d.val.runtime.erbjud); lagg(d.val.bevakning && d.val.bevakning.erbjud);
   for (const p of PROGRAMORDNING) lagg(d.val.sessioner.program[p].erbjud);
   return ut;
 }
@@ -123,6 +123,36 @@ function valrad(nyckel, etikett, v, erbjud, medNiva, program) {  // modell- och 
   if (kt.besked && kt.besked.val === nyckel) delar.push(el('p', { class: 'fv-besked ' + (kt.besked.fel ? 'fel' : ''), role: 'status', text: kt.besked.text }));
   return delar;
 }
+// Runtimes automatiska aktivering (Runtimes D040): läget ur Runtimes statusfil, i Johnnys ord
+const AKTIVERING = { none: 'Valet väntar på Runtimes nästa titt.', in_effect: 'Gäller.', waiting: 'Väntar tills Runtime är ledigt', refused: 'Aktiveras inte',
+  activating: 'Aktiveras nu.', activated: 'Aktiverades', restored: 'Den nya versionen startade inte, så den förra kör igen.',
+  failed: 'Bytet misslyckades', interrupted: 'Ett byte avbröts innan det rapporterades och behöver ses över.' };
+const SKAL = [[/AP10 watch run is in progress/, 'bevakningen kör just nu'], [/less than 20 minutes away/, 'bevakningen kör inom 20 minuter'],
+  [/work is in progress in the engine|work started in the engine/, 'arbete pågår i Runtime'], [/web profile run is in progress/, 'en webbprofil kör'],
+  [/running service is not the recorded one/, 'Runtimes tjänst svarar inte som väntat'],
+  [/did not work in the measurement/, 'valet har inte fungerat i mätningen av Runtimes egna program'],
+  [/no way back/, 'det finns ingen säker väg tillbaka just nu']];
+function skaltext(s) { for (const [re, t] of SKAL) if (re.test(s || '')) return t; return s; }
+function aktiveringsrader(v) {
+  const a = v.aktivering, ut = [];
+  if (v.onskat) ut.push(el('p', { class: 'fv-var fv-onskat', text: 'Önskat: ' + vardetext(v.onskat) + '.' }));
+  if (!a || !a.igang) {
+    if (v.onskat) ut.push(status('Aktiveraren är inte igång, så valet väntar. Johnny startar den en gång (Runtimes övergång 19 och agent install).', 'varning'));
+    return ut;
+  }
+  // en status om ett tidigare önskemål säger inget om det som nyss sparades: Runtime har inte tittat än
+  if (v.onskat && a.onskemal !== v.onskemal_id) { ut.push(el('p', { class: 'fv-besked', role: 'status', text: AKTIVERING.none })); return ut; }
+  const problem = ['refused', 'restored', 'failed', 'interrupted'].includes(a.lage);
+  if (!v.onskat && !problem) {
+    if (a.lage === 'in_effect' && a.aktiverad) ut.push(el('p', { class: 'fv-var', text: 'Aktiverades ' + nar(a.aktiverad) + '.' }));
+    return ut;
+  }
+  let text = AKTIVERING[a.lage] || 'Läget är okänt.';
+  if (a.lage === 'waiting' || a.lage === 'refused' || a.lage === 'failed') text += a.skal ? ': ' + skaltext(a.skal) + '.' : '.';
+  if (a.lage === 'activated') text += ' ' + nar(a.aktiverad || a.tid) + '.';
+  ut.push(el('p', { class: 'fv-besked' + (problem ? ' fel' : ''), role: 'status', text: text + ' Senast kontrollerat ' + nar(a.tid) + '.' }));
+  return ut;
+}
 function grupper(lista) {
   const ut = [];
   for (const utf of ['claude', 'codex']) { const l = lista.filter((x) => x.utforare === utf); if (l.length) ut.push([utf, l]); }
@@ -143,7 +173,10 @@ function valkort(k) {
       if (pv.skal) kort.append(status(pv.namn + ': ' + pv.skal, 'varning'));
     }
   } else if (v.valbar) {
-    kort.append(...valrad(k, v.namn, v, v.erbjud || [], k !== 'lasare'));
+    // Runtime och bevakningen utgår från det önskade valet när ett väntar på att aktiveras
+    const bas = v.onskat ? Object.assign({}, v, { modell: v.onskat.modell, anstrangning: v.onskat.anstrangning, bevisad: null }) : v;
+    kort.append(...valrad(k, v.namn, bas, v.erbjud || [], k !== 'lasare'));
+    if (k === 'runtime' || k === 'bevakning') kort.append(...aktiveringsrader(v));
   } else {
     kort.append(el('div', { class: 'fv-varde', text: vardetext(v) }));
     if (v.bevisad === false) kort.append(status('Har inte fungerat i senaste mätningen.', 'varning'));
@@ -159,7 +192,9 @@ async function sparaVal(nyckel, u) {
     kt.data = await api('POST', '/api/arbetsplats/karta', { val: nyckel, modell: u.modell || null, anstrangning: u.anstrangning || null });
     delete kt.utkast[nyckel];
     const v = nyckel === 'claude_code' || nyckel === 'codex' ? kt.data.val.sessioner.program[nyckel] : kt.data.val[nyckel];
-    kt.besked = { val: nyckel, text: 'Sparat ' + nar(new Date().toISOString()) + ': ' + vardetext(v) + '.' };
+    const runtimeval = nyckel === 'runtime' || nyckel === 'bevakning';
+    kt.besked = { val: nyckel, text: 'Sparat ' + nar(new Date().toISOString()) + ': ' + vardetext(runtimeval && v.onskat ? v.onskat : v) + '.' +
+      (runtimeval ? (v.onskat ? ' Bytet aktiveras av sig självt när Runtime är ledigt.' : ' Det kör redan.') : '') };
   } catch (f) { kt.besked = { val: nyckel, fel: true, text: 'Inte sparat: ' + f.message }; }
   kt.sparar = null;
   ritaFlodet('fv-kort-' + (nyckel === 'claude_code' || nyckel === 'codex' ? 'sessioner' : nyckel));

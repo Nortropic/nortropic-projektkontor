@@ -2139,6 +2139,43 @@ class StartvaktProv(Miljo):
         self.S.overlamning.las_kvittenser()
         self.assertEqual(self.S.lager.en('select status from overlamning')['status'], 'levererad')
 
+    def test_anstrangningen_ar_runtimes_och_en_fortsattning_behaller_sin(self):
+        # D040: startvakten följer Runtimes val, också ansträngningen, ur samma läsning som bemanningen
+        (oid, kat), = self.overlamningar('runtime')
+        self.bemanning = ('codex', 'gpt-6-astra')
+        self.vakt._bemanning = (time.time(), ('codex', 'gpt-6-astra', 'ultra'))
+        self.mottagarmanus('MOTTAGEN KVOT', 'STARTAD LEVERERA', repo='codex')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        h = self.vanta_pa(kat, 'vantar')
+        self.assertEqual(h[0]['anstrangning'], 'ultra')
+        self.assertEqual(self.vakt.lage()['anstrangning'], 'ultra'); self.assertEqual(self.vakt.lage()['anstrangning_ur'], 'runtime')
+        self.vakt._bemanning = (time.time(), ('codex', 'gpt-6-astra', 'low'))   # ett senare val byter inte en pågående session
+        rader = kat.joinpath('START.jsonl').read_text().splitlines()
+        sista = json.loads(rader[-1])
+        sista['till'] = '2000-01-01T00:00:00Z'
+        kat.joinpath('START.jsonl').write_text('\n'.join(rader[:-1] + [json.dumps(sista, ensure_ascii=False)]) + '\n')
+        self.assertEqual(self.vakt.granska(), [(oid, 'startad')])
+        self.vanta_pa(kat, 'klar')
+        anrop = [a['argv'] for a in self.mottagarlogg() if 'argv' in a]
+        self.assertEqual([[x for x in a if x.startswith('model_reasoning_effort=')] for a in anrop],
+                         [['model_reasoning_effort="ultra"'], ['model_reasoning_effort="ultra"']])
+
+    def test_bemanningen_laser_anstrangningen_ur_runtimes_sond(self):
+        vakt = self.start.Startvakt(self.S)
+        def sond(staffing):
+            from unittest import mock
+            return mock.patch.object(self.start.subprocess, 'run', return_value=subprocess.CompletedProcess(
+                [], 0, stdout=json.dumps({'ok': True, 'value': staffing}) + '\n', stderr=''))
+        bas = {'executors': {'driver': 'claude'}, 'models_run': {'claude': 'claude-opus-5', 'codex': 'gpt-6-astra'}}
+        for staffing, niva in ((dict(bas, efforts_run={'claude': 'max', 'codex': 'low'}), 'max'),
+                               (bas, 'high'),                                          # en release före D040: kontorets egen
+                               (dict(bas, efforts_run={'claude': '--max'}), 'high')):  # en ogiltig nivå används aldrig
+            with self.subTest(staffing=staffing):
+                vakt._bemanning = (0.0, None)
+                with sond(staffing):
+                    self.assertEqual(vakt.bemanning(), ('claude', 'claude-opus-5'))
+                self.assertEqual(vakt.anstrangning(), niva)
+
     def test_levande_codex_session_startas_inte_om_efter_omstart(self):
         (oid, kat), = self.overlamningar('runtime')
         self.bemanning = ('codex', 'gpt-6-astra')

@@ -218,6 +218,15 @@ webbverktyget mot webbpolicyn och nekar agentstarter. Kroken svarar själv nej o
 Efter integrationen startas tjänsten om ur main enligt driftregeln. Nästa handling i spåret: steg 2 (Runtime), enligt
 tillägget 22:18 UTC ovan. Återupptagning: `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
 
+Tillägg 2026-09-30 (02:02 UTC): steg 2 av MODELLKARTA-20260929 byggs (RUNTIME-VAL-I-FLODET-20260930 här och Runtimes
+D040). Flödet väljer Runtime och bevakningen, bara bland det som fungerade i mätningen av Runtimes egna program, och
+skriver valet som ett önskemål i Runtimes inkorg. Runtime aktiverar det själv när Runtime är ledigt. Startvakten följer
+Runtimes ansträngning. Innan det första automatiska bytet kan ske ska Runtimes D040 vara på Runtimes main och två
+engångssteg göras av ägaren i hans egen Terminal: Runtimes övergång 19 och aktiveraren (`model_choice.py agent install`).
+D040 är granskad men inte integrerad. Runtimes svit kan inte bli helt grön i den kredentialfria profilen på den här
+datorn, eftersom tre prov startar egna sandlådor. Hur det löses är ägarens beslut. Därefter följer steg 3 (läsarna) och
+steg 4 (automatiska uppdateringar). Återupptagning: `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
+
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
 

@@ -9,13 +9,15 @@ Varje hållplats följer ett av fem val. Kartan läser varje val ur den källa s
 - Runtime: den aktiva releasens konfiguration och kod, läst med releasens egen kod genom samma avgränsade väg som
   Aquarium (`.runtime/temporal-venv`, NR_HOST_ROOT och NR_CONFIG_SHA256, tidsgräns).
 - Läsarna: arbetsplatsens inställning `lasare`; utan val väljer sessionen vid varje körning.
-- Bevakningen: Runtimes Codex-profil i den aktiva releasen.
+- Bevakningen: den aktiva releasens val för bevakningen (utförare, modell och ansträngning), annars Runtimes Codex-profil.
 
 Kartan erbjuder bara modeller och nivåer som bevisligen fungerar i programmet som kör hållplatsen (ägarens krav):
 senaste mätningen (`modellmatning.json`, se modellmatning.py). Samma prövning görs när ett val sparas. Johnny väljer här
-för partnern, sina två program och läsarna; valet gäller direkt. Runtimes och bevakningens val görs i Runtimes release
-och visas här tills Runtime tar emot dem (steg 2). Ingen modell anropas och inga andra filer än de namngivna skrivs.
-Okänt blir aldrig ett påhittat värde.
+för partnern, sina två program, Runtime, läsarna och bevakningen. Partnerns, programmens och läsarnas val gäller direkt.
+Runtimes och bevakningens val skrivs som ett önskemål i Runtimes inkorg (`.runtime/ap10/workplace-choice.json`), och
+Runtime aktiverar det själv när Runtime är ledigt, med sin egen väg tillbaka (Runtimes D040); kartan visar Runtimes
+status för aktiveringen. Ingen modell anropas och inga andra filer än de namngivna skrivs. Okänt blir aldrig ett
+påhittat värde.
 """
 from __future__ import annotations
 
@@ -468,6 +470,93 @@ def _runtime_varden(v: dict) -> dict:
 
 
 # ------------------------------------------------------------------ kartan
+# ------------------------------------------------------------------ Runtime och bevakningen: önskemålet (steg 2, D040)
+AKTIVERING_LAGEN = ('none', 'in_effect', 'waiting', 'refused', 'activating', 'activated', 'restored', 'failed', 'interrupted')
+AKTIVERARE_SEKUNDER = 15 * 60   # aktiveraren tittar var femte minut; en äldre status betyder att den inte går
+NIVA_FORM = re.compile(r'\A[a-z]{1,16}\Z')
+
+
+def _trippel(x) -> dict | None:
+    if (isinstance(x, dict) and set(x) == {'executor', 'model', 'effort'} and x['executor'] in ('claude', 'codex')
+            and isinstance(x['model'], str) and SLUG.match(x['model'])
+            and isinstance(x['effort'], str) and NIVA_FORM.match(x['effort'])):
+        return {'executor': x['executor'], 'model': x['model'], 'effort': x['effort']}
+    return None
+
+
+def las_runtime_onskemal(k) -> dict | None:
+    """Arbetsplatsens senast registrerade val för Runtime och bevakningen, eller None."""
+    p = k.runtime_onskemal
+    if p is None or p.is_symlink() or not p.is_file():
+        return None
+    try:
+        v = json.loads(p.read_text('utf-8'))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(v, dict) or v.get('schema') != 'workplace-choice/1':
+        return None
+    r, w = _trippel(v.get('runtime')), _trippel(v.get('watch'))
+    if not r or not w:
+        return None
+    return {'id': v.get('id'), 'tid': v.get('requested_at'), 'runtime': r, 'watch': w}
+
+
+def las_aktivering(k) -> dict | None:
+    """Runtimes status för den automatiska aktiveringen och om aktiveraren går (en status som är färsk)."""
+    p = k.runtime_status
+    if p is None or p.is_symlink() or not p.is_file():
+        return None
+    try:
+        v = json.loads(p.read_text('utf-8'))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(v, dict) or v.get('schema') != 'automatic-choice-status/1':
+        return None
+    tid = v.get('checked_at') if isinstance(v.get('checked_at'), str) else None
+    try:
+        from datetime import datetime
+        alder = time.time() - datetime.fromisoformat(tid.replace('Z', '+00:00')).timestamp() if tid else None
+    except ValueError:
+        alder = None
+    return {'lage': v.get('state') if v.get('state') in AKTIVERING_LAGEN else 'okant',
+            'skal': str(v.get('reason'))[:400] if v.get('reason') else None, 'tid': tid,
+            'aktiverad': v.get('activated_at') if isinstance(v.get('activated_at'), str) else None,
+            'onskemal': v.get('request_id') if isinstance(v.get('request_id'), str) else None,
+            'igang': alder is not None and alder < AKTIVERARE_SEKUNDER}
+
+
+def spara_runtime_onskemal(k, runtime: dict, watch: dict) -> dict:
+    """Skriver Johnnys val för Runtime och bevakningen i Runtimes inkorg, med ett nytt id. Runtime prövar det igen mot
+    mätningen och aktiverar det själv när Runtime är ledigt (D040). Bara den här filen skrivs."""
+    fil = k.runtime_onskemal
+    if fil is None:
+        raise ValueError('Runtimes inkorg är okänd för den här instansen; valet kan inte sparas här.')
+    if not _trippel(runtime) or not _trippel(watch):   # samma form som läsningen och Runtimes egna regler kräver
+        raise ValueError('Valet har inte den form Runtime tar emot; inget skrivs.')
+    if fil.is_symlink():
+        raise ValueError('Runtimes inkorg är en länk; inget skrivs.')
+    varde = {'schema': 'workplace-choice/1',
+             'id': 'w' + time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()) + '-' + os.urandom(3).hex(),
+             'requested_at': nu(), 'runtime': runtime, 'watch': watch}
+    with _SKRIVLAS:
+        fore = fil.read_bytes() if fil.is_file() else None
+        if not _skriv_atomart(fil, fore, (json.dumps(varde, indent=2, ensure_ascii=False) + '\n').encode(), '.workplace-choice.'):
+            raise ValueError('Valet ändrades samtidigt; läs om och välj igen.')
+    return varde
+
+
+def _aktiv_trippel(utforare, modell, niva) -> dict | None:
+    return ({'executor': utforare, 'model': modell, 'effort': niva}
+            if utforare in ('claude', 'codex') and modell and niva else None)
+
+
+def _onskat(o, utforare, modell, niva) -> dict | None:
+    """Det registrerade valet när det skiljer sig från det som kör, annars None."""
+    if not o or (o['executor'], o['model'], o['effort']) == (utforare, modell, niva):
+        return None
+    return {'utforare': o['executor'], 'modell': o['model'], 'anstrangning': o['effort']}
+
+
 def karta(server) -> dict:
     """De fem valen och startvakten, var och en ur sin källa, med det som bevisligen fungerar. Hållplatserna står i
     ytan (karta.js)."""
@@ -499,24 +588,35 @@ def karta(server) -> dict:
                           bevisad=bevisad(k, 'codex_egen', cx['modell'], cx['anstrangning'])
                           if cx['modell'] and cx['anstrangning'] else None)}}
     niva = rt.get('anstrangning', {}) if rt['status'] == 'ok' else {}
+    onskemal, aktivering = las_runtime_onskemal(k), las_aktivering(k)
+    kan_valja = bool(matning) and k.runtime_onskemal is not None
+    ingen_inkorg = None if k.runtime_onskemal is not None else 'Runtimes inkorg är okänd för den här instansen.'
+    runtime_erbjud = erbjud(k, 'claude_runtime') + erbjud(k, 'codex_runtime')
     if rt['status'] == 'ok':
         u = rt['utforare']
         modell = rt['modeller'].get(u) if u else None
         ut['val']['runtime'] = {
             'namn': 'Runtime', 'status': 'ok' if u else 'blandad', 'utforare': u, 'modell': modell,
             'anstrangning': niva.get(u) if u else None, 'roller': rt['roller'], 'config': rt['config'],
-            'valbar': False, 'kalla': 'runtime',
+            'valbar': kan_valja, 'kalla': 'runtime', 'erbjud': runtime_erbjud,
             'bevisad': bevisad(k, u + '_runtime', modell, niva.get(u)) if u else None,
-            'var': 'Väljs i Runtimes release; ansträngningen är %s.' % (
-                'releasens val' if rt['anstrangning_ur'] == 'release' else 'fast i koden'),
-            'varfor_inte': 'Blir valbart här i steg 2 och aktiveras då av sig självt när Runtime är ledig.'}
+            'onskat': _onskat((onskemal or {}).get('runtime'), u, modell, niva.get(u) if u else None),
+            'onskemal_id': (onskemal or {}).get('id'), 'aktivering': aktivering, 'skal': ingen_matning,
+            'var': ('Väljs här. Modellen avgör utföraren för alla roller, och bytet aktiveras av sig självt när Runtime är '
+                    'ledigt. Ansträngningen är %s.' % ('releasens val' if rt['anstrangning_ur'] == 'release' else
+                                                     'fast i Runtimes kod tills releasen tar emot ett val')),
+            'varfor_inte': ingen_inkorg}
         b = rt['bevakning']
         ut['val']['bevakning'] = {
             'namn': 'Bevakningen', 'status': 'ok' if b['modell'] else 'ofullstandig', 'utforare': b['utforare'],
-            'modell': b['modell'], 'anstrangning': b['anstrangning'], 'valbar': False, 'kalla': 'runtime',
+            'modell': b['modell'], 'anstrangning': b['anstrangning'], 'valbar': kan_valja, 'kalla': 'runtime',
+            'erbjud': runtime_erbjud,
             'bevisad': bevisad(k, b['utforare'] + '_runtime', b['modell'], b['anstrangning']) if b['utforare'] else None,
-            'var': 'Fast i Runtimes kod.' if b['ur'] == 'kod' else 'Väljs i Runtimes release.',
-            'varfor_inte': 'Blir valbart här i steg 2, med Claude eller Codex.'}
+            'onskat': _onskat((onskemal or {}).get('watch'), b['utforare'], b['modell'], b['anstrangning']),
+            'onskemal_id': (onskemal or {}).get('id'), 'aktivering': aktivering, 'skal': ingen_matning,
+            'var': ('Väljs här, med Claude eller Codex, och bytet aktiveras av sig självt när Runtime är ledigt. '
+                    + ('Fast i Runtimes kod tills releasen tar emot ett val.' if b['ur'] == 'kod' else 'Releasens val.')),
+            'varfor_inte': ingen_inkorg}
     else:
         for namn, rubrik in (('runtime', 'Runtime'), ('bevakning', 'Bevakningen')):
             ut['val'][namn] = {'namn': rubrik, 'status': 'olasbar', 'modell': None, 'anstrangning': None,
@@ -532,12 +632,15 @@ def karta(server) -> dict:
         'skal': ingen_matning,
         'var': ('Granskningen, kritiken och provarna hämtar valet. Ansträngningen följer Runtimes läsarprofil.')
                if la['modell'] else 'Sessionen väljer vid varje körning.'}
-    # Startvakten tar Runtimes drivande roll (utförare och modell) och har i dag en egen ansträngning.
+    # Startvakten tar Runtimes drivande roll: utförare, modell och, när releasen bär ett val, ansträngning (D040).
     driver = rt.get('roller', {}).get('driver') if rt['status'] == 'ok' else None
     smodell = rt['modeller'].get(driver) if driver else None
-    ut['startvakt'] = {'pa': server.startvakt.paslagen(), 'utforare': driver, 'modell': smodell,
-                       'anstrangning': k.startvakt_anstrangning,
-                       'bevisad': bevisad(k, driver + '_runtime', smodell, k.startvakt_anstrangning) if driver else None}
+    sniva = (niva.get(driver) if driver and rt.get('anstrangning_ur') == 'release' and niva.get(driver)
+             else k.startvakt_anstrangning)
+    ut['startvakt'] = {'pa': server.startvakt.paslagen(), 'utforare': driver, 'modell': smodell, 'anstrangning': sniva,
+                       'anstrangning_ur': ('runtime' if driver and rt.get('anstrangning_ur') == 'release' and niva.get(driver)
+                                           else 'kontoret'),
+                       'bevisad': bevisad(k, driver + '_runtime', smodell, sniva) if driver else None}
     return ut
 
 
@@ -564,5 +667,23 @@ def spara(server, val: str, modell, anstrangning) -> tuple:
         ny = spara_lasare(k, modell if modell else None, server.runtime_val.las())
         return {'modell': fore['modell']}, {'modell': ny['modell']}
     if val in ('runtime', 'bevakning'):
-        raise ValueError('Runtimes val görs i Runtimes release; det blir valbart här när Runtime tar emot valet.')
+        rt = server.runtime_val.las()
+        if rt['status'] != 'ok':
+            raise ValueError('Runtimes aktiva release går inte att läsa just nu; valet sparas inte.')
+        utf = utforare_for(modell)
+        if utf is None:
+            raise ValueError('Okänd modell.')
+        _prova_erbjuden(k, utf + '_runtime', modell, anstrangning)
+        ny = {'executor': utf, 'model': str(modell), 'effort': str(anstrangning)}
+        onskemal = las_runtime_onskemal(k)
+        u = rt['utforare']; b = rt['bevakning']
+        nu_runtime = (onskemal or {}).get('runtime') or _aktiv_trippel(u, rt['modeller'].get(u) if u else None,
+                                                                         (rt.get('anstrangning') or {}).get(u) if u else None)
+        nu_watch = (onskemal or {}).get('watch') or _aktiv_trippel(b['utforare'], b['modell'], b['anstrangning'])
+        runtime, watch = (ny, nu_watch) if val == 'runtime' else (nu_runtime, ny)
+        if runtime is None or watch is None:
+            raise ValueError('Runtimes nuvarande val går inte att läsa som ett enda val; välj %s först.'
+                             % ('bevakningen' if watch is None else 'Runtime'))
+        spara_runtime_onskemal(k, runtime, watch)
+        return {'runtime': nu_runtime, 'watch': nu_watch}, {'runtime': runtime, 'watch': watch}
     raise ValueError('Okänt val.')
