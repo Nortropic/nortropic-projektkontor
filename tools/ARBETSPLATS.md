@@ -97,8 +97,11 @@ faktiskt styr dem:
 Startvakten visas vid Arbetssession: Runtimes drivande roll med utförare, modell och ansträngning. En release före
 Runtimes D040 har ingen ansträngning i valet; då gäller startvaktens egen (`installningar.json`, `startvakt.anstrangning`).
 
-**Runtime och bevakningen aktiveras av sig självt** (steg 2, Runtimes D040, när den är integrerad och aktiv). När
-detta skrivs är D040 granskad men inte på Runtimes main; beslutet RUNTIME-VAL-I-FLODET-20260930 säger vad som återstår.
+**Runtime och bevakningen aktiveras av sig självt** (steg 2, Runtimes D040, när den är aktiv). D040 och D041 är på
+Runtimes main och blir aktiva med Runtimes övergång 19, Johnnys engångsblock (RUNTIME-OVERGANG-19-20260930). Tills dess
+binder den aktiva releasen hela `~/.codex/config.toml`: ett byte av Codex-sessionernas modell eller ansträngning under
+Dina sessioner stoppar då Runtimes modellanrop. Efter övergången bortser Runtime från filens två rader `model` och
+`model_reasoning_effort` överst (D041).
 Spara skriver ett önskemål i Runtimes
 inkorg, `.runtime/ap10/workplace-choice.json`, med ett nytt id: Runtimes val (utförare, modell, ansträngning) och
 bevakningens. Kortet man inte ändrade behåller sitt väntande värde, annars det som kör. Bara det som fungerade i
