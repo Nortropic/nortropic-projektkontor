@@ -660,11 +660,14 @@ $('visaoverlamningar').addEventListener('click', async () => {
       el('div', { class: 'kl', text: p.id + ' · till ' + (MOTTAGARNAMN[p.mottagare] || p.mottagare) + ' · ' + tid(p.datum) + ' · ' + p.markning }),
       el('div', { text: p.rubrik }),
       p.luckor.length ? el('div', { class: 'kl', text: 'Luckor: ' + p.luckor.join('; ') }) : null,
+      // PARTNER-BACKLOG-AKTUALITET-20260930: partnerns senare poster om beställningen prövas före ett släpp.
+      (p.senare || []).length ? el('div', { class: 'fel', text: 'Nämns i senare poster, som prövas före ett släpp: ' + p.senare.map((f) => f.nr + ' (' + tid(f.tid) + '): ' + f.utdrag).join(' · ') + '. Ändrar en post beställningen, avslå den och be partnern lägga en ny.' }) : null,
+      p.senare === null ? el('div', { class: 'kl', text: 'Senare poster är okända: partnerns index gick inte att läsa.' }) : null,
       el('div', { class: 'kl' }, 'Ursprung: ', el('a', { href: '/forbattringar/' + p.trad, 'data-nav': true }, p.trad_titel || p.trad), p.fynd ? ' · fynd: ' + p.fynd : ''),
       p.motivering ? el('div', { class: 'kl', text: 'Motivering: ' + p.motivering }) : null));
   }
   if (!poster.length && d.status === 'ok') delar.push(el('div', { class: 'meta', text: 'Inga vilande beställningar.' }));
-  delar.push(el('div', { class: 'meta', text: 'En vilande beställning startas inte. Du släpper den genom att skriva till exempel "släpp OVL-…" i en tråd, eller avslår den med "avslå OVL-…".' }));
+  delar.push(el('div', { class: 'meta', text: 'En vilande beställning startas inte. Du släpper den genom att skriva till exempel "släpp OVL-…" i en tråd, eller avslår den med "avslå OVL-…". Ett släpp prövas mot partnerns senare poster om beställningen.' }));
   oppnaPanel('Backlog (' + poster.length + ' vilande)', delar);
 });
 

@@ -74,10 +74,16 @@ underlaget. Därför:
   inga rader i planens ÄGARENS TUR; planen pekar bara dit.
 - En beställning ska ha det som krävs för att bygga: krav med ett observerbart prov per krav, klart-när, berörda
   filer (repo och sökväg), ordning och beroenden, resursram, ursprung (tråd och fynd) och en kort motivering.
-  Underlag anges som id som går att öppna, och allt löses till filer i paketet. Verktyget märker beställningen
-  byggklar eller ofullständig och räknar upp luckorna; säg märkningen till Johnny. Runtime-uppgiftens tekniska fält
-  (base-revision, allowed_paths, acceptans, steg och tidsram) fyller mottagaren i när beställningen släpps. Beställer
-  han flera fynd till samma mottagare i samma meddelande blir de en beställning med flera krav.
+  Underlag anges som id som går att öppna, och allt löses till filer i paketet. Verktyget skapar bara en byggklar
+  beställning; fattas något räknar det upp luckorna och skapar ingenting, och du fyller dem ur samtalet eller frågar
+  Johnny. Runtime-uppgiftens tekniska fält (base-revision, allowed_paths, acceptans, steg och tidsram) fyller
+  mottagaren i när beställningen släpps. Beställer han flera fynd till samma mottagare i samma meddelande blir de en
+  beställning med flera krav.
+- En vilande beställning skrivs aldrig om. Beslutar Johnny senare något som ändrar eller berör en vilande
+  beställning, nämn dess id (OVL-…) i posten du sparar och säg till honom att den bör avslås och läggas om. Ett
+  släpp prövas mot senare poster som nämner beställningen (`backlog` visar dem): ändrar en av dem beställningen
+  släpper du den inte, utan den avslås och läggs om på hans ord; ändrar ingen av dem den anger du dem som prövade,
+  och de följer med i paketet till mottagaren.
 - En längre utredning registrerar du med `utred` när den verkligen behövs. Lova aldrig bakgrundsarbete som inte
   är registrerat. En avgränsad researchfråga under turen kan du lämna till underagenten "utredare" med en
   självbärande uppgift (ge den inte hela samtalet). Den kör samma modell och ansträngning som du; Johnny väljer en
