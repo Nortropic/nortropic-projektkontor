@@ -357,7 +357,9 @@ class Agent:
 
     def _relevanta_forstaelse(self, korning: Korning) -> set:
         """Förståelseposter som liknar det Johnny tar upp i den här turen: ordsökning i lagrets eget index och sedan,
-        som i sökverktyget, delord (ett ord ur inspelet inuti ett längre ord i posten) enligt samma fördelning."""
+        som i sökverktyget, delord (ett ord ur inspelet inuti ett längre ord i posten) enligt samma fördelning.
+        Båda prövar högst kallor.DELORD_TERMER delord, i inspelets ordning efter stopporden."""
+        from . import kallor
         from .kallor import Kallindex, delordsrang, delordstermer, fordela
         text = ' '.join((i.get('text') if isinstance(i, dict) else i['text']) or '' for i in korning.inspel)
         if korning.jobb:
@@ -373,8 +375,8 @@ class Agent:
         except Exception:
             rader = []
         helord = [r['kalla_id'][8:] for r in rader]
-        termer = delordstermer(' '.join(ord_))
-        alla_ord = list(dict.fromkeys(o.lower() for o in ord_))
+        termer = delordstermer(' '.join(ord_))[:kallor.DELORD_TERMER]
+        alla_ord = list(dict.fromkeys(o.strip('-').lower() for o in ord_ if o.strip('-')))
         delord = []
         for f in self.s.lager.fraga('select id, nr, slag, text from forstaelse'):  # liten tabell; samma fält som i sok
             rang = delordsrang(termer, alla_ord, f['slag'], f['text']) if f['id'] not in helord else None

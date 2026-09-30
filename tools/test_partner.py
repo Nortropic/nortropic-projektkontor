@@ -2550,6 +2550,56 @@ class DelordProv(Miljo):
         self.assertEqual(self.traffar('start-vakten'), [])              # annars en delordsträff i "omstart-vakten"
         self.assertEqual(self.traffar('vakten'), [(post, 'ord')])       # indexet delar vid bindestrecket
 
+    def test_bindestreck_i_kanterna_bevarar_delord_och_femteckensgrans(self):
+        post, = self.poster('Startvakten väntar.')
+        for fraga in ('vakten-', '-vakten', 'vakten--'):
+            with self.subTest(fraga=fraga):
+                self.assertEqual(self.traffar(fraga), [(post, 'delord')])
+                self.assertEqual(self.traffar(fraga), self.traffar('vakten'))
+        self.assertEqual(self.traffar('vakt-'), [])
+
+    def test_kantbindestreck_bevarar_flera_ords_rangordning(self):
+        self.poster('Startvakten startvakten.', 'Omvärldsbevakningen och startvakten.')
+        utan = self.traffar('vakten bevakning')
+        self.assertEqual(len(utan), 2)
+        self.assertEqual(self.traffar('vakten- bevakning'), utan)
+
+    def test_relevant_forstaelse_med_kantbindestreck(self):
+        from types import SimpleNamespace
+        f = self.S.lager.lagg_till('forstaelse', trad='t_kant', tur='x', slag='slutsats',
+                                   text='Startvakten väntar.', auktoritet='modellbedomning', kallor=[], ersatter=[])
+        for text in ('vakten', 'vakten-', '-vakten', 'vakten--'):
+            with self.subTest(text=text):
+                korning = SimpleNamespace(inspel=[{'text': text}], jobb=None)
+                self.assertEqual(self.S.agent._relevanta_forstaelse(korning), {f['id']})
+
+    def test_urvalet_har_samma_delordstak_som_sokverktyget(self):
+        from types import SimpleNamespace
+        from unittest import mock
+        from partnern import kallor, agent
+        ord_ = ['alfabet', 'betong', 'cirkus', 'dators', 'energi', 'flaska', 'golvet', 'himmel',
+                'insats', 'julgran', 'klocka']
+        self.assertFalse(set(ord_) & agent.STOPPORD)
+        f = self.S.lager.lagg_till('forstaelse', trad='t_tak', tur='x', slag='slutsats',
+                                   text='Väggklockan tickar.', auktoritet='modellbedomning', kallor=[], ersatter=[])
+        def val(text):
+            return self.S.agent._relevanta_forstaelse(SimpleNamespace(inspel=[{'text': text}], jobb=None))
+        self.assertEqual(val(' '.join(ord_)), set())
+        self.assertEqual(val(' '.join(ord_[-1:] + ord_[:-1])), {f['id']})
+        with mock.patch.object(kallor, 'DELORD_TERMER', 1):
+            for text, expected in [('alfabet klocka', set()), ('klocka alfabet', {f['id']})]:
+                with self.subTest(text=text):
+                    self.assertEqual(val(text), expected)
+                    self.assertEqual({x[0][8:] for x in self.traffar(text, ['partner'])}, expected)
+
+    def test_sokbeskrivningen_sager_kvarvarande_teckengranser(self):
+        from partnern.verktyg import specifikationer
+        for typ in ('tur', 'jobb'):
+            text = next(x['description'] for x in specifikationer(typ) if x['name'] == 'sok')
+            for deltext in ('understreck', 'Å', 'Ä', 'Ö', 'bindestreck inuti'):
+                with self.subTest(typ=typ, deltext=deltext):
+                    self.assertIn(deltext, text)
+
     def test_dold_kalla_i_provlaget_doljs_ocksa_for_delord(self):  # K4, provläget
         self.assertIn(('imp:CONV-002:m1', 'delord'), self.traffar('skåpet'))  # "kylskåpet" i provsamtal två
         self.S.kallor.dolda = ('imp:CONV-002',)
