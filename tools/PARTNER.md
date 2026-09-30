@@ -413,7 +413,7 @@ idempotenta återförsök, sessionsfortsättning och återskapad historik, avbro
 rättelse, bara spara med avbrott, ordnat stopp och krasch mitt i arbetet (tur och utredning), upplockning av
 sparade inspel, verktyg per körningstyp utan stegtak, ägarens-ord-spärren och rättelsens företräde, lägets
 uppdelning i Johnnys ord och partnerns egna bedömningar, mellanrader utanför svaret, samtalets alla bilagor och
-läst andel vid öppning, ÄGARENS TUR läst som Aquarium, överlämning utan dubbletter (samma inspel och öppen
+läst andel vid öppning, ÄGARENS TUR genom den delade `aquarium.parse_owner_turn`, överlämning utan dubbletter (samma inspel och öppen
 överlämning) och med kvittens, en överlämning per mottagare ur samma meddelande med egna id utan att ett befintligt
 paket flyttas, webbkroken med sökträffar och planterade länkar, bakgrundsutredning, provläge och att ingen
 användningsgräns stoppar flera turer i rad. Backloggen prövas med vilande beställningar (byggklar med krav, prov och

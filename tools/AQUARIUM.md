@@ -33,7 +33,8 @@ syntetiska läsare i stället för verklig drift.
   bevakningsbildens egen `owner_decision.needed` är `yes`.
 - **Kontoret genom `git show refs/remotes/origin/main:<sökväg>`**, alltså det publicerade innehållet — aldrig
   arbetsträdet: beslutsloggens poster (id, rubrik, text), leveransbeskeden `evidence/APnn/leverans.md` och planens
-  block `ÄGARENS TUR`, samt `main` och dess datum.
+  block `ÄGARENS TUR`, samt `main` och dess datum. Den rena `parse_owner_turn(plan)` tolkar blocket;
+  partnerns systemläge anropar samma funktion med `raw=True` för oförändrade textrader.
 - **Partnerns överlämningar genom `handoff_reader(office_root)`**, en valfri nionde läsning bredvid de åtta källorna
   (`overlamningar` i läsningen, källan `Kontoret · överlämningar`). Paketen är privata och står bara i kontorets
   primärutcheckning, i `evidence/nasta-uppdrag/local/partner-OVL-…/`. När `collect` får en utcheckning av kontoret,
