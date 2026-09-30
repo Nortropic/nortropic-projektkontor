@@ -117,6 +117,16 @@ sammanhang, eftersom sessioner inte får köra `launchctl`. Johnny startade den 
 datakatalog skriver önskemålet där och kan aldrig utlösa ett verkligt byte, och en instans utan egen datakatalog skriver
 inget önskemål. Saknas Runtimes inkorg på datorn säger kortet det och sparar inget.
 
+**Runtimes nya versioner aktiveras av sig själva** (Runtimes D043, när en release med den är aktiv). Runtimekortet visar
+den aktiva versionen och, när main på GitHub har en nyare, vad aktiveraren gör med den (`automatic-code-status.json`):
+väntar och varför, aktiveras inte av sig själv och varför, kräver Johnny (den ändrar aktiveraren, dess övning,
+kedjebeviset, kontrollutfärdaren, mätkön, tjänsten, bevakningens kommando eller webbverktygen), aktiveras nu,
+aktiverades, startade inte så den förra kör igen, kunde inte aktiveras, eller avbröts. Aktiveraren tar bara en version
+som bevisligen gått genom skyddad publicering och separat granskning och vars kod är just den versionens. Den övar
+versionen isolerat först, bara när Runtime är ledigt, och byter när Runtime är ledigt, med samma väg tillbaka. En release före D043 skriver ingen
+sådan status; då säger kortet inget om nya versioner. En prov- eller utvecklingsinstans läser statusen ur sin egen
+datakatalog.
+
 **Läsarna följer valet** (steg 3, LASARNAS-VAL-20260930). Läsarna är de modeller som bara läser och bedömer: kontorets
 separata granskning före integration och Digitalas kritik och provare. Alla tre kör genom Runtimes läsarprofiler i den
 aktiva releasen och följer samma val, läst med samma funktion (`modellkarta.lasarval`): granskningen läser det i
