@@ -238,6 +238,23 @@ class KrokenNekarSjalv(CodexMiljo):
         self.assertIn('timeout=20}', c)
         self.assertLess(krok.FRIST, 20)
 
+    def test_claudevagens_krok_har_samma_reservrad_och_frist(self):
+        # Claude Code 2.1.280 släpper också igenom en webbsökning när kroken dör eller inte hinner svara
+        # (steg3/KVITTO-krokfel-claude.txt); reservraden stoppade den.
+        from partnern import krok
+        k = ag.Korning(self.S, 'tur', self.S.ny_trad()['id'], [])
+        k.modell, k.anstrangning, k.utforare = 'claude-opus-5-5', 'high', 'claude'
+        a = self.S.agent.argv(k, 'e3b0c442-98fc-4c14-9afb-f4c8996fb924', True)
+        hook = json.loads(a[a.index('--settings') + 1])['hooks']['PreToolUse'][0]['hooks'][0]
+        self.assertEqual(hook['command'], ag._krokkommando(sys.executable))
+        self.assertEqual(hook['timeout'], 20); self.assertLess(krok.FRIST, hook['timeout'])
+        python = ag._citera(sys.executable)
+        r = subprocess.run(['/bin/sh', '-c', '/usr/bin/false' + hook['command'][len(python):]], capture_output=True, text=True,
+                           input=json.dumps({'tool_name': 'WebSearch', 'tool_input': {'query': 'x'}}), timeout=30)
+        svar = json.loads(r.stdout)['hookSpecificOutput']
+        self.assertEqual((svar['permissionDecision'], svar['permissionDecisionReason']),
+                         ('deny', 'Partnerns krok kunde inte köras; anropet nekas.'))
+
 
 class Webbgrinden(unittest.TestCase):
     """webbpolicy.prova_codex utan server: samma regler som WebSearch och WebFetch, och allt annat nekas."""

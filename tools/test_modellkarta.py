@@ -25,6 +25,7 @@ RUNTIME = {'config_sha256': 'ec6ecbd9566df6a0e894e3a91d5c3b8c45eb86ddf0c44057a5e
                                                'final-review', 'implementation', 'review')},
            'models_run': {'claude': 'claude-opus-5', 'codex': 'gpt-6-astra'},
            'efforts': {'claude': 'medium', 'codex': 'high'}, 'efforts_source': 'code',
+           'reader_efforts': {'claude': 'medium', 'codex': 'high'},
            'watch': {'executor': 'codex', 'model': 'gpt-6-astra', 'effort': 'high'}, 'watch_source': 'code'}
 CLAUDE_CODE = {'env': {'X': '1'}, 'permissions': {'allow': ['Read'], 'deny': []}, 'model': 'opus[1m]',
                'hooks': {'Stop': []}, 'effortLevel': 'high',
@@ -374,6 +375,52 @@ class PartnernOchLasarna(KartaMiljo):
         self.assertEqual((kod, d['val']['lasare']['status']), (200, 'sessionen'))
         self.assertNotIn('lasare', json.loads((Path(self.k.data) / 'installningar.json').read_text()))
 
+    def test_lasarnas_niva_foljer_lasarprofilen_och_inte_utvecklingsrollernas_val(self):
+        valt = dict(RUNTIME, efforts={'claude': 'max', 'codex': 'ultra'}, efforts_source='release')
+        self.S.runtime_val = mk.RuntimeLasning(self.k, korare=lambda: valt)
+        self.assertEqual(self.valj('lasare', 'claude-opus-5')[0], 200)
+        la = self.karta()['val']['lasare']
+        self.assertEqual((la['anstrangning'], la['bevisad']), ('medium', True))
+        self.assertEqual({m['id']: m['nivaer'] for m in la['erbjud']}['gpt-6-astra'], ['high'])
+
+    def test_utan_kanda_lasarnivaer_ar_lasarna_inte_valbara(self):
+        okand = dict(RUNTIME, reader_efforts={'claude': None, 'codex': None})
+        self.S.runtime_val = mk.RuntimeLasning(self.k, korare=lambda: okand)
+        la = self.karta()['val']['lasare']
+        self.assertEqual((la['valbar'], la['erbjud']), (False, []))
+
+    def lasare_kommandot(self):
+        """`partner.py lasare` mot provets datakatalog: (utfall, JSON-raden)."""
+        import contextlib
+        import io
+        import partner
+        ut = io.StringIO()
+        with mock.patch.dict(os.environ, {'PARTNER_DATA': str(self.k.data), 'PARTNER_KONTOR_PRIMAR': str(self.rot / 'kontor')}), \
+                contextlib.redirect_stdout(ut):
+            kod = partner.main(['lasare'])
+        return kod, json.loads(ut.getvalue())
+
+    def test_lasarnas_val_lases_av_andra_verktyg_med_partner_lasare(self):
+        self.assertEqual(self.lasare_kommandot(), (0, {'schema': 'lasarval/1', 'modell': None, 'utforare': None}))
+        self.assertEqual(self.valj('lasare', 'gpt-6-astra')[0], 200)
+        self.assertEqual(self.lasare_kommandot(), (0, {'schema': 'lasarval/1', 'modell': 'gpt-6-astra', 'utforare': 'codex'}))
+        self.assertEqual(self.valj('lasare', 'claude-opus-5')[0], 200)
+        self.assertEqual(self.lasare_kommandot()[1]['utforare'], 'claude')
+        self.assertEqual(self.valj('lasare', None)[0], 200)
+        self.assertEqual(self.lasare_kommandot()[1]['modell'], None)
+
+    def test_ett_lasarval_som_inte_gar_att_lasa_ar_ett_fel_och_aldrig_inget_val(self):
+        fil = Path(self.k.data) / 'installningar.json'
+        for innehall in ('{', '[]', json.dumps({'lasare': 'gpt-6-astra'}), json.dumps({'lasare': {'modell': 5}}),
+                         json.dumps({'lasare': {'modell': 'gpt-6-astra', 'utforare': 'claude'}}),
+                         json.dumps({'lasare': {'modell': '--flagga'}})):
+            with self.subTest(innehall=innehall):
+                fil.write_text(innehall, 'utf-8')
+                kod, d = self.lasare_kommandot()
+                self.assertEqual(kod, 1); self.assertEqual(set(d), {'schema', 'fel'}); self.assertIn('okänt', d['fel'])
+        fil.write_text(json.dumps({'modell': {'huvud': 'claude-opus-5-5'}}), 'utf-8')    # andra inställningar, inget läsarval
+        self.assertEqual(self.lasare_kommandot()[1]['modell'], None)
+
     def test_ett_okant_val_nekas(self):
         # Runtime och bevakningen väljs sedan steg 2 (klassen RuntimeOchBevakningen); ett okänt val nekas alltid
         kod, d = self.valj('okant', 'claude-opus-5', 'medium')
@@ -407,7 +454,22 @@ FALSK_RELEASE = {
     'runtime/profile.py': "MODEL = 'gpt-6-astra'\nREASONING_EFFORT = 'high'\n",
     'runtime/development_model.py': ("def executors(c):\n    return {'driver': 'claude', 'review': 'claude'}\n"
                                      "def models(c):\n    return {'claude': 'claude-opus-5', 'codex': 'gpt-6-astra'}\n"),
+    # läsarprofilernas egna nivåer, som i dagens Runtime (web_visitor och probe_bridge med fasta värden)
+    'runtime/web_visitor.py': "def claude_command(m):\n    return ['claude', '-p', '--model', m, '--effort', 'medium']\n",
+    'scripts/__init__.py': '',
+    'scripts/probe_bridge.py': ("def worker_command(model='gpt-6-astra'):\n"
+                                "    return ['codex', '-c', 'model=' + model, '-c', 'model_reasoning_effort=\"high\"']\n"),
 }
+# Som D040: ansträngningen blir ett val för utvecklingsrollerna, men läsarprofilerna bygger sina kommandon utan det.
+D040_RELEASE = dict(FALSK_RELEASE, **{
+    'runtime/claude_profile.py': ("EFFORT = 'medium'\n"
+                                  "def selected_effort(effort=None):\n    return EFFORT if effort is None else effort\n"
+                                  "def command(workspace, allowed_paths=(), writable=True, model=None, effort=None):\n"
+                                  "    return ['claude', '-p', '--model', model, '--effort', selected_effort(effort)]\n"),
+    'scripts/probe_bridge.py': ("def worker_command(model='gpt-6-astra', effort='high'):\n"
+                                "    return ['codex', '-c', 'model_reasoning_effort=' + effort]\n"),
+    'runtime/development_model.py': (FALSK_RELEASE['runtime/development_model.py']
+                                     + "def efforts(c):\n    return {'claude': 'max', 'codex': 'ultra'}\n")})
 
 
 class RuntimeLasningenMotEnFalskRelease(unittest.TestCase):
@@ -439,6 +501,21 @@ class RuntimeLasningenMotEnFalskRelease(unittest.TestCase):
         self.assertEqual((v['utforare'], v['modeller']['claude'], v['anstrangning'], v['anstrangning_ur'], v['config']),
                          ('claude', 'claude-opus-5', {'claude': 'medium', 'codex': 'high'}, 'kod', 'cdcdcdcd'))
         self.assertEqual(v['bevakning'], {'utforare': 'codex', 'modell': 'gpt-6-astra', 'anstrangning': 'high', 'ur': 'kod'})
+        self.assertEqual(v['lasarniva'], {'claude': 'medium', 'codex': 'high'})
+
+    def test_lasarnas_niva_ar_profilernas_egen_ocksa_nar_releasen_bar_ett_val(self):
+        v = self.las(D040_RELEASE)
+        self.assertEqual(v['status'], 'ok', v)
+        self.assertEqual((v['anstrangning'], v['anstrangning_ur']), ({'claude': 'max', 'codex': 'ultra'}, 'release'))
+        self.assertEqual(v['lasarniva'], {'claude': 'medium', 'codex': 'high'})
+        olika = dict(FALSK_RELEASE, **{'runtime/web_visitor.py': "X = ['--effort', 'high']\n"})
+        self.assertEqual(self.las(olika)['lasarniva'], {'codex': 'high'}, 'två olika Claude-nivåer är okänt, inte en gissning')
+
+    def test_utan_lasarprofilernas_filer_ar_nivan_okand_men_resten_lases(self):
+        utan = {n: v for n, v in FALSK_RELEASE.items() if n not in ('runtime/web_visitor.py', 'scripts/probe_bridge.py')}
+        v = self.las(utan)
+        self.assertEqual(v['status'], 'ok', v)
+        self.assertEqual((v['utforare'], v['anstrangning'], v['lasarniva']), ('claude', {'claude': 'medium', 'codex': 'high'}, {}))
 
     def test_en_release_med_val_for_anstrangning_och_bevakning_gar_fore(self):
         filer = dict(FALSK_RELEASE)
@@ -540,6 +617,19 @@ class RuntimeOchBevakningen(KartaMiljo):
         self.status('nagot-nytt')
         self.assertEqual(self.karta()['val']['runtime']['aktivering']['lage'], 'okant')
 
+    def test_en_status_fran_framtiden_betyder_inte_att_aktiveraren_gar(self):
+        self.valj('runtime', 'gpt-6-sol', 'ultra')
+        self.status('waiting', alder=-3600, reason='REFUSED: an AP10 watch run is in progress; activate later')
+        self.assertFalse(self.karta()['val']['runtime']['aktivering']['igang'])
+
+    def test_utan_inkorgens_katalog_ges_ett_lasbart_nej(self):
+        self.k.runtime_onskemal = self.rot / 'ingen-runtime' / '.runtime/ap10/workplace-choice.json'
+        v = self.karta()['val']
+        self.assertFalse(v['runtime']['valbar']); self.assertIn('finns inte på den här datorn', v['runtime']['varfor_inte'])
+        kod, d = self.valj('runtime', 'gpt-6-sol', 'ultra')
+        self.assertEqual(kod, 400, d); self.assertIn('finns inte på den här datorn', json.dumps(d, ensure_ascii=False))
+        self.assertFalse((self.rot / 'ingen-runtime').exists(), 'ingen katalog skapas')
+
     def test_en_samtidig_skrivning_skriver_inget(self):
         with mock.patch.object(mk, '_skriv_atomart', lambda *a: False):
             kod, d = self.valj('runtime', 'gpt-6-sol', 'ultra')
@@ -590,6 +680,17 @@ class ProvInstanser(unittest.TestCase):
         self.assertEqual(k.runtime_status, Path(k.repon['runtime']) / '.runtime/ap10/automatic-choice-status.json')
         self.assertIsNone(kf.Konfig(data=Path('/tmp/x'), hemligheter=Path('/tmp/y')).runtime_onskemal,
                           'en konfiguration som inte laddats har ingen inkorg alls')
+
+    def test_en_instans_utan_egen_datakatalog_har_ingen_inkorg(self):
+        # bara PARTNER_PROV_DOLJ (eller bara PARTNER_PORT): inte den ordinarie tjänsten, men den ordinarie datakatalogen
+        for extra in ({'PARTNER_PROV_DOLJ': 'sok'}, {'PARTNER_PORT': '4799'}):
+            with self.subTest(extra=extra), mock.patch.dict(os.environ, {'PARTNER_KONTOR_PRIMAR': '/tmp/kontor', **extra}):
+                for namn in ('PARTNER_DATA', 'PARTNER_PORT', 'PARTNER_PROV_DOLJ'):
+                    if namn not in extra:
+                        os.environ.pop(namn, None)
+                k = kf.ladda()
+                self.assertEqual(k.data, Path('/tmp/kontor/evidence/partner/local'))
+                self.assertEqual((k.runtime_onskemal, k.runtime_status), (None, None))
 
 
 FEJK_CLAUDE = r'''#!/usr/bin/env python3

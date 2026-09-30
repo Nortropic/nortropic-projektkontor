@@ -91,14 +91,15 @@ faktiskt styr dem:
 | Partnern | arbetsplatsens `installningar.json` (samma som samtalsytans /model) | ja, gäller från nästa svar; en Claude-modell kör Claude Code, en Codex-modell Codex |
 | Dina sessioner | Claude Codes `~/.claude/settings.json` och Codex `~/.codex/config.toml` | ja, i båda programmen (ägarens besked 2026-09-29) |
 | Runtime | den aktiva releasen, läst med releasens egen kod (samma avgränsade väg som Aquarium) | ja; modellen avgör utföraren för alla roller, och bytet aktiveras av sig självt när Runtime är ledigt (se nedan) |
-| Läsarna | arbetsplatsens `installningar.json` (`lasare`); utan val väljer sessionen | ja; ansträngningen följer Runtimes läsarprofil |
+| Läsarna | arbetsplatsens `installningar.json` (`lasare`); utan val väljer sessionen | ja; kontorets granskning och Digitalas kritik och provare hämtar valet (se nedan), och ansträngningen följer Runtimes läsarprofil |
 | Bevakningen | den aktiva releasens val för bevakningen (utförare, modell, ansträngning); före det valet Runtimes Codex-profil | ja, med Claude eller Codex; aktiveras av sig självt som Runtime |
 
 Startvakten visas vid Arbetssession: Runtimes drivande roll med utförare, modell och ansträngning. En release före
 Runtimes D040 har ingen ansträngning i valet; då gäller startvaktens egen (`installningar.json`, `startvakt.anstrangning`).
 
-**Runtime och bevakningen aktiveras av sig självt** (steg 2, Runtimes D040, när den är integrerad och aktiv; se
-beslutet RUNTIME-VAL-I-FLODET-20260930 för vad som återstår). Spara skriver ett önskemål i Runtimes
+**Runtime och bevakningen aktiveras av sig självt** (steg 2, Runtimes D040, när den är integrerad och aktiv). När
+detta skrivs är D040 granskad men inte på Runtimes main; beslutet RUNTIME-VAL-I-FLODET-20260930 säger vad som återstår.
+Spara skriver ett önskemål i Runtimes
 inkorg, `.runtime/ap10/workplace-choice.json`, med ett nytt id: Runtimes val (utförare, modell, ansträngning) och
 bevakningens. Kortet man inte ändrade behåller sitt väntande värde, annars det som kör. Bara det som fungerade i
 mätningen av Runtimes egna program erbjuds och godtas. Runtimes eget verktyg läser önskemålet var femte minut
@@ -109,8 +110,22 @@ tjänsten inte svarar som väntat. Annars byter det release med samma väg tillb
 inte och varför, aktiverades, den förra versionen återställd, misslyckat eller avbrutet; en status om ett tidigare
 önskemål visas som att valet väntar på Runtimes nästa titt. Aktiveraren är en LaunchAgent i Johnnys eget
 sammanhang, eftersom sessioner inte får köra `launchctl`. Johnny startar den en gång, efter Runtimes övergång 19, med
-`model_choice.py agent install`; tills dess säger kortet att valet väntar. En prov- eller utvecklingsinstans skriver
-önskemålet i sin egen datakatalog och kan aldrig utlösa ett verkligt byte.
+`model_choice.py agent install`; tills dess säger kortet att valet väntar. En prov- eller utvecklingsinstans med egen
+datakatalog skriver önskemålet där och kan aldrig utlösa ett verkligt byte, och en instans utan egen datakatalog skriver
+inget önskemål. Saknas Runtimes inkorg på datorn säger kortet det och sparar inget.
+
+**Läsarna följer valet** (steg 3, LASARNAS-VAL-20260930). Läsarna är de modeller som bara läser och bedömer: kontorets
+separata granskning före integration och Digitalas kritik och provare. Alla tre kör genom Runtimes läsarprofiler i den
+aktiva releasen och följer samma val, läst med samma funktion (`modellkarta.lasarval`): granskningen läser det i
+processen, och Digitala hämtar det med `python3 -B tools/partner.py lasare`, som skriver valet som en JSON-rad och
+aldrig ändrar något. Kontorets granskning körs med `python3 -B tools/granska.py KATALOG`: katalogen har
+underlaget i Runtimes manifestform och frågan, verktyget kör kritikprofilen med granskningens svarsform och skriver
+utfallet i `review.json` (modellen, varifrån den kom, Runtimes kvitto och svaret). Finns ett val nekas en annan modell,
+i granskningen med `--modell` och i Digitala med `--utforare` eller `--modell`; finns inget anger sessionen modellen som
+förut. Går valet inte att läsa nekas körningen i stället för att sessionen väljer. Ansträngningen följer Runtimes
+läsarprofil (i dag medium för Claude och high för Codex), eftersom profilerna inte tar någon ansträngning. Att välja
+läsarnas ansträngning kräver att Runtimes kritik- och provarprofil tar en ansträngning som parameter, en ändring i Runtime
+som inte är gjord.
 
 **Bara det som bevisligen fungerar erbjuds.** `python3 -B tools/partner.py matmodeller` prövar varje modell och nivå med
 ett kort anrop ("Svara bara med ordet ok.", inga verktyg, inga MCP-servrar) i programmet som kör hållplatsen: Johnnys
@@ -157,5 +172,7 @@ samma anslutning. Användarresorna provas i Chromium mot en provinstans (se besl
 godtas, exakt vilka rader som skrivs i Claude Codes och Codex filer, att en okänd form och en samtidig skrivning inte
 skriver något, läsarna, partnern, Runtimes och bevakningens önskemål (formen, att det andra kortets väntande värde står
 kvar, att ett obevisat val och en länkad inkorg aldrig skrivs, statusen och om aktiveraren går), startvaktens
-ansträngning ur Runtimes val, adresserna, att en provinstans aldrig rör de riktiga filerna eller Runtimes inkorg, och
-mätverktyget mot falska program.
+ansträngning ur Runtimes val, adresserna, att en provinstans aldrig rör de riktiga filerna eller Runtimes inkorg,
+`partner.py lasare` och mätverktyget mot falska program. `python3 -B -m unittest tools.test_granska` prövar granskningen
+mot en låtsas-release: läsarnas val avgör modell och utförare, en annan modell nekas, utfallet skrivs aldrig över, ett
+svar godtas bara med ett kvitto som stämmer och ett avbrott skickas vidare till läsarprofilen.

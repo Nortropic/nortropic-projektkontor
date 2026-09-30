@@ -478,8 +478,7 @@ class Agent:
         installningar = {
             'autoMemoryEnabled': False,
             'hooks': {'PreToolUse': [{'matcher': 'WebFetch|WebSearch|Agent|Task', 'hooks': [
-                {'type': 'command', 'command': '%s -B %s' % (_citera(python), _citera(str(PAKET / 'krok.py'))),
-                 'timeout': 20}]}]},
+                {'type': 'command', 'command': _krokkommando(python), 'timeout': 20}]}]},
             'permissions': {'deny': ['Bash', 'Edit', 'Write', 'NotebookEdit', 'Read', 'Glob', 'Grep']},
         }
         agenter = {'utredare': {
@@ -603,8 +602,7 @@ class Agent:
         env_vars och kroken ärver Codex miljö, så den står aldrig i processargumenten."""
         g = self.k.gransar
         python = sys.executable
-        krok = '%s -B %s || printf %s %s' % (_citera(python), _citera(str(PAKET / 'krok.py')), _citera('%s\\n'),
-                                             _citera(KROK_RESERV))
+        krok = _krokkommando(python)
         argv = [self.k.codex, 'exec', '--json', '--ephemeral', '--skip-git-repo-check', '--ignore-user-config',
                 '--dangerously-bypass-hook-trust', '-s', 'read-only', '-m', korning.modell,
                 '-c', 'model_reasoning_effort=' + json.dumps(korning.anstrangning),
@@ -922,6 +920,13 @@ def _unika(kallor: list) -> list:
 
 def _citera(s: str) -> str:
     return "'" + s.replace("'", "'\\''") + "'"
+
+
+def _krokkommando(python: str) -> str:
+    """Krokens kommando i båda programmen, som båda kör det genom ett skal: startar Python eller krok.py inte svarar
+    skalets reservrad nej (KROK_RESERV). Claude Code, liksom Codex, släpper annars igenom anropet när en krok dör."""
+    return '%s -B %s || printf %s %s' % (_citera(python), _citera(str(PAKET / 'krok.py')), _citera('%s\\n'),
+                                         _citera(KROK_RESERV))
 
 
 def _beskriv_verktyg(namn: str, indata: dict) -> str:

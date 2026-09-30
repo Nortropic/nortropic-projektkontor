@@ -66,6 +66,21 @@ else:
     m = re.findall(r"'--effort',\s*'([a-z]+)'", inspect.getsource(claude_profile.command))
     out['efforts'] = {'claude': m[0] if len(set(m)) == 1 else None, 'codex': getattr(profile, 'REASONING_EFFORT', None)}
     out['efforts_source'] = 'code'
+# Läsarna: kritik- och provarprofilen bygger sina kommandon utan releasens val (D040 ändrar dem inte), så de kör
+# profilernas egna fasta nivåer: Claude i claude_profile och web_visitor, Codex i probe_bridge.worker_command.
+# Går de inte att läsa (en release utan någon av filerna) är nivåerna okända; resten av läsningen står sig.
+try:
+    from scripts import probe_bridge
+    kl = set(re.findall(r"'--effort',\s*'([a-z]+)'", inspect.getsource(claude_profile.command)))
+    if getattr(claude_profile, 'EFFORT', None):
+        kl.add(claude_profile.EFFORT)
+    kl |= set(re.findall(r"'--effort',\s*'([a-z]+)'", open('runtime/web_visitor.py', encoding='utf-8').read()))
+    p = inspect.signature(probe_bridge.worker_command).parameters
+    cl = ({p['effort'].default} if 'effort' in p else
+          set(re.findall(r'model_reasoning_effort="([a-z]+)"', inspect.getsource(probe_bridge.worker_command))))
+    out['reader_efforts'] = {'claude': kl.pop() if len(kl) == 1 else None, 'codex': cl.pop() if len(cl) == 1 else None}
+except Exception:
+    out['reader_efforts'] = {'claude': None, 'codex': None}
 if hasattr(dm, 'watch'):
     out['watch'] = dm.watch(c); out['watch_source'] = 'release'
 else:
@@ -364,10 +379,32 @@ def las_lasare(k) -> dict:
     return {'modell': modell, 'utforare': utforare_for(modell)}
 
 
+def lasarval(k) -> dict:
+    """Läsarnas val för verktygen som kör läsarna (`partner.py lasare`, `tools/granska.py`, Digitalas kor_profil).
+    Som las_lasare, men en inställningsfil eller ett val som inte går att läsa är ett fel och aldrig "inget val": en
+    läsare får inte köra en annan modell än Johnnys för att filen var trasig."""
+    fil = Path(k.data) / 'installningar.json'
+    if not fil.exists():
+        return {'modell': None, 'utforare': None}
+    try:
+        val = json.loads(fil.read_text('utf-8'))
+    except (OSError, ValueError):
+        raise ValueError('installningar.json går inte att läsa, så läsarnas val är okänt.')
+    if not isinstance(val, dict):
+        raise ValueError('installningar.json har fel form, så läsarnas val är okänt.')
+    if 'lasare' not in val:
+        return {'modell': None, 'utforare': None}
+    v = val['lasare']
+    if not isinstance(v, dict) or set(v) != {'modell'} or not isinstance(v['modell'], str) or not SLUG.match(v['modell']):
+        raise ValueError('Läsarnas val i installningar.json har fel form, så det är okänt.')
+    return {'modell': v['modell'], 'utforare': utforare_for(v['modell'])}
+
+
 def lasarnas_erbjudande(k, rt: dict) -> list:
-    """Läsarna kör genom Runtimes profiler, vars ansträngning i dag är fast: bara modeller som fungerade med just den
-    nivån i Runtimes egna program."""
-    niva = (rt.get('anstrangning') or {}) if rt.get('status') == 'ok' else {}
+    """Läsarna kör genom Runtimes läsarprofiler, vars ansträngning är fast i profilernas kod (också efter D040, som bara
+    gör utvecklingsrollernas ansträngning till ett val): bara modeller som fungerade med just den nivån i Runtimes egna
+    program."""
+    niva = (rt.get('lasarniva') or {}) if rt.get('status') == 'ok' else {}
     ut = []
     for program, utf in (('claude_runtime', 'claude'), ('codex_runtime', 'codex')):
         if niva.get(utf):
@@ -454,6 +491,7 @@ def _runtime_varden(v: dict) -> dict:
     utforare = v.get('executors') if isinstance(v.get('executors'), dict) else {}
     modeller = v.get('models_run') if isinstance(v.get('models_run'), dict) else {}
     niva = v.get('efforts') if isinstance(v.get('efforts'), dict) else {}
+    lasarniva = v.get('reader_efforts') if isinstance(v.get('reader_efforts'), dict) else {}
     vakt = v.get('watch') if isinstance(v.get('watch'), dict) else {}
     roller = {r: u for r, u in utforare.items() if isinstance(r, str) and u in ('claude', 'codex')}
     ensam = set(roller.values())
@@ -463,6 +501,7 @@ def _runtime_varden(v: dict) -> dict:
             'modeller': {u: text(m) for u, m in modeller.items() if u in ('claude', 'codex')},
             'anstrangning': {u: n for u, n in niva.items() if u in ('claude', 'codex') and n in alla_nivaer},
             'anstrangning_ur': 'release' if v.get('efforts_source') == 'release' else 'kod',
+            'lasarniva': {u: n for u, n in lasarniva.items() if u in ('claude', 'codex') and n in alla_nivaer},
             'bevakning': {'utforare': vakt.get('executor') if vakt.get('executor') in ('claude', 'codex') else None,
                           'modell': text(vakt.get('model')),
                           'anstrangning': vakt.get('effort') if vakt.get('effort') in alla_nivaer else None,
@@ -522,7 +561,8 @@ def las_aktivering(k) -> dict | None:
             'skal': str(v.get('reason'))[:400] if v.get('reason') else None, 'tid': tid,
             'aktiverad': v.get('activated_at') if isinstance(v.get('activated_at'), str) else None,
             'onskemal': v.get('request_id') if isinstance(v.get('request_id'), str) else None,
-            'igang': alder is not None and alder < AKTIVERARE_SEKUNDER}
+            # en status från framtiden säger inget om att aktiveraren går
+            'igang': alder is not None and 0 <= alder < AKTIVERARE_SEKUNDER}
 
 
 def spara_runtime_onskemal(k, runtime: dict, watch: dict) -> dict:
@@ -535,6 +575,8 @@ def spara_runtime_onskemal(k, runtime: dict, watch: dict) -> dict:
         raise ValueError('Valet har inte den form Runtime tar emot; inget skrivs.')
     if fil.is_symlink():
         raise ValueError('Runtimes inkorg är en länk; inget skrivs.')
+    if not fil.parent.is_dir():
+        raise ValueError('Runtimes inkorg finns inte på den här datorn (%s saknas); valet kan inte sparas.' % fil.parent)
     varde = {'schema': 'workplace-choice/1',
              'id': 'w' + time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()) + '-' + os.urandom(3).hex(),
              'requested_at': nu(), 'runtime': runtime, 'watch': watch}
@@ -589,8 +631,9 @@ def karta(server) -> dict:
                           if cx['modell'] and cx['anstrangning'] else None)}}
     niva = rt.get('anstrangning', {}) if rt['status'] == 'ok' else {}
     onskemal, aktivering = las_runtime_onskemal(k), las_aktivering(k)
-    kan_valja = bool(matning) and k.runtime_onskemal is not None
-    ingen_inkorg = None if k.runtime_onskemal is not None else 'Runtimes inkorg är okänd för den här instansen.'
+    ingen_inkorg = ('Runtimes inkorg är okänd för den här instansen.' if k.runtime_onskemal is None else
+                    'Runtimes inkorg finns inte på den här datorn.' if not k.runtime_onskemal.parent.is_dir() else None)
+    kan_valja = bool(matning) and ingen_inkorg is None
     runtime_erbjud = erbjud(k, 'claude_runtime') + erbjud(k, 'codex_runtime')
     if rt['status'] == 'ok':
         u = rt['utforare']
@@ -623,11 +666,14 @@ def karta(server) -> dict:
                                'valbar': False, 'kalla': 'runtime',
                                'var': 'Runtimes aktiva release gick inte att läsa just nu: läget är okänt.'}
     la = las_lasare(k)
+    lniva = rt.get('lasarniva', {}) if rt['status'] == 'ok' else {}
+    lerbjud = lasarnas_erbjudande(k, rt)
     ut['val']['lasare'] = {
         'namn': 'Läsarna', 'status': 'ok' if la['modell'] else 'sessionen', 'modell': la['modell'],
-        'utforare': la['utforare'], 'anstrangning': niva.get(la['utforare']) if la['modell'] else None,
-        'valbar': bool(matning) and rt['status'] == 'ok', 'kalla': 'arbetsplatsen', 'erbjud': lasarnas_erbjudande(k, rt),
-        'bevisad': (bevisad(k, la['utforare'] + '_runtime', la['modell'], niva.get(la['utforare']))
+        'utforare': la['utforare'], 'anstrangning': lniva.get(la['utforare']) if la['modell'] else None,
+        # utan kända läsarnivåer finns inget som bevisligen fungerar att erbjuda
+        'valbar': bool(matning) and rt['status'] == 'ok' and bool(lerbjud), 'kalla': 'arbetsplatsen', 'erbjud': lerbjud,
+        'bevisad': (bevisad(k, la['utforare'] + '_runtime', la['modell'], lniva.get(la['utforare']))
                     if la['modell'] and rt['status'] == 'ok' else None),
         'skal': ingen_matning,
         'var': ('Granskningen, kritiken och provarna hämtar valet. Ansträngningen följer Runtimes läsarprofil.')
