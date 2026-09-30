@@ -263,7 +263,8 @@ def matmodeller(k, args) -> int:
 
 def lasare(k, args) -> int:
     """Läsarnas val i Flödet som en JSON-rad, för verktygen som kör läsarna (kontorets granskning, Digitalas kritik och
-    provare): {"schema": "lasarval/1", "modell", "utforare"}, med modell null när inget val finns. Går valet inte att
+    provare): {"schema": "lasarval/1", "modell", "utforare", "anstrangning"}, med modell null när inget val finns och
+    anstrangning null när valet inte bär någon nivå (då kör läsarprofilen sin egen). Går valet inte att
     läsa är utfallet 1 med skälet i "fel". Bara läsning."""
     from partnern import modellkarta
     try:
@@ -271,7 +272,8 @@ def lasare(k, args) -> int:
     except ValueError as fel:
         print(json.dumps({'schema': 'lasarval/1', 'fel': str(fel)}, ensure_ascii=False))
         return 1
-    print(json.dumps({'schema': 'lasarval/1', 'modell': val['modell'], 'utforare': val['utforare']}, ensure_ascii=False))
+    print(json.dumps({'schema': 'lasarval/1', 'modell': val['modell'], 'utforare': val['utforare'],
+                      'anstrangning': val['anstrangning']}, ensure_ascii=False))
     return 0
 
 

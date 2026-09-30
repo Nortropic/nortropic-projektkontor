@@ -391,7 +391,8 @@ Paketet bär instruktionens material, men bara Johnnys ord är beslut.
   aldrig bredvid.
 - **Utföraren väljs som i dag:** i Runtimes bemanning, rollen `driver`, så som Johnny valt den i Runtimes modellval
   (D028–D030, D040, som han sedan steg 2 gör i Flödet). Bemanningen läses genom Aquariums befintliga sond. Claude Code körs med Runtimes fastlåsta
-  `.runtime/bin/claude-2.1.257` i behörighetsläget `auto`; i dag anger bemanningen Claude med modellen
+  Claude Code, läst ur den aktiva releasens `runtime/claude_profile.py` (`konfig.runtime_claude_pinne`; 2.1.285 sedan
+  Runtimes D046, RUNTIME-BINARER-20260930) i behörighetsläget `auto`; i dag anger bemanningen Claude med modellen
   `claude-opus-5`. Codex körs med den fastlåsta `.runtime/bin/codex-0.155.1` (`exec --json --approve-for-me`, och
   `exec resume <tråd>` för att fortsätta). Båda får bemanningens modell och Runtimes ansträngning för samma utförare,
   ur samma läsning; en release före Runtimes D040 har ingen sådan, och då gäller startvaktens egen (`high`). En

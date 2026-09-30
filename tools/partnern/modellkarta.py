@@ -81,6 +81,13 @@ try:
     out['reader_efforts'] = {'claude': kl.pop() if len(kl) == 1 else None, 'codex': cl.pop() if len(cl) == 1 else None}
 except Exception:
     out['reader_efforts'] = {'claude': None, 'codex': None}
+# Runtime D046: the critic and visitor take a level (--anstrangning, web_common.reader_effort); the review reader always
+# took one through claude_profile.command. Without it the readers' level stays the profiles' own.
+try:
+    from runtime import web_common
+    out['reader_effort_choice'] = callable(getattr(web_common, 'reader_effort', None))
+except Exception:
+    out['reader_effort_choice'] = False
 if hasattr(dm, 'watch'):
     out['watch'] = dm.watch(c); out['watch_source'] = 'release'
 else:
@@ -371,12 +378,15 @@ def utforare_for(modell) -> str | None:
 
 
 def las_lasare(k) -> dict:
-    """Läsarnas val (granskning, kritik och provare); modell None när sessionen väljer vid varje körning."""
+    """Läsarnas val (granskning, kritik och provare); modell None när sessionen väljer vid varje körning. Ansträngningen
+    är None när valet inte bär någon: då kör läsarna profilernas egen nivå."""
     v = _installningar(k).get('lasare')
     modell = v.get('modell') if isinstance(v, dict) else None
     if not isinstance(modell, str) or not SLUG.match(modell):
-        return {'modell': None, 'utforare': None}
-    return {'modell': modell, 'utforare': utforare_for(modell)}
+        return {'modell': None, 'utforare': None, 'anstrangning': None}
+    niva = v.get('anstrangning')
+    return {'modell': modell, 'utforare': utforare_for(modell),
+            'anstrangning': niva if isinstance(niva, str) and NIVA_FORM.match(niva) else None}
 
 
 def lasarval(k) -> dict:
@@ -385,7 +395,7 @@ def lasarval(k) -> dict:
     läsare får inte köra en annan modell än Johnnys för att filen var trasig."""
     fil = Path(k.data) / 'installningar.json'
     if not fil.exists():
-        return {'modell': None, 'utforare': None}
+        return {'modell': None, 'utforare': None, 'anstrangning': None}
     try:
         val = json.loads(fil.read_text('utf-8'))
     except (OSError, ValueError):
@@ -393,18 +403,24 @@ def lasarval(k) -> dict:
     if not isinstance(val, dict):
         raise ValueError('installningar.json har fel form, så läsarnas val är okänt.')
     if 'lasare' not in val:
-        return {'modell': None, 'utforare': None}
+        return {'modell': None, 'utforare': None, 'anstrangning': None}
     v = val['lasare']
-    if not isinstance(v, dict) or set(v) != {'modell'} or not isinstance(v['modell'], str) or not SLUG.match(v['modell']):
+    if (not isinstance(v, dict) or set(v) not in ({'modell'}, {'modell', 'anstrangning'}) or not isinstance(v['modell'], str)
+            or not SLUG.match(v['modell'])
+            or ('anstrangning' in v and not (isinstance(v['anstrangning'], str) and NIVA_FORM.match(v['anstrangning'])))):
         raise ValueError('Läsarnas val i installningar.json har fel form, så det är okänt.')
-    return {'modell': v['modell'], 'utforare': utforare_for(v['modell'])}
+    return {'modell': v['modell'], 'utforare': utforare_for(v['modell']), 'anstrangning': v.get('anstrangning')}
 
 
 def lasarnas_erbjudande(k, rt: dict) -> list:
-    """Läsarna kör genom Runtimes läsarprofiler, vars ansträngning är fast i profilernas kod (också efter D040, som bara
-    gör utvecklingsrollernas ansträngning till ett val): bara modeller som fungerade med just den nivån i Runtimes egna
-    program."""
-    niva = (rt.get('lasarniva') or {}) if rt.get('status') == 'ok' else {}
+    """Läsarna kör genom Runtimes läsarprofiler. Tar den aktiva releasen emot en nivå (Runtime D046) erbjuds varje modell
+    med de nivåer som fungerade i Runtimes eget program; annars är nivån fast i profilernas kod och bara modeller som
+    fungerade med just den nivån erbjuds."""
+    if rt.get('status') != 'ok':
+        return []
+    if rt.get('lasarniva_valbar'):
+        return erbjud(k, 'claude_runtime') + erbjud(k, 'codex_runtime')
+    niva = rt.get('lasarniva') or {}
     ut = []
     for program, utf in (('claude_runtime', 'claude'), ('codex_runtime', 'codex')):
         if niva.get(utf):
@@ -412,11 +428,21 @@ def lasarnas_erbjudande(k, rt: dict) -> list:
     return ut
 
 
-def spara_lasare(k, modell, rt: dict) -> dict:
+def spara_lasare(k, modell, rt: dict, anstrangning=None) -> dict:
     """Johnnys val för läsarna, i installningar.json under 'lasare' (övriga inställningar orörda). None tar bort valet,
-    så att sessionen åter väljer. Ansträngningen följer Runtimes läsarprofil tills Runtime tar emot ett val (steg 2)."""
-    if modell is not None and modell not in {m['id'] for m in lasarnas_erbjudande(k, rt)}:
+    så att sessionen åter väljer. Tar den aktiva releasen emot en nivå krävs en nivå som fungerade för modellen i Runtimes
+    program; annars följer nivån Runtimes läsarprofil, och en medskickad nivå (kortet visar profilens egen) sparas inte,
+    som före Runtimes D046."""
+    erbjudna = {m['id']: m['nivaer'] for m in lasarnas_erbjudande(k, rt)}
+    if modell is not None and modell not in erbjudna:
         raise ValueError('%s har inte fungerat i Runtimes program i senaste mätningen och erbjuds inte för läsarna.' % modell)
+    if modell is not None and rt.get('lasarniva_valbar'):
+        if not anstrangning:
+            raise ValueError('Välj en nivå för %s bland dem som fungerade i Runtimes program.' % modell)
+        if anstrangning not in erbjudna[modell]:
+            raise ValueError('Nivån %s har inte fungerat för %s i Runtimes program i senaste mätningen.' % (anstrangning, modell))
+    else:
+        anstrangning = None
     fil = Path(k.data) / 'installningar.json'
     with _SPARLAS:
         val = {}
@@ -430,7 +456,7 @@ def spara_lasare(k, modell, rt: dict) -> dict:
         if modell is None:
             val.pop('lasare', None)
         else:
-            val['lasare'] = {'modell': modell}
+            val['lasare'] = {'modell': modell, 'anstrangning': anstrangning} if anstrangning else {'modell': modell}
         tmp = fil.with_name('.installningar.json.tmp')
         fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
         with os.fdopen(fd, 'w', encoding='utf-8') as f:
@@ -502,6 +528,7 @@ def _runtime_varden(v: dict) -> dict:
             'anstrangning': {u: n for u, n in niva.items() if u in ('claude', 'codex') and n in alla_nivaer},
             'anstrangning_ur': 'release' if v.get('efforts_source') == 'release' else 'kod',
             'lasarniva': {u: n for u, n in lasarniva.items() if u in ('claude', 'codex') and n in alla_nivaer},
+            'lasarniva_valbar': v.get('reader_effort_choice') is True,
             'bevakning': {'utforare': vakt.get('executor') if vakt.get('executor') in ('claude', 'codex') else None,
                           'modell': text(vakt.get('model')),
                           'anstrangning': vakt.get('effort') if vakt.get('effort') in alla_nivaer else None,
@@ -703,16 +730,22 @@ def karta(server) -> dict:
     la = las_lasare(k)
     lniva = rt.get('lasarniva', {}) if rt['status'] == 'ok' else {}
     lerbjud = lasarnas_erbjudande(k, rt)
+    lvalbar = rt['status'] == 'ok' and bool(rt.get('lasarniva_valbar'))
+    # en sparad nivå gäller bara när den aktiva releasen tar emot den; annars kör läsarna profilens egen (granska.py likaså)
+    lanstr = ((la['anstrangning'] if lvalbar and la['anstrangning'] else lniva.get(la['utforare'])) if la['modell'] else None)
     ut['val']['lasare'] = {
         'namn': 'Läsarna', 'status': 'ok' if la['modell'] else 'sessionen', 'modell': la['modell'],
-        'utforare': la['utforare'], 'anstrangning': lniva.get(la['utforare']) if la['modell'] else None,
+        'utforare': la['utforare'], 'anstrangning': lanstr, 'niva_valbar': lvalbar,
         # utan kända läsarnivåer finns inget som bevisligen fungerar att erbjuda
         'valbar': bool(matning) and rt['status'] == 'ok' and bool(lerbjud), 'kalla': 'arbetsplatsen', 'erbjud': lerbjud,
-        'bevisad': (bevisad(k, la['utforare'] + '_runtime', la['modell'], lniva.get(la['utforare']))
+        'bevisad': (bevisad(k, la['utforare'] + '_runtime', la['modell'], lanstr)
                     if la['modell'] and rt['status'] == 'ok' else None),
         'skal': ingen_matning,
-        'var': ('Granskningen, kritiken och provarna hämtar valet. Ansträngningen följer Runtimes läsarprofil.')
-               if la['modell'] else 'Sessionen väljer vid varje körning.'}
+        'var': (('Granskningen, kritiken och provarna hämtar valet, med nivån.' if lvalbar and la['anstrangning'] else
+                 'Granskningen, kritiken och provarna hämtar valet. Den sparade nivån används inte: Runtimes aktiva release '
+                 'tar ingen, så läsarprofilens egen gäller.' if la['anstrangning'] else
+                 'Granskningen, kritiken och provarna hämtar valet. Ansträngningen följer Runtimes läsarprofil.')
+                if la['modell'] else 'Sessionen väljer vid varje körning.')}
     # Startvakten tar Runtimes drivande roll: utförare, modell och, när releasen bär ett val, ansträngning (D040).
     driver = rt.get('roller', {}).get('driver') if rt['status'] == 'ok' else None
     smodell = rt['modeller'].get(driver) if driver else None
@@ -745,8 +778,10 @@ def spara(server, val: str, modell, anstrangning) -> tuple:
                 {'modell': modell, 'anstrangning': anstrangning})
     if val == 'lasare':
         fore = las_lasare(k)
-        ny = spara_lasare(k, modell if modell else None, server.runtime_val.las())
-        return {'modell': fore['modell']}, {'modell': ny['modell']}
+        ny = spara_lasare(k, modell if modell else None, server.runtime_val.las(),
+                          str(anstrangning) if modell and anstrangning else None)
+        return ({'modell': fore['modell'], 'anstrangning': fore['anstrangning']},
+                {'modell': ny['modell'], 'anstrangning': ny['anstrangning']})
     if val in ('runtime', 'bevakning'):
         rt = server.runtime_val.las()
         if rt['status'] != 'ok':

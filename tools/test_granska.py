@@ -33,6 +33,7 @@ ROT = Path(os.environ['NR_HOST_ROOT'])
 p = argparse.ArgumentParser()
 for flagga in ('--underlag', '--fraga', '--schema', '--utforare', '--modell', '--etikett', '--tid'):
     p.add_argument(flagga, required=True)
+p.add_argument('--anstrangning')
 a = p.parse_args()
 with (ROT / 'anrop.jsonl').open('a') as f:
     f.write(json.dumps({'argv': sys.argv[1:], 'cwd': os.getcwd(), 'miljo': sorted(os.environ),
@@ -111,9 +112,10 @@ class Granskning(unittest.TestCase):
         self.env = {'PARTNER_DATA': str(self.data), 'PARTNER_KONTOR_PRIMAR': str(self.rot / 'kontor'),
                     'NR_HOST_ROOT': str(self.host), 'HEMLIG_NYCKEL': 'får aldrig följa med'}
 
-    def lasare(self, modell):
+    def lasare(self, modell, anstrangning=None):
+        val = {'modell': modell, **({'anstrangning': anstrangning} if anstrangning else {})}
         (self.data / 'installningar.json').write_text(json.dumps({'modell': {'huvud': 'claude-opus-5-5'},
-                                                                  **({'lasare': {'modell': modell}} if modell else {})}))
+                                                                  **({'lasare': val} if modell else {})}))
 
     def beteende(self, utfall):
         (self.host / 'beteende.json').write_text(json.dumps({'utfall': utfall}))
@@ -149,6 +151,36 @@ class Granskning(unittest.TestCase):
                 self.assertEqual(u['receipt_sha256'], sha(run / 'KVITTO.json'))
                 self.assertEqual((u['workspace'], u['files'], u['active_release']), (str(run / 'arbetsyta'), 2, True))
                 self.assertIn('Dom: approved', text)
+
+    def test_lasarnas_niva_gar_till_lasarprofilen_och_bokfors(self):
+        """RUNTIME-BINARER-20260930: en nivå i läsarnas val går som --anstrangning när releasen tar den; utan en körs
+        profilens egen."""
+        (self.config.parent / 'runtime/runtime/web_common.py').write_text('def reader_effort(effort):\n    return effort\n')
+        self.lasare('claude-opus-5', 'max')
+        kod, text = self.kor()
+        self.assertEqual(kod, 0, text)
+        argv = self.anrop()[-1]['argv']
+        self.assertEqual(argv[argv.index('--anstrangning') + 1], 'max')
+        u = self.utfallet()
+        self.assertEqual((u['effort'], u['effort_from'], u['effort_saved']), ('max', 'readers', 'max'))
+        self.assertIn('claude-opus-5 · max', text)
+        (self.katalog / 'review.json').unlink()
+        self.lasare('claude-opus-5')
+        self.assertEqual(self.kor()[0], 0)
+        self.assertNotIn('--anstrangning', self.anrop()[-1]['argv'])
+        self.assertEqual((self.utfallet()['effort'], self.utfallet()['effort_from']), (None, 'profile'))
+
+    def test_en_sparad_niva_skickas_inte_till_en_release_som_inte_tar_den(self):
+        """Efter en återgång till en release före Runtimes D046 finns inget --anstrangning: nivån bokförs som sparad men
+        oanvänd, och läsaren kör profilens egen, i stället för att profilen vägrar ett okänt argument."""
+        self.lasare('claude-opus-5', 'max')
+        kod, text = self.kor()
+        self.assertEqual(kod, 0, text)
+        self.assertNotIn('--anstrangning', self.anrop()[-1]['argv'])
+        u = self.utfallet()
+        self.assertEqual((u['effort'], u['effort_from'], u['effort_saved']),
+                         (None, 'profile: the active release takes no level', 'max'))
+        self.assertEqual(u['answer']['verdict'], 'approved')
 
     def test_profilen_kors_ur_den_aktiva_releasen_med_ren_miljo_och_granskningens_schema(self):
         self.lasare('gpt-6-astra')

@@ -91,7 +91,7 @@ faktiskt styr dem:
 | Partnern | arbetsplatsens `installningar.json` (samma som samtalsytans /model) | ja, gäller från nästa svar; en Claude-modell kör Claude Code, en Codex-modell Codex |
 | Dina sessioner | Claude Codes `~/.claude/settings.json` och Codex `~/.codex/config.toml` | ja, i båda programmen (ägarens besked 2026-09-29) |
 | Runtime | den aktiva releasen, läst med releasens egen kod (samma avgränsade väg som Aquarium) | ja; modellen avgör utföraren för alla roller, och bytet aktiveras av sig självt när Runtime är ledigt (se nedan) |
-| Läsarna | arbetsplatsens `installningar.json` (`lasare`); utan val väljer sessionen | ja; kontorets granskning och Digitalas kritik och provare hämtar valet (se nedan), och ansträngningen följer Runtimes läsarprofil |
+| Läsarna | arbetsplatsens `installningar.json` (`lasare`); utan val väljer sessionen | ja; kontorets granskning och Digitalas kritik och provare hämtar valet (se nedan); nivån väljs med modellen när den aktiva releasen tar emot den (Runtime D046), annars följer den Runtimes läsarprofil |
 | Bevakningen | den aktiva releasens val för bevakningen (utförare, modell, ansträngning); före det valet Runtimes Codex-profil | ja, med Claude eller Codex; aktiveras av sig självt som Runtime |
 
 Startvakten visas vid Arbetssession: Runtimes drivande roll med utförare, modell och ansträngning. En release före
@@ -135,10 +135,14 @@ aldrig ändrar något. Kontorets granskning körs med `python3 -B tools/granska.
 underlaget i Runtimes manifestform och frågan, verktyget kör kritikprofilen med granskningens svarsform och skriver
 utfallet i `review.json` (modellen, varifrån den kom, Runtimes kvitto och svaret). Finns ett val nekas en annan modell,
 i granskningen med `--modell` och i Digitala med `--utforare` eller `--modell`; finns inget anger sessionen modellen som
-förut. Går valet inte att läsa nekas körningen i stället för att sessionen väljer. Ansträngningen följer Runtimes
-läsarprofil (i dag medium för Claude och high för Codex), eftersom profilerna inte tar någon ansträngning. Att välja
-läsarnas ansträngning kräver att Runtimes kritik- och provarprofil tar en ansträngning som parameter, en ändring i Runtime
-som inte är gjord.
+förut. Går valet inte att läsa nekas körningen i stället för att sessionen väljer. Sedan Runtimes D046 tar kritik- och
+provarprofilen en nivå (`--anstrangning`), och kortet erbjuder då varje modells nivåer som fungerade i Runtimes eget
+program; valet sparas med nivån (`lasare.anstrangning`), `partner.py lasare` skriver den och granskningen skickar den till
+profilen (RUNTIME-BINARER-20260930). Utan nivå i valet följer ansträngningen läsarprofilens egen (medium för Claude och
+high för Codex). Tar den aktiva releasen ingen nivå, till exempel efter en återgång till en release före D046, används
+ingen sparad nivå: kortet visar profilens egen och säger att den sparade inte används, och granskningen skickar ingen
+och bokför den sparade som oanvänd. Digitalas kritik och provare skickar nivån vidare först när Digitala gör
+det; det är inte gjort.
 
 **Bara det som bevisligen fungerar erbjuds.** `python3 -B tools/partner.py matmodeller` prövar varje modell och nivå med
 ett kort anrop ("Svara bara med ordet ok.", inga verktyg, inga MCP-servrar) i programmet som kör hållplatsen: Johnnys
@@ -186,6 +190,8 @@ godtas, exakt vilka rader som skrivs i Claude Codes och Codex filer, att en okä
 skriver något, läsarna, partnern, Runtimes och bevakningens önskemål (formen, att det andra kortets väntande värde står
 kvar, att ett obevisat val och en länkad inkorg aldrig skrivs, statusen och om aktiveraren går), startvaktens
 ansträngning ur Runtimes val, adresserna, att en provinstans aldrig rör de riktiga filerna eller Runtimes inkorg,
-`partner.py lasare` och mätverktyget mot falska program. `python3 -B -m unittest tools.test_granska` prövar granskningen
-mot en låtsas-release: läsarnas val avgör modell och utförare, en annan modell nekas, utfallet skrivs aldrig över, ett
-svar godtas bara med ett kvitto som stämmer och ett avbrott skickas vidare till läsarprofilen.
+`partner.py lasare`, läsarnas nivå med och utan en release som tar den, Runtimes fästa Claude Code ur den aktiva releasen
+och den senast kända som reserv, och mätverktyget mot falska program. `python3 -B -m unittest tools.test_granska` prövar
+granskningen mot en låtsas-release: läsarnas val avgör modell och utförare, en annan modell nekas, nivån går till
+profilen bara när releasen tar den, utfallet skrivs aldrig över, ett svar godtas bara med ett kvitto som stämmer och ett
+avbrott skickas vidare till läsarprofilen.

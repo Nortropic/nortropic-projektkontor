@@ -27,6 +27,8 @@ RUNTIME = {'config_sha256': 'ec6ecbd9566df6a0e894e3a91d5c3b8c45eb86ddf0c44057a5e
            'efforts': {'claude': 'medium', 'codex': 'high'}, 'efforts_source': 'code',
            'reader_efforts': {'claude': 'medium', 'codex': 'high'},
            'watch': {'executor': 'codex', 'model': 'gpt-6-astra', 'effort': 'high'}, 'watch_source': 'code'}
+# Som efter Runtimes D046: kritiken och provaren tar en nivå, så läsarnas nivå blir ett val.
+RUNTIME_D046 = dict(RUNTIME, reader_effort_choice=True)
 CLAUDE_CODE = {'env': {'X': '1'}, 'permissions': {'allow': ['Read'], 'deny': []}, 'model': 'opus[1m]',
                'hooks': {'Stop': []}, 'effortLevel': 'high',
                'modelSettings': {'claude-fable-5-1': {'effortLevel': 'xhigh'}, 'claude-opus-5-5': {'effortLevel': 'xhigh'}},
@@ -384,6 +386,46 @@ class PartnernOchLasarna(KartaMiljo):
         self.assertEqual((la['anstrangning'], la['bevisad']), ('medium', True))
         self.assertEqual({m['id']: m['nivaer'] for m in la['erbjud']}['gpt-6-astra'], ['high'])
 
+    def test_nar_releasen_tar_en_niva_valjs_den_bland_de_bevisade_och_sparas_med_modellen(self):
+        """RUNTIME-BINARER-20260930: efter Runtimes D046 tar läsarprofilerna en nivå; kortet erbjuder varje modells
+        bevisade nivåer i Runtimes program, och valet sparas och läses med nivån."""
+        self.S.runtime_val = mk.RuntimeLasning(self.k, korare=lambda: RUNTIME_D046)
+        la = self.karta()['val']['lasare']
+        self.assertIs(la['niva_valbar'], True)
+        self.assertEqual({m['id']: m['nivaer'] for m in la['erbjud']}['claude-opus-5'], CLAUDE_NIVAER)
+        self.assertEqual({m['id']: m['nivaer'] for m in la['erbjud']}['gpt-6-astra'], CODEX_NIVAER)
+        self.assertEqual(self.valj('lasare', 'claude-opus-5')[0], 400)             # en nivå krävs
+        self.assertEqual(self.valj('lasare', 'claude-opus-5', 'ultra')[0], 400)    # ingen Claude-nivå
+        kod, d = self.valj('lasare', 'claude-opus-5', 'max')
+        self.assertEqual(kod, 200, d)
+        la = d['val']['lasare']
+        self.assertEqual((la['modell'], la['anstrangning'], la['bevisad']), ('claude-opus-5', 'max', True))
+        self.assertIn('med nivån', la['var'])
+        val = json.loads((Path(self.k.data) / 'installningar.json').read_text())
+        self.assertEqual(val['lasare'], {'modell': 'claude-opus-5', 'anstrangning': 'max'})
+        self.assertEqual(self.lasare_kommandot(), (0, {'schema': 'lasarval/1', 'modell': 'claude-opus-5', 'utforare': 'claude',
+                                                       'anstrangning': 'max'}))
+        self.assertEqual(self.valj('lasare', 'claude-opus-5-5', 'max')[0], 400)   # fungerade inte i Runtimes program
+        kod, d = self.valj('lasare', None)
+        self.assertEqual((kod, d['val']['lasare']['anstrangning']), (200, None))
+
+    def test_en_sparad_niva_visas_inte_som_gallande_nar_releasen_inte_tar_den(self):
+        (Path(self.k.data) / 'installningar.json').write_text(json.dumps({'lasare': {'modell': 'claude-opus-5', 'anstrangning': 'max'}}))
+        la = self.karta()['val']['lasare']                       # RUNTIME: en release före D046
+        self.assertEqual((la['modell'], la['anstrangning'], la['niva_valbar'], la['bevisad']), ('claude-opus-5', 'medium', False, True))
+        self.assertIn('används inte', la['var'])
+
+    def test_en_niva_sparas_inte_nar_releasen_inte_tar_emot_den_men_modellen_sparas(self):
+        """Som före Runtimes D046: med en release som inte tar nivån sparas modellen och en medskickad nivå (kortet visar
+        profilens egen) sparas inte. Granskningsrunda 2 fann att den förra formen vägrade hela valet."""
+        self.assertIs(self.karta()['val']['lasare']['niva_valbar'], False)
+        for niva in ('medium', 'max', None):
+            with self.subTest(niva=niva):
+                kod, d = self.valj('lasare', 'claude-opus-5', niva)
+                self.assertEqual(kod, 200, d)
+                self.assertEqual(json.loads((Path(self.k.data) / 'installningar.json').read_text())['lasare'], {'modell': 'claude-opus-5'})
+                self.assertEqual(d['val']['lasare']['anstrangning'], 'medium')
+
     def test_utan_kanda_lasarnivaer_ar_lasarna_inte_valbara(self):
         okand = dict(RUNTIME, reader_efforts={'claude': None, 'codex': None})
         self.S.runtime_val = mk.RuntimeLasning(self.k, korare=lambda: okand)
@@ -402,9 +444,11 @@ class PartnernOchLasarna(KartaMiljo):
         return kod, json.loads(ut.getvalue())
 
     def test_lasarnas_val_lases_av_andra_verktyg_med_partner_lasare(self):
-        self.assertEqual(self.lasare_kommandot(), (0, {'schema': 'lasarval/1', 'modell': None, 'utforare': None}))
+        self.assertEqual(self.lasare_kommandot(), (0, {'schema': 'lasarval/1', 'modell': None, 'utforare': None,
+                                                       'anstrangning': None}))
         self.assertEqual(self.valj('lasare', 'gpt-6-astra')[0], 200)
-        self.assertEqual(self.lasare_kommandot(), (0, {'schema': 'lasarval/1', 'modell': 'gpt-6-astra', 'utforare': 'codex'}))
+        self.assertEqual(self.lasare_kommandot(), (0, {'schema': 'lasarval/1', 'modell': 'gpt-6-astra', 'utforare': 'codex',
+                                                       'anstrangning': None}))
         self.assertEqual(self.valj('lasare', 'claude-opus-5')[0], 200)
         self.assertEqual(self.lasare_kommandot()[1]['utforare'], 'claude')
         self.assertEqual(self.valj('lasare', None)[0], 200)
@@ -414,6 +458,8 @@ class PartnernOchLasarna(KartaMiljo):
         fil = Path(self.k.data) / 'installningar.json'
         for innehall in ('{', '[]', json.dumps({'lasare': 'gpt-6-astra'}), json.dumps({'lasare': {'modell': 5}}),
                          json.dumps({'lasare': {'modell': 'gpt-6-astra', 'utforare': 'claude'}}),
+                         json.dumps({'lasare': {'modell': 'gpt-6-astra', 'anstrangning': '--max'}}),
+                         json.dumps({'lasare': {'modell': 'gpt-6-astra', 'anstrangning': 5}}),
                          json.dumps({'lasare': {'modell': '--flagga'}})):
             with self.subTest(innehall=innehall):
                 fil.write_text(innehall, 'utf-8')
@@ -473,6 +519,41 @@ D040_RELEASE = dict(FALSK_RELEASE, **{
                                      + "def efforts(c):\n    return {'claude': 'max', 'codex': 'ultra'}\n")})
 
 
+
+class RuntimesClaudePinne(unittest.TestCase):
+    """RUNTIME-BINARER-20260930: startvakten och modellmätningen följer den aktiva releasens fästa Claude Code."""
+
+    def runtime(self, rot, claude_profile):
+        rel = rot / '.runtime/ap10/releases/r1'
+        (rel / 'runtime/runtime').mkdir(parents=True)
+        (rel / 'runtime/runtime/claude_profile.py').write_text(claude_profile)
+        (rel / 'config.json').write_text('{}')
+        import hashlib
+        (rot / '.runtime/ap10/active.json').write_text(json.dumps({'config': str(rel / 'config.json'),
+                                                                   'sha256': hashlib.sha256(b'{}').hexdigest()}))
+
+    def test_pinnen_lases_ur_den_aktiva_releasen_och_annars_galler_den_senast_kanda(self):
+        import tempfile
+        with tempfile.TemporaryDirectory(prefix='pinne-') as t:
+            rot = Path(t)
+            self.assertEqual(kf.runtime_claude_pinne(rot),
+                             (str(rot / '.runtime/bin' / ('claude-' + kf.RUNTIME_CLAUDE_SENAST[0])), kf.RUNTIME_CLAUDE_SENAST[1]))
+            self.runtime(rot, "VERSION = '2.1.999'\nBINARY_SHA256 = '%s'\n" % ('ab' * 32))
+            self.assertEqual(kf.runtime_claude_pinne(rot), (str(rot / '.runtime/bin/claude-2.1.999'), 'ab' * 32))
+            (rot / '.runtime/ap10/releases/r1/config.json').write_text('{"annan": 1}')   # stämmer inte med pekaren
+            self.assertEqual(kf.runtime_claude_pinne(rot)[1], kf.RUNTIME_CLAUDE_SENAST[1])
+            (rot / '.runtime/ap10/releases/r1/config.json').write_text('{}')
+            for trasig in ("VERSION = '../x'\nBINARY_SHA256 = '%s'\n" % ('ab' * 32), "VERSION = '2.1.999'\n",
+                           "VERSION = '2.1.999'\nBINARY_SHA256 = 'kort'\n"):
+                (rot / '.runtime/ap10/releases/r1/runtime/runtime/claude_profile.py').write_text(trasig)
+                with self.subTest(trasig=trasig):
+                    self.assertEqual(kf.runtime_claude_pinne(rot)[1], kf.RUNTIME_CLAUDE_SENAST[1])
+
+    def test_startvakten_anvander_pinnen(self):
+        self.assertEqual(kf.STARTVAKT_BINARER['claude'][0].rsplit('/', 1)[-1][:7], 'claude-')
+        self.assertRegex(kf.STARTVAKT_BINARER['claude'][1], r'\A[0-9a-f]{64}\Z')
+
+
 class RuntimeLasningenMotEnFalskRelease(unittest.TestCase):
     """PROBE körs som i tjänsten: releasens egen kod ur .runtime/ap10/active.json, med Runtimes egen tolk."""
 
@@ -511,6 +592,15 @@ class RuntimeLasningenMotEnFalskRelease(unittest.TestCase):
         self.assertEqual(v['lasarniva'], {'claude': 'medium', 'codex': 'high'})
         olika = dict(FALSK_RELEASE, **{'runtime/web_visitor.py': "X = ['--effort', 'high']\n"})
         self.assertEqual(self.las(olika)['lasarniva'], {'codex': 'high'}, 'två olika Claude-nivåer är okänt, inte en gissning')
+
+    def test_en_release_med_lasarnas_nivaargument_sags_ta_emot_nivan(self):
+        self.assertIs(self.las(FALSK_RELEASE)['lasarniva_valbar'], False)
+        self.assertIs(self.las(D040_RELEASE)['lasarniva_valbar'], False)
+        d046 = dict(D040_RELEASE, **{'runtime/web_common.py': 'def reader_effort(effort):\n    return effort\n'})
+        v = self.las(d046)
+        self.assertEqual(v['status'], 'ok', v)
+        self.assertIs(v['lasarniva_valbar'], True)
+        self.assertEqual(v['lasarniva'], {'claude': 'medium', 'codex': 'high'}, 'profilernas egen nivå står kvar som standard')
 
     def test_utan_lasarprofilernas_filer_ar_nivan_okand_men_resten_lases(self):
         utan = {n: v for n, v in FALSK_RELEASE.items() if n not in ('runtime/web_visitor.py', 'scripts/probe_bridge.py')}
