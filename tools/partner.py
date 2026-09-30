@@ -11,6 +11,7 @@
     python3 -B tools/partner.py autostart    visa hur ägaren gör tjänsten bestående (skriver ingenting)
     python3 -B tools/partner.py app          skapa Nortropic.app i ~/Applications: ett klick startar och öppnar arbetsplatsen
     python3 -B tools/partner.py matmodeller  mät vilka modeller och nivåer som fungerar (Flödet erbjuder bara dem)
+    python3 -B tools/partner.py lasare       läsarnas val i Flödet som JSON (granskningen, kritiken och provarna läser det)
 
 Se tools/PARTNER.md.
 """
@@ -247,6 +248,20 @@ def matmodeller(k, args) -> int:
     return 0
 
 
+def lasare(k, args) -> int:
+    """Läsarnas val i Flödet som en JSON-rad, för verktygen som kör läsarna (kontorets granskning, Digitalas kritik och
+    provare): {"schema": "lasarval/1", "modell", "utforare"}, med modell null när inget val finns. Går valet inte att
+    läsa är utfallet 1 med skälet i "fel". Bara läsning."""
+    from partnern import modellkarta
+    try:
+        val = modellkarta.lasarval(k)
+    except ValueError as fel:
+        print(json.dumps({'schema': 'lasarval/1', 'fel': str(fel)}, ensure_ascii=False))
+        return 1
+    print(json.dumps({'schema': 'lasarval/1', 'modell': val['modell'], 'utforare': val['utforare']}, ensure_ascii=False))
+    return 0
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog='partner.py', description='Projektkontorets förbättringspartner')
     sub = p.add_subparsers(dest='kommando', required=True)
@@ -258,6 +273,7 @@ def main(argv=None) -> int:
     bl = sub.add_parser('backlog')
     bl.add_argument('--alla', action='store_true', help='visa också släppta och avslagna beställningar ur backloggen')
     sub.add_parser('matmodeller')
+    sub.add_parser('lasare')
     kv = sub.add_parser('kvittera')
     kv.add_argument('id')
     kv.add_argument('status', choices=['mottagen', 'startad', 'levererad', 'avslagen'])
@@ -267,7 +283,7 @@ def main(argv=None) -> int:
     k = kf.ladda()
     return {'start': start, 'kor': kor, 'stopp': stopp, 'status': status, 'oppna': oppna, 'index': index,
             'overlamningar': overlamningar, 'backlog': backlog, 'kvittera': kvittera, 'autostart': autostart,
-            'app': app, 'matmodeller': matmodeller}[args.kommando](k, args)
+            'app': app, 'matmodeller': matmodeller, 'lasare': lasare}[args.kommando](k, args)
 
 
 if __name__ == '__main__':

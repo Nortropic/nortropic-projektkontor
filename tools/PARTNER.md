@@ -80,31 +80,35 @@ ska bära framåt och håller trådens läge aktuellt.
 ## Modell, drift och gränser
 
 Agentloopen är Claude Code i headless-läge på Johnnys befintliga Claude Code-inloggning (Max-abonnemanget) —
-samma väg som Runtime redan använder. Ingen ny leverantör, API-nyckel eller köpta krediter. Varje tur körs som en
+samma väg som Runtime redan använder — eller Codex på hans Codex-inloggning när han valt en Codex-modell (se Partnern på
+Codex nedan). Ingen ny leverantör, API-nyckel eller köpta krediter. Varje Claude-tur körs som en
 egen process i `data/arbetsyta/` med `--restricted`, `--strict-mcp-config`, utan auto-minne och CLAUDE.md, med
 verktygen WebFetch, WebSearch, en underagent ("utredare") och partnerns egna verktyg; inga fil-, skal- eller
 skrivverktyg. En modell och en ansträngning gäller allt (Johnnys besked 2026-09-29): svaret, utredaren och de
 registrerade utredningarna kör det Johnny har valt. Standard är `claude-opus-5-5` med ansträngningen `high`. Utredaren
 får samma modell och ansträngning i sin definition (`--agents`), och kroken nekar ett anrop som väljer en annan
-agenttyp (till exempel en inbyggd agent med egen standardmodell) eller en annan modell. Johnny byter modell och
-ansträngning i ytan (`/model`) eller i Flödet; valbara är Opus 5.5, Fable 5.1 (egen kvot), Sonnet 5, Opus 5 och Haiku
-4.5, med ansträngningen low, medium, high, xhigh eller max. Finns en mätning (`python3 -B tools/partner.py matmodeller`,
-kvittot `data/modellmatning.json`) erbjuds bara det som fungerade i Johnnys Claude Code och Codex. Valet står i
-`data/installningar.json`
-(`{"modell": {"huvud": "…", "anstrangning": "…"}}`); en äldre egen utredarmodell där läses inte. Startvaktens
-mottagarsessioner i andra repon kör Runtimes bemanning (rollen driver), se Startvakten.
+agenttyp (till exempel en inbyggd agent med egen standardmodell) eller en annan modell. Kroken får aldrig bli tyst:
+Claude Code 2.1.280 kör webbverktyget om kroken dör utan svar eller inte hinner svara (prövat 2026-09-30), så kroken
+svarar själv nej före tidsgränsen och skalets reservrad svarar nej om Python inte startar, som på Codex. Johnny byter
+modell och ansträngning i ytan (`/model`) eller i Flödet; valbara är Opus 5.5, Fable 5.1 (egen kvot), Sonnet 5, Opus 5
+och Haiku 4.5, med ansträngningen low, medium, high, xhigh eller max. Finns en mätning (`python3 -B tools/partner.py
+matmodeller`, kvittot `data/modellmatning.json`) erbjuds bara det som fungerade i Johnnys Claude Code och Codex. Valet
+står i `data/installningar.json` (`{"modell": {"huvud": "…", "anstrangning": "…"}}`); en äldre egen utredarmodell där
+läses inte. Ytan och Flödet prövar valet mot mätningen innan det sparas; en fil som redigeras för hand prövas inte.
+Startvaktens mottagarsessioner i andra repon kör Runtimes bemanning (rollen driver), se Startvakten.
 
 **Partnern på Codex** (MODELLKARTA-20260929 steg 1b, "Arbetsmodellen ska aldrig spela roll"). Väljer Johnny en
 Codex-modell i ytan eller i Flödet kör partnern `codex exec` på hans Codex-inloggning. Bara modeller och nivåer som
 fungerade i mätningen i hans Codex erbjuds, med Codex egna nivåer (till exempel `ultra`). Körningen:
 - läser inte Johnnys `~/.codex/config.toml` (`--ignore-user-config`), så hans egna MCP-servrar och tillägg laddas inte;
 - har inget skal (`shell_tool` och `unified_exec` av), inga mål, appar, tillägg, dator- eller webbläsarstyrning,
-  ingen bildgenerering, ingen bildläsning från disk (`view_image`) och ingen väntan (`sleep_tool`), och körs i läsläge
-  utan godkännandefrågor;
+  ingen bildgenerering, ingen bildläsning från disk (`view_image`) och ingen `sleep_tool`, och körs i läsläge utan
+  godkännandefrågor. Codex egna `functions.wait` och `request_user_input` finns kvar och nekas av kroken;
 - skickar varje verktygsanrop, också de som modellen gör genom Codex kodläge, genom samma krok som på Claude. Servern
   tillåter bara partnerns egna verktyg och klockan, prövar webbverktyget (`webrun`) med webbpolicyns regler för sökning
   och hämtning, också när en sökträff öppnas genom sin hänvisning, och nekar allt annat, till exempel `apply_patch` och
-  agentstarter (`webbpolicy.prova_codex`);
+  agentstarter (`webbpolicy.prova_codex`). En öppnad sidas träffar gäller bara den sidans värd: en träff på en annan
+  värd, till exempel efter en omdirigering, öppnas inte med sin hänvisning utan hämtas med sin adress;
 - låter aldrig kroken bli tyst. Codex kör verktyget om kroken dör utan svar eller inte hinner svara (prövat
   2026-09-30). Kroken svarar därför själv nej om servern inte svarat inom 17 sekunder (`krok.FRIST`, mot Codex
   tidsgräns 20), och startar Python inte alls svarar skalets reservrad nej. Det partnern inte behöver stängs dessutom av

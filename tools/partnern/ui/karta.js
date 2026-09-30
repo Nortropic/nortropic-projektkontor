@@ -128,9 +128,12 @@ const AKTIVERING = { none: 'Valet väntar på Runtimes nästa titt.', in_effect:
   activating: 'Aktiveras nu.', activated: 'Aktiverades', restored: 'Den nya versionen startade inte, så den förra kör igen.',
   failed: 'Bytet misslyckades', interrupted: 'Ett byte avbröts innan det rapporterades och behöver ses över.' };
 const SKAL = [[/AP10 watch run is in progress/, 'bevakningen kör just nu'], [/less than 20 minutes away/, 'bevakningen kör inom 20 minuter'],
-  [/work is in progress in the engine|work started in the engine/, 'arbete pågår i Runtime'], [/web profile run is in progress/, 'en webbprofil kör'],
+  [/work is in progress in the engine|work started in the engine/, 'arbete pågår i Runtime'],
+  [/process list could not be read/, 'Runtime kunde inte se om en webbprofil kör'], [/web profile run is in progress/, 'en webbprofil kör'],
   [/running service is not the recorded one/, 'Runtimes tjänst svarar inte som väntat'],
   [/did not work in the measurement/, 'valet har inte fungerat i mätningen av Runtimes egna program'],
+  [/workplace measurement could not be read/, 'Runtime kunde inte läsa arbetsplatsens mätning'],
+  [/refuses the (staged )?selection/, 'Runtimes release godtar inte valet'],
   [/no way back/, 'det finns ingen säker väg tillbaka just nu']];
 function skaltext(s) { for (const [re, t] of SKAL) if (re.test(s || '')) return t; return s; }
 function aktiveringsrader(v) {

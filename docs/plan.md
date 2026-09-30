@@ -214,7 +214,8 @@ påverkar inte nästa handling i spåret.
 Tillägg 2026-09-30 (00:00 UTC): steg 1b av MODELLKARTA-20260929 är levererat (PARTNER-CODEX-20260930). Partnern kör på
 Codex när Johnny väljer en Codex-modell i ytan eller i Flödet, lika avgränsad som på Claude: ingen egen konfiguration,
 inget skal, och varje verktyg genom samma krok, där servern bara släpper partnerns egna verktyg och klockan, prövar
-webbverktyget mot webbpolicyn och nekar agentstarter. Kroken svarar själv nej om servern inte svarar. Den levande partnern kör fortfarande det Johnny valt (i dag Opus 5.5).
+webbverktyget mot webbpolicyn och nekar agentstarter. Kroken svarar själv nej om servern inte svarar. Den levande
+partnern kör fortfarande det Johnny valt (i dag Opus 5.5).
 Efter integrationen startas tjänsten om ur main enligt driftregeln. Nästa handling i spåret: steg 2 (Runtime), enligt
 tillägget 22:18 UTC ovan. Återupptagning: `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
 
@@ -226,6 +227,14 @@ engångssteg göras av ägaren i hans egen Terminal: Runtimes övergång 19 och 
 D040 är granskad men inte integrerad. Runtimes svit kan inte bli helt grön i den kredentialfria profilen på den här
 datorn, eftersom tre prov startar egna sandlådor. Hur det löses är ägarens beslut. Därefter följer steg 3 (läsarna) och
 steg 4 (automatiska uppdateringar). Återupptagning: `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
+
+Tillägg 2026-09-30 (03:26 UTC): steg 3 av MODELLKARTA-20260929 byggs medan Runtimes D040 väntar på ägarens beslut om
+mätningen (LASARNAS-VAL-20260930 här och en egen ändring i Digitala). Kontorets granskning (`tools/granska.py`) och
+Digitalas kritik och provare (`verktyg/kor_profil.py`) följer läsarnas val i Flödet, och finns ett val nekas en annan
+modell. Digitala hämtar valet med kontorets `python3 -B tools/partner.py lasare`, så kontorets ändring publiceras först. Läsarnas ansträngning följer Runtimes läsarprofiler; att välja den kräver en ändring i Runtime efter D040.
+Samma ändring rättar anteckningarna från steg 1b:s och steg 2:s granskningar, bland dem en reservrad för partnerns krok
+på Claude. Nästa handling i spåret: granska och publicera steg 3, sedan ägarens beslut om Runtimes mätning (D040),
+sedan steg 4. Återupptagning: `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.

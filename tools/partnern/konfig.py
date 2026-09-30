@@ -106,8 +106,9 @@ class Konfig:
     claude_installningar: Path = field(default_factory=lambda: Path.home() / '.claude/settings.json')
     codex_installningar: Path = field(default_factory=lambda: Path.home() / '.codex/config.toml')
     # Runtimes inkorg för arbetsplatsens val och Runtimes status för den automatiska aktiveringen (D040). None: okänd,
-    # och då skrivs inget val. ladda() pekar den ordinarie tjänsten på Runtimes egna filer och prov- och
-    # utvecklingsinstanser på sin egen datakatalog, så att ett prov aldrig kan utlösa ett verkligt byte.
+    # och då skrivs inget val. ladda() pekar den ordinarie tjänsten på Runtimes egna filer och en prov- eller
+    # utvecklingsinstans med egen datakatalog på den, så att ett prov aldrig kan utlösa ett verkligt byte; en instans
+    # utan egen datakatalog som inte är den ordinarie har ingen inkorg.
     runtime_onskemal: Path | None = None
     runtime_status: Path | None = None
 
@@ -163,19 +164,24 @@ def ladda() -> Konfig:
     if ordinarie and runtime:
         k.runtime_onskemal = Path(runtime) / '.runtime/ap10/workplace-choice.json'
         k.runtime_status = Path(runtime) / '.runtime/ap10/automatic-choice-status.json'
-    elif not ordinarie:
+    elif os.environ.get('PARTNER_DATA'):
         k.runtime_onskemal = data / 'runtime-workplace-choice.json'
         k.runtime_status = data / 'runtime-automatic-choice-status.json'
+    # En instans som varken är den ordinarie eller har egen datakatalog (till exempel bara PARTNER_PROV_DOLJ) har
+    # ingen inkorg: den skriver inget önskemål för Runtime, varken i Runtimes inkorg eller i den ordinarie tjänstens
+    # datakatalog.
     installningar = data / 'installningar.json'
     if installningar.is_file():
         try:
             val = json.loads(installningar.read_text('utf-8'))
         except ValueError:
             val = {}
-        for namn, varde in (val.get('modell') or {}).items():
+        if not isinstance(val, dict):   # en fil med fel form ger standardvärdena, som en fil som inte går att läsa
+            val = {}
+        for namn, varde in (val.get('modell') if isinstance(val.get('modell'), dict) else {}).items():
             if hasattr(k.modell, namn) and isinstance(varde, str):
                 setattr(k.modell, namn, varde)
-        for namn, varde in (val.get('gransar') or {}).items():
+        for namn, varde in (val.get('gransar') if isinstance(val.get('gransar'), dict) else {}).items():
             if hasattr(k.gransar, namn) and isinstance(varde, (int, float)) and not isinstance(varde, bool):
                 setattr(k.gransar, namn, type(getattr(k.gransar, namn))(varde))
         start = val.get('startvakt') if isinstance(val.get('startvakt'), dict) else {}
@@ -188,7 +194,8 @@ def ladda() -> Konfig:
 
 def spara_modellval(k: Konfig, huvud: str, anstrangning: str) -> dict:
     """Johnnys val i samtalsytan: skrivs i installningar.json (övriga inställningar orörda) och gäller från nästa
-    modellkörning i alla trådar. En pågående körning påverkas inte."""
+    modellkörning i alla trådar. En pågående körning påverkas inte. Här prövas bara formen och nivån för programmet;
+    prövningen mot mätningen görs av anroparna (/api/installningar och Flödet), och en ny anropare måste göra den själv."""
     if not isinstance(huvud, str) or not MODELLNAMN_FORM.match(huvud):
         raise ValueError('Okänd modell.')
     if anstrangning not in (ANSTRANGNING if ar_claude(huvud) else CODEX_ANSTRANGNING):

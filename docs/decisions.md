@@ -8623,7 +8623,12 @@ egna sandlådor, som inte kan kapslas; samma fyra fel på oförändrad main). Hu
 aktiveraren är ägarens engångssteg i hans egen Terminal, eftersom sessioner inte får köra `launchctl`. Tills allt detta
 är gjort säger Flödet att valet väntar.
 
-**Granskning.** Separat granskning före integration; utfallet står här efter granskningen.
+**Granskning.** Två separata granskningsrundor (claude-opus-5, Runtimes läsarprofil) godkände kontorets del utan
+blockerande fynd. Den första hade nio anteckningar, och sju rättades före den andra: tillståndet `none` fick sin text,
+kortet bär önskemålets id så att en äldre status skiljs ut, formen prövas innan något skrivs, prov för en samtidig
+skrivning och en trasig status lades till, och en portkommentar och texterna om D040 rättades. Den andra hade sju
+anteckningar; fem av dem rättas i LASARNAS-VAL-20260930. Runtimes D040 godkändes i två egna rundor utan blockerande
+fynd.
 
 **Ersätter:** ingen post.
 
@@ -8632,3 +8637,102 @@ tas bort genom att ta bort filen i Runtimes inkorg; Runtimes aktiverare gör då
 
 **Avslut.** Steg 2 är klart när Runtimes D040 och denna ändring är på main, tjänsten kör den nya koden, övergång 19 är
 aktiv och aktiveraren går. Nästa steg under beställningen är steg 3 (läsarna i Digitala och kontorets granskning).
+
+## LASARNAS-VAL-20260930 — steg 3 av MODELLKARTA-20260929: kontorets granskning och Digitalas kritik och provare följer läsarnas val i Flödet
+
+**Status:** registrerat 2026-09-30 av sessionen nortropic-repos-d7 (Claude Code) på ägarens beställning
+MODELLKARTA-20260929, hans svar och hans tillägg om Codex, ordagrant i
+`evidence/nasta-uppdrag/local/modellkarta-20260929/owner-words-modellkarta-svar-20260929.md` och
+`evidence/nasta-uppdrag/local/modellkarta-20260929/owner-words-modellkarta-codex-20260929.md`.
+
+**Ägarens ord** (ordagrant). Sessionens fråga: "Räcker ett gemensamt val för läsarna? Då delar kontorets granskning och
+Digitalas kritik och provare samma val. Idag väljer sessionen olika modeller för dem." Hans svar: "ja på båda, kartan
+känns bra". Ur tillägget: "Varje val på kartan ska kunna sättas till en Codex-modell likaväl som en Claude-modell, med
+Codex egna ansträngningsnivåer. Det gäller Partnern, Dina sessioner, Runtime, Läsarna och Bevakningen, och startvakten
+genom Runtime. Modellen jag väljer avgör vilken utförare som kör."
+
+**Problemet.** Sedan steg 1a sparar Flödet läsarnas val, men inget läste det. Kontorets separata granskning kördes med
+privata skript per uppdrag och en modell som sessionen valde, bara med Claude. Digitalas `kor_profil.py` krävde
+`--utforare` och `--modell` av sessionen.
+
+**Genomfört, här:**
+- `python3 -B tools/partner.py lasare` skriver läsarnas val som en JSON-rad (`lasarval/1`: modell och utförare, eller
+  modell `null` när sessionen väljer) och ändrar ingenting. Går valet eller inställningsfilen inte att läsa blir utfallet
+  1 med skälet, aldrig "inget val" (`partnern/modellkarta.lasarval`).
+- `python3 -B tools/granska.py KATALOG` är kontorets separata granskning. Katalogen innehåller underlaget i Runtimes
+  manifestform och frågan. Verktyget kör den aktiva releasens egen kritikprofil (Runtimes D034), samma läsare som
+  Digitalas kritik, med granskningens svarsform, Claude eller Codex efter modellen. Finns ett läsarval nekas en annan
+  `--modell` innan någon läsare startar; finns inget anger sessionen `--modell`. Utfallet skrivs i `review.json`, aldrig
+  över ett tidigare: modellen, varifrån den kom, Runtimes körkatalog och kvittots sha256 och svaret. Svaret tas bara med
+  när kvittot stämmer med sin hash och svaret med kvittot. Ett avbrott skickas vidare till profilen, som avslutar sin
+  modellsession. Prövat skarpt med båda utförarna (kvitto `steg3/KVITTO-granska-live.txt`): Sonnet 5 genom Runtimes
+  Claude Code 2.1.257 med ansträngningen medium och gpt-6-astra genom Runtimes Codex 0.155.1 med high gav var sitt
+  giltigt svar.
+- Läsarkortet i Flödet visar läsarprofilernas egen ansträngning, läst ur releasens kod (Claude i `claude_profile` och
+  `web_visitor`, Codex i `probe_bridge.worker_command`). Tidigare visades utvecklingsrollernas ansträngning. D040 gör den
+  till ett val men ändrar inte läsarprofilerna, så efter ett val hade kortet visat fel nivå och erbjudit fel modeller.
+
+**Digitalas del** (en egen ändring i Digitala, med egen granskning och skyddad integration, publicerad efter denna,
+eftersom den läser kontorets nya kommando). `verktyg/kor_profil.py kritik` och `provare` tar modellen och utföraren ur
+läsarnas val. Ett annat `--utforare` eller `--modell` vägras. Utan val anger sessionen båda, som förut. Går valet inte
+att läsa, eller hittas inte kontoret (`NR_KONTOR_ROOT` eller systerkatalogen `nortropic-projektkontor`), vägras
+körningen. Varifrån modellen kom bokförs i körposten (`lasarval`). En formåterhämtning behåller den ursprungliga
+körningens modell. Mätningen använder ingen modell och läser inget val. `kor_profil.py` hör till den beslutade domkoden,
+så dess rad i `steg/DOMKOD.sha256` skrivs om som en del av detta beslut. Domlogiken själv (`kritikbevis.py`,
+`stegbevis.py`) är oförändrad, så en historisk formåterhämtning påverkas inte. Digitalas `AGENTS.md` säger var modellen
+kommer ifrån.
+
+**Läsarnas ansträngning.** Den följer Runtimes läsarprofiler, i dag medium för Claude och high för Codex. Profilerna tar
+ingen ansträngning. Ägarens tillägg ger varje val egna nivåer, och för läsarna kräver det en ändring i Runtime: kritik-
+och provarprofilen (`runtime.web_critique`, `runtime.web_visitor`) tar en ansträngning som parameter, prövad som
+modellen. Därefter erbjuder Flödet nivåerna, och `granska.py` och `kor_profil.py` skickar dem vidare. Den ändringen är
+inte gjord. Den hör till Runtimes nästa ändring efter D040, som väntar på ägarens beslut om mätningen.
+
+**Rättelser efter tidigare granskningar.** Ur RUNTIME-VAL-I-FLODET-20260930:s andra runda:
+- En status från framtiden räknas inte som att aktiveraren går.
+- Runtimes skäl "the workplace measurement could not be read", "this release refuses the selection" och "the process
+  list could not be read" visas på svenska.
+- Saknas Runtimes inkorg på datorn säger kortet det, och ett val nekas läsbart.
+- En instans utan egen datakatalog som inte är den ordinarie, till exempel bara med `PARTNER_PROV_DOLJ`, har ingen inkorg
+  och skriver inget önskemål för Runtime, varken i Runtimes inkorg eller i den ordinarie tjänstens datakatalog.
+- `tools/ARBETSPLATS.md` säger själv att D040 inte är på Runtimes main.
+
+Ur PARTNER-CODEX-20260930:s andra runda:
+- Claude-vägens krok har samma reservrad i skalet som Codex-vägen. Prövat med riktiga Claude Code 2.1.280 (kvitto
+  `steg3/KVITTO-krokfel-claude.txt`). En krok som dör utan svar, och en som inte hinner svara, släppte båda igenom en
+  webbsökning. Med reservraden nekades sökningen.
+- `tools/PARTNER.md` säger att agentloopen är Claude Code eller Codex. Där står också att Codex `functions.wait` och
+  `request_user_input` finns kvar och nekas av kroken. En öppnad sidas träffar på en annan värd hämtas med sin adress.
+  En handredigerad `installningar.json` prövas inte mot mätningen.
+- `spara_modellval` säger att mätprövningen görs av anroparna.
+- Planens alltför breda rad är ombruten.
+
+`konfig.ladda` tål dessutom en `installningar.json` som är giltig JSON men inte ett objekt. Det nya provet för läsarvalet
+hittade felet: laddningen föll.
+
+**Oförändrat.** Läsarnas val är i dag inte satt, så sessionen väljer som förut tills Johnny väljer i Flödet. Ingen
+Runtime-release och inget av Runtimes eller bevakningens val ändras. De enda modellanropen var de två skarpa
+granskningsproven och krokprovet.
+
+**Granskning.** Den första separata granskningen (claude-opus-5, läsarprofil) läste båda kandidaterna och godkände dem
+utan blockerande fynd, med elva anteckningar. Sju är rättade i kontorets andra kandidat:
+- `granska.py` nekar ett okänt Claude-namn i stället för att köra det som Codex.
+- `granska.py` prövar `--tid` innan något startar och säger att den skriver svarsformen i katalogen.
+- En release utan någon av läsarprofilernas filer ger okänd läsarnivå, inte ett oläsbart Runtime-kort.
+- Läsarkortet är inte valbart när inget finns att erbjuda.
+- Texterna säger att en instans utan egen datakatalog inte skriver något önskemål, och att granskningen läser valet i
+  processen medan Digitala hämtar det med kommandot.
+En anteckning besvaras med kvitton i underlaget: att D040 inte ändrar läsarprofilerna, och D040:s två granskningsrundor.
+Tre kräver ingen ändring. Ett fel i Runtimes profil efter modellsessionen beskrivs som en vägran, och inget svar godtas då
+heller. Inget annat Digitala-prov kör kritik eller provare utan återhämtning. Krokprovets reservtext skiljer sig från
+partnerns, men mekanismen är densamma, och partnerns text prövas i sviten och acceptansen. Digitalas kandidat är
+oförändrad. Rättelserna prövas i en andra runda.
+
+**Ersätter:** ingen post.
+
+**Återgång.** Återställ integrationscommitarna med `git revert` (Digitalas först) och starta om tjänsten ur main. Ett
+läsarval tas bort i Flödet, så väljer sessionen igen.
+
+**Avslut.** Steg 3 är klart när denna ändring och Digitalas del är på main och tjänsten kör den nya koden. Nästa steg
+under beställningen är steg 4 (automatiska uppdateringar av Claude Code och Codex). Det återanvänder aktiveringen från
+steg 2 och väntar alltså på D040.
