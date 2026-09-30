@@ -267,6 +267,9 @@ class Miljo(unittest.TestCase):
         self.httpd.daemon_threads = True
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
         self.S.jobb.starta_arbetare()
+        # Just den här serverns lager stängs sist (också efter en omstart i provet): jobbarbetarens tråd håller servern
+        # vid liv i processen, och utan stängning tar fildeskriptorerna slut under launchd (256 per process).
+        self.addCleanup(self.S.lager.stang)
         self.addCleanup(self.stoppa_server)
         self.kaka = None
 
