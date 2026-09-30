@@ -42,7 +42,7 @@ from pathlib import Path
 
 from .lager import nu
 from . import start_installningar as skydd
-from .overlamning import KVITTENSER, MOTTAGARE, mottagarens, paketlage
+from .overlamning import KVITTENSER, MOTTAGARE, mottagarens, paketlage, beroendeinstruktion
 
 NAMNRYMD = uuid.UUID('6f1c2a57-3d4e-5b8a-9c0f-1e2d3c4b5a69')
 REPO_FOR = {'kontorets-kedjedrivare': 'kontoret', 'digitala': 'digitala', 'runtime': 'runtime', 'kundstart': 'kundstart'}
@@ -82,7 +82,8 @@ Arbeta som en mottagande session enligt repots AGENTS.md och plan:
 4. Arbeta inom gällande mandat och plan, med separat granskning och skyddad integration som vanligt. Nya kostnader,
    konton, aktivering av övergångar och publika lanseringar kräver Johnny: skriv dem i planens ÄGARENS TUR i stället
    för att göra dem.
-5. Avsluta med {kvittera} levererad --av "{namn}" --bevis "<PR, commit eller fil>", eller avslagen med skälet som
+5. {avgoranden}
+   Avsluta med {kvittera} levererad --av "{namn}" --bevis "<PR, commit eller fil>", eller avslagen med skälet som
    bevis. Kan du inte slutföra nu, låt överlämningen stå som startad och skriv i planen var arbetet står och vad som
    väntar.
 """
@@ -461,9 +462,15 @@ class Startvakt:
         namn = 'startvakt-' + o['id']
         # tjänstens egen tolk: ett bart `python3` kan vara Xcodes shim, som inte alltid går att köra
         kvittera = '"%s" -B "%s" kvittera %s' % (sys.executable, Path(__file__).resolve().parents[1] / 'partner.py', o['id'])
+        avgoranden_kravs = not fortsatt or any(h.get('typ')=='startad' and h.get('avgoranden_kravs') is True
+                                              for h in handelser(kat))
+        avgoranden = ('Skriv AVGORANDEN.md i paketet före leverans: varje avgörande på Johnnys vägnar och kostnaden om det är fel, '
+                      'eller uttryckligen \"inga avgöranden\". Det är sessionens redovisning, aldrig Johnnys ord.'
+                      if avgoranden_kravs else 'Den äldre sessionens leveransvillkor består; AVGORANDEN.md är inget nytt krav vid denna fortsättning.')
         rubrik = ' '.join(str(d.get('rubrik') or '').split())[:160]   # en rad: rubriken kan inte lägga till rader
         prompt = PROMPT.format(oid=o['id'], rubrik=rubrik, katalog=kat, kvittera=kvittera, namn=namn,
-                               mottagare_text=MOTTAGARE.get(d.get('mottagare') or 'kontorets-kedjedrivare', ''))
+                               avgoranden=avgoranden, mottagare_text=MOTTAGARE.get(d.get('mottagare') or 'kontorets-kedjedrivare', ''))
+        prompt += beroendeinstruktion(kat)
         effort = anstrangning or self.k.startvakt_anstrangning
         config = None
         if utforare == 'codex':
@@ -487,7 +494,10 @@ class Startvakt:
             argv = (common + ['resume', sid, '--json'] + installning + ['-'] if finns else
                     common + ['--json', '-C', str(rot)] + installning + ['-'])
         if fortsatt and finns:
-            prompt = ('Fortsätt arbetet med överlämningen %s där du slutade; sessionen stoppades av kvot, åtkomst eller '
+            prompt = ('Kontrollera först vad som redan är gjort: git log och git status i repot och dess worktrees, '
+                      'vad som har pushats, PR:ers läge och paketets KVITTENS.jsonl. Verifiera tidigare resultat; '
+                      'gör inte om redan gjort arbete.\n\n'
+                      'Fortsätt arbetet med överlämningen %s där du slutade; sessionen stoppades av kvot, åtkomst eller '
                       'ett avbrott. Samma instruktion gäller:\n\n%s' % (o['id'], prompt))
         miljo = {n: os.environ[n] for n in ('HOME', 'USER', 'LOGNAME', 'TMPDIR', 'SHELL') if n in os.environ}
         miljo.update(PATH='/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin', LANG='en_US.UTF-8',
@@ -505,16 +515,20 @@ class Startvakt:
         finally:
             os.close(ut)
             os.close(fel)
+        self._processer[o['id']] = proc
+        # The child waits for stdin. Persist its new delivery requirement before
+        # it can read the prompt and attempt a delivery receipt.
+        started = self._logga(o, kat, 'startad', session=sid, pid=proc.pid, nr=nr, utforare=utforare,
+                             cli=Path(binar).name, modell=modell, anstrangning=effort, repo=rot.name,
+                             fortsatt=fortsatt, namn=namn, installningar_sha256=skydd.avtryck(settings),
+                             codex_config_bindning=config, codex_config_bindning_sha256=skydd.avtryck(config) if config else None,
+                             avgoranden_kravs=avgoranden_kravs)
         try:
             proc.stdin.write(prompt.encode('utf-8'))
             proc.stdin.close()
         except OSError:
             pass
-        self._processer[o['id']] = proc
-        return self._logga(o, kat, 'startad', session=sid, pid=proc.pid, nr=nr, utforare=utforare,
-                           cli=Path(binar).name, modell=modell, anstrangning=effort, repo=rot.name,
-                           fortsatt=fortsatt, namn=namn, installningar_sha256=skydd.avtryck(settings),
-                           codex_config_bindning=config, codex_config_bindning_sha256=skydd.avtryck(config) if config else None)
+        return started
 
     def _lever(self, oid: str, sista: dict, kat: Path | None = None) -> bool:
         proc = self._processer.get(oid)
@@ -543,6 +557,17 @@ class Startvakt:
         return any(m in kommando for m in merken)
 
     def _utfall(self, o: dict, kat: Path, sista: dict, nr: int) -> dict:
+        from . import forbrukning
+        result = self._utfall_resultat(o, kat, sista, nr)
+        try:
+            forbrukning.spara(kat)
+        except (OSError, ValueError, UnicodeError):
+            # Quota/account recovery still follows its existing state machine.
+            # A missing measurement is explicit, never a made-up zero.
+            result['forbrukning'] = 'inte räknad: strömmen gick inte att läsa'
+        return result
+
+    def _utfall_resultat(self, o: dict, kat: Path, sista: dict, nr: int) -> dict:
         self._processer.pop(o['id'], None)
         nr = sista.get('nr', nr)
         har, lyckad, text, felbesked = resultat(sista.get('utforare') or 'claude',

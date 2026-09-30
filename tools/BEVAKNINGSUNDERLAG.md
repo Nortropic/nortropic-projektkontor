@@ -61,7 +61,7 @@ Senaste stabila versionens och installerad versions detaljer hämtas via
 indexfönstret; dess separata detalj måste ändå finnas. Detaljens `tag_name`
 måste överensstämma med begärd tagg och får inte vara draft/prerelease.
 
-Dubbletter inom respektive produkt hämtas en gång. Det blir högst sex anrop,
+Dubbletter inom respektive produkt hämtas en gång. För releaseunderlaget blir det högst sex anrop,
 utan omtag eller paginering. Om ett index fallerar försöker modulen fortfarande
 hämta installerad utgåvas detalj och de övriga oberoende observationerna.
 Urvalet är avgränsat till vald Python-linje, Temporal-fönstret och installerade
@@ -166,3 +166,46 @@ oförändrade äldre komprimerade paket. Tidigare datumetikett- och
 URL/versionsregressioner finns kvar. Syntetiskt godkänt resultat återstartar
 ingen förbrukad bevakningsomgång och aktiverar ingen ändrad kod; fryst acceptans
 och oberoende granskning ägs av värden.
+
+## Låsta pip-beroenden: GitHubs säkerhetsmeddelanden
+
+OVL-20260930-ac1914 C2 kompletterar beroendegrafen där Runtimes egna låsfil inte
+återfinns i dess SBOM. Den redan lästa kopian av **active**-rotens
+`config/temporal-probe-requirements.lock` styr frågorna; arbetskopians paket eller
+en löst uppgiven installerad version används inte. Låsfilen måste innehålla exakta
+numeriska versioner med två till fyra sifferled och SHA-256-hashar, högst 50 unika
+paket. Okänd syntax, intervall, markeruttryck, extra index, dubbletter eller tom fil
+ger otillgänglig `advisory-lock` och ofullständigt paket. Ingen rad hoppas över
+utom tomma rader och kommentarer. Paketnamn normaliseras enligt pip-konventionen.
+
+En förfrågan per låst paket och omgång, utan credentials eller omtag:
+`https://api.github.com/advisories?ecosystem=pip&affects=PAKET%40VERSION&type=reviewed&is_withdrawn=false&per_page=100`.
+Endast detta exakta adressmönster tillkommer; URL prövas före nätkontakt även
+med injicerad transport. Befintlig proxyvägran, redirectvägran, timeout,
+storleksgräns och innehållsavkodning gäller. `Link: rel=next` eller 100 svarsposter
+ger okänt i stället för en tyst ofullständig sida. HTTP 429 och nätfel ger
+otillgänglig källa. Inga fler sidor eller alternativa tjänster hämtas.
+
+Omfattningen är GitHub-granskade, inte återkallade pip-meddelanden. API:ts separata
+malware- och unreviewed-kategorier ingår inte; »inga kända« betyder bara tomt svar
+inom detta urval vid observationstiden. Det är ingen säkerhetsgaranti.
+
+Råsvaret bevaras som `advisories-PAKET-VERSION.raw`. Varje GHSA blir dessutom en
+egen hashad källobservation med id, allvarlighet, låst version och första rättade
+version per angivet sårbart versionsintervall. Appliceringen på den låsta versionen
+kommer från API:ts `affects=paket@version`; verktyget genomför ingen egen PEP 440-
+intervalltolkning. Null betyder att källan inte anger någon rättad version.
+Tomt svar blir en egen observation `inga_kanda_granskade`. Härledda observationer
+anger `derived_from`, som pekar på råkällan. Observationstiden ligger i postens
+metadata; identiskt underlag får därmed samma fingeravtryck även nästa dygn.
+
+De nya observationerna går som vanliga `sources` genom den befintliga bedömningen
+och dess separata granskning till eventuellt AP-06-förslag. `bevakning.py` behöver
+ingen ny modell, schemaroll eller befogenhet. Prov visar att både analysens och
+granskarens arbetsyta får GHSA-observationen. Ingen åtgärd verkställs automatiskt.
+
+Källa läst 2026-09-30: [GitHub List global security advisories](https://docs.github.com/en/rest/security-advisories/global-advisories#list-global-security-advisories).
+Den nya frysta acceptansen binder just den ändrade modulen och bevarar den tidigare
+policyacceptansen. Gamla acceptanser och tidigare paket skrivs inte om. Kodintegration
+är skild från AP-10-aktivering; en nödvändig ägarövergång ska förberedas och redovisas
+i planens ÄGARENS TUR innan den aktiva frysta roten byts.

@@ -177,6 +177,73 @@ def mottagarens(lage: dict | None) -> list:
     return [k for k in (lage or {}).get('overgangar') or [] if not k.get('beslut')]
 
 
+def _beroendeform(value):
+    if not isinstance(value, list) or len(value)>100:
+        raise ValueError('beroenden ska vara en lista med högst 100 poster')
+    result=[];seen=set()
+    for row in value:
+        if not isinstance(row,dict):raise ValueError('ett beroende ska vara ett objekt')
+        oid=row.get('overlamning')
+        if not isinstance(oid,str) or not OVL_ID.fullmatch(oid):raise ValueError('ogiltig beroendeform: '+_en_rad(oid))
+        if oid.casefold() in seen:raise ValueError('dubblett bland beroenden: '+oid)
+        seen.add(oid.casefold())
+        kind=row.get('slag','blockerar');requirements=row.get('krav',[])
+        if kind not in ('blockerar','beror'):raise ValueError('ogiltigt slag för '+oid)
+        if not isinstance(requirements,list) or len(requirements)>MAX_KRAV or any(not isinstance(k,str) or not re.fullmatch(r'[A-Za-z0-9._-]{1,20}',k) for k in requirements):
+            raise ValueError('ogiltiga krav för '+oid)
+        if not isinstance(row.get('vad',''),str):raise ValueError('vad ska vara kort text för '+oid)
+        result.append({'overlamning':oid,'slag':kind,'krav':requirements,'vad':_en_rad(row.get('vad'),400)})
+    return result
+
+
+def _beroendepaket(rot, oid):
+    kat=rot/('partner-'+oid)
+    from .forbrukning import las_fil
+    try:
+        # paketlage ignores malformed receipt lines for historic display. A
+        # dependency readiness claim additionally requires a readable journal.
+        raw=las_fil(kat/'OVERLAMNING.json');package=json.loads(raw)
+        journal=las_fil(kat/'KVITTENS.jsonl').decode('utf-8')
+        if any(not isinstance(json.loads(line),dict) for line in journal.splitlines() if line.strip()):return None
+        if not isinstance(package,dict) or package.get('id')!=oid:return None
+        return paketlage(kat)
+    except (OSError,ValueError,UnicodeError):return None
+
+
+def slappbar(paket, rot):
+    """Readiness is derived only from unchanged package receipts, never Git or the index."""
+    def result(value,reason,rows=()):return {'varde':value,'skal':reason,'beroenden':list(rows)}
+    if 'beroenden' not in paket:return result('okänd','beroenden i fri text')
+    try:deps=_beroendeform(paket['beroenden'])
+    except ValueError as error:return result('okänd',str(error))
+    rows=[];unknown=[];blocked=[];rejected=[]
+    for dep in deps:
+        oid=dep['overlamning'];state=_beroendepaket(rot,oid)
+        title=_en_rad(state['paket'].get('rubrik')) if state else 'okänd rubrik'
+        status=state['status'] if state else 'okänd'
+        row={'id':oid,'rubrik':title,'slag':dep['slag'],'status':status};rows.append(row)
+        label='%s (%s): %s' % (title,oid,status)
+        if state is None:unknown.append(label+' — paketet går inte att läsa')
+        elif dep['slag']=='blockerar' and status=='avslagen':rejected.append(label)
+        elif dep['slag']=='blockerar' and status!='levererad':blocked.append(label)
+    if unknown:return result('okänd','; '.join(unknown+rejected+blocked),rows)
+    if rejected:return result('blockerad: beroendet avslaget','; '.join(rejected+blocked),rows)
+    if blocked:return result('blockerad','; '.join(blocked),rows)
+    return result('släppbar nu','alla blockerande beroenden är levererade' if deps else 'inga beroenden',rows)
+
+
+def beroendeinstruktion(kat):
+    """Use the release-time snapshot, not a later recalculation of dependencies."""
+    state=paketlage(kat)
+    release=next((r for r in reversed((state or {}).get('overgangar',[])) if r.get('beslut')=='slapp'),None)
+    snapshot=(release or {}).get('beroenden_lage')
+    if not isinstance(snapshot,dict) or snapshot.get('varde')=='släppbar nu':return ''
+    return ('Beroenden vid släppet: %s (%s). Ett namngivet beroende var inte levererat eller läget var okänt. '
+            'Kontrollera det före arbetet; gör inte det som bygger på en saknad förutsättning. '
+            'Saknas den, avsluta med avslagen och skälet i stället för att bygga runt beroendet.\n' %
+            (_en_rad(snapshot.get('varde')), _en_rad(snapshot.get('skal'),100000)))
+
+
 class Overlamning:
     def __init__(self, server):
         self.s = server
@@ -257,6 +324,30 @@ class Overlamning:
         if luckor:
             raise Verktygsfel(INTE_BYGGKLAR % '; '.join(luckor))
         ordning = _text(a.get('ordning_och_beroenden'), 2000)
+        try:
+            beroenden = _beroendeform(a.get('beroenden',[]))
+        except ValueError as error:
+            raise Verktygsfel(INTE_BYGGKLAR % str(error)) from None
+        luckor=[];beroendetexter=[]
+        for dep in beroenden:
+            oid=dep['overlamning'];state=_beroendepaket(paketrot(self.s.k),oid)
+            row=self.s.lager.en('select data from overlamning where id=?',(oid,))
+            metadata=state['paket'] if state else json.loads(row['data']) if row else None
+            if metadata is None:
+                from .forbrukning import las_fil
+                try:
+                    candidate=json.loads(las_fil(paketrot(self.s.k)/('partner-'+oid)/'OVERLAMNING.json'))
+                    if isinstance(candidate,dict) and candidate.get('id')==oid:metadata=candidate
+                except (OSError,ValueError):pass
+            if metadata is None:
+                luckor.append('okänt beroende '+oid);continue
+            title=metadata.get('rubrik')
+            beroendetexter.append('%s (%s) — %s%s%s' % (_en_rad(title),oid,dep['slag'],
+                ('; krav '+', '.join(dep['krav'])) if dep['krav'] else '', ('; '+dep['vad']) if dep['vad'] else ''))
+        named={dep['overlamning'].casefold() for dep in beroenden}
+        for oid in sorted(ovl_i_citat(ordning)-named):
+            luckor.append('fritexten nämner %s som inte står bland beroendena' % ('OVL-'+oid[4:]))
+        if luckor:raise Verktygsfel(INTE_BYGGKLAR % '; '.join(luckor))
         resursram = _text(a.get('resursram'), 1000)
         fynd = _text(a.get('fynd'), 1000)
         motivering = _text(a.get('motivering'), 1000)
@@ -277,7 +368,7 @@ class Overlamning:
         tid = nu()
         trad = self.s.lager.trad(korning.trad) or {}
         ap06 = self._ap06(kat, oid, rubrik, mal, citat, granser, nasta, underlag, krav, klart_nar, filer, ordning,
-                          resursram, motivering)
+                          resursram, motivering, beroendetexter)
         markning = _markning(krav, klart_nar, olosta, ap06)
         if markning['luckor']:  # formen prövades innan något skrevs; här återstår bara AP-06-beredningens luckor
             shutil.rmtree(kat)  # katalogen skapades nyss av det här anropet (exist_ok=False) och har ingen överlämning
@@ -299,7 +390,9 @@ class Overlamning:
         order += ['', '## Klart när', '', klart_nar or '(inte angivet)', '',
                   '## Berörda filer', '']
         order += ['- %s: `%s`' % (f['repo'], f['sokvag']) for f in filer] or ['- (inga angivna)']
-        order += ['', '## Ordning och beroenden', '', ordning or '(inte angivet)', '',
+        order += ['', '## Ordning och beroenden', '']
+        order += ['- '+text for text in beroendetexter] or ['- Inga strukturerade beroenden.']
+        order += ['', ordning or '(inte angivet)', '',
                   '## Resursram', '', resursram or '(inte angiven)', '',
                   '## Ursprung', '', 'Tråd `%s`%s. Fynd: %s' % (
                       korning.trad, (' ("%s")' % trad.get('titel')) if trad.get('titel') else '', fynd or '(inte angivet)'), '',
@@ -338,7 +431,7 @@ class Overlamning:
                      'mottagare_text': MOTTAGARE[mottagare], 'trad': korning.trad, 'trad_titel': trad.get('titel'),
                      'inspel': inspel['id'], 'citerade_inspel': [c['id'] for c in citerade if c],
                      'rubrik': rubrik, 'fynd': fynd, 'motivering': motivering, 'krav': krav, 'klart_nar': klart_nar,
-                     'berorda_filer': filer, 'ordning_och_beroenden': ordning, 'resursram': resursram,
+                     'berorda_filer': filer, 'ordning_och_beroenden': ordning, 'beroenden':beroenden, 'resursram': resursram,
                      'underlag': underlag, 'underlag_olosta': olosta, 'markning': markning, 'ap06': ap06,
                      'skild_fran': [o['id'] for o in oppna],
                      'status_not': 'Status när paketet skrevs (vilande eller lamnad). Senare övergångar står i '
@@ -404,7 +497,7 @@ class Overlamning:
             return '', 'kunde inte öppnas (%s)' % type(fel).__name__
 
     def _ap06(self, kat: Path, oid: str, rubrik, mal, citat, granser, nasta, underlag, krav, klart_nar, filer, ordning,
-              resursram, motivering) -> dict:
+              resursram, motivering, beroendetexter=()) -> dict:
         """AP-06-utkast genom kontorets befintliga beredning: kraven och deras prov blir requirements och tests. Luckor
         redovisas, inget hittas på; Runtime-uppgiftens tekniska fält är väntande."""
         tools = Path(__file__).resolve().parents[1]
@@ -442,6 +535,8 @@ class Overlamning:
         context = [{'kind': 'decision', 'text': citat}, {'kind': 'judgment', 'text': mal or rubrik}]
         if ordning:
             context.append({'kind': 'judgment', 'text': 'Ordning och beroenden: ' + ordning})
+        for text in beroendetexter:
+            context.append({'kind':'judgment','text':'Strukturerat beroende: '+text})
         spec = {'schema': 1, 'action': 'A1', 'references': [ref],
                 'reference_checks': [dict(ref, sha256=kallor[0]['sha256'], status='matched')],
                 'requirements': requirements, 'tests': tests,
@@ -545,6 +640,8 @@ class Overlamning:
                     'bevis': 'Johnnys ord (inspel %s): "%s" — ordagrant i %s' % (inspel['id'], citat[:300], fil),
                     'inspel': inspel['id'], 'citerade_inspel': [c['id'] for c in citerade if c], 'trad': korning.trad,
                     'agarord': fil, 'agarord_sha256': _sha(kat / fil), 'kvitterad': nu()}
+            if beslut == 'slapp':
+                post['beroenden_lage'] = slappbar(lage['paket'],paketrot(self.s.k))
             if senare:
                 sfil = 'SENARE-POSTER-%s.md' % stampel
                 self._skriv(kat / sfil, _senare_poster_fil(oid, lage['paket'], senare, post['kvitterad']))
@@ -563,6 +660,8 @@ class Overlamning:
                         (' Partnerns senare poster om den (%s) följer med ordagrant i %s; mottagaren läser dem före '
                          'arbetet.' % (', '.join(post['senare_poster']), post['senare_poster_fil']))
                         if post.get('senare_poster') else ''))
+            if post.get('beroenden_lage'):
+                text += ' Släppbar: %s (%s).' % (post['beroenden_lage']['varde'],post['beroenden_lage']['skal'])
         else:
             text = ('Överlämningen %s är AVSLAGEN på Johnnys ord, direkt ur backloggen; den startas aldrig och står kvar som '
                     'historik. Hans ord står ordagrant i %s i paketet.' % (oid, post['agarord']))
@@ -640,6 +739,10 @@ def paketrot(k) -> Path:
     return Path(k.kontor_primar) / 'evidence/nasta-uppdrag/local'
 
 
+class AvgorandenSaknas(ValueError):
+    pass
+
+
 def kvittera(k, oid: str, status: str, av: str, bevis: str = '') -> Path:
     """Mottagarens kvittens. k är tjänstens konfiguration (eller, som tidigare, kontorets primärutcheckning). En vilande
     överlämning kvitteras aldrig: den släpps eller avslås bara på Johnnys ord i partnertråden."""
@@ -658,8 +761,24 @@ def kvittera(k, oid: str, status: str, av: str, bevis: str = '') -> Path:
     if lage['status'] == 'vilande':
         raise ValueError('%s är vilande i backloggen: en mottagare kvitterar den inte. Den släpps eller avslås bara på '
                          'Johnnys ord i partnertråden.' % oid)
+    extra = {}
+    if status == 'levererad':
+        from .forbrukning import las_fil
+        try:
+            events = [json.loads(line) for line in las_fil(kat/'START.jsonl').decode('utf-8').splitlines() if line.strip()]
+        except FileNotFoundError:
+            events = []  # older/manual receivers have no start marker
+        except (OSError,ValueError,UnicodeError):
+            raise AvgorandenSaknas('START.jsonl går inte att läsa; kravet på avgöranden är okänt') from None
+        if any(isinstance(e,dict) and e.get('typ')=='startad' and e.get('avgoranden_kravs') is True for e in events):
+            try:
+                raw = las_fil(kat/'AVGORANDEN.md')
+                if not raw.decode('utf-8').strip():raise ValueError()
+            except (OSError,ValueError,UnicodeError):
+                raise AvgorandenSaknas('AVGORANDEN.md saknas, är tom eller går inte att läsa; ingen leveranskvittens skrevs') from None
+            extra = {'avgoranden':'AVGORANDEN.md', 'avgoranden_sha256':hashlib.sha256(raw).hexdigest()}
     with open(fil, 'a', encoding='utf-8') as f:
-        f.write(json.dumps({'status': status, 'av': av, 'bevis': bevis, 'kvitterad': nu()}, ensure_ascii=False) + '\n')
+        f.write(json.dumps({'status': status, 'av': av, 'bevis': bevis, 'kvitterad': nu(), **extra}, ensure_ascii=False) + '\n')
     return fil
 
 
@@ -742,6 +861,11 @@ def backlog(k, alla: bool = False, fraga=None) -> dict:
     if ut['olasbara']:
         ut['status'] = 'ofullstandig'
     ut['poster'].sort(key=lambda x: str(x.get('datum') or ''))
+    waiting=[p for p in ut['poster'] if p['status']=='vilande']
+    ut['sammanfattning']={'vilande':len(waiting),
+        'slappbara':sum(p['slappbar']['varde']=='släppbar nu' for p in waiting),
+        'blockerade':sum(p['slappbar']['varde'].startswith('blockerad') for p in waiting),
+        'okanda':sum(p['slappbar']['varde']=='okänd' for p in waiting)}
     return ut
 
 
@@ -768,12 +892,17 @@ def _las_backlog(ut: dict, rot: Path, namn: list, alla: bool, fraga) -> None:
                           for f in senare_poster(fraga, p)]
             except sqlite3.Error:  # ett index utan partnerns tabeller: okänt, aldrig "inga poster"
                 pass
+        consumption = None
+        if alla:
+            from .forbrukning import las_sparad
+            consumption = las_sparad(kat)
         ut['poster'].append({'id': oid, 'status': lage['status'], 'mottagare': p.get('mottagare'),
                              'rubrik': p.get('rubrik'), 'datum': p.get('lamnad'), 'trad': p.get('trad'),
                              'trad_titel': p.get('trad_titel'), 'fynd': p.get('fynd'), 'motivering': p.get('motivering'),
                              'markning': m.get('varde') or 'okänd', 'luckor': m.get('luckor') or [],
                              'vantande': m.get('vantande') or [], 'senare': senare,
-                             'beslut': (lage['overgangar'][0] if lage['overgangar'] else None)})
+                             'beslut': (lage['overgangar'][0] if lage['overgangar'] else None),
+                             'forbrukning': consumption, 'slappbar':slappbar(p,rot)})
 
 
 def backlogtext(b: dict) -> str:
@@ -781,8 +910,10 @@ def backlogtext(b: dict) -> str:
         return 'Backloggen är OKÄND, inte tom: %s.' % b.get('skal')
     vilande = [p for p in b['poster'] if p['status'] == 'vilande']
     namnda = [p for p in vilande if p.get('senare')]
-    rader = ['Backloggen (vilande beställningar, läst %sZ ur %s): %d vilande%s%s.' % (
+    summary=b.get('sammanfattning') or {}
+    rader = ['Backloggen (vilande beställningar, läst %sZ ur %s): %d vilande, varav %d släppbara nu, %d blockerade, %d okända%s%s.' % (
         b['last'][:16], b['rot'], len(vilande),
+        summary.get('slappbara',0),summary.get('blockerade',0),summary.get('okanda',len(vilande)),
         (', varav %d nämns i senare poster' % len(namnda)) if namnda else '',
         (', %d släppta eller avslagna visas också' % (len(b['poster']) - len(vilande))) if b.get('alla') else '')]
     if b['olasbara']:
@@ -795,6 +926,8 @@ def backlogtext(b: dict) -> str:
         rader.append('  Ursprung: tråd %s%s; fynd: %s' % (p.get('trad'), (' "%s"' % p['trad_titel']) if p.get('trad_titel') else '',
                                                           p.get('fynd') or '(inte angivet)'))
         rader.append('  Motivering: %s' % (p.get('motivering') or '(inte angiven)'))
+        readiness=p.get('slappbar') or {'varde':'okänd','skal':'beroenden i fri text'}
+        rader.append('  Släppbar: %s (%s)' % (readiness['varde'],readiness['skal']))
         if p['status'] == 'vilande' and p.get('senare'):
             rader.append('  Nämns i senare poster, som prövas före ett släpp: %s. Ändrar en post beställningen avslås den '
                          'och läggs om.' % '; '.join(_posttext(f) for f in p['senare']))
@@ -803,6 +936,9 @@ def backlogtext(b: dict) -> str:
         if p.get('beslut'):
             rader.append('  %s %s: %s' % ('Släppt' if p['beslut'].get('beslut') == 'slapp' else 'Avslagen',
                                           str(p['beslut'].get('kvitterad') or '')[:16], p['beslut'].get('bevis')))
+        if b.get('alla'):
+            from .forbrukning import text as forbrukningstext
+            rader.append('  Förbrukning: '+forbrukningstext(p.get('forbrukning')))
     if not b['poster'] and b['status'] == 'ok':
         rader.append('Inga vilande beställningar.')
     rader.append('Johnny släpper en vilande beställning i partnertråden ("släpp OVL-…" eller "genomför OVL-…") eller '

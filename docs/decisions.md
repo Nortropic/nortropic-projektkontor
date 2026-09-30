@@ -9231,3 +9231,24 @@ Ett importprov förbjuder subprocess och nätanslutning medan partnerns systeml�
 Frusen main-plan, avsiktlig filtermutation och återställda prov bevaras privat tillsammans
 med helsvitens och den separata granskningens kvitton i beställningens genomförandeunderlag.
 Denna post påstår ingen ändrad partnerstatus, driftåterläsning eller ägarens ord.
+
+
+## PARTNER-FORBRUKNING-AVGORANDEN-20260930
+
+OVL-20260930-82c52c K1–K3 bereds enligt sessionens mandat att implementera hela
+backloggen autonomt. Detta återger omfattningen; ingen ny ägarordfil eller
+partnerkvittens skapas. Kod och syntetiska prov ingår i vanlig separat granskning
+och skyddad integration. K1:s klart-när tillåter fixturprov när ingen verklig
+mottagarsession avslutas under uppdraget; sådana prov påstås inte vara levande.
+
+Förbrukning räknas utan modell med källa per tal; saknade fält förblir okända.
+Fortsättningsprompten kräver kontroll av redan utfört arbete före fortsatt bygge.
+En markerad ny start kräver sessionens egen AVGORANDEN.md före leveranskvittens;
+äldre paket får ingen ny markering i efterhand. Filen redovisar avgöranden och
+kostnad om de är fel; den innehåller inte påstådda ord från Johnny.
+
+Källa: arbetsorderns K1–K3 och Klart när, dokumenterat i `tools/PARTNER.md`
+tillsammans med originalkällorna för strömmarnas format. Nyckellös helsvit,
+separat granskningskvitto och skyddad publicering binds till exakt kandidat av
+värden. Originalpartnerdata skrivs inte som del av detta genomförande och
+aktivering av tjänsten är inte bevisad genom kodintegration.

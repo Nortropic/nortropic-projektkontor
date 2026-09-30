@@ -653,12 +653,14 @@ $('visaoverlamningar').addEventListener('click', async () => {
   const d = await api('GET', '/api/backlog');
   if (d.status === 'okand') { oppnaPanel('Backlog', el('div', { class: 'meta', text: 'Backloggen är okänd, inte tom: ' + d.skal + '.' })); return; }
   const poster = d.poster.filter((p) => p.status === 'vilande');
+  const samman = d.sammanfattning;
   const delar = [];
   if (d.olasbara.length) delar.push(el('div', { class: 'meta', text: 'Backloggen är inte känd i sin helhet: ' + d.olasbara.length + ' paket gick inte att läsa (' + d.olasbara.map((o) => o.id).join(', ') + ').' }));
   for (const p of poster) {
     delar.push(el('div', { class: 'traff' },
       el('div', { class: 'kl', text: p.id + ' · till ' + (MOTTAGARNAMN[p.mottagare] || p.mottagare) + ' · ' + tid(p.datum) + ' · ' + p.markning }),
       el('div', { text: p.rubrik }),
+      el('div', { class: 'meta', text: 'Släppbar: ' + (p.slappbar ? p.slappbar.varde + ' (' + p.slappbar.skal + ')' : 'okänd (beroenden i fri text)') }),
       p.luckor.length ? el('div', { class: 'kl', text: 'Luckor: ' + p.luckor.join('; ') }) : null,
       // PARTNER-BACKLOG-AKTUALITET-20260930: partnerns senare poster om beställningen prövas före ett släpp.
       (p.senare || []).length ? el('div', { class: 'fel', text: 'Nämns i senare poster, som prövas före ett släpp: ' + p.senare.map((f) => f.nr + ' (' + tid(f.tid) + '): ' + f.utdrag).join(' · ') + '. Ändrar en post beställningen, avslå den och be partnern lägga en ny.' }) : null,
@@ -668,7 +670,7 @@ $('visaoverlamningar').addEventListener('click', async () => {
   }
   if (!poster.length && d.status === 'ok') delar.push(el('div', { class: 'meta', text: 'Inga vilande beställningar.' }));
   delar.push(el('div', { class: 'meta', text: 'En vilande beställning startas inte. Du släpper den genom att skriva till exempel "släpp OVL-…" i en tråd, eller avslår den med "avslå OVL-…". Ett släpp prövas mot partnerns senare poster om beställningen.' }));
-  oppnaPanel('Backlog (' + poster.length + ' vilande)', delar);
+  oppnaPanel('Backlog (' + poster.length + ' vilande' + (samman ? ', varav ' + samman.slappbara + ' släppbara nu, ' + samman.blockerade + ' blockerade, ' + samman.okanda + ' okända' : '') + ')', delar);
 });
 
 // ------------------------------------------------------------------ start

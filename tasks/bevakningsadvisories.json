@@ -1,0 +1,23 @@
+{
+  "id": "office-watch-advisories-20260930",
+  "target": "Nortropic/nortropic-projektkontor",
+  "base": "014638abd982bd593c1c7063c1bb11b4120f8bd8",
+  "runtime_revision": "cddaf4993ebd86fbf5ecdf9e72acc7b3339a53a1",
+  "allowed_paths": [
+    "tools/bevakningsunderlag.py",
+    "tools/test_bevakningsunderlag.py",
+    "tools/test_bevakning.py",
+    "tools/BEVAKNINGSUNDERLAG.md"
+  ],
+  "attempt_seconds": 900,
+  "automatic_retries": 0,
+  "steps": [
+    {
+      "provider": "codex",
+      "prompt": "Read TASK.md. Implement the accepted advisory-intake scope using synthetic sources only. Do not alter frozen acceptance, Runtime, operations or partner data. Host owns independent review, qualification and protected integration."
+    }
+  ],
+  "brief": "tasks/bevakningsadvisories.md",
+  "acceptance": "acceptance/bevakningsadvisories.py",
+  "acceptance_sha256": "198a6bc1bd46983cc7545d89af12ba7b9f68b813154f4ee6925a2ad04a81f275"
+}

@@ -36,6 +36,12 @@ def python_index(*versions):
         for v in versions) + "</html>").encode()
 
 
+def advisory():
+    return {'ghsa_id':'GHSA-2345-6789-cfgh','type':'reviewed','withdrawn_at':None,'severity':'high',
+            'vulnerabilities':[{'package':{'ecosystem':'pip','name':'temporalio'},
+                                'vulnerable_version_range':'< 1.8.1','first_patched_version':'1.8.1'}]}
+
+
 class CollectionTests(unittest.TestCase):
     def test_exact_local_file_extension(self):
         self.assertEqual(intake.LOCAL_FILES, (
@@ -104,6 +110,11 @@ class CollectionTests(unittest.TestCase):
             ).encode()
         for v in ("1.8.0", "1.10.0"):
             self.responses[intake.TEMPORAL_BASE + "/tags/" + v] = encoded(release(v))
+        for root in self.roots.values():
+            (root/intake.LOCK_FILE).write_text('temporalio==1.8.0 --hash=sha256:'+'a'*64+'\n'
+                                             'protobuf==7.36.2 --hash=sha256:'+'b'*64+'\n')
+        for package,version in [('temporalio','1.8.0'),('protobuf','7.36.2')]:
+            self.responses[intake._advisory_url(package,version)]=b'[]'
         self.calls = []
         self.counter = 0
         # Fail immediately if any collection test accidentally uses real transport.
@@ -140,7 +151,7 @@ class CollectionTests(unittest.TestCase):
         packet = self.collect()
         self.assertTrue(packet["complete"])
         self.assertEqual(packet["schema"], 1)
-        self.assertEqual(len(self.calls), 6)
+        self.assertEqual(len(self.calls), 8)
         self.assertEqual(len(packet["local"]), 30)
         self.assertEqual(len(packet["fingerprint"]), 64)
         self.assertFalse(packet["same_controlled_basis"])
@@ -150,7 +161,7 @@ class CollectionTests(unittest.TestCase):
             self.assertFalse(Path(record["path"]).is_absolute())
             raw = (self.output / record["path"]).read_bytes()
             self.assertEqual(intake.sha256(raw).hexdigest(), record["sha256"])
-            if "url" in record:
+            if "url" in record and 'derived_from' not in record:
                 self.assertEqual(raw, self.responses[record["url"]])
         self.assertEqual(stat.S_IMODE(self.output.stat().st_mode), 0o700)
         for file in self.output.iterdir():
@@ -192,8 +203,8 @@ class CollectionTests(unittest.TestCase):
         self.versions.update(python="3.12.10", temporalio="1.10.0")
         self.responses[intake.TEMPORAL_INDEX] = encoded([release("1.10.0")] * 20 + [release("99.0.0")])
         self.assertTrue(self.collect()["complete"])
-        self.assertEqual(len(self.calls), 4)
-        self.assertEqual(len(set(self.calls)), 4)
+        self.assertEqual(len(self.calls), 6)
+        self.assertEqual(len(set(self.calls)), 6)
 
     def test_per_observation_clock_and_absent_publication_date(self):
         self.responses[intake._python_url("3.12.1")] = b"<h1>Python 3.12.1</h1>"
@@ -232,7 +243,7 @@ class CollectionTests(unittest.TestCase):
                 self.calls.clear()
                 packet = self.collect(previous)
                 self.assert_incomplete(packet)
-                self.assertLessEqual(len(self.calls), 6)
+                self.assertLessEqual(len(self.calls), 8)
                 self.assertEqual(self.calls[:2], [intake.PYTHON_INDEX, intake.TEMPORAL_INDEX])
                 self.assertTrue(all(r["status"] == "available" for r in packet["local"]))
                 self.assertTrue(any(r["status"] == "available" for r in packet["sources"]))
@@ -354,7 +365,7 @@ class CollectionTests(unittest.TestCase):
         with patch.object(urllib.request, "build_opener") as build:
             build.return_value.open.side_effect = open_response
             packet = intake.collect(self.output, self.roots, self.versions, previous)
-        self.assertLessEqual(len(responses), 6)
+        self.assertLessEqual(len(responses), 8)
         self.assertTrue(all(response.closed for response in responses))
         return packet
 
@@ -367,7 +378,8 @@ class CollectionTests(unittest.TestCase):
         self.assertTrue(packet["same_controlled_basis"])
         self.assertEqual(packet["fingerprint"], previous["fingerprint"])
         for record in packet["sources"]:
-            raw = self.responses[record["url"]]
+            raw = (next(raw for path,raw in saved_files.items() if path.name == record['path'])
+                   if 'derived_from' in record else self.responses[record["url"]])
             self.assertEqual((self.output / record["path"]).read_bytes(), raw)
             self.assertEqual(record["sha256"], intake.sha256(raw).hexdigest())
             self.assertEqual(record["published_at"], next(
@@ -418,6 +430,52 @@ class CollectionTests(unittest.TestCase):
                                     if r["id"] != "python-index"))
 
 
+    def test_advisories_exact_requests_from_active_lock_and_empty_observations(self):
+        (self.roots['working']/intake.LOCK_FILE).write_text('working-only==9.9.9 --hash=sha256:'+'c'*64+'\n')
+        packet=self.collect();urls=[u for u in self.calls if u.startswith(intake.ADVISORIES)]
+        self.assertEqual(urls,[
+            'https://api.github.com/advisories?ecosystem=pip&affects=protobuf%407.36.2&type=reviewed&is_withdrawn=false&per_page=100',
+            'https://api.github.com/advisories?ecosystem=pip&affects=temporalio%401.8.0&type=reviewed&is_withdrawn=false&per_page=100'])
+        observations=[r for r in packet['sources'] if 'derived_from' in r]
+        self.assertEqual(len(observations),2);self.assertTrue(packet['complete'])
+        for r in observations:
+            self.assertEqual(json.loads((self.output/r['path']).read_bytes())['state'],'inga_kanda_granskade')
+            self.assertIsNotNone(datetime.fromisoformat(r['observed_at']).tzinfo)
+
+    def test_advisory_is_separate_hashed_observation_with_patch_and_severity(self):
+        url=intake._advisory_url('temporalio','1.8.0');self.responses[url]=encoded([advisory()])
+        packet=self.collect()
+        row=next(r for r in packet['sources'] if r['id'].endswith('GHSA-2345-6789-cfgh'))
+        payload=(self.output/row['path']).read_bytes();value=json.loads(payload)
+        self.assertEqual((value['ghsa_id'],value['severity'],value['locked_version']),('GHSA-2345-6789-cfgh','high','1.8.0'))
+        self.assertEqual(value['patches'],[{'affected_range':'< 1.8.1','first_patched_version':'1.8.1'}])
+        self.assertEqual(intake.sha256(payload).hexdigest(),row['sha256'])
+        self.assertEqual(value['derived_from'],'advisories-temporalio-1.8.0');self.assertTrue(packet['complete'])
+        same=self.collect(packet);self.assertTrue(same['same_controlled_basis'])
+        changed=advisory();changed['severity']='critical';self.responses[url]=encoded([changed])
+        self.assertFalse(self.collect(same)['same_controlled_basis'])
+
+    def test_advisory_failures_and_page_limit_are_unknown_not_clean(self):
+        url=intake._advisory_url('temporalio','1.8.0')
+        bad=advisory();bad['vulnerabilities'][0]['package']['name']='other'
+        for response in (TimeoutError(),urllib.error.HTTPError('hidden',429,'rate limit',{},None),
+                         b'{}',encoded([bad]),encoded([advisory()]*100)):
+            self.responses[url]=response;packet=self.collect();self.assert_incomplete(packet)
+            rows=[r for r in packet['sources'] if r['id'].startswith('advisories-temporalio-')]
+            self.assertEqual(len(rows),1);self.assertEqual(rows[0]['status'],'unavailable')
+            self.assertTrue(any(r['id'].startswith('advisories-protobuf-') and r['status']=='available' for r in packet['sources']))
+
+    def test_unfamiliar_or_duplicate_lock_is_unknown_before_advisory_network(self):
+        path=self.roots['active']/intake.LOCK_FILE
+        valid='temporalio==1.8.0 --hash=sha256:'+'a'*64+'\n'
+        for raw in (b'',b'--index-url https://other.test\n',b'foo>=1.2.3\n',valid.encode()*2,
+                    b'foo==1.0rc1 --hash=sha256:'+b'a'*64):
+            path.write_bytes(raw);self.calls.clear();packet=self.collect();self.assert_incomplete(packet)
+            self.assertFalse(any(u.startswith(intake.ADVISORIES) for u in self.calls))
+            self.assertEqual(next(r['error'] for r in packet['sources'] if r['id']=='advisory-lock'),
+                             'active_lock_unavailable_or_unsupported')
+
+
 class Response(io.BytesIO):
     status = 200
 
@@ -438,6 +496,24 @@ class Response(io.BytesIO):
 
 
 class TransportTests(unittest.TestCase):
+    def test_advisory_url_and_pagination_guard_before_body_or_outside_contact(self):
+        good=intake._advisory_url('temporalio','1.33.0')
+        for url in (good.replace('api.github.com','other.test'),good+'&extra=x',good.replace('%40','@'),
+                    good.replace('ecosystem=pip','ecosystem=npm')):
+            with patch.object(urllib.request,'build_opener') as build, self.assertRaises(intake.IntakeError):
+                intake.fetch(url)
+            build.assert_not_called()
+        with patch.object(urllib.request,'build_opener') as build:
+            r=Response(b'[]',(('Link','<https://api.github.com/advisories?after=x>; rel="next"'),),url=good)
+            build.return_value.open.return_value=r
+            with self.assertRaises(intake.IntakeError):intake.fetch(good)
+            self.assertEqual(r.read_sizes,[])
+        with patch.object(urllib.request,'build_opener') as build:
+            build.return_value.open.return_value=Response(b'[]',url=good)
+            self.assertEqual(intake.fetch(good),b'[]')
+            request=build.return_value.open.call_args.args[0]
+            self.assertNotIn('Authorization',dict(request.header_items()))
+
     def test_transport_controls_and_exact_bytes(self):
         with patch.object(urllib.request, "build_opener") as build:
             build.return_value.open.return_value = Response(b"\xff\x00raw bytes")
