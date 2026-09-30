@@ -113,7 +113,7 @@ def status(k, args) -> int:
     head = subprocess.run(['git', '-C', str(rot), 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True).stdout.strip()
     main = subprocess.run(['git', '-C', str(rot), 'rev-parse', '--short', 'origin/main'], capture_output=True, text=True).stdout.strip()
     print('Kod:    %s i %s (%s)' % (head, rot, 'samma som origin/main' if head == main else 'origin/main är ' + main))
-    print('Modell: %s (%s) genom %s' % (k.modell.huvud, k.modell.anstrangning, k.claude))
+    print('Modell: %s (%s) genom %s' % (k.modell.huvud, k.modell.anstrangning, k.claude if kf.ar_claude(k.modell.huvud) else k.codex))
     return 0 if h else 3
 
 

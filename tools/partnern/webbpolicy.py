@@ -114,3 +114,46 @@ def prova(korning, verktyg: str, indata: dict, hemligheter: tuple = ()) -> tuple
         return 'deny', ('Värden %s kommer varken från Johnnys länkar i tråden, en webbsökning i den här körningen '
                         'eller listan över dokumentationskällor. Be Johnny om länken om den behövs.' % vard)
     return 'deny', 'Okänt verktyg.'
+
+
+# Codex (MODELLKARTA-20260929 steg 1b): kroken gäller varje verktyg, också de som modellen anropar genom kodläget.
+CODEX_TILLATNA = ('clockcurr_time',)          # klockan: läser bara tiden
+WEBRUN_FALT = {'search_query', 'open', 'response_length'}
+SOK_FALT = {'q', 'recency', 'domains'}
+OPPNA_FALT = {'ref_id', 'lineno'}
+
+
+def prova_codex(korning, verktyg: str, indata, hemligheter: tuple = ()) -> tuple:
+    """Serverns beslut för ett Codex-verktyg: partnerns egna verktyg (MCP-bryggan, vars nyckel servern prövar) och
+    klockan tillåts, webbverktyget prövas med samma regler som WebSearch och WebFetch, och allt annat nekas: skal,
+    filändringar, bildläsning från disk, underagenter och okända verktyg. Stäng hellre än släpp."""
+    if verktyg.startswith('mcp__partner__') and re.match(r'\Amcp__partner__[a-z_]{1,40}\Z', verktyg):
+        return 'allow', ''
+    if verktyg in CODEX_TILLATNA:
+        return 'allow', ''
+    if verktyg != 'webrun':
+        return 'deny', 'Verktyget %s används inte av partnern; använd partnerns egna verktyg.' % verktyg[:60]
+    if not isinstance(indata, dict) or set(indata) - WEBRUN_FALT or not (indata.get('search_query') or indata.get('open')):
+        return 'deny', 'Webbverktyget får bara söka och öppna sidor här.'
+    for s in indata.get('search_query') or []:
+        if not isinstance(s, dict) or set(s) - SOK_FALT or not isinstance(s.get('q'), str):
+            return 'deny', 'En sökning har en form som partnern inte känner igen.'
+        beslut, skal = prova(korning, 'WebSearch', {'query': s['q']}, hemligheter)
+        if beslut == 'deny':
+            return beslut, skal
+        for vard in s.get('domains') or []:   # begränsning till domäner: samma regel som site:
+            beslut, skal = prova(korning, 'WebSearch', {'query': 'site:%s' % str(vard)[:200]}, hemligheter)
+            if beslut == 'deny':
+                return beslut, skal
+    for o in indata.get('open') or []:
+        if not isinstance(o, dict) or set(o) - OPPNA_FALT or not isinstance(o.get('ref_id'), str):
+            return 'deny', 'En sida har en form som partnern inte känner igen.'
+        ref = o['ref_id']
+        if re.match(r'(?i)\Ahttps?://', ref):
+            beslut, skal = prova(korning, 'WebFetch', {'url': ref}, hemligheter)
+            if beslut == 'deny':
+                return beslut, skal
+        elif ref not in getattr(korning, 'codex_ref', {}):
+            return 'deny', 'Sökträffen %s är okänd i den här körningen; öppna adressen direkt.' % ref[:40]
+    return 'allow', ''
+

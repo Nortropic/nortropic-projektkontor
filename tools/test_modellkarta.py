@@ -119,14 +119,25 @@ class LasningAvValen(KartaMiljo):
     def test_bara_det_som_fungerade_i_programmet_som_kor_hallplatsen_erbjuds(self):
         v = self.karta()['val']
         ids = lambda lista: [m['id'] for m in lista]
+        # partnern kör på Claude Code eller Codex (steg 1b): båda programmens uppmätta modeller erbjuds
         self.assertEqual(ids(v['partner']['erbjud']), ['claude-opus-5-5', 'claude-fable-5-1', 'claude-sonnet-5',
-                                                       'claude-opus-5', 'claude-haiku-4-5-20251001'])
-        self.assertEqual(ids(v['partner']['kommer']), ['gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol'])
+                                                       'claude-opus-5', 'claude-haiku-4-5-20251001',
+                                                       'gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol'])
         self.assertEqual(ids(v['sessioner']['program']['codex']['erbjud']), ['gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol'])
         # läsarna går genom Runtimes äldre program: Opus 5.5 och gpt-6.1-sol fungerade inte där och erbjuds inte
         self.assertEqual(ids(v['lasare']['erbjud']), ['claude-fable-5-1', 'claude-sonnet-5', 'claude-opus-5',
                                                       'claude-haiku-4-5-20251001', 'gpt-6-astra', 'gpt-6-sol'])
         self.assertEqual({m['id']: m['nivaer'] for m in v['lasare']['erbjud']}['gpt-6-astra'], ['high'])
+
+    def test_ett_program_utan_modell_eller_niva_ar_okant_inte_obevisat(self):
+        self.k.codex_installningar.write_text('approval_policy = "never"\n[x]\n', 'utf-8')
+        cc = dict(CLAUDE_CODE)
+        cc.pop('effortLevel')
+        cc['modelSettings'] = {}
+        self.k.claude_installningar.write_text(json.dumps(cc, ensure_ascii=False, indent=2) + '\n', 'utf-8')
+        p = self.karta()['val']['sessioner']['program']
+        self.assertEqual((p['codex']['status'], p['codex']['bevisad']), ('ofullstandig', None))
+        self.assertEqual((p['claude_code']['status'], p['claude_code']['bevisad']), ('ofullstandig', None))
 
     def test_en_niva_som_inte_fungerade_erbjuds_inte_och_nuvarande_varde_markeras(self):
         self.skriv_matning(matning(claude_egen={('claude-opus-5-5', 'xhigh'), ('claude-opus-5-5', 'max')}))
@@ -329,7 +340,7 @@ class PartnernOchLasarna(KartaMiljo):
 
     def test_en_matning_utan_lyckade_anrop_erbjuder_ingenting_och_samtalsytan_provar_valet(self):
         kvitto = matning()
-        kvitto['resultat'] = [r for r in kvitto['resultat'] if r['program'] != 'claude_egen']
+        kvitto['resultat'] = [r for r in kvitto['resultat'] if r['program'] not in ('claude_egen', 'codex_egen')]
         self.skriv_matning(kvitto)
         self.assertEqual(self.json('GET', '/api/installningar')[1]['modeller'], [])
         kod, d = self.json('POST', '/api/installningar', {'huvud': 'claude-sonnet-5', 'anstrangning': 'low'})
@@ -338,14 +349,16 @@ class PartnernOchLasarna(KartaMiljo):
         self.assertEqual(self.json('POST', '/api/installningar', {'huvud': 'claude-sonnet-5', 'anstrangning': 'max'})[0], 400)
         self.assertEqual(self.json('POST', '/api/installningar', {'huvud': 'claude-sonnet-5', 'anstrangning': 'low'})[0], 200)
 
-    def test_partnerns_val_galler_direkt_och_bara_claude_i_dag(self):
+    def test_partnerns_val_galler_direkt_med_claude_eller_codex_om_det_fungerat(self):
         kod, d = self.valj('partner', 'claude-sonnet-5', 'low')
         self.assertEqual(kod, 200, d)
         self.assertEqual((self.S.k.modell.huvud, self.S.k.modell.anstrangning), ('claude-sonnet-5', 'low'))
         self.assertEqual(self.json('GET', '/api/installningar')[1]['huvud'], 'claude-sonnet-5')
         kod, d = self.valj('partner', 'gpt-6-astra', 'high')
-        self.assertEqual(kod, 400)
-        self.assertIn('Codex-drivare', d['fel'])
+        self.assertEqual(kod, 200, d)
+        self.assertEqual(d['val']['partner']['utforare'], 'codex')
+        self.assertEqual(self.valj('partner', 'gpt-okand', 'high')[0], 400)
+        self.assertEqual(self.valj('partner', 'gpt-6-astra', 'minimal')[0], 400)
 
     def test_lasarna_sparas_tas_bort_och_vagras_utanfor_matningen(self):
         kod, d = self.valj('lasare', 'gpt-6-astra')
@@ -534,6 +547,8 @@ class Matningen(unittest.TestCase):
         self.assertTrue(all(len(r['forsok']) == 1 and not r['ok'] for r in tydliga))   # ett tydligt nej prövas inte om
         self.assertEqual(mm.kortnamn(self.rot), {'opus': 'claude-opus-5'})
         self.assertEqual(json.loads((self.rot / 'modellmatning.json').read_text())['schema'], 'modellmatning/2')
+        self.assertFalse((self.rot / '.modellmatning.json.tmp').exists())   # ingen kvarlämnad tillfällig fil
+        self.assertEqual(oct((self.rot / 'modellmatning.json').stat().st_mode & 0o777), oct(0o600))
 
     def test_ett_forsok_skriver_inget_kvitto(self):
         with mock.patch.dict(os.environ, {'HOME': str(self.rot / 'hem')}):

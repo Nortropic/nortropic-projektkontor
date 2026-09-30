@@ -70,8 +70,8 @@ ska bära framåt och håller trådens läge aktuellt.
 | Källindex: Improvements-korpusen, ägarens sparade ord och beställningar, kontorets beslut/plan, andra repons dokument, förberedelsens syntes | `partnern/kallor.py` | Byggs om vid start och inom tio minuter när repons lokala origin/main, de sparade ägarorden eller korpusens manifest ändras (`partner.py index` gör det direkt); privata filer tvättas från hemligheter |
 | Systemläge: git (origin/main, primärutcheckning), planen på main, Runtimes drift genom Aquariums läsning, öppna PR | `partnern/systemlage.py` | Alltid med lästid och ålder |
 | Verktyg för modellen: sök, öppna i sammanhang, bilaga, systemläge, repo, GitHub (GET, i delar), förståelse, resonemang, tråd, backlog, bered_uppdrag, backlog_beslut, utred | `partnern/verktyg.py` | Genom MCP-bryggan, per körning |
-| Agentloop: Claude Code headless (`claude -p`, dvs. Agent SDK via CLI) i begränsat läge | `partnern/agent.py` | Se modell och drift nedan |
-| Webbkrok och destinationspolicy | `partnern/krok.py`, `partnern/webbpolicy.py` | Servern avgör varje webbanrop |
+| Agentloop: Claude Code headless (`claude -p`, dvs. Agent SDK via CLI) i begränsat läge, eller Codex (`codex exec`) när en Codex-modell är vald | `partnern/agent.py` | Se modell och drift nedan |
+| Webbkrok och destinationspolicy | `partnern/krok.py`, `partnern/webbpolicy.py` | Servern avgör varje webbanrop, och på Codex varje verktyg |
 | Bakgrundsutredningar | `partnern/jobb.py` | Journalförda, återupptas efter omstart |
 | Överlämning till kontoret och backloggen | `partnern/overlamning.py` | Paket i `evidence/nasta-uppdrag/local/partner-OVL-…/`, vilande eller lämnat, med krav, prov, märkning och AP-06-utkast, ett per mottagare |
 | Startvakt | `partnern/start.py` | Startar mottagarens session för en lämnad överlämning, aldrig för en vilande; väntar synligt när skrivplatsen är upptagen eller kvoten slut |
@@ -89,10 +89,37 @@ får samma modell och ansträngning i sin definition (`--agents`), och kroken ne
 agenttyp (till exempel en inbyggd agent med egen standardmodell) eller en annan modell. Johnny byter modell och
 ansträngning i ytan (`/model`) eller i Flödet; valbara är Opus 5.5, Fable 5.1 (egen kvot), Sonnet 5, Opus 5 och Haiku
 4.5, med ansträngningen low, medium, high, xhigh eller max. Finns en mätning (`python3 -B tools/partner.py matmodeller`,
-kvittot `data/modellmatning.json`) erbjuds bara modellerna som fungerade i Johnnys Claude Code. Valet står i
+kvittot `data/modellmatning.json`) erbjuds bara det som fungerade i Johnnys Claude Code och Codex. Valet står i
 `data/installningar.json`
 (`{"modell": {"huvud": "…", "anstrangning": "…"}}`); en äldre egen utredarmodell där läses inte. Startvaktens
 mottagarsessioner i andra repon kör Runtimes bemanning (rollen driver), se Startvakten.
+
+**Partnern på Codex** (MODELLKARTA-20260929 steg 1b, "Arbetsmodellen ska aldrig spela roll"). Väljer Johnny en
+Codex-modell i ytan eller i Flödet kör partnern `codex exec` på hans Codex-inloggning. Bara modeller och nivåer som
+fungerade i mätningen i hans Codex erbjuds, med Codex egna nivåer (till exempel `ultra`). Körningen:
+- läser inte Johnnys `~/.codex/config.toml` (`--ignore-user-config`), så hans egna MCP-servrar och tillägg laddas inte;
+- har inget skal (`shell_tool` och `unified_exec` av), inga mål, appar, tillägg, dator- eller webbläsarstyrning,
+  ingen bildgenerering, ingen bildläsning från disk (`view_image`) och ingen väntan (`sleep_tool`), och körs i läsläge
+  utan godkännandefrågor;
+- skickar varje verktygsanrop, också de som modellen gör genom Codex kodläge, genom samma krok som på Claude. Servern
+  tillåter bara partnerns egna verktyg och klockan, prövar webbverktyget (`webrun`) med webbpolicyns regler för sökning
+  och hämtning, också när en sökträff öppnas genom sin hänvisning, och nekar allt annat, till exempel `apply_patch` och
+  agentstarter (`webbpolicy.prova_codex`);
+- låter aldrig kroken bli tyst. Codex kör verktyget om kroken dör utan svar eller inte hinner svara (prövat
+  2026-09-30). Kroken svarar därför själv nej om servern inte svarat inom 17 sekunder (`krok.FRIST`, mot Codex
+  tidsgräns 20), och startar Python inte alls svarar skalets reservrad nej. Det partnern inte behöver stängs dessutom av
+  vid källan. Kvar finns `apply_patch`, som läsläget stoppar också när kroken släpper igenom (prövat), och Codex
+  agentverktyg (`collaboration.*`), som inte går att stänga av i Codex 0.159 (`agents.max_threads=0` vägras) och som
+  kroken nekar. Bara om Python tar över tre sekunder att starta och servern samtidigt inte svarar hinner Codex
+  tidsgräns före kroken, och då körs verktyget;
+- ger MCP-bryggan körningens nyckel genom `env_vars`, aldrig i processargumenten.
+Kodlägets JavaScript har ingen fil- eller nätåtkomst: `require`, `import`, `fetch`, `process`, Deno och Bun saknas
+(prövat 2026-09-29). Skillnader mot Claude: ingen underagent i turen, så en utredning registreras med verktyget utred
+och körs på samma modell; ingen sparad session (`--ephemeral`), så varje tur får trådens historik ur journalen och
+Johnnys egen Codex-historik fylls inte av partnerns turer; bilder skickas som filer (`-i`). En Codex-tur får ett eget
+sessions-id (`codex-…`); väljer Johnny sedan Claude igen börjar Claude Code en ny session med trådens hela historik,
+så att inget från Codex-turerna försvinner. Systemprompten går som utvecklarinstruktion i processens argument, som
+andra lokala processer för samma användare kan se; blir den ovanligt stor läggs den först i prompten i stället.
 
 Ägarbeslut 2026-09-29: förbättringspartnern har ingen användningsgräns. Inget dygnstak på antal körningar, inget
 stegtak per tur eller bakgrundsutredning, ingen kostnadsspärr (`--max-turns` och `--max-budget-usd` skickas inte
@@ -374,6 +401,15 @@ partnern arbetar i tråden. GitHub prövas med en fejkad `gh`: hela trädet mär
 ett kapat träd, en fil över 1 MB läst i delar till sista raden och hämtad en gång, säkerhetsmeddelanden, en kapad lista
 och en otillåten sökväg. Modellvalet prövas så att utredaren får samma modell och ansträngning och kroken nekar andra
 agenttyper och modeller.
+`python3 -B -m unittest tools.test_codexpartner` prövar partnern på Codex mot en fejkad `codex` som gör det riktiga Codex
+gör i en tur: kör partnerns krok mot servern med körningens nyckel ur miljön och startar MCP-bryggan med bara de
+namngivna miljövariablerna. Proven visar att modellen avgör utföraren och att Claude Code aldrig startas, att bryggan
+når servern, att argumenten stänger skal, `view_image`, `sleep_tool` och Johnnys egen konfiguration och aldrig bär
+nyckeln, att kroken släpper partnerns verktyg och webben men nekar `view_image`, `apply_patch` och agentstarter, att
+kroken svarar nej av sig själv när servern tar emot anropet men aldrig svarar och att skalets reservrad svarar nej när
+Python inte går att starta, att webbgrinden prövar sökningar,
+öppnade sidor och sökträffar med webbpolicyns regler och nekar okända former, och att en Codex-modell bara kan väljas
+när den fungerat i mätningen.
 Startvakten prövas med en fejkad mottagarsession som kör det riktiga kvitteringskommandot ur sin instruktion: exakt
 en session per överlämning (även efter en omstart av tjänsten), väntan när skrivplatsen är upptagen och sedan start,
 egen session i samma repo och dygnstaket, kvot och saknad inloggning med synlig väntan och samma session, Codex ur

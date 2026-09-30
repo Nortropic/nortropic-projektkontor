@@ -190,8 +190,16 @@ def mat(data: Path, claude_egen: str, logg=print, forsok: bool = False, binarer:
         return kvitto
     fil = Path(data) / 'modellmatning.json'
     tmp = fil.with_name('.modellmatning.json.tmp')
-    tmp.write_text(json.dumps(kvitto, ensure_ascii=False, indent=1) + '\n', 'utf-8')
-    os.replace(tmp, fil)
+    try:
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(kvitto, ensure_ascii=False, indent=1) + '\n')
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, fil)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
     return kvitto
 
 

@@ -193,7 +193,7 @@ arbetsplatsen har delen Flödet (`/flodet`), en karta med fyra linjer där varje
 Partnern, dina sessioner (Claude Code och Codex) och läsarna väljs där. Bara modeller och nivåer som fungerade i
 mätningen (`python3 -B tools/partner.py matmodeller`) erbjuds. Runtimes och bevakningens val visas och görs i steg 2.
 Återstående steg, i ordning:
-1b. partnern på Codex: en Codex-drivare bredvid Claude Code-drivaren;
+1b. partnern på Codex: en Codex-drivare bredvid Claude Code-drivaren (levererat, se tillägget 2026-09-30 00:00 UTC);
 2. Runtime: ansträngning och utförare som val i releasen, bevakningen med Claude eller Codex, arbetsplatsens
    automatiska aktivering när Runtime är ledig och startvakten som följer Runtimes val; ägaren aktiverar den releasen
    en gång;
@@ -210,6 +210,13 @@ partnerns sökning nu också ett ord inuti längre ord ("vakten" i "startvakten"
 ordbörjan (PARTNER-SOK-DELORD-20260930). Urvalet av partnerns egna bedömningar per tur gör detsamma. Efter
 integrationen startas tjänsten om ur main enligt driftregeln, och mätningen upprepas mot den levande tjänsten. Ändringen
 påverkar inte nästa handling i spåret.
+
+Tillägg 2026-09-30 (00:00 UTC): steg 1b av MODELLKARTA-20260929 är levererat (PARTNER-CODEX-20260930). Partnern kör på
+Codex när Johnny väljer en Codex-modell i ytan eller i Flödet, lika avgränsad som på Claude: ingen egen konfiguration,
+inget skal, och varje verktyg genom samma krok, där servern bara släpper partnerns egna verktyg och klockan, prövar
+webbverktyget mot webbpolicyn och nekar agentstarter. Kroken svarar själv nej om servern inte svarar. Den levande partnern kör fortfarande det Johnny valt (i dag Opus 5.5).
+Efter integrationen startas tjänsten om ur main enligt driftregeln. Nästa handling i spåret: steg 2 (Runtime), enligt
+tillägget 22:18 UTC ovan. Återupptagning: `evidence/nasta-uppdrag/local/modellkarta-20260929/LAGE.md`.
 
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.

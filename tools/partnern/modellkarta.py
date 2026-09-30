@@ -480,22 +480,24 @@ def karta(server) -> dict:
           if matning else None}
     ingen_matning = (None if matning else
                      'Ingen mätning av modellerna finns ännu, så inget erbjuds: kör python3 -B tools/partner.py matmodeller.')
+    partner_program = 'claude_egen' if utforare_for(k.modell.huvud) == 'claude' else 'codex_egen'
     ut['val']['partner'] = {
-        'namn': 'Partnern', 'modell': k.modell.huvud, 'anstrangning': k.modell.anstrangning, 'utforare': 'claude',
-        'status': 'ok', 'valbar': bool(matning), 'kalla': 'arbetsplatsen', 'erbjud': erbjud(k, 'claude_egen'),
-        'bevisad': bevisad(k, 'claude_egen', k.modell.huvud, k.modell.anstrangning),
-        'kommer': erbjud(k, 'codex_egen'), 'skal': ingen_matning,
-        'var': 'Gäller direkt, från nästa svar.',
-        'kraver': 'Codex kräver partnerns Codex-drivare, som byggs härnäst.'}
+        'namn': 'Partnern', 'modell': k.modell.huvud, 'anstrangning': k.modell.anstrangning,
+        'utforare': utforare_for(k.modell.huvud), 'status': 'ok', 'valbar': bool(matning), 'kalla': 'arbetsplatsen',
+        'erbjud': erbjud(k, 'claude_egen') + erbjud(k, 'codex_egen'),
+        'bevisad': bevisad(k, partner_program, k.modell.huvud, k.modell.anstrangning), 'skal': ingen_matning,
+        'var': 'Gäller direkt, från nästa svar. Modellen avgör om partnern kör på Claude Code eller Codex.'}
     cc, cx = las_claude_code(k), las_codex(k)
     ut['val']['sessioner'] = {
         'namn': 'Dina sessioner', 'valbar': bool(matning), 'kalla': 'program', 'skal': ingen_matning,
         'var': 'Programmens egna inställningar. Nya sessioner får valet direkt.',
         'program': {
             'claude_code': dict(cc, namn='Claude Code', utforare='claude', erbjud=erbjud(k, 'claude_egen'),
-                                bevisad=bevisad(k, 'claude_egen', cc['modell'], cc['anstrangning'])),
+                                bevisad=bevisad(k, 'claude_egen', cc['modell'], cc['anstrangning'])
+                                if cc['modell'] and cc['anstrangning'] else None),
             'codex': dict(cx, namn='Codex', utforare='codex', erbjud=erbjud(k, 'codex_egen'),
-                          bevisad=bevisad(k, 'codex_egen', cx['modell'], cx['anstrangning']))}}
+                          bevisad=bevisad(k, 'codex_egen', cx['modell'], cx['anstrangning'])
+                          if cx['modell'] and cx['anstrangning'] else None)}}
     niva = rt.get('anstrangning', {}) if rt['status'] == 'ok' else {}
     if rt['status'] == 'ok':
         u = rt['utforare']
@@ -544,9 +546,7 @@ def spara(server, val: str, modell, anstrangning) -> tuple:
     k = server.k
     if val == 'partner':
         fore = {'modell': k.modell.huvud, 'anstrangning': k.modell.anstrangning}
-        if modell not in MODELL_ID:
-            raise ValueError('Partnern kör i dag bara på Claude; Codex kräver partnerns Codex-drivare.')
-        _prova_erbjuden(k, 'claude_egen', modell, anstrangning)
+        _prova_erbjuden(k, 'claude_egen' if modell in MODELL_ID else 'codex_egen', modell, anstrangning)
         ny = spara_modellval(k, str(modell), str(anstrangning))
         return fore, {'modell': ny['huvud'], 'anstrangning': ny['anstrangning']}
     if val == 'claude_code':
