@@ -8758,6 +8758,9 @@ steg 2 och väntar alltså på D040.
 **Delvis ersatt av:** RUNTIME-OVERGANG-19-20260930, i fråga om att D040 väntade på ägarens beslut om mätningen: beslutet
 är fattat, och D040 och D041 är på Runtimes main. Steg 4 väntar nu på att ägaren aktiverar övergång 19. Övrigt gäller.
 
+**Delvis ersatt av:** RUNTIME-OVERGANG-19-AKTIV-20260930, i fråga om meningen att `tools/ARBETSPLATS.md` säger att D040 inte är på Runtimes
+main: D040 och D041 är aktiva sedan övergång 19, och ARBETSPLATS.md säger det. Övrigt gäller.
+
 ## RUNTIME-OVERGANG-19-20260930 — steg 2 av MODELLKARTA-20260929, Runtimes del: D040 och D041 är på Runtimes main, och övergång 19 med aktiveraren väntar på ägarens engångsblock
 
 **Status:** registrerat 2026-09-30 av sessionen nortropic-repos-d7 (Claude Code) på ägarens beställning
@@ -8825,6 +8828,10 @@ D040, och båda bär raden om det.
 
 **Avslut.** Steg 2 är klart när övergång 19 är aktiv och aktiveraren går. Nästa steg under beställningen är steg 4:
 automatiska uppdateringar av Claude Code och Codex.
+
+**Delvis ersatt av:** RUNTIME-OVERGANG-19-AKTIV-20260930, i fråga om att övergång 19 väntade på ägarens engångsblock (den är aktiv sedan
+2026-09-30 08:04Z, och aktiveraren går), om återgångens verkan och om två uppgifter om mätningen, som den nya posten
+preciserar. Övrigt gäller.
 
 ## SMA-ANDRINGAR-FORSLAG-20260930 — förslag: en lättare väg för små kontorsändringar och färre publiceringar; väntar på att Johnny lägger det i backloggen och släpper det
 
@@ -8897,3 +8904,73 @@ Text till backloggen, att klistra in:
 posten.
 
 **Ersätter:** ingen post.
+
+## RUNTIME-OVERGANG-19-AKTIV-20260930 — övergång 19 är aktiv och aktiveraren går; steg 2 av MODELLKARTA-20260929 är klart
+
+**Status:** registrerat 2026-09-30 av sessionen nortropic-repos-d7 (Claude Code) efter ägarens aktivering. Hans
+terminalutdrag är sparat ordagrant i
+`evidence/nasta-uppdrag/local/modellkarta-20260929/overgang-19/OWNER-ACTIVATION-TERMINAL-19.txt`.
+
+**Ägarens handling.** Johnny körde blocket i `overgang-19/OPERATORSSTEG-19.md` i sin egen Terminal 08:04Z.
+
+- `check` godkände alla förvillkor.
+- `activate` slutade med "KLART. Den nya versionen kör (bekräftat nu) …".
+- `agent install` slutade med "Den automatiska aktiveringen är igång".
+
+**Återläsning.** Sessionens egen återläsning 08:07Z gjordes med den aktiva releasens kod och bara läsning
+(`overgang-19/LASNING-EFTER-AKTIVERING.json`).
+
+- Pekaren och tjänsten pekar på konfigurationen `0ee0fda3`: Runtime `faf3cfb` och kontoret `df5ed5dc`. Tjänstens tre
+  processer är nya och lever.
+- Releasens egna kontroller godtar den, utan avvikelser i vakterna. Codex-filen är bunden i D041:s form. På en kopia av
+  filen gav en ändrad ansträngning samma bundna värde och en annan ändring ett annat.
+- AP10:s schema är bundet till den nya konfigurationen och inte pausat; nästa körning är 2026-10-01 07:00Z.
+- Det avslutade AP-11 är oförändrat.
+- Samma val som före övergången:
+  - modellerna Claude Opus 5 och GPT-6 Astra;
+  - Claude som utförare för alla utvecklingsroller;
+  - bevakningen med Codex, GPT-6 Astra och ansträngningen high.
+- Ansträngningen följer releasens standard: medium för Claude och high för Codex.
+- Aktiveraren `se.nortropic.ap10-runtime-choice` är installerad. Dess första titt 08:04:47Z gav "none", alltså inget
+  väntande val.
+
+Två senare läsningar av aktiverarens statusfil (`overgang-19/AKTIVERAREN-STATUS.json`) visar titterna 08:24:57Z och
+08:30:00Z, 303,5 sekunder isär, båda med "none". Aktiveraren tittar alltså var femte minut.
+
+**Dagens bevakning.** Den gick 07:00Z, före aktiveringen och under den tidigare releasen. Modellanalysen avbröts efter
+72 sekunder, när motorn inte fick aktivitetens livstecken inom tio sekunder ("activity Heartbeat timeout"). Rundan blev
+"insufficient", utan granskning.
+
+- Enligt sessionernas egna uppgifter gick samtidigt tung last: nortropic-repos-d7:s publicering av PR 144 och
+  nortropic-repos-07:s provsviter. Orsaken är inte fastställd.
+- Båda sessionerna har åtagit sig att inte köra något tungt från 20 minuter före till 10 minuter efter en bevakning.
+- Runtimes runbok har ingen godkänd väg att köra om en bevakning, så nästa bedömning är 2026-10-01 07:00Z.
+
+**Rättelser efter granskningen av RUNTIME-OVERGANG-19-20260930.** Granskningen godkände utan blockerande fynd och gav
+tolv anteckningar. Sju tas här:
+
+- De tre proven kördes direkt på datorn en gång för D040 och en gång för D041, med ägarens filåtkomst, också till
+  utfärdarens katalog. Bevisen sade det öppet; posten sade det inte.
+- Att ägarens val 1 också gäller D041 är sessionens läsning av "fixa båda". Det stod öppet i underlaget för D041:s
+  sammansatta mätning, som ingår i den förseglade begäran, men inte i posten.
+- Återgången: en `git revert` av kontorets integrationscommit ändrar bara kontorets dokument. D040 och D041 återställs i
+  Runtime med Runtimes egen väg, och en aktiv övergång har sin egen väg tillbaka.
+- `tools/ARBETSPLATS.md` säger nu att bara formen med dubbelcitat undantas.
+- Planens rad om vad som skulle göras före det första automatiska bytet står i dåtid.
+- Planens mening om att ägaren inte byter Codex-valet före aktiveringen är ersatt av att blocket är kört.
+- LASARNAS-VAL-20260930 sade att `tools/ARBETSPLATS.md` anger att D040 inte är på Runtimes main. Den posten bär nu en
+  rad om det.
+
+De övriga fem kräver ingen ändring.
+
+**Oförändrat.** Här ändras bara planen, beslutsloggen och `tools/ARBETSPLATS.md`.
+
+**Ersätter:** ingen post. RUNTIME-OVERGANG-19-20260930 och LASARNAS-VAL-20260930 är delvis ersatta, och båda bär raden om
+det.
+
+**Återgång.** Återställ integrationscommiten med `git revert`; den ändrar bara dokumenten. Runtimes release byts
+tillbaka bara genom en ny övergång.
+
+**Avslut.** Steg 2 av MODELLKARTA-20260929 är klart. Nästa steg under beställningen är steg 4, automatiska uppdateringar
+av Claude Code och Codex. Det byggs i samordning med del B i ägarens beställning FULL AUTONOMI UTAN ROOT (automatiska
+kodövergångar), som nortropic-repos-07 bygger.

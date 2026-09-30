@@ -97,11 +97,11 @@ faktiskt styr dem:
 Startvakten visas vid Arbetssession: Runtimes drivande roll med utförare, modell och ansträngning. En release före
 Runtimes D040 har ingen ansträngning i valet; då gäller startvaktens egen (`installningar.json`, `startvakt.anstrangning`).
 
-**Runtime och bevakningen aktiveras av sig självt** (steg 2, Runtimes D040, när den är aktiv). D040 och D041 är på
-Runtimes main och blir aktiva med Runtimes övergång 19, Johnnys engångsblock (RUNTIME-OVERGANG-19-20260930). Tills dess
-binder den aktiva releasen hela `~/.codex/config.toml`: ett byte av Codex-sessionernas modell eller ansträngning under
-Dina sessioner stoppar då Runtimes modellanrop. Efter övergången bortser Runtime från filens två rader `model` och
-`model_reasoning_effort` överst (D041).
+**Runtime och bevakningen aktiveras av sig självt** (steg 2, Runtimes D040). D040 och D041 är aktiva sedan Runtimes
+övergång 19 (2026-09-30 08:04Z, RUNTIME-OVERGANG-19-AKTIV-20260930), och aktiveraren går. Runtime bortser från de två raderna
+`model = "…"` och `model_reasoning_effort = "…"`, med dubbelcitat, överst i `~/.codex/config.toml`, som Flödet skriver för
+Dina sessioner; ett byte där stoppar inte Runtime. Ändras något annat i filen, eller skrivs raderna i en annan form,
+stoppas Runtimes modellanrop som förut (D041).
 Spara skriver ett önskemål i Runtimes
 inkorg, `.runtime/ap10/workplace-choice.json`, med ett nytt id: Runtimes val (utförare, modell, ansträngning) och
 bevakningens. Kortet man inte ändrade behåller sitt väntande värde, annars det som kör. Bara det som fungerade i
@@ -112,8 +112,8 @@ tjänsten inte svarar som väntat. Annars byter det release med samma väg tillb
 önskade valet och Runtimes status (`automatic-choice-status.json`) för just det önskemålet: väntar och varför, aktiveras
 inte och varför, aktiverades, den förra versionen återställd, misslyckat eller avbrutet; en status om ett tidigare
 önskemål visas som att valet väntar på Runtimes nästa titt. Aktiveraren är en LaunchAgent i Johnnys eget
-sammanhang, eftersom sessioner inte får köra `launchctl`. Johnny startar den en gång, efter Runtimes övergång 19, med
-`model_choice.py agent install`; tills dess säger kortet att valet väntar. En prov- eller utvecklingsinstans med egen
+sammanhang, eftersom sessioner inte får köra `launchctl`. Johnny startade den 2026-09-30, efter Runtimes övergång 19, med
+`model_choice.py agent install`; utan den säger kortet att valet väntar. En prov- eller utvecklingsinstans med egen
 datakatalog skriver önskemålet där och kan aldrig utlösa ett verkligt byte, och en instans utan egen datakatalog skriver
 inget önskemål. Saknas Runtimes inkorg på datorn säger kortet det och sparar inget.
 
