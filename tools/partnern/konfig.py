@@ -111,6 +111,7 @@ class Konfig:
     # utan egen datakatalog som inte är den ordinarie har ingen inkorg.
     runtime_onskemal: Path | None = None
     runtime_status: Path | None = None
+    runtime_kodstatus: Path | None = None
 
     def till_json(self) -> dict:
         d = asdict(self)
@@ -164,9 +165,11 @@ def ladda() -> Konfig:
     if ordinarie and runtime:
         k.runtime_onskemal = Path(runtime) / '.runtime/ap10/workplace-choice.json'
         k.runtime_status = Path(runtime) / '.runtime/ap10/automatic-choice-status.json'
+        k.runtime_kodstatus = Path(runtime) / '.runtime/ap10/automatic-code-status.json'
     elif os.environ.get('PARTNER_DATA'):
         k.runtime_onskemal = data / 'runtime-workplace-choice.json'
         k.runtime_status = data / 'runtime-automatic-choice-status.json'
+        k.runtime_kodstatus = data / 'runtime-automatic-code-status.json'
     # En instans som varken är den ordinarie eller har egen datakatalog (till exempel bara PARTNER_PROV_DOLJ) har
     # ingen inkorg: den skriver inget önskemål för Runtime, varken i Runtimes inkorg eller i den ordinarie tjänstens
     # datakatalog.

@@ -68,6 +68,7 @@ class KartaMiljo(tp.Miljo):
         self.k.codex_installningar = self.rot / 'codex-config.toml'
         self.k.runtime_onskemal = self.rot / 'runtime-workplace-choice.json'
         self.k.runtime_status = self.rot / 'runtime-automatic-choice-status.json'
+        self.k.runtime_kodstatus = self.rot / 'runtime-automatic-code-status.json'
         self.claude_fore = (json.dumps(CLAUDE_CODE, ensure_ascii=False, indent=2) + '\n').encode()
         self.k.claude_installningar.write_bytes(self.claude_fore)
         self.k.codex_installningar.write_text(CODEX, 'utf-8')
@@ -617,6 +618,36 @@ class RuntimeOchBevakningen(KartaMiljo):
         self.status('nagot-nytt')
         self.assertEqual(self.karta()['val']['runtime']['aktivering']['lage'], 'okant')
 
+    def kodstatus(self, lage, alder=0, **extra):
+        from datetime import datetime, timedelta, timezone
+        tid = (datetime.now(timezone.utc) - timedelta(seconds=alder)).isoformat()
+        self.k.runtime_kodstatus.write_text(json.dumps({'schema': 'automatic-code-status/1', 'checked_at': tid,
+                                                        'state': lage, **extra}), 'utf-8')
+
+    def test_runtimes_nya_versioner_syns_pa_runtimekortet(self):
+        self.assertIsNone(self.karta()['val']['runtime']['kodovergang'], 'en release före D043 skriver ingen status')
+        self.kodstatus('owner_needed', active_revision='a' * 40, target_revision='b' * 40,
+                       reason='the release changes the activator or the service definition (runtime/scripts/model_choice.py)',
+                       proven=[{'pull_request': 76}, {'pull_request': 77}, {'pull_request': 'x'}])
+        k = self.karta()['val']['runtime']['kodovergang']
+        self.assertEqual((k['lage'], k['aktiv'], k['mal'], k['pr'], k['igang']), ('owner_needed', 'a' * 12, 'b' * 12, [76, 77], True))
+        self.assertIn('activator', k['skal'])
+        self.assertNotIn('kodovergang', self.karta()['val']['bevakning'])
+        self.kodstatus('activated', alder=3600, activated_at='2026-09-30T12:00:00+00:00', target_revision='nej')
+        k = self.karta()['val']['runtime']['kodovergang']
+        self.assertEqual((k['lage'], k['igang'], k['mal'], k['aktiverad']), ('activated', False, None, '2026-09-30T12:00:00+00:00'))
+        for innehall in ('inte json', json.dumps({'schema': 'automatic-choice-status/1', 'state': 'activated'}), json.dumps([1])):
+            self.k.runtime_kodstatus.write_text(innehall, 'utf-8')
+            self.assertIsNone(self.karta()['val']['runtime']['kodovergang'])
+        self.kodstatus('nagot-annat')
+        self.assertEqual(self.karta()['val']['runtime']['kodovergang']['lage'], 'okant')
+
+    def test_en_lankad_kodstatus_lases_inte(self):
+        mal = self.rot / 'annan-status.json'
+        mal.write_text(json.dumps({'schema': 'automatic-code-status/1', 'state': 'activated'}), 'utf-8')
+        self.k.runtime_kodstatus.symlink_to(mal)
+        self.assertIsNone(self.karta()['val']['runtime']['kodovergang'])
+
     def test_en_status_fran_framtiden_betyder_inte_att_aktiveraren_gar(self):
         self.valj('runtime', 'gpt-6-sol', 'ultra')
         self.status('waiting', alder=-3600, reason='REFUSED: an AP10 watch run is in progress; activate later')
@@ -670,6 +701,7 @@ class ProvInstanser(unittest.TestCase):
         self.assertEqual((k.runtime_onskemal, k.runtime_status),
                          (Path('/tmp/prov-data/runtime-workplace-choice.json'),
                           Path('/tmp/prov-data/runtime-automatic-choice-status.json')))
+        self.assertEqual(k.runtime_kodstatus, Path('/tmp/prov-data/runtime-automatic-code-status.json'))
         with mock.patch.dict(os.environ, {'PARTNER_KONTOR_PRIMAR': '/tmp/kontor', 'HOME': '/tmp/ett-hem'}):
             os.environ.pop('PARTNER_DATA', None)
             os.environ.pop('PARTNER_PORT', None)
@@ -678,6 +710,7 @@ class ProvInstanser(unittest.TestCase):
         # bara den ordinarie tjänsten skriver i Runtimes egen inkorg (D040)
         self.assertEqual(k.runtime_onskemal, Path(k.repon['runtime']) / '.runtime/ap10/workplace-choice.json')
         self.assertEqual(k.runtime_status, Path(k.repon['runtime']) / '.runtime/ap10/automatic-choice-status.json')
+        self.assertEqual(k.runtime_kodstatus, Path(k.repon['runtime']) / '.runtime/ap10/automatic-code-status.json')
         self.assertIsNone(kf.Konfig(data=Path('/tmp/x'), hemligheter=Path('/tmp/y')).runtime_onskemal,
                           'en konfiguration som inte laddats har ingen inkorg alls')
 
@@ -690,7 +723,7 @@ class ProvInstanser(unittest.TestCase):
                         os.environ.pop(namn, None)
                 k = kf.ladda()
                 self.assertEqual(k.data, Path('/tmp/kontor/evidence/partner/local'))
-                self.assertEqual((k.runtime_onskemal, k.runtime_status), (None, None))
+                self.assertEqual((k.runtime_onskemal, k.runtime_status, k.runtime_kodstatus), (None, None, None))
 
 
 FEJK_CLAUDE = r'''#!/usr/bin/env python3

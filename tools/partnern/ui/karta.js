@@ -156,6 +156,28 @@ function aktiveringsrader(v) {
   ut.push(el('p', { class: 'fv-besked' + (problem ? ' fel' : ''), role: 'status', text: text + ' Senast kontrollerat ' + nar(a.tid) + '.' }));
   return ut;
 }
+// Runtimes nya versioner (Runtimes D043): en integrerad och granskad version aktiveras av sig själv när Runtime är ledigt
+const KOD = { waiting: 'väntar', refused: 'aktiveras inte av sig själv', owner_needed: 'kräver dig', activating: 'aktiveras nu',
+  activated: 'aktiverades', restored: 'startade inte, så den förra kör igen', failed: 'kunde inte aktiveras',
+  interrupted: 'avbröts innan bytet rapporterades och behöver ses över' };
+const KODSKAL = [[/pull request|protected App|sealed issuer request|approved separate review|reviewed head tree|not a completed success|one binding/,
+  'den är inte bevisat granskad och skyddat integrerad'],
+  [/changes the activator or the service definition|AP-10 command differs|service definition differs|pinned tools/,
+    'den ändrar det som bara du aktiverar (aktiveraren, tjänsten eller bevakningens kommando)'],
+  [/rehearsal/, 'startövningen gick inte igenom'], [/heavy work waits/, 'bevakningen kör snart, så övningen väntar'],
+  [/GitHub could not be read|not fetched|main moved/, 'GitHub gick inte att läsa just nu']];
+function kodskal(s) { for (const [re, t] of KODSKAL) if (re.test(s || '')) return t; return skaltext(s); }
+function kodrader(v) {
+  const k = v.kodovergang;
+  if (!k || k.lage === 'current') return k && k.aktiv ? [el('p', { class: 'fv-var', text: 'Runtime-version ' + k.aktiv.slice(0, 7) + ', den senaste på main.' })] : [];
+  if (!k.igang) return [status('Aktiveraren är inte igång, så en ny Runtime-version väntar.', 'varning')];
+  const pr = k.pr.length ? ' (' + k.pr.map((n) => '#' + n).join(', ') + ')' : '';
+  let text = 'Ny Runtime-version ' + (k.mal || '').slice(0, 7) + pr + ' ' + (KOD[k.lage] || 'är i ett okänt läge');
+  if (['waiting', 'refused', 'owner_needed', 'failed'].includes(k.lage) && k.skal) text += ': ' + kodskal(k.skal);
+  if (k.lage === 'activated') text += ' ' + nar(k.aktiverad || k.tid);
+  const problem = ['refused', 'owner_needed', 'restored', 'failed', 'interrupted'].includes(k.lage);
+  return [el('p', { class: 'fv-besked' + (problem ? ' fel' : ''), role: 'status', text: text + '. Senast kontrollerat ' + nar(k.tid) + '.' })];
+}
 function grupper(lista) {
   const ut = [];
   for (const utf of ['claude', 'codex']) { const l = lista.filter((x) => x.utforare === utf); if (l.length) ut.push([utf, l]); }
@@ -184,6 +206,7 @@ function valkort(k) {
     kort.append(el('div', { class: 'fv-varde', text: vardetext(v) }));
     if (v.bevisad === false) kort.append(status('Har inte fungerat i senaste mätningen.', 'varning'));
   }
+  if (k === 'runtime') kort.append(...kodrader(v));
   kort.append(el('p', { class: 'fv-var', text: 'I dag: ' + v.var }));
   if (v.skal) kort.append(status(v.skal, 'varning'));
   if (!v.valbar && v.varfor_inte) kort.append(el('p', { class: 'fv-var', text: v.varfor_inte }));

@@ -565,6 +565,40 @@ def las_aktivering(k) -> dict | None:
             'igang': alder is not None and 0 <= alder < AKTIVERARE_SEKUNDER}
 
 
+# ------------------------------------------------------------------ Runtimes nya versioner (Runtimes D043)
+KODOVERGANG_LAGEN = ('current', 'waiting', 'refused', 'owner_needed', 'activating', 'activated', 'restored', 'failed',
+                     'interrupted')
+REVISION = re.compile(r'\A[0-9a-f]{40}\Z')
+
+
+def las_kodovergang(k) -> dict | None:
+    """Runtimes status för automatiska kodövergångar: den aktiva versionen, en ny version på main och vad aktiveraren
+    gör med den. None när Runtime inte skriver någon sådan status (en release före D043) eller den inte går att läsa."""
+    p = k.runtime_kodstatus
+    if p is None or p.is_symlink() or not p.is_file():
+        return None
+    try:
+        v = json.loads(p.read_text('utf-8'))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(v, dict) or v.get('schema') != 'automatic-code-status/1':
+        return None
+    tid = v.get('checked_at') if isinstance(v.get('checked_at'), str) else None
+    try:
+        from datetime import datetime
+        alder = time.time() - datetime.fromisoformat(tid.replace('Z', '+00:00')).timestamp() if tid else None
+    except ValueError:
+        alder = None
+    rev = lambda x: x[:12] if isinstance(x, str) and REVISION.match(x) else None
+    bevis = v.get('proven') if isinstance(v.get('proven'), list) else []
+    return {'lage': v.get('state') if v.get('state') in KODOVERGANG_LAGEN else 'okant',
+            'skal': str(v.get('reason'))[:400] if v.get('reason') else None, 'tid': tid,
+            'aktiv': rev(v.get('active_revision')), 'mal': rev(v.get('target_revision')),
+            'pr': [r['pull_request'] for r in bevis if isinstance(r, dict) and isinstance(r.get('pull_request'), int)][:20],
+            'aktiverad': v.get('activated_at') if isinstance(v.get('activated_at'), str) else None,
+            'igang': alder is not None and 0 <= alder < AKTIVERARE_SEKUNDER}
+
+
 def spara_runtime_onskemal(k, runtime: dict, watch: dict) -> dict:
     """Skriver Johnnys val för Runtime och bevakningen i Runtimes inkorg, med ett nytt id. Runtime prövar det igen mot
     mätningen och aktiverar det själv när Runtime är ledigt (D040). Bara den här filen skrivs."""
@@ -644,7 +678,8 @@ def karta(server) -> dict:
             'valbar': kan_valja, 'kalla': 'runtime', 'erbjud': runtime_erbjud,
             'bevisad': bevisad(k, u + '_runtime', modell, niva.get(u)) if u else None,
             'onskat': _onskat((onskemal or {}).get('runtime'), u, modell, niva.get(u) if u else None),
-            'onskemal_id': (onskemal or {}).get('id'), 'aktivering': aktivering, 'skal': ingen_matning,
+            'onskemal_id': (onskemal or {}).get('id'), 'aktivering': aktivering, 'kodovergang': las_kodovergang(k),
+            'skal': ingen_matning,
             'var': ('Väljs här. Modellen avgör utföraren för alla roller, och bytet aktiveras av sig självt när Runtime är '
                     'ledigt. Ansträngningen är %s.' % ('releasens val' if rt['anstrangning_ur'] == 'release' else
                                                      'fast i Runtimes kod tills releasen tar emot ett val')),

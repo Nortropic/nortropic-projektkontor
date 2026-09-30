@@ -9037,3 +9037,71 @@ tiden bär fältet `tur`, som den gamla koden inte läser; inget annat i data ä
 
 **Avslut.** Klart när ändringen är integrerad och tjänsten har startats om ur main enligt driftregeln. Nästa bygge i
 spåret kräver ett eget beslut.
+
+## FULL-AUTONOMI-AB-20260930 — del A och B av FULL AUTONOMI UTAN ROOT: provanvändaren (D042) och automatiska kodövergångar (D043) är på Runtimes main; Johnnys två block väntar
+
+**Status:** registrerat 2026-09-30 av sessionen nortropic-repos-07 (Claude Code). Johnnys beställning FULL AUTONOMI UTAN
+ROOT står ordagrant i `evidence/nasta-uppdrag/local/full-autonomi-20260930/owner-words-full-autonomi-20260930.md`. Del C
+är SMA-ANDRINGAR-FORSLAG-20260930. Läget med kvitton står i `evidence/nasta-uppdrag/local/full-autonomi-20260930/LAGE.md`.
+
+**Del A: Runtimes D042 (PR 76, merge cf78dbe).**
+- En separat lokal macOS-användare utan nycklar, `_nortropicprov`, ska köra Runtimes, kontorets och Digitalas
+  helsviter. En enda sudoers-regel tillåter bara ett fast, rotägt mätskript att köras som den användaren, inget annat
+  kommando. Skriptet pinnas i regeln med sin sha256.
+- Den hanterade policyn tillåter att regeln finns, men nekar varje session `sudo`, `su`, `dscl`, `visudo` och
+  `launchctl`, och ett nekande kan inte undantas. Ingen session kan alltså använda regeln, och policyn behöver inte
+  ändras. Sessioner köar en mätbegäran, och Johnnys agent, som kör som hans konto utanför policyn, kör regeln.
+- Ingen hemlighet kopieras till provanvändaren. Installationen slutar med gränsproben, körd som provanvändaren. Den
+  försöker läsa App-nyckeln, Claude- och Codex-inloggningarna, GitHub, SSH, nyckelringen och `~/.nortropic-hemligheter`,
+  och en nyckel den kan läsa stoppar varje mätning tills Johnny stängt den.
+- Separat granskning: runda 1 och 2 underkände, runda 3 godkände.
+
+**Del B: Runtimes D043 (PR 77, merge a4fcdb3).**
+- Aktiveraren från D040 stegar, kontrollerar, övar isolerat och aktiverar av sig själv en Runtime-release som
+  bevisligen gått genom skyddad publicering och separat granskning. Varje commit sedan den aktiva ska vara en skyddad
+  merge med båda App-kontrollerna, bundna till en förseglad godkänd granskning av någon annan än den som byggde. Den
+  stegade koden ska vara byte för byte den bevisade versionens.
+- Samma förvillkor och samma väg tillbaka som ett handbyte. Aktiveraren väntar medan Runtime arbetar, och övningen
+  startar också bara när Runtime är ledigt.
+- En release som ändrar aktiveraren, dess övning, kedjebeviset, kontrollutfärdaren, mätkön eller tjänstens definition
+  aktiveras aldrig av sig själv. Den blir Johnnys egen övergång, och Runtimekortet i Flödet säger det.
+- Övningen körs i en sandlåda utan nät utanför datorn och utan skrivning utanför övningens egen katalog. Ett mätt fynd
+  på vägen: macOS sandlåda ignorerar en regel för en enskild lokal port så fort en annan regel nämner alla lokala
+  portar. Den levande motorn hålls därför borta genom portförskjutningen, och kopians anslutningar mäts vid varje start.
+- Separat granskning: runda 1 underkände (övningen gällde en annan commit och begränsade inte utåtverkan), runda 2
+  underkände (en övning som väntat kunde aldrig köras om), runda 3 godkände.
+
+**Mätningen.** D042 och D043 publicerades genom Johnnys mätbeslut "1" en sista gång: 780 av 783 respektive 828 av 831
+prov gick igenom i den kredentialfria profilen, och de tre prov som startar Codex egen sandlåda gick igenom i en körning
+utan sandlåda. När provanvändaren finns och övergång 20 är aktiv mäts Runtimes ändringar som provanvändaren, utan
+sammansatt väg.
+
+**Flödet.** Runtimekortet visar vad aktiveraren gör med en ny version på main (`tools/ARBETSPLATS.md`). En release före
+D043 skriver ingen sådan status, så kortet säger inget om nya versioner förrän övergång 20 är aktiv.
+
+**Johnnys två block (två nya rader i ÄGARENS TUR).** Båda körs i hans vanliga Terminal, inte 08:40–09:10 svensk tid.
+Ordningen mellan dem är fri.
+1. Provanvändaren: installationsblocket i Runtimes runbook ("Credential-free measurement as the key-less test user"),
+   en gång och med sudo. Det slutar med gränsproben som provanvändaren.
+2. Övergång 20: blocket i `evidence/nasta-uppdrag/local/full-autonomi-20260930/overgang-20/OPERATORSSTEG-20.md`
+   (`check && activate`). Övergången är stegad, kontrollerad, övad i en isolerad kopia och separat granskad. Det är den
+   sista kodövergången Johnny kör själv. Agenten behöver inte installeras om.
+
+**Kvar som ägarsteg när båda blocken är körda.**
+- En ändring i det fasta mätskriptet: ny installation och ny sha256 i regeln.
+- En Runtime-release som ändrar aktiveraren, dess övning, kedjebeviset, kontrollutfärdaren, mätkön eller tjänstens
+  definition: en egen kontrollerad övergång.
+- En ändring av policyn, en ny kostnad, ett nytt konto eller en ny behörighet.
+- `~/.claude.json` går att läsa för varje lokalt konto, eftersom filen är 0644 i ett hem som går att lista. Johnny
+  avgör om den ska begränsas; gränsproben namnger den (D042).
+- Besluten i ÄGARENS TUR, bland dem att släppa förslaget om små ändringar (SMA-ANDRINGAR-FORSLAG-20260930).
+
+**Oförändrat.** Här ändras bara planen, beslutsloggen, `tools/ARBETSPLATS.md` och Runtimekortets läsning av
+kodövergångens status (`tools/partnern/konfig.py`, `tools/partnern/modellkarta.py`, `tools/partnern/ui/karta.js`,
+`tools/test_modellkarta.py`).
+
+**Återgång.** Återställ integrationscommiten med `git revert` och starta om partnerns tjänst ur main. D042 och D043
+återställs i Runtime med Runtimes egen väg.
+
+**Avslut.** Klart när ändringen är integrerad och partnerns tjänst har startats om ur main enligt driftregeln. Johnnys två
+block står som rader i ÄGARENS TUR, och nästa handling i spåret är att läsa tillbaka efter vart och ett.
