@@ -357,14 +357,15 @@ class Agent:
 
     def _relevanta_forstaelse(self, korning: Korning) -> set:
         """Förståelseposter som liknar det Johnny tar upp i den här turen: ordsökning i lagrets eget index och sedan,
-        som i sökverktyget, delord (ett ord ur inspelet inuti ett längre ord i posten) enligt samma fördelning.
-        Båda prövar högst kallor.DELORD_TERMER delord, i inspelets ordning efter stopporden."""
+        som i sökverktyget, delord och sist svenska stammar enligt samma fördelning.
+        Båda extrapassen prövar högst kallor.DELORD_TERMER ord, i inspelets ordning efter stopporden."""
         from . import kallor
         from .kallor import Kallindex, delordsrang, delordstermer, fordela
         text = ' '.join((i.get('text') if isinstance(i, dict) else i['text']) or '' for i in korning.inspel)
         if korning.jobb:
             text += ' ' + str(korning.jobb.get('rubrik') or '') + ' ' + str(korning.jobb.get('uppdrag') or '')
-        ord_ = [o for o in re.findall(r'[\w-]+', re.sub(r'https?://\S+', ' ', text)[:1500])
+        soktext = re.sub(r'https?://\S+', ' ', text)[:1500]
+        ord_ = [o for o in re.findall(r'[\w-]+', soktext)
                 if len(o) >= 3 and o.lower() not in STOPPORD]
         q = Kallindex._fts_fraga(' '.join(ord_), True)
         if not q:
@@ -374,15 +375,23 @@ class Agent:
                                        "order by bm25(sok, 0, 0, 3.0, 0, 0, 1.0)", [q])
         except Exception:
             rader = []
-        helord = [r['kalla_id'][8:] for r in rader]
-        termer = delordstermer(' '.join(ord_))[:kallor.DELORD_TERMER]
+        helord = [r['kalla_id'][8:] for r in rader if not self.s.kallor.dold(r['kalla_id'])]
+        # Behåll citatgränser även efter agentens stoppordsfilter.
+        extra_fraga = re.sub(r'[\w-]+', lambda m: m[0] if len(m[0]) >= 3 and m[0].lower() not in STOPPORD else ' ', soktext)
+        termer = delordstermer(extra_fraga)[:kallor.DELORD_TERMER]
         alla_ord = list(dict.fromkeys(o.strip('-').lower() for o in ord_ if o.strip('-')))
         delord = []
         for f in self.s.lager.fraga('select id, nr, slag, text from forstaelse'):  # liten tabell; samma fält som i sok
+            if self.s.kallor.dold('partner:' + f['id']):
+                continue
             rang = delordsrang(termer, alla_ord, f['slag'], f['text']) if f['id'] not in helord else None
             if rang is not None:
                 delord.append((rang + (-f['nr'],), f['id']))  # lika rang: nyaste först
-        return set(fordela(helord, [i for _, i in sorted(delord)], FORSTAELSE_RELEVANTA))
+        extra = [i for _, i in sorted(delord)]
+        sedda = {'partner:' + i for i in helord + extra}
+        extra += [r['kalla_id'][8:] for r in self.s.kallor._stam(
+            extra_fraga, " and klass='partner:forstaelse'", [], sedda, FORSTAELSE_RELEVANTA)]
+        return set(fordela(helord, extra, FORSTAELSE_RELEVANTA))
 
     def historiktext(self, trad: str, utom: set) -> str:
         rader = self.s.historik(trad, max_tecken=40000, utom=utom)

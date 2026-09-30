@@ -228,10 +228,13 @@ def specifikationer(typ: str) -> list:
             'Sök i Nortropics underlag: Improvements-samtalen (original: Johnnys ord och ChatGPT-assistentens svar), '
             'ägarens ordagrant sparade ord och beställningar, kontorets beslutslogg och plan (main), andra repons '
             'dokument, förberedelsekampanjens härledda syntes och partnerns egna tidigare trådar och förståelse. '
-            'Ordsökning i två pass. Först hela ord och ordbörjan (ord med minst fyra tecken som prefix, "exakt fras" '
+            'Ordsökning i tre pass. Först hela ord och ordbörjan (ord med minst fyra tecken som prefix, "exakt fras" '
             'inom citattecken). Sedan delord: ett sökord med minst fem tecken hittas också inuti längre ord (bevakning '
             'hittar omvärldsbevakningen; högst tio ord per fråga); de träffarna kommer efter de andra, märks delordsträff '
-            'och får en tredjedel av platserna när de andra fyller antalet. Omvänt hittar ett sammansatt sökord inte en '
+            'och delar en tredjedel av platserna med sista passet när hela ord fyller antalet (minst en vid antal 2). '
+            'Sist svenska stammar enligt Snowballs steg 1: sökord minst fem tecken, stam minst fyra, som ordbörjan '
+            '(lista hittar listorna, fråga hittar frågor); märks stamträff. Delord går före stam på samma extraplatser. '
+            'Stammar under fyra tecken, som köra/körde, hittas inte denna väg. Omvänt hittar ett sammansatt sökord inte en '
             'post som bara har efterledet. Kortare ord, fraser, ord med bindestreck inuti och ord med understreck '
             'söks inte inuti ord; bindestreck i början och slutet tas bort före femteckensgränsen. LIKE viker bara '
             'A–Z: å, ä och ö hittas inte inuti ord där de står som versala Å, Ä och Ö. Sök också '
@@ -447,6 +450,8 @@ class Verktyg:
             status = (' · ' + t['status']) if t.get('status') else ''
             if t.get('traff') == 'delord':
                 status += ' · delordsträff (sökordet inuti ett längre ord)'
+            elif t.get('traff') == 'stam':
+                status += ' · stamträff (svensk stam som ordbörjan)'
             nr = (' ' + t['nr']) if t.get('nr') else ''
             rader.append('%d. [%s]%s %s · %s · %s · %s%s\n   %s' % (
                 i, t['kalla_id'], nr, t['kalla_klass'], (t['titel'] or '')[:90], t['talare'] or '', t['datum'] or '',

@@ -152,6 +152,44 @@ def delordstermer(fraga: str) -> list:
     return ut
 
 
+def svensk_stam(ord_: str) -> str | None:
+    """Snowball Swedish step 1 only (read 2026-09-30); query >=5, resulting stem >=4.
+    https://snowballstem.org/algorithms/swedish/stemmer.html
+    Region R1 and the conditional s/et rules apply; steps 2 and 3 are not used.
+    """
+    word = ord_.lower()
+    if len(word) < 5:
+        return None
+    vowels = 'aeiouyäåö'
+    r1 = next((max(3, i + 1) for i in range(1, len(word))
+               if word[i - 1] in vowels and word[i] not in vowels), len(word))
+    suffixes = ('a arna erna heterna orna ad e ade ande arne are aste en anden aren heten ern ar er heter or '
+                'as arnas ernas ornas es ades andes ens arens hetens erns at andet het ast s et').split()
+    suffix = next((s for s in sorted(suffixes, key=lambda s: (-len(s), s))
+                   if word.endswith(s) and len(word) - len(s) >= r1), None)
+    if suffix is None:
+        return None
+    stem = word[:-len(suffix)]
+    def et_ending(s):
+        exceptions = ('h iet uit fab cit dit alit ilit mit nit pit rit sit tit ivit kvit xit kom rak pak stak').split()
+        return (len(s) >= 3 and s[-2] in vowels and s[-1] not in vowels
+                and not any(s.endswith(x) for x in exceptions))
+    if suffix == 'et' and not et_ending(stem):
+        return None
+    if suffix == 's':
+        if stem.endswith('et') and et_ending(stem[:-2]):
+            stem = stem[:-2]
+        elif not stem or stem[-1] not in 'bcdfghjklmnoprtvy':
+            return None
+    return stem if len(stem) >= 4 else None
+
+
+def stamtermer(fraga: str) -> list:
+    # The same query-word cap and phrase/hyphen exclusions as the second pass.
+    return list(dict.fromkeys(s for o in delordstermer(fraga)[:DELORD_TERMER]
+                              if (s := svensk_stam(o)) is not None))
+
+
 def _inuti(text: str, term: str) -> int:
     """Hur många gånger term (gemener) står inuti ett ord i text, alltså direkt efter en bokstav eller siffra. Övriga
     tecken (också _ och -) skiljer ord åt, som i indexets tokenisering (unicode61), och täcks av första passet."""
@@ -577,7 +615,9 @@ class Kallindex:
                 break
         for r in ut:
             r['traff'] = 'ord'
-        ut = fordela(ut, self._delord(fraga, villkor, args, sedda, antal), antal)
+        extra = self._delord(fraga, villkor, args, sedda, antal)
+        extra += self._stam(fraga, villkor, args, sedda, antal)
+        ut = fordela(ut, extra, antal)
         for r in ut:
             r['kalla_klass'] = KLASSER.get(r['klass'], r['klass'])
             if r['klass'] == 'partner:forstaelse':
@@ -632,6 +672,27 @@ class Kallindex:
             if len(ut) >= antal:
                 break
         return ut
+
+    def _stam(self, fraga: str, villkor: str, args: list, sedda: set, antal: int) -> list:
+        """Third pass: stem prefixes in the same FTS index and visibility scope."""
+        termer = stamtermer(fraga)
+        if not termer:
+            return []
+        query = ' OR '.join('"%s"*' % s for s in termer)
+        rows = self.lager.fraga(
+            "select kalla_id, klass, titel, talare, datum, snippet(sok, 5, '«', '»', ' … ', 28) as utdrag "
+            "from sok where sok match ?" + villkor + " order by bm25(sok, 0, 0, 3.0, 0, 0, 1.0), rowid",
+            [query] + args)
+        result = []
+        for r in rows:
+            bas = r['kalla_id'].split('~')[0]
+            if bas in sedda or self.dold(bas):
+                continue
+            sedda.add(bas)
+            result.append(dict(r, kalla_id=bas, traff='stam'))
+            if len(result) >= antal:
+                break
+        return result
 
     # --------------------------------------------------------------- öppna
     def oppna(self, kid: str, omkrets: int = 2) -> dict | None:

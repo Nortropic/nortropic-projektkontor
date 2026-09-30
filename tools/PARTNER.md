@@ -246,7 +246,7 @@ start (`ingang.py`) och efter varje publicering. Repo-verktygen läser den senas
 
 ## Sökningen
 
-Verktyget `sok` och `/api/sok` söker i indexets tabell `sok` (titel och text) i två pass, utan modell. Första passet
+Verktyget `sok` och `/api/sok` söker i indexets tabell `sok` (titel och text) i tre pass, utan modell. Första passet
 är FTS5 med hela ord: ett ord med minst fyra tecken söks som ordbörjan, ett ord med två eller tre tecken som helt ord
 (ett tecken används inte) och "en fras" inom citattecken som exakt fras. Först måste alla ord finnas, sedan räcker
 ett, och träffarna ordnas efter bm25 med titeln tre gånger tyngre. Andra passet (PARTNER-SOK-DELORD-20260930) söker
@@ -256,9 +256,17 @@ efter en bokstav eller siffra; `_` och `-` skiljer ord åt som i indexet. Poster
 källor i provläget räknas inte, och en raderad tråds text finns inte i tabellen. Delordsträffarna kommer efter de
 andra och märks "delordsträff" i verktygets utdata (`"traff": "delord"` i `/api/sok`, annars `"ord"`). Sinsemellan
 ordnas de efter hur många av frågans ord posten har, om träffen står i titeln och hur många gånger ordet står inuti
-ett ord. Fyller första passet antalet hålls ändå en tredjedel av platserna (minst en) för delordsträffar; annars får
-de platserna som blir över. Med antal 1 hålls ingen plats, så att den enda platsen går till en träff på hela ordet.
-Urvalet av partnerns egna bedömningar som står i sin helhet i varje tur använder samma två pass och samma fördelning
+ett ord. Tredje passet (OVL-20260930-dbbdd8 S1–S4) söker svenska stammar som ordbörjan:
+ett sökord om minst fem tecken får sin längsta giltiga ändelse i Snowballs svenska steg 1 borttagen,
+med region R1 och villkoren för s/et. En stam om minst fyra tecken söks i samma FTS-tabell och
+omfång. »lista« hittar »listorna«, »fråga« hittar »frågor« och »bilaga« hittar »bilagor«.
+Steg 2–3 i Snowball används inte. Stamträffar kommer sist, märks »stamträff« i verktyget och
+`"traff": "stam"` i API:t. Redan valda, dolda och raderade källor tas inte med igen.
+
+Fyller första passet antalet hålls en tredjedel av platserna (minst en vid antal 2)
+gemensamt för delord och stam, med delord först; annars får extrapassen platserna som blir över.
+Med antal 1 hålls ingen plats, så att den enda platsen går till en träff på hela ordet.
+Urvalet av partnerns egna bedömningar som står i sin helhet i varje tur använder samma tre pass och samma fördelning
 mot det Johnny skriver.
 
 Gränser som finns kvar: omvänt hittar ett sammansatt sökord inte en post som bara har efterledet ("startvakten" hittar
@@ -269,7 +277,11 @@ vid de tecknen, så delarna hittas av första passet. Rangordningen
 mellan träffar på hela ord är densamma som före delordspasset. LIKE viker bara versaler i A–Z, så ett sökord med å, ä
 eller ö hittas inte inuti ett ord där de bokstäverna står som versaler. Sökverktyget och urvalet av egna bedömningar
 prövar högst tio ord inuti ord, med samma `kallor.DELORD_TERMER`: i frågans ordning respektive inspelets ordning efter
-stopporden. Urvalets första pass är oförändrat.
+stopporden. Samma tio ursprungliga sökord är gränsen för stampasset. Kortare stammar används
+inte: »köra« är redan för kort som fråga, och »körde« ger »körd« och hittar alltså inte »köra«.
+Det är ingen generell böjningsanalys eller synonymkontroll. Fraser, bindestreck inuti och
+understreck undantas även från stampasset. Källan läst 2026-09-30:
+[Snowball Swedish, step 1](https://snowballstem.org/algorithms/swedish/stemmer.html).
 
 ## Läsning i original
 
@@ -432,6 +444,9 @@ fördelningen vid antal 1, 2, 3, 6 och 12; korta ord, fraser, omfång, `%` och `
 eller slutet, även flera frågeords rangordning; dold källa i provläget; raderad tråd; urvalet av egna bedömningar med
 kantbindestreck och samma delordstak som sökverktyget, också när konstanten ändras i provet. Verktygsbeskrivningen
 prövas för både tur och jobb: understreck, bindestreck inuti ord och versala Å, Ä och Ö.
+S1–S4-proven täcker svenska böjningar, R1/s/et och längdgränser, delade extraplatser
+vid antal 1/2/6, stammarkering i verktyg/API, dolda och raderade källor samt samma
+stamurval i partnerns bedömningar. Prov är syntetiska; integration aktiverar inte tjänsten.
 
 `python3 -B -m unittest tools.test_partner` kör en riktig server i processen mot en fejkad `claude` som talar
 Claude Codes strömformat, startar den riktiga MCP-bryggan och kör den riktiga webbkroken: lager och återbyggnad,

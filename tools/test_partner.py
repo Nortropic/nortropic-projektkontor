@@ -2737,6 +2737,77 @@ class DelordProv(Miljo):
         block = self.S.agent.lagesblock(korning)                        # i sin helhet, före de övriga
         self.assertLess(block.index('Startvakten startar mottagarens session.'), block.index('Övriga (bara första raden'))
 
+    def test_svenska_stammar_hittar_lista_fraga_bilaga_och_marks(self):
+        from types import SimpleNamespace
+        ids=self.poster('Listorna är långa.', 'Frågor finns här.', 'Bilagor ska läsas.')
+        for word, pid in zip(('lista','fråga','bilaga'), ids):
+            rows=self.S.kallor.sok(word,['kontoret'])
+            self.assertEqual([(x['kalla_id'],x['traff']) for x in rows],[(pid,'stam')])
+            self.assertIn('«',rows[0]['utdrag'])
+        output=self.S.verktyg.v_sok(SimpleNamespace(logga_kallor=lambda *a:None),{'fraga':'lista','omfang':['kontoret']})
+        self.assertIn('stamträff',output['text'])
+        self.assertEqual(self.traffar('"lista"',['kontoret']),[])
+        self.assertEqual(self.traffar('arbetslista',['kontoret']),[])
+
+    def test_stammar_delar_extraplatser_efter_delord_aven_vid_antal_tva(self):
+        ids=self.poster(*['Lista för nummer %d.' % i for i in range(6)],'Avprickningslista finns.','Listorna finns.')
+        rows=self.traffar('lista',['kontoret'],antal=6)
+        self.assertEqual([r[1] for r in rows],['ord']*4+['delord','stam'])
+        self.assertEqual([r[0] for r in rows[-2:]],ids[-2:])
+        self.assertEqual([r[1] for r in self.traffar('lista',['kontoret'],antal=2)],['ord','delord'])
+        self.S.kallor.dolda=(ids[-2],)
+        self.assertEqual([r[1] for r in self.traffar('lista',['kontoret'],antal=2)],['ord','stam'])
+        self.assertEqual([r[1] for r in self.traffar('lista',['kontoret'],antal=1)],['ord'])
+
+    def test_snowball_steg_ett_region_langsta_andelse_och_granser(self):
+        from partnern.kallor import svensk_stam,stamtermer
+        for word,expected in [('lista','list'),('fråga','fråg'),('bilaga','bilag'),('möjligheterna','möjlig'),
+                              ('arbetets','arbet'),('alfabetet','alfabet'),('paket',None),('aktivitet',None),
+                              ('köra',None),('körde','körd'),('valet',None),('friskt',None),('atlas',None)]:
+            with self.subTest(word=word):self.assertEqual(svensk_stam(word),expected)
+        self.assertEqual(stamtermer('"lista" under_lista arbets-lista -bilaga'),['bilag'])
+
+    def test_stam_dold_raderad_och_api(self):
+        self.logga_in()
+        row=self.skicka('Listorna i den här tråden.',lage='bara_spara')['inspel'];pid='partner:'+row['id']
+        url='/api/sok?q=lista&omfang=partner'
+        self.assertIn((pid,'stam'),[(x['kalla_id'],x['traff']) for x in self.json('GET',url)[1]['traffar']])
+        self.S.kallor.dolda=(pid,)
+        self.assertNotIn(pid,[x['kalla_id'] for x in self.json('GET',url)[1]['traffar']])
+        self.S.kallor.dolda=()
+        self.assertEqual(self.json('POST','/api/trad/%s/radera'%row['trad'],{'bekraftat':True})[0],200)
+        self.assertNotIn(pid,[x['kalla_id'] for x in self.json('GET',url)[1]['traffar']])
+
+    def test_citat_bevaras_i_agentens_bada_extrapass(self):
+        from types import SimpleNamespace
+        from unittest import mock
+        from partnern import kallor
+        ids=[]
+        for text in ('Listorna.', 'Avprickningslista.', 'Bilagor.'):
+            f=self.S.lager.lagg_till('forstaelse',trad='t_citat',tur='x',slag='slutsats',text=text,
+                                    auktoritet='modellbedomning',kallor=[],ersatter=[])
+            ids.append(f['id'])
+        val=lambda q:self.S.agent._relevanta_forstaelse(SimpleNamespace(inspel=[{'text':q}],jobb=None))
+        for q,expected in [('"lista"',set()), ('"lista" bilaga',{ids[2]}), ('lista',{ids[0],ids[1]})]:
+            with self.subTest(q=q):
+                self.assertEqual(val(q),expected)
+                self.assertEqual({r['kalla_id'][8:] for r in self.S.kallor.sok(q,['partner'])},expected)
+        with mock.patch.object(kallor,'DELORD_TERMER',1):
+            self.assertEqual(val('"lista" bilaga'),{ids[2]})
+
+    def test_egna_bedomningar_valjs_ocksa_pa_stam_med_samma_tak(self):
+        from types import SimpleNamespace
+        from unittest import mock
+        from partnern import kallor
+        f=self.S.lager.lagg_till('forstaelse',trad='t_stam',tur='x',slag='slutsats',text='Listorna behöver läsas.',
+                                 auktoritet='modellbedomning',kallor=[],ersatter=[])
+        val=lambda s:self.S.agent._relevanta_forstaelse(SimpleNamespace(inspel=[{'text':s}],jobb=None))
+        self.assertEqual(val('lista'),{f['id']})
+        with mock.patch.object(kallor,'DELORD_TERMER',1):
+            self.assertEqual(val('bilaga lista'),set());self.assertEqual(val('lista bilaga'),{f['id']})
+        self.S.kallor.dolda=('partner:'+f['id'],)
+        self.assertEqual(val('lista'),set())
+
 
 if __name__ == '__main__':
     unittest.main()
