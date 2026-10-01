@@ -55,12 +55,24 @@ class Modell:
     anstrangning: str = 'high'
 
 
-# Startvaktens utförare: Runtimes fastlåsta binärer med de kontrollsummor Runtime själv binder (claude_profile.py och
-# evidence/v0.1/dependencies.json). Vilken som startar, och med vilken modell, väljs i Runtimes bemanning (rollen driver).
+# Startvaktens utförare: Runtimes fastlåsta binärer med de kontrollsummor Runtime själv binder (claude_profile.py och,
+# sedan Runtimes D047, codex_pin.py; äldre releaser evidence/v0.1/dependencies.json). Vilken som startar, och med vilken modell, väljs i Runtimes bemanning (rollen driver).
 RUNTIME = HEM / 'nortropic-repos/Nortropic Runtime'
-RUNTIME_BIN = RUNTIME / '.runtime/bin'
 # Senast kända Claude-pinne (Runtime D046), när den aktiva releasen inte går att läsa.
 RUNTIME_CLAUDE_SENAST = ('2.1.285', '51f09bd1e021d9fa8a1864c179799bd37cb39962a937935c5cf6823398e86db4')
+# Codex-pinnen: en release före Runtimes D047 har ingen runtime/codex_pin.py och fäster 0.155.1; den senast kända
+# (D047) gäller när den aktiva releasen inte går att läsa.
+RUNTIME_CODEX_FORE_D047 = ('.runtime/bin/codex-0.155.1', '8eaf1ad12fe6bf89b1710330f58900014322c7c5af677e43be116d8ac5fc0a9e')
+RUNTIME_CODEX_SENAST = ('.runtime/bin/codex-0.159.2/codex', '16593cc2f422d5f398a8e40f550ebbaf1245392528957be342c295920a300704')
+
+
+def _aktiv_runtimekod(runtime: Path) -> Path:
+    """Den aktiva releasens egen Runtime-kod, när pekarens sha256 stämmer med konfigurationen."""
+    pekare = json.loads((runtime / '.runtime/ap10/active.json').read_text('utf-8'))
+    config = Path(pekare['config'])
+    if hashlib.sha256(config.read_bytes()).hexdigest() != pekare['sha256']:   # som kontorets andra releaseläsningar
+        raise ValueError('active.json pekar på en konfiguration med annan sha256')
+    return config.parent / 'runtime'
 
 
 def runtime_claude_pinne(runtime: Path = RUNTIME) -> tuple:
@@ -70,11 +82,7 @@ def runtime_claude_pinne(runtime: Path = RUNTIME) -> tuple:
     varje körning. Går releasen inte att läsa, eller stämmer konfigurationen inte med pekarens sha256, gäller den senast
     kända."""
     try:
-        pekare = json.loads((runtime / '.runtime/ap10/active.json').read_text('utf-8'))
-        config = Path(pekare['config'])
-        if hashlib.sha256(config.read_bytes()).hexdigest() != pekare['sha256']:   # som kontorets andra releaseläsningar
-            raise ValueError('active.json pekar på en konfiguration med annan sha256')
-        text = (config.parent / 'runtime/runtime/claude_profile.py').read_text('utf-8')
+        text = (_aktiv_runtimekod(runtime) / 'runtime/claude_profile.py').read_text('utf-8')
         version = re.search(r"^VERSION = '([0-9][0-9.]{0,15})'$", text, re.M).group(1)
         sha = re.search(r"^BINARY_SHA256 = '([0-9a-f]{64})'$", text, re.M).group(1)
     except (OSError, ValueError, KeyError, TypeError, AttributeError):
@@ -82,9 +90,26 @@ def runtime_claude_pinne(runtime: Path = RUNTIME) -> tuple:
     return str(runtime / '.runtime/bin' / ('claude-' + version)), sha
 
 
+def runtime_codex_pinne(runtime: Path = RUNTIME) -> tuple:
+    """(sökväg, sha256) för Runtimes fästa Codex, läst ur den aktiva releasens egen runtime/codex_pin.py (BINARY och
+    SHA256, Runtimes D047) på samma sätt som Claude-pinnen (RUNTIME-CODEX-20261001). En release utan filen är äldre än
+    D047 och fäster 0.155.1. Går releasen inte att läsa, eller är filen inte av den formen, gäller den senast kända."""
+    try:
+        fil = _aktiv_runtimekod(runtime) / 'runtime/codex_pin.py'
+        if not fil.exists() and not fil.is_symlink():
+            binar, sha = RUNTIME_CODEX_FORE_D047
+        else:
+            text = fil.read_text('utf-8')
+            binar = re.search(r"^BINARY = '(\.runtime/bin/codex-[0-9][0-9.]{0,15}/codex)'$", text, re.M).group(1)
+            sha = re.search(r"^SHA256 = '([0-9a-f]{64})'$", text, re.M).group(1)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        binar, sha = RUNTIME_CODEX_SENAST
+    return str(runtime / binar), sha
+
+
 STARTVAKT_BINARER = {
     'claude': runtime_claude_pinne(),
-    'codex': (str(RUNTIME_BIN / 'codex-0.155.1'), '8eaf1ad12fe6bf89b1710330f58900014322c7c5af677e43be116d8ac5fc0a9e'),
+    'codex': runtime_codex_pinne(),
 }
 
 # Valbara i samtalsytan (/model), prövade med Claude Code 2.1.280 på ägarens inloggning 2026-09-29. Fable har egen kvot

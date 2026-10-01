@@ -364,7 +364,8 @@ och dess `codex_config_bindning_sha256`. Värden ur hemkonfigurationen kopieras 
 Källor, lästa 2026-09-30: [Claude auto mode](https://code.claude.com/docs/en/auto-mode-config),
 [Claude permissions](https://code.claude.com/docs/en/permissions),
 [Codex konfigurationsordning](https://learn.chatgpt.com/docs/config-file/config-basic) samt den fastlåsta
-Codex 0.155.1-binärens `exec --help` och `exec --approve-for-me resume --help`.
+Codex 0.155.1-binärens `exec --help` och `exec --approve-for-me resume --help` (0.159.2:s är byte för byte desamma,
+jämförda 2026-09-30).
 
 **Startvakten** (`partnern/start.py`) gör att en lämnad överlämning startar arbetet av sig själv. Varje minut, och
 direkt när tjänsten startar, går den igenom öppna överlämningar. För en lämnad överlämning som ingen har kvitterat
@@ -392,9 +393,12 @@ Paketet bär instruktionens material, men bara Johnnys ord är beslut.
 - **Utföraren väljs som i dag:** i Runtimes bemanning, rollen `driver`, så som Johnny valt den i Runtimes modellval
   (D028–D030, D040, som han sedan steg 2 gör i Flödet). Bemanningen läses genom Aquariums befintliga sond. Claude Code körs med Runtimes fastlåsta
   Claude Code, läst ur den aktiva releasens `runtime/claude_profile.py` (`konfig.runtime_claude_pinne`; 2.1.285 sedan
-  Runtimes D046, RUNTIME-BINARER-20260930) i behörighetsläget `auto`; i dag anger bemanningen Claude med modellen
-  `claude-opus-5`. Codex körs med den fastlåsta `.runtime/bin/codex-0.155.1` (`exec --json --approve-for-me`, och
-  `exec resume <tråd>` för att fortsätta). Båda får bemanningens modell och Runtimes ansträngning för samma utförare,
+  Runtimes D046, RUNTIME-BINARER-20260930) i behörighetsläget `auto`; 2026-10-01 anger bemanningen Claude med modellen
+  `claude-fable-5-1` och ansträngningen max. Codex körs med Runtimes fastlåsta Codex, läst ur den aktiva releasens
+  `runtime/codex_pin.py`
+  (`konfig.runtime_codex_pinne`; en release före Runtimes D047 har ingen och fäster 0.155.1, D047 fäster 0.159.2,
+  RUNTIME-CODEX-20261001), med `exec --json --approve-for-me`, och `exec resume <tråd>` för att fortsätta. Båda får
+  bemanningens modell och Runtimes ansträngning för samma utförare,
   ur samma läsning; en release före Runtimes D040 har ingen sådan, och då gäller startvaktens egen (`high`). En
   fortsättning behåller den ansträngning sessionen startade med. Binärens kontrollsumma prövas mot den som Runtime
   själv binder före varje start. De kör på Johnnys abonnemang (Claude
