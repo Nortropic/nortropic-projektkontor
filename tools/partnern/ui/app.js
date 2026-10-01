@@ -4,7 +4,7 @@
 // bekräftat att de är sparade, och samma klient_id används vid varje nytt försök så att inget dubbleras.
 
 const $ = (id) => document.getElementById(id);
-const tillstand = { trad: null, vy: null, tradar: [], utkorgTimer: null, pollTimer: null };
+const tillstand = { trad: null, vy: null, tradar: [], utkorgTimer: null, pollTimer: null, vyer: {}, livepoll: {}, escNar: 0 };
 
 // ------------------------------------------------------------------ hjälp
 function el(tag, attrs, ...barn) {
@@ -170,7 +170,7 @@ function ritaTradar() {
     lista.append(el('div', { class: 'tradrad' + (t.id === tillstand.trad ? ' vald' : '') },
       el('button', { class: 'trad' + (t.id === tillstand.trad ? ' vald' : ''), onclick: () => { stangTradmeny(); oppnaTrad(t.id, 'lagg'); }, 'aria-current': t.id === tillstand.trad ? 'true' : null,
         title: t.titel + ' · ' + tid(t.senast) + ' · ' + t.inspel + ' inspel' },
-        el('span', { class: t.aktiv ? 'aktiv' : 'punkt', title: t.aktiv ? 'Arbetar' : null }), el('span', { class: 't', text: t.titel })),
+        el('span', { class: t.aktiv ? 'aktiv' : t.jobb_aktiva ? 'aktiv jobb' : 'punkt', title: t.aktiv ? 'Arbetar' : t.jobb_aktiva ? 'En utredning pågår' : null }), el('span', { class: 't', text: t.titel })),
       el('button', { class: 'radera', type: 'button', title: 'Radera tråden', 'aria-label': 'Radera tråden ' + t.titel, onclick: () => fragaRadera(t) }, soptunna())));
   }
 }
@@ -202,6 +202,7 @@ $('raderabekrafta').addEventListener('click', async () => {
 });
 async function oppnaTrad(id, adress) {  // adress: 'lagg' (ny historikpost), 'ersatt' eller 'ingen' (routern har redan satt den)
   if (tillstand.trad) sparaUtkast();  // spara den tråd som lämnas, aldrig en tom ruta innan utkastet laddats
+  stoppaLivepoll(); rensaVyer();
   tillstand.trad = id; tillstand.vy = null; tillstand.vyNyckel = null;
   if (id !== 'ny') skriv('senasteTrad', id);
   if (adress !== 'ingen') satAdress('/forbattringar/' + id, adress === 'ersatt');
@@ -209,16 +210,104 @@ async function oppnaTrad(id, adress) {  // adress: 'lagg' (ny historikpost), 'er
 }
 async function hamtaTrad() {
   if (!forbattringarSyns()) return;  // ingen läsning eller polling medan samtalet inte syns
-  if (!tillstand.trad || tillstand.trad === 'ny') { tillstand.vy = null; ritaTrad(); planera(8000); return; }
+  if (!tillstand.trad || tillstand.trad === 'ny') { tillstand.vy = null; stoppaLivepoll(); ritaTrad(); planera(8000); return; }
   try {
-    const ny = await api('GET', '/api/trad/' + tillstand.trad); const nyckel = JSON.stringify(ny);
+    const ny = await api('GET', '/api/trad/' + tillstand.trad); const nyckel = strukturnyckel(ny);
+    // Tråden ritas om bara när något i den har ändrats (ett inspel, en tur, en notis), inte för att sekunder och
+    // steg tickar: det levande arbetet uppdateras i arbetsvyn genom sin egen poll, så att öppna rader och markering
+    // överlever (PARTNER-INSYN-20261001).
     if (nyckel !== tillstand.vyNyckel || !tillstand.vy) { tillstand.vy = ny; tillstand.vyNyckel = nyckel; ritaTrad(); }
+    else tillstand.vy = ny;
   }
   catch (f) { $('tradstatus').textContent = 'Kunde inte läsa tråden: ' + f.message; }
   const arbetar = tillstand.vy && (tillstand.vy.aktiv || Object.keys(tillstand.vy.jobb_aktiva || {}).length);
-  planera(arbetar ? 1200 : 8000);
+  planera(arbetar && !Object.keys(tillstand.livepoll).length ? 1200 : 8000);
+}
+function strukturnyckel(vy) {
+  return JSON.stringify({ trad: vy.trad, resonemang: vy.resonemang, poster: vy.poster, seq: vy.seq,
+    aktiv: vy.aktiv ? { id: vy.aktiv.id, status: vy.aktiv.status } : null, jobb: Object.keys(vy.jobb_aktiva || {}).sort() });
 }
 function planera(ms) { clearTimeout(tillstand.pollTimer); if (!forbattringarSyns()) return; tillstand.pollTimer = setTimeout(async () => { await hamtaTrad(); if (forbattringarSyns() && Math.random() < 0.3) laddaTradar().catch(() => {}); }, ms); }
+
+// ------------------------------------------------------------------ arbetsvyn: en levande poll per körning
+// GET /api/korning/<id>/handelser?fran=<n> ger bara nya rader (markören), fasen, räknarna och delsvaret; var sekund
+// medan körningen pågår. När servern säger klar hämtas tråden en gång och loggen fälls ihop ovanför svaret.
+function sakerstallVy(run, slag, alt) {
+  let v = tillstand.vyer[run.id];
+  if (!v) {
+    v = Arbetsvy.skapa({ id: run.id, slag, start: run.startad, modell: run.modell, anstrangning: run.raknare && run.raknare.anstrangning }, alt);
+    tillstand.vyer[run.id] = v;
+    if (run.delsvar) sattDelsvar(v, run.delsvar);
+  }
+  if (!v.klar) { v.levande(); v.sattLage(run); startaLivepoll(run.id, v); }  // också när tråden öppnas igen efter ett byte
+  return v;
+}
+function sattDelsvar(v, text) {
+  if (!v.delsvarEl) v.delsvarEl = el('div', { class: 'av-delsvar' });
+  if (text === v._delsvarText) return;
+  v._delsvarText = text;
+  v.delsvarEl.replaceChildren(text ? markdown(text) : '');
+}
+// En pollkedja är bunden till sin post i tillstand.livepoll: stoppas den (trådbyte, radering, klar, 404) eller ersätts den
+// medan ett anrop är i luften, ser fortsättningen att posten inte längre är dess egen och dör tyst — den varken ritar
+// eller återarmar sig. Så kan en lämnad tråds vy aldrig skriva den öppna trådens huvud, och ingen stoppad kedja lämnar
+// ett timer-id som hindrar nästa start.
+function startaLivepoll(id, v) {
+  if (tillstand.livepoll[id]) return;
+  const post = { timer: null };
+  tillstand.livepoll[id] = post;
+  const egen = () => tillstand.livepoll[id] === post;
+  const polla = async () => {
+    if (!egen()) return;
+    if (!forbattringarSyns()) { stoppaLivepoll(id); return; }
+    let d;
+    try { d = await api('GET', '/api/korning/' + encodeURIComponent(id) + '/handelser?fran=' + v.nasta); }
+    catch (f) {
+      if (!egen()) return;
+      if (/HTTP 404|finns inte|händelselogg/.test(f.message)) { stoppaLivepoll(id); tillstand.vyNyckel = null; hamtaTrad(); return; }
+      post.timer = setTimeout(polla, 3000); return;
+    }
+    if (!egen()) return;  // stoppad medan svaret var på väg
+    if (d.aterstall) { stoppaLivepoll(id); v.forstor(); delete tillstand.vyer[id]; tillstand.vyNyckel = null; hamtaTrad(); return; }  // servern har startat om
+    v.mata(d.handelser); v.sattLage(d);
+    if (d.delsvar !== undefined) sattDelsvar(v, d.delsvar);
+    if (d.klar) { stoppaLivepoll(id); tillstand.vyNyckel = null; hamtaTrad(); return; }
+    post.timer = setTimeout(polla, 1000);
+  };
+  post.timer = setTimeout(polla, 60);
+}
+function stoppaLivepoll(id) {
+  if (id === undefined) { for (const i of Object.keys(tillstand.livepoll)) stoppaLivepoll(i); return; }
+  const post = tillstand.livepoll[id];
+  if (post) clearTimeout(post.timer);
+  delete tillstand.livepoll[id];
+  const v = tillstand.vyer[id];
+  if (v && !v.klar) v.paus();  // en pausad vy rör inte trådhuvudet; den väcks när dess tråd öppnas igen
+}
+const VYER_MAX = 20;
+function rensaVyer() {  // avslutade vyer byggs billigt om när tråden öppnas; levande behålls tills de avslutas, men inte hur många som helst
+  for (const [id, v] of Object.entries(tillstand.vyer)) if (v.klar) { v.forstor(); delete tillstand.vyer[id]; }
+  const kvar = Object.keys(tillstand.vyer);
+  for (const id of kvar.slice(0, Math.max(0, kvar.length - VYER_MAX))) {  // de äldsta som inte visas; en bortrensad vy byggs om ur serverns logg
+    const v = tillstand.vyer[id];
+    if (v.rot.isConnected) continue;
+    stoppaLivepoll(id); v.forstor(); delete tillstand.vyer[id];
+  }
+}
+async function laddaLogg(id, v, reservsteg) {  // en avslutad körnings logg (det som inte redan finns i vyn), först när den fälls ut
+  try { const d = await api('GET', '/api/korning/' + encodeURIComponent(id) + '/handelser?fran=' + v.nasta + '&max=2000'); v.mata(d.handelser); }
+  catch { if (!v.nasta) v.mata((reservsteg || []).map((s, n) => ({ n, typ: s.typ, text: s.text, tid: s.tid }))); }  // äldre tur utan händelselogg: journalens steg
+}
+function visaArbetet() { try { return localStorage.getItem('arbete:visa') === 'ja'; } catch { return false; } }
+let huvudSagt = '';
+function huvudStatus(text, sagt) {  // trådhuvudet: fasord och tid synligt; det upplästa byts bara när fasen byts
+  const h = $('tradstatus');
+  let synlig = h.querySelector('.synlig'), dold = h.querySelector('.dold');
+  if (!synlig) { h.replaceChildren(synlig = el('span', { class: 'synlig', 'aria-hidden': 'true' }), dold = el('span', { class: 'dold' })); }
+  synlig.textContent = text ? '✻ ' + text : '';
+  if ((sagt || '') !== huvudSagt) { huvudSagt = sagt || ''; dold.textContent = huvudSagt ? 'Partnern ' + huvudSagt.toLowerCase() : ''; }
+  document.title = (text ? '✻ ' : '') + 'Nortropic';
+}
 
 $('nytrad').addEventListener('click', () => { stangTradmeny(); oppnaTrad('ny', 'lagg'); });
 $('tradtitel').addEventListener('click', async () => {
@@ -258,8 +347,7 @@ function ritaTrad() {
     }
   }
   for (const u of las('utkorg', []).filter((x) => x.trad === tillstand.trad)) flode.append(ritaVantande(u));
-  const status = vy && vy.aktiv ? 'Partnern ' + (vy.aktiv.status_text || 'arbetar') + ' · ' + vy.aktiv.sekunder + ' s' : '';
-  $('tradstatus').textContent = status;
+  if (!(vy && vy.aktiv)) huvudStatus('', '');  // annars sätter arbetsvyns ticker fasord och tid
   $('skickaavbryt').hidden = !(vy && vy.aktiv);
   $('skicka').title = vy && vy.aktiv ? 'Skicka – partnern svarar när det pågående arbetet är klart' : 'Skicka (Enter)';
   if (nere) flode.scrollTop = flode.scrollHeight;
@@ -292,46 +380,54 @@ function ritaInspel(p, tur) {
     p.kontext && p.kontext.length ? el('div', { class: 'sammanhang' }, el('span', { class: 'kl', text: 'Sammanhang från arbetsplatsen (underlag, inte dina ord):' }),
       p.kontext.map((k) => el('a', { class: 'chip lank-chip', href: '/kontoret/objekt/' + encodeURIComponent(k.ref), 'data-nav': true }, (OBJEKTSLAG[k.typ] || k.typ) + ' · ' + k.titel))) : null);
 }
-function ritaArbete(steg, kallor, forb, modell) {
-  const detaljer = el('details', { class: 'arbete' });
-  const delar = [];
-  if (forb && forb.sekunder) delar.push(Math.round(forb.sekunder) + ' s');
-  if (modell) delar.push(modell + (forb && forb.anstrangning ? ' · ' + forb.anstrangning : ''));
-  if (forb && forb.tokens_in) delar.push(Math.round(forb.tokens_in / 1000) + 'k in / ' + Math.round((forb.tokens_ut || 0) / 1000 * 10) / 10 + 'k ut');
-  if (forb && forb.omforsok) delar.push(forb.omforsok + ' omförsök');
-  detaljer.append(el('summary', null, 'Källor och arbete' + (delar.length ? ' · ' + delar.join(' · ') : '')));
-  if (steg && steg.length) detaljer.append(el('ol', null, steg.map((s) => el('li', null, s.text))));
-  const unika = [...new Set((kallor || []).filter((k) => k.hur === 'last').map((k) => k.id))];
-  if (unika.length) detaljer.append(el('div', null, 'Lästa källor:'), el('div', { class: 'kalllista' }, unika.slice(0, 60).map((id) => el('button', { class: 'kalla-lank', onclick: () => visaKalla(id) }, id))));
-  if (forb && forb.listpris_usd) detaljer.append(el('div', null, 'Listprisvärde enligt Claude Code: ' + forb.listpris_usd.toFixed(3) + ' USD (inte en kostnad; körs på abonnemanget).'));
-  return detaljer;
+// En avslutad körnings arbetsvy: hopfälld till en rad ovanför svaret (ägarens val 2026-10-01), öppen när "Visa arbetet"
+// är valt eller när turen slutade med fel, avbrott eller begränsning (då är loggen förklaringen). Loggen hämtas när
+// den fälls ut; fanns den redan levande i vyn behålls den.
+function klarVy(id, slag, p, info) {
+  let v = tillstand.vyer[id];
+  const oppen = visaArbetet() || !['svarad', 'klart'].includes(p.status);
+  if (!v) {
+    v = Arbetsvy.skapa({ id, slag, klar: true, modell: p.modell, anstrangning: info.anstrangning },
+      { hopfalld: !oppen, visaKalla, oppnaPanel, ladda: (vy) => laddaLogg(id, vy, p.steg) });
+    tillstand.vyer[id] = v;
+    v.avsluta(info);
+    if (oppen) v.oppna(true);
+  } else if (!v.klar) {  // en levande vy blev klar (kanske medan tråden var lämnad): rader som inte hann hämtas laddas nu
+    stoppaLivepoll(id); v.avsluta(info); v.oppna(oppen);
+    if ((p.handelser || 0) > v.nasta) laddaLogg(id, v, p.steg);
+  }
+  return v;
 }
+function stegantal(steg) { return (steg || []).filter((s) => s.typ === 'verktyg' || s.typ === 'utredare').length; }
 function ritaTur(p, vy) {
   const aktiv = vy.aktiv && vy.aktiv.id === p.id ? vy.aktiv : null;
   const kort = el('div', { class: 'post partner' });
   const chip = el('span', { class: 'chip ' + ({ svarad: 'ok', undersoker: 'varm', fel: 'fel', avbruten: 'fel', begransad: 'varm' }[p.status] || ''), text: STATUS[p.status] || p.status });
   kort.append(el('div', { class: 'rubrikrad' }, el('span', { class: 'vem', text: 'Partnern' }), chip, p.klar ? el('span', { text: tid(p.klar) }) : null, p.ateruppta ? el('span', { text: 'fortsättning' }) : null));
   const bubbla = el('div', { class: 'bubbla' });
+  const forb = p.forbrukning || {};
+  const info = { sekunder: forb.sekunder, forbrukning: forb, modell: p.modell, anstrangning: forb.anstrangning, status: p.status, kallor: p.kallor,
+    listpris_usd: forb.listpris_usd, omforsok: forb.omforsok, antal: stegantal(p.steg), fel: (p.steg || []).filter((s) => / · fel$/.test(s.text || '')).length };
   if (p.status === 'svarad') {
+    bubbla.append(klarVy(p.id, 'tur', p, info).rot);
     bubbla.append(markdown(p.svar));
     bubbla.append(el('div', { class: 'svarsverktyg' }, kopieraKnapp('Kopiera hela svaret som markdown', () => p.svar,
       kallruta)));
-    bubbla.append(ritaArbete(p.steg, p.kallor, p.forbrukning, p.modell));
   }
   else if (p.status === 'undersoker') {
-    const a = aktiv || { sekunder: '', steg: [], delsvar: '' };
-    bubbla.append(el('div', { class: 'pagar' }, 'Undersöker' + (a.sekunder !== '' ? ' · ' + a.sekunder + ' s' : '') + '…',
-      a.steg && a.steg.length ? el('ol', { class: 'steg' }, a.steg.slice(-6).map((s) => el('li', null, s.text))) : null));
-    if (a.delsvar) bubbla.append(markdown(a.delsvar));
-    if (aktiv) bubbla.append(el('div', { class: 'atgarder' }, el('button', { onclick: () => api('POST', '/api/tur/' + p.id + '/avbryt').then(hamtaTrad) }, 'Avbryt')));
+    if (aktiv) {
+      const v = sakerstallVy(aktiv, 'tur', { onAvbryt: () => api('POST', '/api/tur/' + p.id + '/avbryt').then(hamtaTrad), oppnaPanel, visaKalla, huvud: huvudStatus });
+      if (!v.delsvarEl) sattDelsvar(v, aktiv.delsvar || '');
+      bubbla.append(v.rot, v.delsvarEl);
+    } else bubbla.append(el('div', { class: 'pagar' }, 'Undersöker…'));  // registrerad men ännu ingen levande körning (eller en omstart)
   } else {
     const orsak = { avbruten: 'Avbrutet', begransad: 'Begränsat', fel: 'Fel' }[p.status] || p.status;
+    bubbla.append(klarVy(p.id, 'tur', p, info).rot);
     if (p.svar) bubbla.append(markdown(p.svar));
     bubbla.append(el('div', { class: 'pagar' }, orsak + (p.orsak ? ': ' + p.orsak : '') + '. Ditt material är sparat.'));
     if (p.delsvar) bubbla.append(el('details', null, el('summary', null, 'Det som hann skrivas (ofullständigt)'), markdown(p.delsvar)));
     const senare = vy.poster.some((q) => q.slag === 'tur' && q.tid > p.tid && q.inspel.some((i) => p.inspel.includes(i)));
     if (!senare && !vy.aktiv) bubbla.append(el('div', { class: 'atgarder' }, el('button', { onclick: () => api('POST', '/api/tur/' + p.id + '/ateruppta').then(hamtaTrad) }, p.status === 'fel' ? 'Försök igen' : 'Återuppta')));
-    if (p.steg && p.steg.length) bubbla.append(ritaArbete(p.steg, p.kallor, p.forbrukning, p.modell));
   }
   kort.append(bubbla);
   return kort;
@@ -341,7 +437,15 @@ function ritaJobb(p, vy) {
   const a = (vy.jobb_aktiva || {})[p.id];
   const k = el('div', { class: 'kort' }, el('h4', null, 'Utredning: ' + p.rubrik),
     el('div', { class: 'rubrikrad' }, el('span', { class: 'chip ' + (p.status === 'klart' ? 'ok' : 'varm'), text: JOBBSTATUS[p.status] || p.status }), el('span', { text: 'registrerad ' + tid(p.tid) })));
-  if (a) k.append(el('div', { class: 'pagar' }, 'Arbetar · ' + a.sekunder + ' s', a.steg && a.steg.length ? el('ol', { class: 'steg' }, a.steg.slice(-5).map((s) => el('li', null, s.text))) : null));
+  if (a) {
+    const v = sakerstallVy(a, 'jobb', { onAvbryt: () => api('POST', '/api/jobb/' + p.id + '/avbryt').then(hamtaTrad), oppnaPanel, visaKalla });
+    if (!v.delsvarEl) sattDelsvar(v, a.delsvar || '');
+    k.append(v.rot, v.delsvarEl);
+  } else if (p.korning && p.status !== 'registrerat') {
+    const forb = p.forbrukning || {};
+    k.append(klarVy(p.korning, 'jobb', p, { sekunder: forb.sekunder, forbrukning: forb, modell: forb.modell, anstrangning: forb.anstrangning,
+      status: p.status, listpris_usd: forb.listpris_usd, omforsok: forb.omforsok }).rot);
+  }
   if (p.resultat) k.append(markdown(p.resultat));
   const h = (p.historik || []).slice(-1)[0];
   if (h && h.orsak && p.status !== 'klart') k.append(el('div', { class: 'pagar', text: h.orsak }));
@@ -499,6 +603,18 @@ $('text').addEventListener('input', () => {
 });
 $('text').addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); skicka(false); }
+  // Esc två gånger avbryter det pågående arbetet, som i Claude Code: bara med fokus i rutan, utan öppen meny eller
+  // dialog, och aldrig på ett enda tryck (ett tiominutersarbete ska inte dö av misstag). Knappen Avbryt finns kvar.
+  if (e.key === 'Escape' && tillstand.vy && tillstand.vy.aktiv && $('modellval').hidden && !document.querySelector('dialog[open]')) {
+    e.preventDefault();
+    if (tillstand.escNar && Date.now() - tillstand.escNar < 2000) {
+      tillstand.escNar = 0; $('utkaststatus').textContent = 'Avbryter…';
+      api('POST', '/api/tur/' + tillstand.vy.aktiv.id + '/avbryt').then(hamtaTrad).catch((f) => { $('utkaststatus').textContent = 'Kunde inte avbryta: ' + f.message; });
+    } else {
+      tillstand.escNar = Date.now(); $('utkaststatus').textContent = 'Tryck Esc igen för att avbryta det pågående arbetet.';
+      setTimeout(() => { if (tillstand.escNar && Date.now() - tillstand.escNar >= 2000) { tillstand.escNar = 0; if (/Esc igen/.test($('utkaststatus').textContent)) $('utkaststatus').textContent = ''; } }, 2100);
+    }
+  }
 });
 function halsning() {
   const h = new Date().getHours();
@@ -686,7 +802,7 @@ async function visaForbattringar(trad) {  // trad: id ur adressen, 'ny', eller n
   else { laddaUtkast(); await hamtaTrad(); }
   if (las('utkorg', []).length) tomUtkorg();
 }
-function lamnaForbattringar() { if (tillstand.trad) sparaUtkast(); clearTimeout(tillstand.pollTimer); stangTradmeny(); }
+function lamnaForbattringar() { if (tillstand.trad) sparaUtkast(); clearTimeout(tillstand.pollTimer); stoppaLivepoll(); huvudStatus('', ''); stangTradmeny(); }
 function stangTradmeny() { $('app').classList.remove('tradmeny'); $('visatradar').setAttribute('aria-expanded', 'false'); }
 $('visatradar').addEventListener('click', () => {
   const oppen = $('app').classList.toggle('tradmeny'); $('visatradar').setAttribute('aria-expanded', String(oppen));

@@ -430,6 +430,8 @@ class Lager:
                               ev['tid'][:10], ev['resultat'])
                 if ev.get('session'):
                     data['session'] = ev['session']
+                if ev.get('korning'):  # katalogen i turer/, så att ytan hittar utredningens händelselogg
+                    data['korning'] = ev['korning']
                 if ev.get('forbrukning'):
                     data.setdefault('forbrukning', []).append(dict(ev['forbrukning'], tid=ev['tid']))
                 db.execute('update jobb set status=?, data=?, uppdaterad=? where id=?',

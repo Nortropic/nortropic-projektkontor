@@ -26,6 +26,7 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from . import VERSION
 from . import bilagor as bil
+from . import strom
 from .agent import Agent, Korning, _session_fil, prova_underagent
 from .arbetsplats import Arbetsplats
 from .jobb import Jobb
@@ -52,6 +53,7 @@ BARA_SPARA_AVBROTT = 'Johnny avbröt och sparade utan svar'
 ATERUPPTA_INOM = 3600
 KALLVAKT_SEKUNDER = 600   # källindexet byggs om inom tio minuter när det det byggs ur har ändrats
 STARTVAKT_SEKUNDER = 60   # lämnade överlämningar prövas för start varje minut (och direkt när tjänsten startar)
+RAKNARE_UR = 'strömmen, löpande; inte abonnemangets kvot'  # räknarna i arbetsvyn är en uppskattning ur strömmen
 
 
 def las_hemlighet(katalog: Path, namn: str, skapa: bool = True) -> str:
@@ -115,6 +117,13 @@ class Server:
                     return k
         return None
 
+    def korning_for_id(self, kid: str):
+        with self._las:
+            for k in self._korningar.values():
+                if k.id == kid:
+                    return k
+        return None
+
     def aktiv_tur(self, trad: str):
         with self._las:
             return self._tradkorning.get(trad)
@@ -134,8 +143,11 @@ class Server:
             fil = Path(self.lager.turer) / t['id'] / 'delsvar.txt'
             if fil.exists():
                 delsvar = fil.read_text('utf-8', errors='replace')
+            # Händelseloggen skrevs rad för rad medan turen pågick, så kraschen tappar inte arbetet som syntes.
+            rader, antal = strom.las_handelser(Path(self.lager.turer) / t['id'] / 'handelser.jsonl', 0, 100000)
             self.lager.lagg_till('tur_klar', tur=t['id'], trad=t['trad'], status='avbruten', orsak=OMSTART,
-                                 delsvar=delsvar[-8000:], forbrukning={'modellanrop': True, 'okand': True})
+                                 delsvar=delsvar[-8000:], forbrukning={'modellanrop': True, 'okand': True},
+                                 steg=strom.steg_ur(rader, 60) or None, handelser=antal or None)
             avbrutna.append(t['id'])
         ater = []
         for t in self.lager.fraga("select * from tur where status='avbruten' order by startad"):
@@ -322,13 +334,13 @@ class Server:
             res = self.agent.kor(korning, session)
         except Exception as fel:
             res = {'status': 'fel', 'svar': '', 'orsak': 'internt fel: %s' % type(fel).__name__, 'delsvar': korning.delsvar,
-                   'session': korning.session, 'forbrukning': {'modellanrop': True}, 'steg': korning.steg[-60:],
-                   'kallor': korning.kallor[:120], 'modell': korning.modell}
+                   'session': korning.session, 'forbrukning': {'modellanrop': True}, 'steg': korning.logg.steg(60),
+                   'handelser': korning.logg.nasta, 'kallor': korning.kallor[:120], 'modell': korning.modell}
         try:
             self.lager.lagg_till('tur_klar', tur=korning.id, trad=korning.trad, status=res['status'], svar=res.get('svar'),
                                  orsak=res.get('orsak') or None, delsvar=(res.get('delsvar') or '')[-8000:] or None,
                                  session=res.get('session'), modell=res.get('modell'), forbrukning=res.get('forbrukning'),
-                                 steg=res.get('steg'), kallor=res.get('kallor'))
+                                 steg=res.get('steg'), handelser=res.get('handelser'), kallor=res.get('kallor'))
         finally:
             self.avregistrera_korning(korning)  # först när utfallet står i journalen
         if korning.avbruten_av == OMSTART:
@@ -416,12 +428,14 @@ class Server:
                            'svar': u['svar'], 'orsak': klar.get('orsak'), 'delsvar': klar.get('delsvar'),
                            'inspel': json.loads(u['inspel'] or '[]'), 'steg': klar.get('steg') or [],
                            'kallor': klar.get('kallor') or [], 'forbrukning': klar.get('forbrukning') or {},
-                           'modell': klar.get('modell') or u['modell'], 'ateruppta': d.get('ateruppta')})
+                           'modell': klar.get('modell') or u['modell'], 'ateruppta': d.get('ateruppta'),
+                           'handelser': klar.get('handelser')})
         for j in self.lager.fraga('select * from jobb where trad=? order by tid', (trad,)):
             d = json.loads(j['data'])
             poster.append({'slag': 'jobb', 'id': j['id'], 'tid': j['tid'], 'uppdaterad': j['uppdaterad'],
                            'status': j['status'], 'rubrik': d.get('rubrik'), 'uppdrag': d.get('uppdrag'),
-                           'resultat': d.get('resultat'), 'historik': d.get('historik') or []})
+                           'resultat': d.get('resultat'), 'historik': d.get('historik') or [],
+                           'korning': d.get('korning'), 'forbrukning': (d.get('forbrukning') or [None])[-1]})
         for o in self.lager.fraga('select * from overlamning where trad=? order by tid', (trad,)):
             d = json.loads(o['data'])
             poster.append({'slag': 'overlamning', 'id': o['id'], 'tid': o['tid'], 'status': o['status'],
@@ -548,6 +562,7 @@ CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' 
 STATISKA = {'/': ('index.html', 'text/html; charset=utf-8'), '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
             '/app.css': ('app.css', 'text/css; charset=utf-8'), '/favicon.svg': ('favicon.svg', 'image/svg+xml'),
             '/arbetsplats.js': ('arbetsplats.js', 'text/javascript; charset=utf-8'),
+            '/arbetsvy.js': ('arbetsvy.js', 'text/javascript; charset=utf-8'),
             '/karta.js': ('karta.js', 'text/javascript; charset=utf-8'), '/karta.css': ('karta.css', 'text/css; charset=utf-8')}
 # Arbetsplatsens egna adresser ger samma sida; ytan väljer del ur adressen (direktlänk, omladdning, bakåt/framåt).
 SKAL = re.compile(r'^/(?:kontoret(?:/presentation|/objekt/[A-Za-z0-9:_%.-]{1,200})?|kundstart|flodet|forbattringar(?:/ny|/t_[A-Za-z0-9]+)?)$')
@@ -565,6 +580,8 @@ class Hanterare(BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):  # inga innehåll, frågor eller nycklar i loggen
         kod = args[1] if len(args) > 1 and fmt.startswith('"%s" %s') else ''
+        if str(kod) == '200' and '/handelser' in self.path:  # arbetsvyns poll varje sekund fyller annars loggen
+            return
         sys.stderr.write('%s %s %s %s\n' % (nu()[:19], self.command, urlparse(self.path).path[:60], kod))
 
     # ------------------------------------------------------------- svar
@@ -665,12 +682,16 @@ class Hanterare(BaseHTTPRequestHandler):
             for r in rader:
                 r['aktiv'] = bool(S.aktiv_tur(r['id']))
                 r['inspel'] = S.lager.en('select count(*) as n from inspel where trad=?', (r['id'],))['n']
+                r['jobb_aktiva'] = S.lager.en("select count(*) as n from jobb where trad=? and status='pagar'", (r['id'],))['n']
                 r.pop('session', None)
             return self._svara(200, {'tradar': rader})
         m = re.match(r'^/api/trad/(t_[A-Za-z0-9]+)$', p)
         if m:
             vy = S.tradvy(m.group(1))
             return self._svara(200, vy) if vy else self._fel(404, 'tråden finns inte')
+        m = re.match(r'^/api/korning/((?:tur|jobbk)_[A-Za-z0-9]+)/handelser$', p)
+        if m:
+            return self._handelser(m.group(1), q)
         if p == '/api/sok':
             omfang = [x for x in (q.get('omfang') or '').split(',') if x]
             return self._svara(200, {'traffar': S.kallor.sok(q.get('q', ''), omfang or None, int(q.get('antal') or 20))})
@@ -708,6 +729,39 @@ class Hanterare(BaseHTTPRequestHandler):
                 r.update({k: d.get(k) for k in ('rubrik', 'mottagare', 'katalog_visning', 'ap06', 'historik', 'start')})
             return self._svara(200, {'overlamningar': rader})
         return self._fel(404, 'finns inte')
+
+    def _handelser(self, kid: str, q):
+        """Körningshändelserna till arbetsvyn (PARTNER-INSYN-20261001): ur minnet medan körningen pågår, med fas,
+        räknare och delsvar; annars ur turer/<id>/handelser.jsonl. Markören `fran` gör varje poll O(nytt): raderna
+        från och med n. Är klienten före servern (efter en omstart) sägs det med `aterstall`."""
+        S = self.S
+        try:
+            fran = max(0, int(q.get('fran') or 0))
+            max_ = min(2000, max(1, int(q.get('max') or 500)))
+        except ValueError:
+            return self._fel(400, 'fran och max ska vara tal')
+        k = S.korning_for_id(kid)
+        if k is not None:
+            rader, nasta = k.logg.fran(fran, max_)
+            lage = k.lage()
+            return self._svara(200, {'id': kid, 'typ': k.typ, 'trad': k.trad, 'status': lage['status'],
+                                     'status_text': lage['status_text'], 'aktiv': True, 'klar': False, 'nasta': nasta,
+                                     'aterstall': fran > nasta, 'fas': lage['fas'], 'raknare': lage['raknare'],
+                                     'raknare_ur': RAKNARE_UR, 'delsvar': lage['delsvar'], 'handelser': rader})
+        if kid.startswith('tur_'):
+            rad, typ = S.lager.en('select id, trad, status from tur where id=?', (kid,)), 'tur'
+        else:  # utredningens katalog står i jobb_status (korning); samma form som lager._indexera skriver
+            rad, typ = S.lager.en('select id, trad, status from jobb where instr(data, ?) > 0', ('"korning": "%s"' % kid,)), 'jobb'
+        if not rad:
+            return self._fel(404, 'körningen finns inte')
+        fil = Path(S.lager.turer) / kid / 'handelser.jsonl'
+        if not fil.is_file():
+            return self._fel(404, 'ingen händelselogg för körningen')
+        alla, nasta = strom.las_handelser(fil, 0, 100000)
+        return self._svara(200, {'id': kid, 'typ': typ, 'trad': rad['trad'], 'status': rad['status'], 'aktiv': False,
+                                 'klar': True, 'nasta': nasta, 'aterstall': fran > nasta,
+                                 'fas': {'lage': 'klar', 'sekunder': 0, 'tankt_tokens': 0, 'verktyg': None, 'forsok': None, 'utan_tolkning': 0},
+                                 'raknare': strom.sammanfatta(alla), 'raknare_ur': RAKNARE_UR, 'handelser': alla[fran:fran + max_]})
 
     def _aquarium(self, p):
         """Aquarium på samma ursprung: fönstrets sida och dess lästid, bakom inloggningen."""

@@ -138,14 +138,62 @@ code, pre { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: .
 .svar table { border-collapse: collapse; margin: .6em 0; font-size: 14px; }
 .svar th, .svar td { border: 1px solid var(--linje); padding: 4px 8px; text-align: left; vertical-align: top; }
 .svar a { color: var(--accent); }
-.arbete { margin-top: 10px; font-size: 13px; color: var(--dampad); }
-.arbete summary { cursor: pointer; }
-.arbete ol { margin: 6px 0; padding-left: 20px; }
 .kalla-lank { background: none; border: 0; padding: 0; color: var(--accent); font-size: 13px; text-decoration: underline dotted; }
-.kalllista { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; }
 .pagar { color: var(--dampad); font-size: 14px; }
-.pagar .steg { font-size: 13px; margin-top: 6px; }
-.delsvar { white-space: pre-wrap; margin-top: 8px; }
+
+/* ------------------------------------------------------------------ arbetsvyn (PARTNER-INSYN-20261001): Claude Codes
+   terminalutskrift i samma ljusa yta — monospace, ⏺/⎿-rader, ingen svart ruta. */
+:root { --mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace; --logg-storlek: 12.5px; --logg-dampad: var(--dampad);
+  --logg-linje: var(--linje); --logg-klar: var(--ok); --logg-pagar: var(--varm); --logg-fel: var(--fel); --logg-fas: var(--accent);
+  --logg-indrag: 1.6ch; }
+.arbetsvy { font: var(--logg-storlek)/1.55 var(--mono); color: var(--text); margin: 6px 0 10px; }
+.av-logg, .av-grupp { list-style: none; margin: 0; padding: 0; }
+.av-rad { display: grid; grid-template-columns: var(--logg-indrag) minmax(0, 1fr) auto; column-gap: .6ch; align-items: baseline; overflow-wrap: anywhere; margin: 0; }
+.av-steg { margin: 0; }
+.av-punkt { color: var(--logg-dampad); }
+.av-punkt.pagar { color: var(--logg-pagar); animation: puls 1.6s infinite; }
+.av-punkt.klar { color: var(--logg-klar); }
+.av-punkt.fel { color: var(--logg-fel); }
+.av-besk, .av-res { padding-left: var(--logg-indrag); }
+.av-besk .av-text, .av-res { color: var(--logg-dampad); }
+.av-res { width: 100%; background: none; border: 0; text-align: left; font: inherit; cursor: pointer; border-radius: 4px; }
+.av-res:hover .av-text, .av-res:focus-visible .av-text { color: var(--text); }
+.av-res.fel .av-text, .av-los.fel .av-text, .av-slut.fel .av-text, .av-nekat .av-text, .av-varning .av-text { color: var(--logg-fel); }
+.av-kvot .av-text, .av-omforsok .av-text { color: var(--varm); }
+.av-slut .av-text, .av-start .av-text, .av-ko .av-text, .av-komprimering .av-text { color: var(--logg-dampad); }
+.av-tid { color: var(--logg-dampad); font-size: 11.5px; white-space: nowrap; }
+.av-prosa .av-text { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, system-ui, sans-serif; font-size: 13.5px; color: var(--logg-dampad);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.av-grupp { border-left: 1px solid var(--logg-linje); margin-left: .7ch; padding-left: 1ch; }
+.av-grupp.hopfalld { display: none; }
+.av-detalj { margin: 2px 0 6px calc(var(--logg-indrag) * 2); }
+.av-pre { margin: 2px 0 6px; padding: 6px 8px; background: var(--yta2); border-radius: 6px; max-height: 40vh; overflow: auto; white-space: pre-wrap; font: inherit; }
+.av-etikett { color: var(--logg-dampad); font-size: 11.5px; margin-top: 4px; }
+.av-pr a { color: var(--accent); }
+.av-status { position: sticky; bottom: 0; background: var(--bg); border-top: 1px solid var(--logg-linje); padding: 4px 0 2px; margin-top: 4px;
+  display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: center; color: var(--logg-dampad); }
+.av-status .av-fas { color: var(--text); }
+.av-snurr { color: var(--logg-fas); display: inline-block; min-width: 1.2ch; }
+.av-snurr.snurrar::before { content: "·"; animation: snurr 1.2s steps(1) infinite; }
+@keyframes snurr { 0% { content: "·"; } 17% { content: "✢"; } 33% { content: "✳"; } 50% { content: "✶"; } 67% { content: "✻"; } 83% { content: "✽"; } }
+.av-avbryt { margin-left: auto; border: 1px solid var(--linje); background: var(--yta); border-radius: 8px; padding: 2px 10px; color: var(--text);
+  font: 12.5px -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.av-piller { position: sticky; bottom: 36px; margin-left: auto; display: block; border: 1px solid var(--linje); background: var(--yta); border-radius: 99px;
+  padding: 2px 10px; font: 12px -apple-system, BlinkMacSystemFont, system-ui, sans-serif; box-shadow: var(--skugga); color: var(--text); }
+.av-tidigare { display: block; background: none; border: 0; color: var(--dampad); font: 12.5px -apple-system, BlinkMacSystemFont, system-ui, sans-serif; padding: 2px 0 6px; }
+.av-fold { display: block; background: none; border: 0; padding: 2px 0; color: var(--dampad); font: 13px var(--mono); text-align: left; cursor: pointer; }
+.av-fold:hover, .av-fold:focus-visible { color: var(--text); }
+.av-fot { margin-top: 6px; color: var(--dampad); font: 13px -apple-system, BlinkMacSystemFont, system-ui, sans-serif; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+.av-kallor { display: flex; flex-wrap: wrap; gap: 4px 10px; flex-basis: 100%; }
+.av-val { display: inline-flex; align-items: center; gap: 6px; }
+.av-dold { display: none; }
+.av-delsvar { margin-top: 8px; }
+.av-delsvar .svar > :last-child::after { content: " ▍"; color: var(--accent); }
+.av-session .av-kropp { max-height: 60vh; overflow: auto; }
+.arbetsvy.hopfalld { margin-bottom: 6px; }
+.tradstatus .dold { position: absolute; }
+.trad .aktiv.jobb { background: none; border: 1.3px solid var(--varm); }
+@media (max-width: 480px) { .arbetsvy { --logg-storlek: 12px; } .av-tid { display: none; } .av-rad { grid-template-columns: 1.4ch minmax(0, 1fr); } }
 .atgarder { display: flex; gap: 8px; margin-top: 8px; }
 .notis { font-size: 13.5px; color: var(--dampad); border-left: 2px solid var(--linje); padding: 4px 12px; margin: 10px 0; }
 .kort { border: 1px solid var(--linje); border-radius: 14px; padding: 10px 14px; background: var(--yta); margin: 14px 0; }
@@ -327,6 +375,8 @@ body.presentation .kontor-scen { aspect-ratio: auto; max-height: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  .av-snurr.snurrar::before { content: "✻"; animation: none; }  /* annars fryser snurran på sin första bild */
+  .av-punkt.pagar { animation: none; }
 }
 details.fler summary { cursor: pointer; color: var(--dampad); font-size: 13px; margin: 6px 0; }
 .arende-prov { margin-left: 8px; }

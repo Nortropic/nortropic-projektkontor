@@ -9566,3 +9566,105 @@ granskningsunderlaget.
 **Omfattning och återgång.** Bara denna förslagspost och planraden ändras.
 Inget nytt fall startas och överlämningens kvittens ändras inte. Förslaget kan
 återtas genom en rättelsepost och motsvarande ändring av planraden.
+
+## PARTNER-INSYN-20261001 — ägarens beställning: insyn i förbättringspartnerns arbete i Claude Codes terminalform, inte en chattbot; steg 1 (partnerns turer och utredningar) är levererat, steg 2 (mottagarsessionerna) följer som eget beslut
+
+**Status:** registrerat och byggt 2026-10-01 (08:11 UTC) av en Claude Code-session i VS Code (Fable 5.1) inom förbättringspartnerns
+förvaltning. Ägarens ord och hans två svar är sparade ordagrant i
+`evidence/nasta-uppdrag/local/partner-insyn-20261001/owner-words-insyn-20261001.md`; läget i `LAGE.md` bredvid.
+
+**Beställningen.** Johnny skrev: "Jag önskar en bättre insyn i förbättringspartnern, tänk mer claude code terminal arbete
+hur det ska se ut arbetet. Nu är det så mycket som en chattbot, think hard, iterate". På två frågor svarade han "Båda,
+i två leveranser" (partnerns egna turer och utredningar först, därefter mottagarsessionerna som en överlämning startar,
+i Kontoret och trådens kort) och "Hopfälld rad ovanför svaret" (en klar tur fäller ihop arbetet till en rad som
+Claude.ai:s "Thought for N s"; valet "Visa arbetet i alla svar" finns ändå).
+
+**Tolkning och val.** Ytan var en chattbot: under en tur en rad "Undersöker · N s", de sex sista stegtexterna och
+delsvaret, hela tråden omritad var 1,2 s (utfällda delar fälldes ihop, markering försvann, `#flode` är aria-live);
+efter turen ett hopfällt "Källor och arbete". Backend fångade bara verktygsstart som en rad: tankehjärtslag, "requesting",
+komprimering, kvot, omförsök, resultat, tid per anrop och underagentens händelser ignorerades, stegen fanns bara i
+minnet (tak 200, journalen 60) och en krasch tappade dem. I en verklig tur (13 min, 1 403 händelser) kom första
+verktygssteget efter fyra minuters tänkande som ytan inte visade. Designen itererades tre varv (terminaltrogen vy,
+backend, skeptisk granskning) och ströks på: svart terminalruta (ägaren valde Claude-appens form 2026-09-29), en rad per
+tankeblock (~1 000 rader per körning), öppna resultatförhandsvisningar, hjärtslag som rader, kvotrad per händelse,
+statusrad fäst i viewporten, alltid auto-rullning och tokens per rad. Ramen (sidomeny, ruta, modellmeny) behåller
+Claude-appens form från FORBATTRINGSPARTNER-MODELLVAL-20260929; bara arbetsvyn tar Claude Codes form, och ingen
+terminal med inmatning bäddas in (samma beslut). På den punkten ersätter denna post MODELLVAL.
+
+**Byggt.** `tools/partnern/strom.py` (ny): en tolk för Claude Codes stream-json och Codex `exec --json` till
+körningshändelser — rader `{n, tid, typ, text, id, foralder, verktyg, beskrivning, indata, status, ms, resultat, data}`
+med typerna start, ko, verktyg, utredare, resultat, nekat, varning, omforsok, komprimering, kvot, text, uppgift, push,
+pr, jobb, overlamning, forstaelse, resonemang, trad, koppling och slut; ett anrop och dess resultat är två rader med
+samma id (bara tillägg); hjärtslag (thinking_delta, system/thinking_tokens, tool_progress, system/status) uppdaterar
+fasen och blir aldrig rader; kvoten blir en rad först vid 75 % av ett fönster eller när den inte längre är "allowed";
+resultat sparas som en avgörande rad (första raden eller exit-koden, storlek, fel) och ett utdrag om högst 2 000
+tecken, Edits originalFile, oldString/newString och Reads filinnehåll läses aldrig, okända fält krymps och allt
+tvättas från hemlighetsliknande värden; en okänd händelse räknas (`utan_tolkning`) och ett tolkningsfel ger en
+varningsrad, aldrig ett avbrott. `Logg` skriver varje rad till `turer/<id>/handelser.jsonl` (0600, bara tillägg, ingen
+långlivad fildeskriptor) i samma stund som den tolkas; `Svans` läser en ström som en annan process skriver (steg 2).
+Codex eget besked om att partnerns krok körs utan tillit blir ingen varningsrad, ett resultat vars anrop tolken aldrig
+såg får bara sin första rad, och ett `tool_use_result` räknas bara till ett ensamt resultat i meddelandet.
+`agent.py`: varje körning har en logg och en tolk, `Korning.steg` är journalens korta form ur loggen, `lage()` bär
+`fas`, `raknare` och `nasta`, strömfilerna stängs i `finally`, och kö på en ledig plats är en fas (`ko`), aldrig en
+status — avbryt och återhämtning förutsätter `undersoker`, så en köad tur kan avbrytas och startar då aldrig modellen.
+`server.py`: `GET /api/korning/<id>/handelser?fran=<n>` ger raderna från n med fas, räknare, `raknare_ur` och delsvar
+medan körningen pågår, annars ur filen (`klar: true`); `fran` bortom slutet ger tomt och `aterstall` efter en omstart;
+okänd eller raderad körning ger 404; `aterhamta` läser loggen efter en krasch; trådvyn bär `handelser` och
+utredningens `korning`; `/api/tradar` bär `jobb_aktiva`; pollvägen loggas inte. `lager.py`/`jobb.py`: utredningens
+katalog följer med i indexet. Ytan: `ui/arbetsvy.js` (ny) med ⏺/⎿-rader, nästlad underagent, statusrad med fas, tid
+som tickar lokalt, steg, fel, tokens, modell och ansträngning, "↓ N nya rader" när läsaren inte följer, tak 200 rader
+med "Visa N tidigare rader", `aria-live="off"` och en dold statusrad som läser upp fasbyten; `app.js` ritar inte om
+tråden per sekund (strukturnyckel) utan pollar varje körning för sig, fäller en klar tur till `▸ Arbetade 42 s · 9 steg
+…`, visar trådhuvudets fasord och tid, `✻` i fliken, ihålig prick för utredning och Esc två gånger som avbrott; `app.css`
+får `--mono` och `.av-*`. `tools/PARTNER.md` beskriver det under Arbetsvyn.
+
+**Provat.** `tools/test_strom.py` (24 prov, utan server): parning, saknat id, Bash/Edit/Read/WebSearch/MCP-sammanfattningar
+utan filinnehåll, tak och tvätt, tusen hjärtslag utan rader, status, komprimering, omförsök, push, PR, bakgrund, kvot,
+tokens med och utan partiella meddelanden, underagent, result, startrad, trasiga händelser, okänt anrop, flera
+resultat i ett meddelande, Codex bypass-notis, Codex item-typer, loggen, filreserven och svansläsaren. `tools/test_partner.py` (116 prov, 4 nya): fejken talar `RESULTAT`, `TÄNK`, `STATUS`,
+`KOMPRIMERA`, `KVOTHÄNDELSE`, `MEDDELANDE`, `OMFÖRSÖK`, `PUSH`, `PR` och `UNDERAGENT`; `HandelserProv` prövar den levande
+loggen genom API:t, markören, 401/404/400, filen som sanning efter avbrott (0600, radantal), journalens korta form med
+ihopvikt utfall, utredningens logg efter klar, krasch med återhämtning ur filen och radering; `KoProv` kön som fas.
+`test_codexpartner` 17 och `test_arbetsplats` 29 oförändrade gröna. Rökprov mot två sparade verkliga strömmar: partnerns
+tur (1 403 händelser → 51 rader) och en mottagarsession (654 → 223), utan originalFile, oldString, newString eller
+`~/.claude`-sökvägar. Webbläsarprov (`prov/arbetsvy.js`, Playwright) mot en provinstans med fejkad claude: 62 kontroller i
+tre lägen (dator 1440×900, mobil 390×844, reduced motion) i Chromium och WebKit, alla godkända — loggen växer, raderna har
+Claude Codes form, resultaten är avgörande, fel syns som ✗, underagenten nästlas, komprimering och kvot är rader, ingen
+filtext eller prompt når arbetsvyn, statusraden tickar, en utfälld rad överlever pollen, ett trådbyte mitt i arbetet
+lämnar trådhuvudet tomt i den andra tråden och loggen, pollen och huvudet går igen när tråden öppnas, Esc en gång
+avbryter inte och två gånger gör det, en avbruten tur har loggen öppen, en klar tur är hopfälld och fälls ut med laddad
+logg, valet "Visa arbetet" består efter omladdning, ingen vågrät rullning på mobil, snurran står stilla under reduced
+motion, inga konsolfel från ytan. Två separata granskningsrundor fann fel i just trådbytet: först att pollen inte startade om
+efter ett byte och att den lämnade vyns ticker skrev den andra trådens fas i trådhuvudet, sedan att ett pollsvar som
+var i luften när tråden lämnades ändå ritade och återarmade sig, och att en tidig retur lämnade ett timer-id som
+hindrade nästa start. Allt är rättat: en pollkedja är bunden till sin post och dör tyst när den stoppats eller
+ersatts, en pausad vy rör varken logg eller huvud och väcks med sin poll när tråden öppnas, rader som kom medan
+tråden var lämnad hämtas när turen blir klar, och antalet cachade vyer är begränsat. Trådbyteskontrollen i
+webbläsarprovet (via sidomenyn, med en väntan längre än ett pollsvar) kom till därför. Helsviten mäts kredentialfritt på exakt kandidat (inforande/suite.json) och beteendeacceptansen
+fryses i utfärdarens sandlåda före förseglingen.
+
+**Gränser som sägs rakt ut.** Händelseformerna är lästa ur Claude Code 2.1.280 (partnern) och 2.1.285/2.1.257
+(mottagarsessioner) 2026-10-01; en ny subtyp räknas, visas inte. Tankeresonemangets text är tom i strömmen: bara
+tokenuppskattningen visas. Mottagarsessioner saknar partiella meddelanden, så meddelanden och sammanhang räknas ur
+assistant-händelsernas message.id och usage. Underagentens nästling och Codex-vägen (command_execution, file_change) är
+provade mot fejken; ingen verklig underagentkörning eller Codex-ström från partnern finns sparad. Räknarna är en löpande
+uppskattning ur strömmen, inte abonnemangets kvot; `FORBRUKNING.json` förblir kvittot för överlämningar. Loggens rader
+når bara ägarens egen webbläsare bakom inloggningen, som sammanfattade poster, aldrig som råa strömrader. En tur som
+avbröts tas med i nästa tur i tråden (befintligt beteende), så den turens logg bär båda inspelens steg. WebKit:
+Playwrights skärmbild injicerar en stilmall som sidans CSP nekar — en känd artefakt från tidigare WebKit-evidens, inte
+ytans. Esc-två-gånger finns bara på tangentbord. Steg 2 (mottagarsessionerna) bygger på `Svans` och en egen endpoint
+`/api/overlamning/<id>/session`, med samma sammanfattade poster och `nr` ur START.jsonl, aldrig råa rader; det är inte
+med här.
+
+**Införande.** Kandidaten integreras genom den ordinarie skyddade vägen efter separat granskning (frysta beteendefall
+i utfärdarens sandlåda, kredentialfri helsvit, läsarprofilens granskning av exakta byte, försegling, Publisher). Integration
+och omstart är skilda steg: tjänsten startas om ur main enligt driftregeln när ingen tur eller utredning pågår, och först
+då syns arbetsvyn i den levande tjänsten. Planen äger nästa handling.
+
+**Oförändrat.** Partnerns verktyg, krok, webbpolicy, överlämning, startvakt, backlog, journalens händelsetyper och
+`tur_klar.steg` (högst 60 korta rader) är oförändrade; `/api/trad/<id>` bär `aktiv.steg` och `aktiv.delsvar` som förut.
+Inga paket i beställningsvägen och inga andra repon ändras.
+
+**Återgång.** Återställ integrationscommiten med `git revert`; `handelser.jsonl` i turer/ är då bara en fil som ingen läser.
+
+**Avslut.** Steg 1 är klart när ändringen är integrerad och tjänsten omstartad ur main. Steg 2 kräver ett eget beslut.

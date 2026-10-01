@@ -349,6 +349,20 @@ Tillägg 2026-10-01 (07:50 UTC): steg 1 av DOKUMENTVAG-20261001 är levererat: v
 medan verktyget själv kör utfärdarens nuvarande krav. Steg 2, utfärdarens dokumentsort, väntar på att Codex 1225ac
 når Runtimes main.
 
+Tillägg 2026-10-01 (08:11 UTC): på Johnnys beställning ("Jag önskar en bättre insyn i förbättringspartnern, tänk mer claude code
+terminal arbete hur det ska se ut arbetet. Nu är det så mycket som en chattbot, think hard, iterate", ordagrant i
+`evidence/nasta-uppdrag/local/partner-insyn-20261001/`) visar tråden partnerns arbete som en terminalutskrift i Claude
+Codes form medan det pågår — anrop, resultat med tid och fel, nästlad underagent, faser, komprimering, kvot och en
+statusrad — och fäller ihop det till en rad ovanför svaret när turen är klar (PARTNER-INSYN-20261001, steg 1; hans val:
+båda stegen i två leveranser, klar tur hopfälld). Körningsströmmen tolkas till händelser som skrivs rad för rad till
+`turer/<id>/handelser.jsonl` och serveras genom `GET /api/korning/<id>/handelser`; kö är en fas, aldrig en status.
+Skrivansvar för `tools/partnern/`, `tools/partner.py`, `tools/test_partner.py`, `tools/test_strom.py`, `tools/PARTNER.md`
+och detta block under PARTNER-INSYN-20261001: Claude Code-sessionen i VS Code som bygger den. Efter integrationen startas
+tjänsten om ur main enligt driftregeln (när ingen tur eller utredning pågår). Nästa handling i spåret: steg 2,
+mottagarsessionerna som en överlämning startar, i Kontorets objektvy och trådens OVL-kort, som ett eget beslut med samma
+tolk (`strom.Svans`) och sammanfattade poster, aldrig råa rader. Återupptagning:
+`evidence/nasta-uppdrag/local/partner-insyn-20261001/LAGE.md`.
+
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
 
