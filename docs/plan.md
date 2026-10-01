@@ -336,6 +336,11 @@ Tillägg 2026-10-01 (05:30 UTC): Johnny körde övergång 22 04:52Z; Runtime kö
 för Runtime efter modellmätningen (RUNTIME-CODEX-AKTIV-20261001). Raden i ÄGARENS TUR är stängd. Beställningen från
 2026-09-30 är levererad.
 
+Tillägg 2026-10-01 (06:40 UTC): Johnny beslutade en lättare väg för rena dokumentändringar i kontoret, en granskning och
+ett kommando (DOKUMENTVAG-20261001). Första steget är kontorsverktyget `tools/dokumentpost.py`. Utfärdarens dokumentsort
+byggs när Codex 1225ac är på Runtimes main; utfärdaren antas då på nytt, och Johnny kör en Runtime-övergång.
+Återupptagning: `evidence/nasta-uppdrag/local/dokumentvag-20261001/`.
+
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
 

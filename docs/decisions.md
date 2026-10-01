@@ -8914,6 +8914,9 @@ posten.
 
 **Ersätter:** ingen post.
 
+**Delvis ersatt av:** DOKUMENTVAG-20261001, i fråga om rena dokumentändringar under docs/: för dem gäller en
+granskning och ett kommando sedan Johnnys beslut 2026-10-01. Övrigt gäller och väntar som förut.
+
 ## RUNTIME-OVERGANG-19-AKTIV-20260930 — övergång 19 är aktiv och aktiveraren går; steg 2 av MODELLKARTA-20260929 är klart
 
 **Status:** registrerat 2026-09-30 av sessionen nortropic-repos-d7 (Claude Code) efter ägarens aktivering. Hans
@@ -9430,3 +9433,64 @@ beslutsloggen (den nya posten och markeringen sist i RUNTIME-CODEX-20261001).
 
 **Avslut.** Klart när ändringen är integrerad. Med den är Johnnys beställning från 2026-09-30 levererad: Opus 5.5 och
 gpt-6.1-sol går att välja för Runtime, och läsarnas nivå är ett val i kontoret och Digitala.
+
+## DOKUMENTVAG-20261001 — Johnnys beslut: rena dokumentändringar i kontoret får en lättare väg, en granskning och ett kommando; utfärdarens dokumentsort byggs ovanpå Codex 1225ac
+
+**Status:** registrerat 2026-10-01 av sessionen nortropic-repos-07 (Claude Code). Johnnys ord och tre val står
+ordagrant i `evidence/nasta-uppdrag/local/dokumentvag-20261001/owner-words-dokumentvag-20261001.md`.
+
+**Ägarens ord.** "Vi behöver ha en Lättare väg för rena dokumentändringar i kontoret, en granskning och ingen försegling
+för poster utan kod. Kontorsposter, som bara är dokumentation, går samma tunga väg som kod. Det gäller frysta fall,
+kredentialfri svit, integrationskopia, separat granskning och försegling. Ett felaktigt tal i en text kostade en hel
+granskningsrunda."
+
+**Johnnys val** (svar på sessionens frågor samma morgon):
+- vägen: "Dokumentväg i utfärdaren (rekommenderas)", alltså en egen sort i Runtimes utfärdare som själv prövar att bara
+  dokument ändras och att planens ÄGARENS TUR och beslutsloggen behåller sina former; skyddet på main är oförändrat;
+- omfånget: "Bara docs/ (rekommenderas)";
+- ordningen: "Börja med kontorsverktyget nu (rekommenderas)".
+
+**Varför utfärdaren.** Kontorets main skyddas av två kontroller som bara den antagna utfärdaren kan sätta. Den kräver i dag
+en förseglad begäran med frysta beteendefall, och Runtimes publiceringsskript för konstruktioner kräver dessutom en
+uppmätt kredentialfri svit. En väg utan försegling kräver därför en ändring i den antagna utfärdarkoden, som antas på
+nytt efter separat granskning. Codex backlog 1225ac skriver om samma utfärdarkod och lägger redan till värdägda
+kontroller för beslutsloggen och för innehåll. Dokumentsorten byggs därför ovanpå den, så att utfärdaren antas en gång
+och Johnny kör en övergång.
+
+**Beslutet.**
+1. *En ren dokumentändring* är en commit direkt på origin/main som bara lägger till eller ändrar `.md`-filer under
+   `docs/` (vanliga filer, UTF-8). `docs/decisions.md` får bara växa: inga rader tas bort eller ändras, och rättelser blir
+   nya poster. Varje radformad rad i planen (`- [beslut] `, `- [operatörshandling] `) ska ingå i det Aquarium läser som
+   ÄGARENS TUR. `AGENTS.md`, `CLAUDE.md` och allt under `tools/` går den vanliga vägen.
+2. *En granskning.* `python3 -B tools/dokumentpost.py granska REF --id ID --kalla ÄGARORD [--bevis KVITTO ...]` kör
+   kontorets `tools/granska.py`, med läsarnas val i Flödet, på patchen, de ändrade filerna, ägarens ord och kvittona.
+   - Godkänd utan blockerande fynd: ändringen publiceras på exakt de granskade bytena. Anteckningar som inte blockerar
+     rättas inte i samma ändring; de står i postens `NOTER.md` och tas i nästa.
+   - Blockerande fynd, alltså ett fel Johnny agerar på, en rad i ägarens tur som är fel eller inte går att läsa, eller
+     privat material: de rättas och granskas igen.
+   - `prova` visar före granskningen vilka tal de tillagda raderna innehåller, så att varje tal har sitt kvitto.
+3. *Ett kommando.* `python3 -B tools/dokumentpost.py publicera ID`. Har main flyttat läggs ändringen om och anges med
+   `--ref`. Granskningen gäller fortfarande om de ändrade filernas byte är desamma.
+4. *Tills utfärdarens dokumentsort finns* kör `publicera` utfärdarens nuvarande krav själv: integrationskopia,
+   kredentialfri helsvit, ett fryst dokumentfall (`tools/dokumentpost_prov.py`: filernas sha256, ägarens tur som Aquarium
+   läser den och beslutsloggens rubriker), försegling (`tools/dokumentpost_utfardare.py`) och skyddad publicering. Det
+   är ett kommando. Vid kontorets förra post (PR 157) tog motsvarande steg cirka 5,4 minuter maskintid, varav
+   helsviten 272 sekunder, och granskningen ytterligare 230 sekunder; sessionens fråga hade sagt cirka 15 minuter.
+5. *Nästa steg, när Codex 1225ac är på Runtimes main:* Runtime får en dokumentsort i utfärdaren. Den återanvänder
+   1225ac:s kontroller av beslutsloggen och innehållet och lägger till regeln för ägarens tur. Utfärdaren och dess
+   startprogram antas på nytt en gång med separat granskning, på Johnnys mandat från i dag. Utfärdarkoden ligger i
+   ägarfiler, så Runtime-releasen kräver en övergång som Johnny kör; den kan tas tillsammans med 1225ac:s. Därefter
+   hoppar `publicera` över integrationskopia, svit och fryst fall.
+
+**Oförändrat.** Separat granskning och skyddad integration gäller före varje publicering. Kod och allt utanför `docs/`
+går den vanliga vägen. Skyddet på main ändras inte. Förslaget om små ändringar (SMA-ANDRINGAR-FORSLAG-20260930) väntar
+som förut för allt utom rena dokumentändringar.
+
+**Här.** `tools/dokumentpost.py`, `tools/dokumentpost_prov.py`, `tools/dokumentpost_utfardare.py` och deras prov
+(`tools/test_dokumentpost.py`), den här posten, markeringen sist i SMA-ANDRINGAR-FORSLAG-20260930 och ett tillägg i
+planen. Den här ändringen innehåller kod och går därför själv den vanliga vägen.
+
+**Återgång.** Återställ integrationscommiten med `git revert`.
+
+**Avslut.** Första steget är klart när ändringen är integrerad. Beslutet är helt infört när utfärdarens dokumentsort är
+antagen och Runtime-övergången är körd.
