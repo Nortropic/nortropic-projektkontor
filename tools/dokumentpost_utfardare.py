@@ -35,6 +35,19 @@ def git(repo, *args):
     return subprocess.run(['git', '-C', str(repo), *args], capture_output=True, check=True, timeout=120).stdout
 
 
+def granskarens_namn(run_namn):
+    """reviewer_run publiceras ordagrant och måste vara en ren etikett ([a-z0-9-], publish_construction.py); härlett ur
+    läsarens körning, tvättat här i stället för att vägras där, efter förseglingens skrivningar."""
+    return re.sub('-+', '-', re.sub('[^a-z0-9-]', '-', ('kontorsgranskning-' + run_namn).lower()))[:110].rstrip('-')
+
+
+def publicerbar(text):
+    """Samma prov som publish_construction.py gör på limitations och actual_reviewer, här före första skrivningen."""
+    return not (len(text) > 3000 or re.search(r'(/Users/|/private/|/var/|/tmp/|/opt/|~/|[A-Za-z]:\\|\.runtime/|evidence/)', text)
+                or '@' in text or re.search(r'https?://|www\.', text, re.I) or re.search(r'#\d|GH-\d', text, re.I)
+                or any(ord(ch) < 32 or ord(ch) > 126 for ch in text))
+
+
 def skriv_exklusivt(path, data, mode=0o400):
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, mode)
     with os.fdopen(fd, 'wb') as f:
@@ -100,8 +113,11 @@ def forsegla(katalog):
     filer = {rel: sha(git(W, 'show', kandidat + ':' + rel)) for rel in andrade}
     if not andrade or not all(DOKUMENT.match(rel) and '..' not in Path(rel).parts for rel in andrade):
         raise SystemExit('Kandidaten ändrar annat än .md-filer under docs/; den går den vanliga vägen.')
-    if json.loads(granskade_bytes).get('files_sha256') != filer:
-        raise SystemExit('Granskningen band andra byte än kandidaten.')
+    bas_filer = {rel: (sha(git(W, 'show', bas + ':' + rel)) if git(W, 'ls-tree', bas, '--', rel).strip() else None)
+                 for rel in andrade}
+    granskat = json.loads(granskade_bytes)
+    if granskat.get('files_sha256') != filer or granskat.get('base_files_sha256') != bas_filer:
+        raise SystemExit('Granskningen band andra byte än kandidaten eller basen.')
     suite_raw = (katalog / 'suite.json').read_bytes()
     suite = json.loads(suite_raw)
     if suite['candidate'] != kandidat or suite['tree'] != tree or suite['returncode'] != 0 or suite['last_line'] != 'OK':
@@ -113,12 +129,15 @@ def forsegla(katalog):
             obs['probe_sha256'] != sha((katalog / 'probe.py').read_bytes()):
         raise SystemExit('Dokumentfallet är inte mätt och grönt på exakt kandidat med denna probe.')
     accept = (katalog / 'acceptance.txt').read_text().strip()
-    reviewer_run = ('kontorsgranskning-' + run.name.lower())[:110]
+    reviewer_run = granskarens_namn(run.name)
     actual_reviewer = ('Independent reader through the office review tool (tools/granska.py: Runtime critique profile, %s, '
                        'read-only, no network, no execution) over the complete diff from main, the changed documents, the '
                        'owner\'s order and the receipts the post rests on.' % modell)
     limitations = ('Static reading of exact bytes only; the reviewer ran nothing. Documents under docs/ only (DOKUMENTVAG-20261001): '
                    'no code, rule, Runtime, activation or other repository change.')
+    if (not re.fullmatch('[a-z0-9][a-z0-9-]{0,119}', reviewer_run) or reviewer_run == u['implementation_run']
+            or not publicerbar(actual_reviewer) or not publicerbar(limitations)):
+        raise SystemExit('Granskningens kvittofält går inte att publicera ordagrant; inget förseglas.')
     # ---- skrivningar (exklusiva)
     kallsha = sha(kalla.read_bytes())
     accepted = HOST / '.runtime/ap11/accepted' / (namn + '.json')

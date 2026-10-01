@@ -5,9 +5,10 @@
     python3 -B tools/dokumentpost.py publicera ID [--ref REF] [--torr]
 
 En ren dokumentändring är en commit direkt på origin/main som bara lägger till eller ändrar .md-filer under docs/
-(vanliga filer, UTF-8), där docs/decisions.md bara växer (inga rader tas bort eller ändras) och där varje radformad rad
-i planen (`- [beslut] ` eller `- [operatörshandling] `) ingår i det Aquarium läser som ÄGARENS TUR. Allt annat, också
-AGENTS.md, CLAUDE.md och allt under tools/, går den vanliga vägen.
+(vanliga filer, UTF-8, sökvägar av A-Z, a-z, 0-9, punkt, understreck och bindestreck), där docs/decisions.md bara
+växer (inga rader tas bort eller ändras) och där varje radformad rad i planen (`- [beslut] ` eller
+`- [operatörshandling] `) ingår i det Aquarium läser som ÄGARENS TUR. Allt annat, också AGENTS.md, CLAUDE.md och allt
+under tools/, går den vanliga vägen.
 
 REF läses i den utcheckning verktyget körs ur, så HEAD är sessionens worktree.
 
@@ -20,9 +21,12 @@ granska    en separat granskning genom kontorets tools/granska.py, med läsarnas
 publicera  efter en godkänd granskning utan blockerande fynd, på exakt de granskade filernas byte. Anteckningar som inte
            blockerar rättas inte i samma ändring: de står i postens NOTER.md och tas i nästa. Har main flyttat lägger
            sessionen om ändringen och anger den nya commiten med --ref; samma granskning gäller om de ändrade filernas byte
-           är desamma. Tills Runtimes utfärdare har en dokumentsort kör verktyget utfärdarens vanliga krav självt:
+           är desamma, både i kandidaten och i basen (annars kunde en omläggning tyst ta bort det main ändrat). Tills
+           Runtimes utfärdare har en dokumentsort kör verktyget utfärdarens vanliga krav självt:
            integrationskopia, kredentialfri helsvit, ett fryst dokumentfall (tools/dokumentpost_prov.py), försegling
-           (tools/dokumentpost_utfardare.py) och skyddad publicering. --torr stannar före publiceringen.
+           (tools/dokumentpost_utfardare.py) och skyddad publicering. Varje försök får ett eget namn hos utfärdaren,
+           så ett nytt försök krockar inte med ett tidigare. --torr förseglar och torrkör publiceringen men publicerar
+           inte.
 """
 from __future__ import annotations
 
@@ -126,12 +130,13 @@ def regel(repo, ref: str = 'HEAD', bas: str | None = None) -> dict:
     par = [(delar[i], delar[i + 1]) for i in range(0, len(delar) - 1, 2)]
     if not par:
         raise Nekad('kandidaten ändrar ingenting')
-    filer = {}
+    filer, bas_filer = {}, {}
     for status, vag in par:
         if status not in ('A', 'M'):
             raise Nekad('%s: bara tillagda eller ändrade filer går den här vägen (status %s)' % (vag, status))
         if not DOKUMENT.match(vag) or '..' in Path(vag).parts:
-            raise Nekad('%s är ingen .md-fil under docs/; den ändringen går den vanliga vägen' % vag)
+            raise Nekad('%s är ingen .md-fil under docs/ med en sökväg av A-Z, a-z, 0-9, punkt, understreck och bindestreck; '
+                        'den ändringen går den vanliga vägen' % vag)
         trad = git(repo, 'ls-tree', kandidat, '--', vag).split()
         if trad[:2] != ['100644', 'blob']:
             raise Nekad('%s är ingen vanlig fil' % vag)
@@ -145,6 +150,7 @@ def regel(repo, ref: str = 'HEAD', bas: str | None = None) -> dict:
         if '\0' in text:
             raise Nekad('%s innehåller en nollbyte' % vag)
         filer[vag] = sha(data)
+        bas_filer[vag] = sha(git(repo, 'show', bas + ':' + vag, text=False)) if status == 'M' else None
     if BESLUT in filer:
         # --numstat räknar borttagna rader utan att tolka patchtext (en borttagen rad "---" liknar annars ett filhuvud)
         bort = git(repo, 'diff', '--numstat', '--no-renames', '--no-ext-diff', bas, kandidat, '--', BESLUT).split('\t')[1]
@@ -156,7 +162,7 @@ def regel(repo, ref: str = 'HEAD', bas: str | None = None) -> dict:
                                         '--output-indicator-old=<', bas, kandidat).splitlines() if line.startswith('>')]
     poster = [line[3:].split(' — ')[0].strip() for line in tillagt if line.startswith('## ')]
     tal = sorted(set(re.findall(r'(?<![\w.:])\d+(?:[.,:]\d+)*', '\n'.join(tillagt))))
-    return {'kandidat': kandidat, 'bas': bas, 'filer': filer, 'nya_poster': poster,
+    return {'kandidat': kandidat, 'bas': bas, 'filer': filer, 'bas_filer': bas_filer, 'nya_poster': poster,
             'agarens_tur_rader': len(tur), 'tal_i_tillagda_rader': tal}
 
 
@@ -198,8 +204,9 @@ def bygg_underlag(repo, r: dict, runda: Path, kalla: Path, bevis: list) -> dict:
 
     lagg(git(repo, 'diff', '--no-color', '--no-ext-diff', r['bas'], r['kandidat'], text=False), 'kandidat/FULL.patch',
          'Varje ändrad byte från main %s till kandidaten %s' % (r['bas'][:7], r['kandidat'][:7]))
-    lagg((json.dumps({'candidate': r['kandidat'], 'base': r['bas'], 'files_sha256': r['filer']}, indent=1) + '\n').encode(),
-         'kandidat/files-sha256.json', 'Exakt sha256 för varje ändrad fil i kandidaten')
+    lagg((json.dumps({'candidate': r['kandidat'], 'base': r['bas'], 'files_sha256': r['filer'],
+                      'base_files_sha256': r['bas_filer']}, indent=1) + '\n').encode(),
+         'kandidat/files-sha256.json', 'Exakt sha256 för varje ändrad fil i kandidaten och i basen (null: ny fil)')
     for vag in sorted(r['filer']):
         if vag != BESLUT:
             lagg(git(repo, 'show', r['kandidat'] + ':' + vag, text=False), 'kandidat/' + vag, 'Den ändrade filen, hel')
@@ -259,6 +266,15 @@ def granska(ref: str, ident: str, kalla: str, bevis: list, modell: str | None) -
     for b in svar.get('blocking_findings') or []:
         print('  BLOCKERAR: ' + b)
     return 0 if svar.get('verdict') == 'approved' and not svar.get('blocking_findings') else 1
+
+
+def vardnamn(ident: str, stampel: str) -> str:
+    """Försökets namn hos utfärdaren (accepted/, registrering, build/, requests/): eget för varje försök, eftersom
+    förseglingen skriver exklusivt och ett tidigare försök annars spärrar namnet."""
+    namn = ('office-dok-%s-%s' % (ident, stampel)).lower()
+    if not re.fullmatch('[a-z0-9][a-z0-9-]{0,79}', namn):
+        raise Nekad('namnet %s duger inte hos utfärdaren' % namn)
+    return namn
 
 
 def senaste_runda(hem: Path) -> Path:
@@ -382,10 +398,26 @@ def svit(W: Path, kandidat: str, ut: Path) -> dict:
     (ut / 'suite.json').write_text(json.dumps(rekord, ensure_ascii=False, indent=2) + '\n')
     if r.returncode != 0 or rekord['last_line'] != 'OK' or not rekord['test_count']:
         raise Nekad('helsviten är inte grön på kandidaten (%s); se %s' % (rekord['last_line'], ut / 'suite.log'))
-    grans_varden = json.loads(grans.stdout or '{}')
-    if any(str(v).startswith(('LÄSBAR', 'ÖPPET')) for v in grans_varden.values()):
-        raise Nekad('gränsproben fann något läsbart eller öppet i den kredentialfria profilen; se %s' % (ut / 'gransprob.out.json'))
+    stangd(grans.returncode, grans.stdout, ut / 'gransprob.out.json')
     return rekord
+
+
+GRANSNYCKLAR = {'loopback', 'utgaende_ip', 'utgaende_github', 'nyckelring_gh', 'gh_token',
+                'nortropic-repos/Nortropic Runtime/.runtime/ap11/check-issuer/app.pem', '.nortropic-hemligheter',
+                'Library/Keychains', '.config/gh/hosts.yml', '.ssh', '.codex/auth.json', '.claude/.credentials.json', '.claude.json'}
+
+
+def stangd(kod: int, text: str, fil) -> None:
+    """Gränsprobens utfall: varje väntad rad finns, loopback fungerar och inget är läsbart eller öppet. Ett tomt eller
+    ofullständigt utfall bevisar ingenting och nekas."""
+    try:
+        varden = json.loads(text)
+    except ValueError:
+        varden = None
+    if kod or not isinstance(varden, dict) or set(varden) != GRANSNYCKLAR or varden.get('loopback') != 'ok':
+        raise Nekad('gränsproben gav inget fullständigt utfall; se %s' % fil)
+    if any(str(v).startswith(('LÄSBAR', 'ÖPPET')) for v in varden.values()):
+        raise Nekad('gränsproben fann något läsbart eller öppet i den kredentialfria profilen; se %s' % fil)
 
 
 def dokumentfall(rt: Path, ut: Path, r: dict) -> None:
@@ -413,11 +445,15 @@ def dokumentfall(rt: Path, ut: Path, r: dict) -> None:
             raise Nekad('dokumentfallet kunde inte observeras: ' + k.stderr[-500:])
     if not all(f.get('matchar') for f in json.loads((ut / 'obs-kandidat.json').read_text())['fall']):
         raise Nekad('dokumentfallet matchar inte kandidaten')
+    if all(f.get('matchar') for f in json.loads((ut / 'obs-gammal-main.json').read_text())['fall']):
+        raise Nekad('dokumentfallet skiljer inte kandidaten från main')
 
 
 def publicera(ident: str, ref: str | None, torr: bool) -> int:
     hem = katalog_for(ident)
     runda = senaste_runda(hem)
+    if not (runda / 'review.json').is_file() or not (runda / 'regel.json').is_file():
+        raise Nekad('senaste rundan (%s) har ingen granskning; kör granska igen' % runda.name)
     utfall = json.loads((runda / 'review.json').read_text())
     svar = utfall.get('answer') or {}
     if svar.get('verdict') != 'approved' or svar.get('blocking_findings'):
@@ -428,11 +464,12 @@ def publicera(ident: str, ref: str | None, torr: bool) -> int:
         r = regel(KONTOR, upplos(ref) if ref else granskad['kandidat'], bas=main)
     except Nekad as fel:
         raise Nekad('%s. Har main flyttat: lägg om ändringen på origin/main och kör publicera %s --ref NY-COMMIT' % (fel, ident)) from None
-    if r['filer'] != granskad['filer']:
-        raise Nekad('kandidatens ändrade filer har andra byte än de granskade; kör granska igen')
+    if r['filer'] != granskad['filer'] or r['bas_filer'] != granskad.get('bas_filer'):
+        raise Nekad('kandidatens ändrade filer har andra byte än de granskade, i kandidaten eller i basen; kör granska igen')
     rt = runtime_rot()
-    namn = 'office-dok-' + ident
-    ut = hem / ('publicering-%s-%s' % (r['kandidat'][:12], datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')))
+    stampel = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+    namn = vardnamn(ident, stampel)
+    ut = hem / ('publicering-%s-%s' % (r['kandidat'][:12], stampel))
     ut.mkdir(parents=True, exist_ok=False)
     W = KONTOR / 'evidence/ap11/local' / ('integration-dok-' + ident)
     if W.exists():
