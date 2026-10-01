@@ -9668,3 +9668,68 @@ Inga paket i beställningsvägen och inga andra repon ändras.
 **Återgång.** Återställ integrationscommiten med `git revert`; `handelser.jsonl` i turer/ är då bara en fil som ingen läser.
 
 **Avslut.** Steg 1 är klart när ändringen är integrerad och tjänsten omstartad ur main. Steg 2 kräver ett eget beslut.
+
+
+## BACKLOG-U1-GRANSKNINGSRUNDOR-FORSLAG-20261001 — mätt underlag, inget tak infört
+
+**Status.** Förslag av Codex inom OVL-20260930-f00327 U1 och sessionens mandat
+att genomföra backloggen autonomt. Texten är sessionens analys och
+rekommendation. Något beslut om granskningsrundornas tak tillskrivs inte Johnny.
+Originalbeställning: privat
+`evidence/nasta-uppdrag/local/partner-OVL-20260930-f00327/ARBETSORDER.md`, U1.
+
+**Mätningen.** Läsbara kvitton för Nortropic-ändringar från 2026-09-27 lokal tid
+inventerades 2026-10-01. Fångsten slutar 11:25:51 UTC; senare kvitton och
+underlagets egen senare granskning ingår inte. Den innehåller 375 faktiska
+domrundor för 160 namngivna granskningsomfång. Av dem är 161 underkännanden,
+med 331 blockerande fynd: 292 sakfel, 36 tal eller kvarstående lägestext,
+2 main-flyttar och 1 annat. Därutöver redovisas 22 andra försök eller
+bedömningar. Kopior av samma kvitto räknas inte igen; utvidgade paket och
+ombasering av en ofärdig rättningskedja nollställer inte dess rundor.
+Källor: de privata `RUNDOR-VERKLIGA-r8.json`, `ANDRINGAR-OCH-RUNDOR-r5.json`,
+`FYND-KLASSNING-r6.json` och `VERIFIERING-r6.json` i mappen nedan.
+
+**Kostnad och osäkerhet.** Per runda finns faktisk läsartid, bevarade
+förbrukningsfält och länkar till de svit- och acceptansbevis som läsaren fick.
+Okänd tid, oläsbara kvitton och ändringar utan säker kvittokoppling redovisas.
+Ett återanvänt provkvitto är ingen ny provkörning. Förbrukning är inte uppmätt
+andel av abonnemangskvot eller faktisk debitering. Källor:
+`KOSTNADSUNDERLAG-r5.json`, `OKANDA-ANDRINGAR-r6.json` och rapportens radtabeller.
+
+**Alternativ för den vanliga vägen.**
+
+| Alternativ | Vad det skulle innebära i mätbilden |
+|---|---|
+| Inget tak | Samma möjlighet att fortsätta rätta efter blockerande fynd; ingen ny gräns införs. |
+| Tre avslutade rundor, sedan Johnny före nästa | 18 vanliga granskningsomfång hade behövt ett ägarbeslut före fortsättningen. |
+| Tre underkännanden i följd, sedan Johnny | 9 vanliga granskningsomfång hade behövt ett ägarbeslut; ofullständiga försök redovisas därutöver. |
+| Tak som bara får sänkas av sessionen | Johnny väljer starttaket; en höjning kräver nytt tak, skäl, godkännare och datum. Vid starttaket tre träffar det samma omfång som det första takalternativet, fram till ett verkligt nytt beslut. |
+
+Detta är villkorade utfall för läst historik, inte uppmätt tidsbesparing eller
+ett tillstånd att godkänna kvarstående fel. Källor: `UTFALL-OCH-ALTERNATIV-r6.json`
+och originalbeställningens U1 med OpenClaw-spärrmönstret som förlaga.
+
+**Tal och lägestext.** I 16 underkännanden är samtliga blockerande fynd
+klassade som tal eller kvarstående lägestext och möjliga att ta bort i den
+angivna kontrafaktiken. Antalet är en övre gräns för undanröjda sådana avslag,
+under antagandet att inga andra fynd tillkommer. Blandade rundor räknas inte
+bort och senare godkännande antas inte ha inträffat tidigare. Källa:
+`UTFALL-OCH-ALTERNATIV-r6.json`, fälten `pure_text_rejections`, och rapportens
+avsnitt om kontrafaktik.
+
+**Rekommendation att besluta om.** Överväg tre underkännanden i följd med
+spärrmönstrets bokföring av varje undantag. Behåll sakkrav, verkliga prov och
+separat granskning. Vid en beslutad gräns lämnas kända fel, bevis och nästa
+konkreta rättning till Johnny; gränsen ger inget automatiskt godkännande.
+Små ändringar enligt SMA-ANDRINGAR-FORSLAG-20260930 redovisas separat och
+förslaget ändras inte. Den redan beslutade dokumentvägen enligt
+DOKUMENTVAG-20261001 och DOKUMENTVAG-RATTELSE-20261001 hålls utanför ett nytt
+vanligt rundtak. Detta är fortfarande ett beslutsunderlag; ingen regel införs.
+
+**Privat fullständigt underlag.**
+`evidence/nasta-uppdrag/local/backlog-plan-20260930/f00327-u1/UNDERLAG-UTKAST-r6.md`
+innehåller rundor per ändring, varje runda, kostnadsbindningar, småändringsklassning,
+okända underlag och alternativens utfall. Samma katalog innehåller de namngivna
+källfilerna, den modellfria verifieringen och frysta original i
+`kallpaket-slut-r5/MANIFEST.json`. Råa granskningskvitton och personliga sökvägar
+stannar i det privata underlaget. Förslaget läggs som en beslutsrad i ÄGARENS TUR.
