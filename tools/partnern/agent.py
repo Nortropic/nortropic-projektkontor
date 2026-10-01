@@ -38,8 +38,9 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from . import bilagor as bil
+from . import strom
 from .konfig import ar_claude
-from .lager import nu, nytt_id
+from .lager import nytt_id
 
 PAKET = Path(__file__).resolve().parent
 FORSTAELSE_AGARE_TECKEN = 10000   # Johnnys egna ord i läget
@@ -72,7 +73,7 @@ CODEX_NOT = ('\n\n## Den här körningen (Codex)\n\nDu kör på Codex. Det finns
              'separat registrerar du en utredning med verktyget utred, som körs på samma modell. Webbverktyget prövas av '
              'partnerns server med samma regler som webbsökning och webbhämtning; ett nekat anrop kommer med skälet. '
              'Lokala filer läses bara genom partnerns egna verktyg.')
-CODEX_VARNING = 'dangerously-bypass-hook-trust'  # Codex eget besked om att partnerns granskade krok körs utan tillit
+CODEX_VARNING = strom.CODEX_VARNING  # Codex eget besked om att partnerns granskade krok körs utan tillit; tolken tiger om det
 BILDTYPER = {'image/png': '.png', 'image/jpeg': '.jpg', 'image/gif': '.gif', 'image/webp': '.webp'}
 UUID_FORM = re.compile(r'\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z')
 # Systemprompten går som utvecklarinstruktion i argumenten; blir den ovanligt stor läggs den först i prompten i stället,
@@ -117,7 +118,7 @@ class Korning:
         self.nyckel = secrets.token_urlsafe(32)
         self.status = 'undersoker'
         self.startad = time.time()
-        self.steg = []
+        self.fas_ko = False      # väntar på en ledig plats (statusen rörs inte; se Agent.kor)
         self.kallor = []
         self.delsvar = ''
         self.svarstext = []      # huvudagentens textblock: {'text', 'fore_verktyg'}
@@ -139,13 +140,19 @@ class Korning:
         self._las = threading.Lock()
         self.katalog = Path(server.lager.turer) / self.id
         self.katalog.mkdir(parents=True, exist_ok=True, mode=0o700)
+        # Körningshändelserna (PARTNER-INSYN-20261001): i minnet och i turer/<id>/handelser.jsonl, rad för rad medan
+        # körningen pågår. Tolken skapas när utföraren är känd (_kor/_kor_codex).
+        self.logg = strom.Logg(self.katalog / 'handelser.jsonl')
+        self.tolk = None
 
     # anropas av verktyg och tolkning
     def handelse(self, typ: str, text: str) -> None:
-        with self._las:
-            self.steg.append({'tid': nu(), 'typ': typ, 'text': text[:400]})
-            if len(self.steg) > 200:
-                self.steg = self.steg[-200:]
+        self.logg.lagg({'typ': typ, 'text': text[:400]})
+
+    @property
+    def steg(self) -> list:
+        """Journalens korta form av händelserna (som före PARTNER-INSYN-20261001)."""
+        return self.logg.steg(200)
 
     def logga_kallor(self, ids: list, hur: str) -> None:
         with self._las:
@@ -155,10 +162,22 @@ class Korning:
 
     def lage(self) -> dict:
         with self._las:
-            return {'id': self.id, 'typ': self.typ, 'trad': self.trad, 'status': self.status,
-                    'status_text': STATUS_TEXT.get(self.status, self.status), 'startad': self.startad,
-                    'sekunder': int(time.time() - self.startad), 'steg': list(self.steg[-40:]),
-                    'delsvar': self.delsvar[-20000:], 'modell': self.modell}
+            delsvar = self.delsvar[-20000:]
+            status = self.status
+        sekunder = int(time.time() - self.startad)
+        if self.tolk is not None:
+            t = self.tolk.lage()
+            fas, raknare = t['fas'], t['raknare']
+        else:
+            fas = {'lage': 'ko' if self.fas_ko else 'start', 'sedan': strom._iso(self.startad), 'sekunder': sekunder,
+                   'tankt_tokens': 0, 'verktyg': None, 'forsok': None, 'utan_tolkning': 0}
+            raknare = {}
+        raknare = dict(raknare, anstrangning=self.anstrangning, sekunder=sekunder, utforare=self.utforare)
+        raknare['modell'] = raknare.get('modell') or self.modell
+        return {'id': self.id, 'typ': self.typ, 'trad': self.trad, 'status': status,
+                'status_text': 'i kö' if self.fas_ko else STATUS_TEXT.get(status, status), 'startad': self.startad,
+                'sekunder': sekunder, 'steg': self.logg.steg(40), 'delsvar': delsvar, 'modell': self.modell,
+                'fas': fas, 'raknare': raknare, 'nasta': self.logg.nasta}
 
     def avbryt(self, orsak: str) -> bool:
         """Begär avbrott. Gäller även innan modellprocessen har startat (då startas den aldrig)."""
@@ -528,8 +547,21 @@ class Agent:
     def kor(self, korning: Korning, session: str | None) -> dict:
         """Kör en tur eller utredning till slut. Anroparen registrerar körningen före och journalför resultatet
         innan den avregistreras, så att ett stopp aldrig ser en körning försvinna innan dess utfall står på disk."""
-        with self.platser:
+        if not self.platser.acquire(blocking=False):
+            # Kö: synlig som fas (aldrig som status, som avbryt och återhämtning förutsätter) och avbrytbar.
+            korning.fas_ko = True
+            korning.handelse('ko', 'Väntar på en ledig plats (%d samtidiga körningar pågår)' % self.k.gransar.samtidiga_korningar)
+            t0 = time.time()
+            while not self.platser.acquire(timeout=0.5):
+                if korning.avbruten_av:
+                    korning.fas_ko = False
+                    return self._avsluta(korning, 'avbruten', orsak=korning.avbruten_av, start=t0)
+            korning.fas_ko = False
+            korning.handelse('ko', 'Plats ledig efter %d s' % (time.time() - t0))
+        try:
             return self._kor(korning, session)
+        finally:
+            self.platser.release()
 
     def _kor(self, korning: Korning, session: str | None) -> dict:
         texter = [i['text'] for i in korning.inspel]
@@ -557,54 +589,57 @@ class Agent:
         meddelande = self.anvandarmeddelande(korning, historik=ny, redan_skickade=redan)
         argv = self.argv(korning, session, ny)
         env = self.miljo(korning, korning.fortsatt_avbruten and not ny)
-        korning.handelse('start', 'Startar %s (%s)' % ('ny modellsession' if ny else 'fortsatt modellsession',
-                                                        korning.modell))
+        korning.tolk = strom.Tolk('claude')
+        korning.handelse('start', 'Startar %s (%s, %s)' % ('ny modellsession' if ny else 'fortsatt modellsession',
+                                                            korning.modell, korning.anstrangning))
         if korning.avbruten_av:
             return self._avsluta(korning, 'avbruten', orsak=korning.avbruten_av, start=time.time())
-        strom = open(korning.katalog / 'strom.jsonl', 'ab')
+        rastrom = open(korning.katalog / 'strom.jsonl', 'ab')
         os.chmod(korning.katalog / 'strom.jsonl', 0o600)
         fel_ut = open(korning.katalog / 'stderr.txt', 'ab')
         resultat = None
         start = time.time()
         try:
-            proc = subprocess.Popen(argv, cwd=str(self.arbetsyta), env=env, stdin=subprocess.PIPE,
-                                    stdout=subprocess.PIPE, stderr=fel_ut, start_new_session=True)
-        except OSError as e:
-            return self._avsluta(korning, 'fel', orsak='Claude Code kunde inte startas (%s).' % type(e).__name__,
-                                 start=start)
-        with korning._las:
-            korning.proc = proc
-        if korning.avbruten_av:  # begärdes medan processen startade
             try:
-                os.killpg(proc.pid, signal.SIGINT)
-            except OSError:
-                pass
-        vakt = threading.Thread(target=self._vakt, args=(korning,), daemon=True)
-        vakt.start()
-        try:
-            proc.stdin.write((json.dumps(meddelande, ensure_ascii=False) + '\n').encode('utf-8'))
-            proc.stdin.close()
-        except OSError:
-            pass
-        aktuell = []
-        skrivet, sparat = '', time.time()
-        for rad in proc.stdout:
-            strom.write(rad)
-            try:
-                ev = json.loads(rad)
-            except ValueError:
-                continue
-            resultat = self._tolka(korning, ev, aktuell) or resultat
-            if time.time() - sparat > 2 and korning.delsvar != skrivet:
-                skrivet, sparat = korning.delsvar, time.time()
+                proc = subprocess.Popen(argv, cwd=str(self.arbetsyta), env=env, stdin=subprocess.PIPE,
+                                        stdout=subprocess.PIPE, stderr=fel_ut, start_new_session=True)
+            except OSError as e:
+                return self._avsluta(korning, 'fel', orsak='Claude Code kunde inte startas (%s).' % type(e).__name__,
+                                     start=start)
+            with korning._las:
+                korning.proc = proc
+            if korning.avbruten_av:  # begärdes medan processen startade
                 try:
-                    self.s.lager.spara_privat_fil(korning.katalog / 'delsvar.txt', skrivet.encode('utf-8'))
+                    os.killpg(proc.pid, signal.SIGINT)
                 except OSError:
                     pass
-        proc.wait()
-        proc.stdout.close()
-        strom.close()
-        fel_ut.close()
+            vakt = threading.Thread(target=self._vakt, args=(korning,), daemon=True)
+            vakt.start()
+            try:
+                proc.stdin.write((json.dumps(meddelande, ensure_ascii=False) + '\n').encode('utf-8'))
+                proc.stdin.close()
+            except OSError:
+                pass
+            aktuell = []
+            skrivet, sparat = '', time.time()
+            for rad in proc.stdout:
+                rastrom.write(rad)
+                try:
+                    ev = json.loads(rad)
+                except ValueError:
+                    continue
+                resultat = self._tolka(korning, ev, aktuell) or resultat
+                if time.time() - sparat > 2 and korning.delsvar != skrivet:
+                    skrivet, sparat = korning.delsvar, time.time()
+                    try:
+                        self.s.lager.spara_privat_fil(korning.katalog / 'delsvar.txt', skrivet.encode('utf-8'))
+                    except OSError:
+                        pass
+            proc.wait()
+            proc.stdout.close()
+        finally:
+            rastrom.close()
+            fel_ut.close()
         return self._slutstatus(korning, resultat, proc.returncode, start)
 
     # ---------------------------------------------------------------- Codex
@@ -659,54 +694,60 @@ class Agent:
         korning.session = 'codex-' + korning.id  # ett eget id, aldrig en Claude-sessions (se _kor)
         argv = self.argv_codex(korning, systemtext, bilder)
         env = self.miljo(korning, False)
-        korning.handelse('start', 'Startar ny modellsession (%s, Codex)' % korning.modell)
+        korning.tolk = strom.Tolk('codex')
+        korning.handelse('start', 'Startar ny modellsession (%s, %s, Codex)' % (korning.modell, korning.anstrangning))
         if korning.avbruten_av:
             return self._avsluta(korning, 'avbruten', orsak=korning.avbruten_av, start=time.time())
-        strom = open(korning.katalog / 'strom.jsonl', 'ab')
+        rastrom = open(korning.katalog / 'strom.jsonl', 'ab')
         os.chmod(korning.katalog / 'strom.jsonl', 0o600)
         fel_ut = open(korning.katalog / 'stderr.txt', 'ab')
         start = time.time()
         try:
-            proc = subprocess.Popen(argv, cwd=str(self.arbetsyta), env=env, stdin=subprocess.PIPE,
-                                    stdout=subprocess.PIPE, stderr=fel_ut, start_new_session=True)
-        except OSError as e:
-            return self._avsluta(korning, 'fel', orsak='Codex kunde inte startas (%s).' % type(e).__name__, start=start)
-        with korning._las:
-            korning.proc = proc
-        if korning.avbruten_av:
             try:
-                os.killpg(proc.pid, signal.SIGINT)
-            except OSError:
-                pass
-        threading.Thread(target=self._vakt, args=(korning,), daemon=True).start()
-        try:
-            proc.stdin.write(text.encode('utf-8'))
-            proc.stdin.close()
-        except OSError:
-            pass
-        utfall = {'usage': None, 'fel': []}
-        skrivet, sparat = '', time.time()
-        for rad in proc.stdout:
-            strom.write(rad)
-            try:
-                ev = json.loads(rad)
-            except ValueError:
-                continue
-            if isinstance(ev, dict):
-                self._tolka_codex(korning, ev, utfall)
-            if time.time() - sparat > 2 and korning.delsvar != skrivet:
-                skrivet, sparat = korning.delsvar, time.time()
+                proc = subprocess.Popen(argv, cwd=str(self.arbetsyta), env=env, stdin=subprocess.PIPE,
+                                        stdout=subprocess.PIPE, stderr=fel_ut, start_new_session=True)
+            except OSError as e:
+                return self._avsluta(korning, 'fel', orsak='Codex kunde inte startas (%s).' % type(e).__name__, start=start)
+            with korning._las:
+                korning.proc = proc
+            if korning.avbruten_av:
                 try:
-                    self.s.lager.spara_privat_fil(korning.katalog / 'delsvar.txt', skrivet.encode('utf-8'))
+                    os.killpg(proc.pid, signal.SIGINT)
                 except OSError:
                     pass
-        proc.wait()
-        proc.stdout.close()
-        strom.close()
-        fel_ut.close()
+            threading.Thread(target=self._vakt, args=(korning,), daemon=True).start()
+            try:
+                proc.stdin.write(text.encode('utf-8'))
+                proc.stdin.close()
+            except OSError:
+                pass
+            utfall = {'usage': None, 'fel': []}
+            skrivet, sparat = '', time.time()
+            for rad in proc.stdout:
+                rastrom.write(rad)
+                try:
+                    ev = json.loads(rad)
+                except ValueError:
+                    continue
+                if isinstance(ev, dict):
+                    self._tolka_codex(korning, ev, utfall)
+                if time.time() - sparat > 2 and korning.delsvar != skrivet:
+                    skrivet, sparat = korning.delsvar, time.time()
+                    try:
+                        self.s.lager.spara_privat_fil(korning.katalog / 'delsvar.txt', skrivet.encode('utf-8'))
+                    except OSError:
+                        pass
+            proc.wait()
+            proc.stdout.close()
+        finally:
+            rastrom.close()
+            fel_ut.close()
         return self._slutstatus_codex(korning, utfall, proc.returncode, start)
 
     def _tolka_codex(self, korning: Korning, ev: dict, utfall: dict) -> None:
+        if korning.tolk is None:  # körningen skapar tolken före strömmen; en direkt anropad tolkning får en här
+            korning.tolk = strom.Tolk('codex')
+        korning.logg.lagg_flera(korning.tolk.mata(ev))  # körningshändelserna: verktyg, resultat, text, omförsök, slut
         typ = ev.get('type')
         item = ev.get('item') if isinstance(ev.get('item'), dict) else {}
         slag = item.get('type')
@@ -715,9 +756,6 @@ class Agent:
         elif typ == 'item.started' and slag in ('mcp_tool_call', 'web_search'):
             for t in korning.svarstext:  # en kort text före verktyg är en mellanrad (som på Claude)
                 t['fore_verktyg'] = True
-            if slag == 'mcp_tool_call':
-                korning.handelse('verktyg', _beskriv_verktyg('mcp__partner__' + str(item.get('tool') or ''),
-                                                             item.get('arguments') or {}))
         elif typ == 'item.completed' and slag == 'agent_message':
             text = str(item.get('text') or '')
             if text.strip():
@@ -726,11 +764,7 @@ class Agent:
                     korning.delsvar += ('\n\n' if korning.delsvar.strip() else '') + text
         elif typ == 'item.completed' and slag == 'web_search':
             handling = item.get('action') if isinstance(item.get('action'), dict) else {}
-            if handling.get('type') == 'open_page':
-                korning.handelse('verktyg', 'Hämtar webbsida: %s' % str(handling.get('url') or '')[:200])
-            else:
-                korning.handelse('verktyg', 'Webbsökning: "%s"' % str(item.get('query') or '')[:200])
-            oppnad = (urlparse(str(handling.get('url') or '')).hostname or '').lower() if handling.get('type') == 'open_page' else None
+            oppnad =(urlparse(str(handling.get('url') or '')).hostname or '').lower() if handling.get('type') == 'open_page' else None
             for r in item.get('results') or []:
                 if not isinstance(r, dict):
                     continue
@@ -741,13 +775,6 @@ class Agent:
                     korning.sokvardar.add(vard)
                 if r.get('ref_id') and vard and len(korning.codex_ref) < 2000:
                     korning.codex_ref[str(r['ref_id'])[:80]] = vard
-        elif typ == 'item.completed' and slag == 'mcp_tool_call' and item.get('status') == 'failed':
-            fel = item.get('error') if isinstance(item.get('error'), dict) else {}
-            korning.handelse('nekat', str(fel.get('message') or 'Verktyget %s gav ett fel.' % str(item.get('tool') or '')[:40])[:300])
-        elif typ == 'item.completed' and slag == 'error':
-            text = str(item.get('message') or '')
-            if CODEX_VARNING not in text:
-                korning.handelse('varning', text[:300])
         elif typ == 'turn.completed':
             utfall['usage'] = ev.get('usage') if isinstance(ev.get('usage'), dict) else {}
         elif typ == 'turn.failed':
@@ -755,9 +782,7 @@ class Agent:
             utfall['fel'].append(str(fel.get('message') or typ)[:500])
         elif typ == 'error':  # t.ex. "Reconnecting... (403)": räknas som omförsök, som Claudes api_retry
             korning.forsok += 1
-            text = str(ev.get('message') or 'fel')[:300]
-            utfall.setdefault('tillfalliga', []).append(text)
-            korning.handelse('omforsok', 'Codex: %s' % text)
+            utfall.setdefault('tillfalliga', []).append(str(ev.get('message') or 'fel')[:300])
 
     def _slutstatus_codex(self, korning: Korning, utfall: dict, returkod: int, start: float) -> dict:
         forbrukning = {'modellanrop': True, 'sekunder': round(time.time() - start, 1), 'omforsok': korning.forsok,
@@ -811,6 +836,9 @@ class Agent:
             time.sleep(1)
 
     def _tolka(self, korning: Korning, ev: dict, aktuell: list):
+        if korning.tolk is None:  # körningen skapar tolken före strömmen; en direkt anropad tolkning får en här
+            korning.tolk = strom.Tolk('claude')
+        korning.logg.lagg_flera(korning.tolk.mata(ev))  # körningshändelserna: verktyg, resultat, faser, kvot, komprimering, slut
         typ = ev.get('type')
         huvud = ev.get('parent_tool_use_id') in (None, '')
         if typ == 'system' and ev.get('subtype') == 'init':
@@ -820,8 +848,6 @@ class Agent:
                 korning.handelse('varning', 'Partnerns verktyg anslöt inte (%s).' % servrar.get('partner'))
         elif typ == 'system' and ev.get('subtype') == 'api_retry':
             korning.forsok += 1
-            korning.handelse('omforsok', 'Modelltjänsten svarade inte (%s); nytt försök %s.' % (
-                ev.get('error') or ev.get('error_status'), ev.get('attempt')))
         elif typ == 'stream_event' and huvud:
             e = ev.get('event') or {}
             if e.get('type') == 'content_block_delta' and (e.get('delta') or {}).get('type') == 'text_delta':
@@ -839,7 +865,6 @@ class Agent:
                     if huvud:
                         for t in korning.svarstext:
                             t['fore_verktyg'] = True
-                    korning.handelse('verktyg' if huvud else 'utredare', _beskriv_verktyg(b.get('name'), b.get('input') or {}))
                 elif b.get('type') == 'text' and huvud and b.get('text', '').strip():
                     korning.svarstext.append({'text': b['text'], 'fore_verktyg': False})
         elif typ == 'user':
@@ -857,8 +882,6 @@ class Agent:
                             h = (urlparse(m.group(0)).hostname or '').lower()
                             if h and len(korning.sokvardar) < 400:
                                 korning.sokvardar.add(h)
-                    if b.get('is_error'):
-                        korning.handelse('nekat', text[:300])
         elif typ == 'result':
             return ev
         return None
@@ -902,7 +925,7 @@ class Agent:
         korning.status = status
         return {'status': status, 'svar': svar, 'orsak': orsak, 'delsvar': delsvar, 'session': korning.session,
                 'modell': korning.modell, 'forbrukning': forbrukning or {'modellanrop': False},
-                'steg': korning.steg[-60:], 'kallor': _unika(korning.kallor)[:120]}
+                'steg': korning.logg.steg(60), 'handelser': korning.logg.nasta, 'kallor': _unika(korning.kallor)[:120]}
 
 
 def svarstext(block: list) -> str:
@@ -941,33 +964,5 @@ def _krokkommando(python: str) -> str:
 
 
 def _beskriv_verktyg(namn: str, indata: dict) -> str:
-    kort = (namn or '').replace('mcp__partner__', '')
-    if kort == 'sok':
-        return 'Söker i underlaget: "%s"' % str(indata.get('fraga', ''))[:120]
-    if kort == 'oppna':
-        return 'Öppnar %s i sitt sammanhang' % indata.get('id')
-    if kort == 'bilaga':
-        return 'Läser bilaga %s%s' % (indata.get('id'), (' (sidor %s)' % indata['sidor']) if indata.get('sidor') else '')
-    if kort == 'systemlage':
-        return 'Läser systemläget (%s)' % ', '.join(indata.get('delar') or ['repon', 'plan', 'drift'])
-    if kort in ('repo_las', 'repo_sok', 'repo_historik'):
-        return 'Läser repot %s: %s' % (indata.get('repo'), indata.get('sokvag') or indata.get('monster') or 'historik')
-    if kort == 'github':
-        return 'Läser GitHub: %s' % str(indata.get('sokvag', ''))[:140]
-    if kort == 'forstaelse':
-        return 'Sparar förståelse (%s, %s)' % (indata.get('slag'), indata.get('auktoritet'))
-    if kort == 'resonemang':
-        return 'Uppdaterar trådens läge'
-    if kort == 'trad':
-        return 'Tråd: %s' % indata.get('atgard')
-    if kort == 'bered_uppdrag':
-        return 'Bereder uppdrag till kontoret: %s' % str(indata.get('rubrik', ''))[:100]
-    if kort == 'utred':
-        return 'Registrerar utredning: %s' % str(indata.get('rubrik', ''))[:100]
-    if namn == 'WebSearch':
-        return 'Webbsökning: "%s"' % str(indata.get('query', ''))[:120]
-    if namn == 'WebFetch':
-        return 'Hämtar webbsida: %s' % str(indata.get('url', ''))[:160]
-    if namn in ('Agent', 'Task'):
-        return 'Delegerar avgränsad research till utredaren: %s' % str(indata.get('description') or '')[:120]
-    return 'Verktyg %s' % namn
+    """Anropsraden i arbetsvyn; sedan PARTNER-INSYN-20261001 i strom.beskriv, gemensam för alla strömmar."""
+    return strom.beskriv(namn, indata)

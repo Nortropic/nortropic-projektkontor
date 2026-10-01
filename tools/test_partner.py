@@ -56,6 +56,10 @@ with open(Path(__file__).with_name('fejklogg.jsonl'), 'a') as f:
                         'minne': os.environ.get('CLAUDE_CODE_DISABLE_AUTO_MEMORY')}) + '\n')
 def ut(o):
     sys.stdout.write(json.dumps(o) + '\n'); sys.stdout.flush()
+import datetime
+def ts():
+    return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+rakn = [0]
 mcp = json.loads(val('--mcp-config'))['mcpServers']['partner']
 env = dict(os.environ); env.update(mcp.get('env') or {})
 bro = subprocess.Popen([mcp['command']] + mcp['args'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, env=env, text=True)
@@ -100,6 +104,51 @@ for rad in rader:
                            capture_output=True, text=True)
         beslut = json.loads(r.stdout)['hookSpecificOutput']['permissionDecision']
         svar.append('Agent:%s:%s:%s' % (indata.get('subagent_type'), indata.get('model'), beslut))
+    # Arbetsvyns händelser (PARTNER-INSYN-20261001), i de former verkliga strömmar har (lästa 2026-10-01).
+    m = re.match(r'^(?:Uppdrag: )?RESULTAT (\S+) (\{.*\})$', rad)
+    if m:  # RESULTAT <verktyg> {"indata": {...}, "resultat": "...", "tur": {...tool_use_result}, "fel": false}
+        namn, d = m.group(1), json.loads(m.group(2)); rakn[0] += 1; vid = 'toolu_%d' % rakn[0]
+        ut({'type': 'stream_event', 'parent_tool_use_id': None, 'event': {'type': 'content_block_start', 'index': 1, 'content_block': {'type': 'tool_use', 'id': vid, 'name': namn, 'input': {}}}})
+        ut({'type': 'assistant', 'parent_tool_use_id': None, 'timestamp': ts(), 'message': {'id': 'msg_%d' % rakn[0], 'content': [{'type': 'tool_use', 'id': vid, 'name': namn, 'input': d.get('indata') or {}}], 'usage': {'input_tokens': 10, 'cache_read_input_tokens': 100}}})
+        time.sleep(0.05)
+        ev = {'type': 'user', 'parent_tool_use_id': None, 'timestamp': ts(), 'message': {'role': 'user', 'content': [{'type': 'tool_result', 'tool_use_id': vid, 'content': d.get('resultat', ''), 'is_error': bool(d.get('fel'))}]}}
+        if 'tur' in d:
+            ev['tool_use_result'] = d['tur']
+        ut(ev)
+        svar.append('%s:%s' % (namn, 'FEL' if d.get('fel') else 'OK'))
+    m = re.match(r'^(?:Uppdrag: )?TÄNK (\d+)$', rad)
+    if m:  # n tankehjärtslag, sedan en paus så att fasen hinner synas
+        for i in range(int(m.group(1))):
+            ut({'type': 'stream_event', 'parent_tool_use_id': None, 'event': {'type': 'content_block_delta', 'index': 0, 'delta': {'type': 'thinking_delta', 'thinking': '', 'estimated_tokens': 50 * (i + 1)}}})
+            ut({'type': 'system', 'subtype': 'thinking_tokens', 'estimated_tokens': 50 * (i + 1), 'estimated_tokens_delta': 50})
+        time.sleep(1.5)
+    m = re.match(r'^(?:Uppdrag: )?STATUS (\S+)$', rad)
+    if m:
+        ut({'type': 'system', 'subtype': 'status', 'status': None if m.group(1) == 'null' else m.group(1)})
+    m = re.match(r'^(?:Uppdrag: )?KOMPRIMERA (\d+) (\d+)$', rad)
+    if m:
+        ut({'type': 'system', 'subtype': 'compact_boundary', 'compact_metadata': {'trigger': 'auto', 'pre_tokens': int(m.group(1)), 'post_tokens': int(m.group(2)), 'duration_ms': 1234}})
+    m = re.match(r'^(?:Uppdrag: )?KVOTHÄNDELSE ([\d.]+)$', rad)
+    if m:
+        ut({'type': 'rate_limit_event', 'rate_limit_info': {'status': 'allowed', 'rateLimitType': 'seven_day', 'resetsAt': 1790000000, 'unifiedWindows': {'five_hour': {'utilization': 0.1}, 'seven_day': {'utilization': float(m.group(1))}}}})
+    m = re.match(r'^(?:Uppdrag: )?MEDDELANDE (\d+) (\d+) (\d+)$', rad)
+    if m:  # message_start med usage (in, cache) och message_delta (ut)
+        rakn[0] += 1
+        ut({'type': 'stream_event', 'parent_tool_use_id': None, 'event': {'type': 'message_start', 'message': {'id': 'msg_m%d' % rakn[0], 'usage': {'input_tokens': int(m.group(1)), 'cache_read_input_tokens': int(m.group(2)), 'cache_creation_input_tokens': 0}}}})
+        ut({'type': 'stream_event', 'parent_tool_use_id': None, 'event': {'type': 'message_delta', 'usage': {'output_tokens': int(m.group(3))}}})
+    if rad in ('OMFÖRSÖK', 'Uppdrag: OMFÖRSÖK'):
+        ut({'type': 'system', 'subtype': 'api_retry', 'attempt': 2, 'error': 'overloaded_error', 'error_status': 529})
+    m = re.match(r'^(?:Uppdrag: )?PUSH (\S+)$', rad)
+    if m:
+        ut({'type': 'system', 'subtype': 'vcs_state_changed', 'kind': 'push', 'branch': m.group(1)})
+    m = re.match(r'^(?:Uppdrag: )?PR (\S+)$', rad)
+    if m:
+        ut({'type': 'system', 'subtype': 'code_change_published', 'provider': 'github', 'action': 'created', 'url': m.group(1)})
+    if rad in ('UNDERAGENT', 'Uppdrag: UNDERAGENT'):  # utredaren: ett Agent-anrop med ett eget verktygsanrop under sig
+        ut({'type': 'assistant', 'parent_tool_use_id': None, 'timestamp': ts(), 'message': {'id': 'msg_ag', 'content': [{'type': 'tool_use', 'id': 'toolu_ag', 'name': 'Agent', 'input': {'subagent_type': 'utredare', 'description': 'prisnivåer', 'prompt': 'HEMLIG PROMPT'}}]}})
+        ut({'type': 'assistant', 'parent_tool_use_id': 'toolu_ag', 'timestamp': ts(), 'message': {'id': 'msg_u', 'content': [{'type': 'tool_use', 'id': 'toolu_u1', 'name': 'WebSearch', 'input': {'query': 'Railway pricing'}}]}})
+        ut({'type': 'user', 'parent_tool_use_id': 'toolu_ag', 'timestamp': ts(), 'message': {'role': 'user', 'content': [{'type': 'tool_result', 'tool_use_id': 'toolu_u1', 'content': 'träffar'}]}})
+        ut({'type': 'user', 'parent_tool_use_id': None, 'timestamp': ts(), 'message': {'role': 'user', 'content': [{'type': 'tool_result', 'tool_use_id': 'toolu_ag', 'content': 'Klar: 1 verktyg'}]}})
     m = re.match(r'^(SÖKRESULTAT|LÄNKRESULTAT) (\S+)$', rad)
     if m:
         namn = 'WebSearch' if m.group(1) == 'SÖKRESULTAT' else 'mcp__partner__bilaga'
@@ -2120,6 +2169,150 @@ for d in steg.split():
         ut({'type': 'turn.failed', 'error': {'message': "You've hit your usage limit. Try again later."}}); sys.exit(1)
 ut({'type': 'turn.completed', 'usage': {'input_tokens': 1, 'output_tokens': 1}})
 """
+
+
+class HandelserProv(Miljo):
+    """Arbetsvyns händelser (PARTNER-INSYN-20261001): levande logg med markör, fas, räknare och delsvar; filen som
+    sanning när körningen är klar; utredningens logg; krasch; radering; inloggning."""
+
+    MANUS = ('RESULTAT Bash {"indata": {"command": "git status --porcelain", "description": "Kolla git"}, "resultat": " M x.py", "tur": {"stdout": " M x.py", "stderr": "", "interrupted": false}}',
+             'RESULTAT Edit {"indata": {"file_path": "/a/b/c.py", "old_string": "GAMMALT", "new_string": "NYTT"}, "resultat": "ok", "tur": {"filePath": "/a/b/c.py", "originalFile": "HELA FILEN", "oldString": "GAMMALT", "newString": "NYTT", "structuredPatch": [{"lines": ["-a", "+b"]}]}}',
+             'RESULTAT mcp__partner__sok {"indata": {"fraga": "Railway"}, "resultat": "0 träffar", "fel": true}',
+             'MEDDELANDE 20 300 50', 'KOMPRIMERA 90000 2000', 'KVOTHÄNDELSE 0.86', 'OMFÖRSÖK', 'PUSH kontor/x',
+             'PR https://github.com/Nortropic/x/pull/7', 'UNDERAGENT', 'STATUS requesting', 'TÄNK 30')
+
+    def test_levande_logg_markor_fas_raknare_fil_och_radering(self):
+        self.logga_in()
+        trad = self.skicka('\n'.join(self.MANUS + ('SOV 25',)))['inspel']['trad']
+        vy = self.vanta(trad, lambda v: v['aktiv'] and v['aktiv'].get('nasta', 0) >= 14 and 'arbetar' in (v['aktiv']['delsvar'] or ''))
+        tur = vy['aktiv']['id']
+        self.assertEqual(vy['aktiv']['fas']['lage'], 'svarar')  # text strömmar
+        self.assertTrue(vy['aktiv']['steg'] and all(set(s) == {'tid', 'typ', 'text'} for s in vy['aktiv']['steg']))  # den korta formen kvar
+        kod, d = self.json('GET', '/api/korning/%s/handelser?fran=0' % tur)
+        self.assertEqual(kod, 200)
+        self.assertTrue(d['aktiv'] and not d['klar'] and not d['aterstall'])
+        self.assertEqual(d['nasta'], len(d['handelser']))
+        typer = [h['typ'] for h in d['handelser']]
+        self.assertEqual(typer[0], 'start')
+        for typ in ('verktyg', 'resultat', 'komprimering', 'kvot', 'omforsok', 'push', 'pr', 'utredare'):
+            self.assertIn(typ, typer, typ)
+        self.assertEqual(typer.count('text'), 0)  # hjärtslag och faser blir aldrig rader
+        per = {h['id']: h for h in d['handelser'] if h['typ'] == 'resultat' and h.get('id')}
+        bash = next(h for h in d['handelser'] if h.get('verktyg') == 'Bash')
+        self.assertEqual((bash['text'], bash['beskrivning'], bash['indata'], bash['status']),
+                         ('Bash(git status --porcelain)', 'Kolla git', 'git status --porcelain', 'pagar'))
+        self.assertEqual(per[bash['id']]['resultat']['utdrag'], 'M x.py')
+        self.assertIsInstance(per[bash['id']]['ms'], int)
+        edit = next(h for h in d['handelser'] if h.get('verktyg') == 'Edit')
+        self.assertEqual(per[edit['id']]['resultat']['utdrag'], '…/b/c.py: +1 −1')
+        sok = next(h for h in d['handelser'] if h.get('verktyg') == 'mcp__partner__sok')
+        self.assertEqual((sok['text'], per[sok['id']]['status']), ('Söker("Railway")', 'fel'))
+        agent = next(h for h in d['handelser'] if h.get('verktyg') == 'Agent')
+        under = next(h for h in d['handelser'] if h['typ'] == 'utredare')
+        self.assertEqual((agent['text'], under['foralder'], under['text']), ('Utredaren(prisnivåer)', agent['id'], 'Webbsökning("Railway pricing")'))
+        dump = json.dumps(d, ensure_ascii=False)
+        for forbjudet in ('HELA FILEN', 'GAMMALT', 'NYTT', 'originalFile', 'oldString', 'HEMLIG PROMPT'):
+            self.assertNotIn(forbjudet, dump, forbjudet)
+        r = d['raknare']
+        self.assertEqual((r['komprimeringar'], r['omforsok'], r['fel'], r['kvot']['sju_dagar'], r['verktyg'], r['underagent']['verktyg']),
+                         (1, 1, 1, 0.86, 4, 1))
+        self.assertEqual((r['tokens_in'], r['cache_lasta'], r['tokens_ut'], r['meddelanden']), (50, 600, 50, 5))
+        self.assertEqual((r['modell'], r['anstrangning'], r['utforare']), ('claude-opus-5-5', 'high', 'claude'))
+        self.assertIn('arbetar', d['delsvar'])
+        self.assertEqual(d['raknare_ur'], srv.RAKNARE_UR)
+        kod, d2 = self.json('GET', '/api/korning/%s/handelser?fran=%d' % (tur, d['nasta']))  # markören: bara nytt
+        self.assertTrue(all(h['n'] >= d['nasta'] for h in d2['handelser']) and not d2['aterstall'])
+        self.assertTrue(self.json('GET', '/api/korning/%s/handelser?fran=99999' % tur)[1]['aterstall'])
+        self.assertEqual(self.anrop('GET', '/api/korning/%s/handelser' % tur, kaka=False)[0], 401)
+        self.assertEqual(self.json('GET', '/api/korning/tur_finnsinte/handelser')[0], 404)
+        self.assertEqual(self.json('GET', '/api/korning/%s/handelser?fran=x' % tur)[0], 400)
+        self.assertEqual(self.json('POST', '/api/tur/%s/avbryt' % tur)[1], {'ok': True})
+        vy = self.vanta(trad, lambda v: self.turer(v, 'avbruten') and not v['aktiv'], 45)
+        t = self.turer(vy, 'avbruten')[0]
+        self.assertGreaterEqual(t['handelser'], d['nasta'])
+        self.assertLessEqual(len(t['steg']), 60)
+        self.assertTrue(any(s['typ'] == 'verktyg' and s['text'].startswith('Bash(') for s in t['steg']))
+        self.assertTrue(any(s['text'].endswith(' · fel') for s in t['steg']))  # ihopvikt utfall i journalens form
+        kod, d3 = self.json('GET', '/api/korning/%s/handelser?fran=0' % tur)
+        self.assertTrue(d3['klar'] and not d3['aktiv'])
+        self.assertEqual((d3['nasta'], d3['raknare']['verktyg'], d3['fas']['lage']), (t['handelser'], 4, 'klar'))
+        fil = Path(self.S.lager.turer) / tur / 'handelser.jsonl'
+        self.assertEqual(oct(fil.stat().st_mode & 0o777), '0o600')
+        self.assertEqual(len(fil.read_text('utf-8').splitlines()), t['handelser'])
+        self.assertEqual(self.json('POST', '/api/trad/%s/radera' % trad, {'bekraftat': True})[0], 200)
+        self.assertFalse(fil.exists())
+        self.assertEqual(self.json('GET', '/api/korning/%s/handelser' % tur)[0], 404)
+
+    def test_utredningens_logg_finns_efter_klar(self):
+        self.logga_in()
+        uppdrag = 'RESULTAT Bash ' + json.dumps({'indata': {'command': 'ls'}, 'resultat': 'a'})
+        trad = self.skicka('RING utred ' + json.dumps({'rubrik': 'Loggad utredning', 'uppdrag': uppdrag}))['inspel']['trad']
+        vy = self.vanta(trad, lambda v: any(p['slag'] == 'jobb' and p['status'] == 'klart' for p in v['poster']) and not v['aktiv'], 45)
+        jobb = next(p for p in vy['poster'] if p['slag'] == 'jobb')
+        self.assertTrue(jobb['korning'].startswith('jobbk_'))
+        self.assertTrue(jobb['forbrukning']['modellanrop'])
+        kod, d = self.json('GET', '/api/korning/%s/handelser?fran=0' % jobb['korning'])
+        self.assertEqual(kod, 200)
+        self.assertTrue(d['klar'])
+        self.assertEqual((d['typ'], d['trad']), ('jobb', trad))
+        self.assertIn('Bash(ls)', [h.get('text') for h in d['handelser']])
+        self.assertEqual(d['handelser'][-1]['typ'], 'slut')
+        self.assertEqual(d['raknare']['verktyg'], 1)
+        self.assertEqual(self.json('GET', '/api/tradar')[1]['tradar'][0]['jobb_aktiva'], 0)
+
+    def test_krasch_mitt_i_arbetet_behaller_loggen(self):
+        self.logga_in()
+        trad = self.skicka('RESULTAT Bash {"indata": {"command": "ls"}, "resultat": "a"}\nSOV 60')['inspel']['trad']
+        self.vanta(trad, lambda v: v['aktiv'] and 'arbetar' in (v['aktiv']['delsvar'] or ''))
+        time.sleep(2.3)
+        aktiv = self.S.aktiv_tur(trad)
+        aktiv.proc.kill()  # som vid en krasch: inget utfall hinner journalföras
+        self.S._korningar.clear()
+        self.S._tradkorning.clear()
+        self.httpd.shutdown()
+        self.httpd.server_close()
+        rader = [json.loads(r) for r in self.S.lager.journal.read_text().splitlines()]
+        rader = [r for r in rader if not (r['typ'] == 'tur_klar' and r['tur'] == aktiv.id)]
+        self.S.lager.journal.write_text(''.join(json.dumps(r, ensure_ascii=False) + '\n' for r in rader))
+        os.unlink(self.S.lager.index_fil)
+        self.manus('SVARA')
+        self.starta_server()
+        self.logga_in()
+        ater = self.S.aterhamta()
+        self.assertEqual(ater['avbrutna_turer'], [aktiv.id])
+        vy = self.vanta(trad, lambda v: self.turer(v, 'avbruten') and self.turer(v, 'svarad'), 45)
+        t = self.turer(vy, 'avbruten')[0]
+        self.assertEqual(t['orsak'], srv.OMSTART)
+        self.assertTrue(any(s['text'].startswith('Bash(ls)') for s in t['steg']))  # ur handelser.jsonl, inte ur minnet
+        self.assertGreaterEqual(t['handelser'], 3)
+        kod, d = self.json('GET', '/api/korning/%s/handelser' % aktiv.id)
+        self.assertTrue(d['klar'])
+        self.assertEqual(d['nasta'], t['handelser'])
+
+
+class KoProv(Miljo):
+    """Kö syns som en fas, aldrig som en status: avbryt och återhämtning förutsätter 'undersoker'."""
+    gransar = {'samtidiga_korningar': 1}
+
+    def test_ko_syns_som_fas_och_kan_avbrytas(self):
+        self.logga_in()
+        t1 = self.skicka('SOV 30')['inspel']['trad']
+        self.vanta(t1, lambda v: v['aktiv'] and 'arbetar' in (v['aktiv']['delsvar'] or ''))
+        t2 = self.skicka('SOV 5')['inspel']['trad']
+        vy = self.vanta(t2, lambda v: v['aktiv'] and v['aktiv']['fas']['lage'] == 'ko')
+        a = vy['aktiv']
+        self.assertEqual((a['status'], a['status_text']), ('undersoker', 'i kö'))
+        kod, d = self.json('GET', '/api/korning/%s/handelser?fran=0' % a['id'])
+        self.assertEqual([h['typ'] for h in d['handelser']], ['ko'])
+        self.assertEqual(d['fas']['lage'], 'ko')
+        self.assertEqual(self.json('POST', '/api/tur/%s/avbryt' % a['id'])[1], {'ok': True})
+        vy = self.vanta(t2, lambda v: self.turer(v, 'avbruten') and not v['aktiv'])
+        t = self.turer(vy, 'avbruten')[0]
+        self.assertEqual(t['orsak'], 'Johnny avbröt')
+        self.assertFalse(t['forbrukning']['modellanrop'])
+        self.assertEqual(len(self.fejkanrop()), 1)  # den köade startade aldrig modellen
+        self.json('POST', '/api/tur/%s/avbryt' % self.S.aktiv_tur(t1).id)
+        self.vanta(t1, lambda v: not v['aktiv'], 45)
 
 
 class ForbrukningProv(unittest.TestCase):

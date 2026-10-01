@@ -123,7 +123,7 @@ class Jobb:
                                    resultat=res.get('svar') or None, orsak=res.get('orsak') or None,
                                    session=res.get('session'), forbrukning=res.get('forbrukning'),
                                    delsvar=(res.get('delsvar') or '')[-4000:] or None, steg=res.get('steg'),
-                                   kallor=res.get('kallor'))
+                                   handelser=res.get('handelser'), korning=korning.id, kallor=res.get('kallor'))
         finally:  # avregistreras först när utfallet står i journalen
             self.s.avregistrera_korning(korning)
             with self._las:

@@ -31,7 +31,8 @@ Modell och ansträngning väljer du i rutan: klicka på "Opus 5.5 · high" (↑�
 eller skriv `/model`, `/model sonnet` eller `/effort max`. Valet sparas i `data/installningar.json` och gäller från
 nästa svar i alla trådar; en pågående körning påverkas inte, och kommandona skickas aldrig till partnern. Varje svar
 visar vilken modell och ansträngning det kördes med. Samma val finns i arbetsplatsens Flödet (`/flodet`, se
-`tools/ARBETSPLATS.md`), tillsammans med Nortropics övriga modellval.
+`tools/ARBETSPLATS.md`), tillsammans med Nortropics övriga modellval. Medan partnern arbetar visar tråden arbetet som
+en terminalutskrift i Claude Codes form, och en klar tur fäller ihop den till en rad ovanför svaret (se Arbetsvyn).
 
 I rutan: skriv, klistra in bilder (⌘V), släpp flera filer eller bifoga med "+". Enter skickar, Skift+Enter ger ny
 rad. Varje kodblock i ett svar har en knapp "Kopiera" som kopierar blockets text exakt (utan språkmarkör), och under
@@ -71,6 +72,7 @@ ska bära framåt och håller trådens läge aktuellt.
 | Systemläge: git (origin/main, primärutcheckning), planen på main, Runtimes drift genom Aquariums läsning, öppna PR | `partnern/systemlage.py` | Alltid med lästid och ålder |
 | Verktyg för modellen: sök, öppna i sammanhang, bilaga, systemläge, repo, GitHub (GET, i delar), förståelse, resonemang, tråd, backlog, bered_uppdrag, backlog_beslut, utred | `partnern/verktyg.py` | Genom MCP-bryggan, per körning |
 | Agentloop: Claude Code headless (`claude -p`, dvs. Agent SDK via CLI) i begränsat läge, eller Codex (`codex exec`) när en Codex-modell är vald | `partnern/agent.py` | Se modell och drift nedan |
+| Arbetsvyn: körningsströmmens tolk till körningshändelser (anrop, resultat, faser, räknare), loggen `handelser.jsonl` och svansläsaren; ytans terminalvy | `partnern/strom.py`, `partnern/ui/arbetsvy.js` | Se Arbetsvyn nedan |
 | Webbkrok och destinationspolicy | `partnern/krok.py`, `partnern/webbpolicy.py` | Servern avgör varje webbanrop, och på Codex varje verktyg |
 | Bakgrundsutredningar | `partnern/jobb.py` | Journalförda, återupptas efter omstart |
 | Överlämning till kontoret och backloggen | `partnern/overlamning.py` | Paket i `evidence/nasta-uppdrag/local/partner-OVL-…/`, vilande eller lämnat, med krav, prov, märkning och AP-06-utkast, ett per mottagare |
@@ -158,10 +160,69 @@ raderas igen, eller en journal utan tråden, som indexet följer vid nästa star
 partnern arbetar i tråden vägras raderingen, och en köad utredning startar antingen före raderingen eller inte alls.
 Säkerhetskopior utanför tjänsten, till exempel Time Machine, rör den inte.
 
+## Arbetsvyn
+
+Ägarens beställning PARTNER-INSYN-20261001: insyn i partnerns arbete i Claude Codes terminalform, inte en tyst
+chattbot. Ramen (sidomeny, ruta, modellmeny) behåller Claude-appens form från FORBATTRINGSPARTNER-MODELLVAL-20260929;
+bara arbetsvyn tar Claude Codes form, och ingen terminal med inmatning bäddas in (samma beslut). Steg 1 gäller partnerns
+egna turer och utredningar; steg 2 (mottagarsessionerna som en överlämning startar, i Kontoret och trådens kort) är ett
+eget beslut.
+
+**Vad som syns.** Medan en tur pågår växer en logg i tråden: `⏺ Söker("…", partner)`, `⎿ 7 träffar · …  0,8 s`,
+`⏺ Läser(kontoret: tools/PARTNER.md)`, `⎿ ✗ Fel: …`, `⏺ Utredaren(…)` med utredarens egna steg nästlade under,
+`⟲ Komprimerade sammanhanget · 965k → 146k tokens`, `↻ Omförsök 2`, `⚠ Kvot 86 % av veckofönstret` (bara vid 75 % eller
+när kvoten inte längre är "allowed"), `⊘ Nekat: …` (krokens skäl) och `■ Klart · 42 s · 9 steg`. Den korta text
+modellen skriver före ett verktygsanrop (mellanraden) står som en dämpad `⏺`-rad. Längst ned står en statusrad med
+fasen (`✻ Tänker… ~1,2k`, `Begär svar…`, `Läser(…)… 41 s`, `⟲ Komprimerar…`, `⏸ I kö`), tiden som tickar i
+webbläsaren, antal steg och fel, tokens in/ut, modell och ansträngning, samt Avbryt. Hjärtslag (tankedeltor,
+verktygens tid, "requesting") blir aldrig rader; de uppdaterar fasen. Trådhuvudet visar fasord och tid, fliken får ett
+`✻`, och sidomenyns prick är ihålig när bara en utredning pågår. Ett `⎿` fälls ut med klick eller Enter (hela indata,
+början av resultatet, "Öppna i panelen"); alt-klick fäller alla. Loggen är `aria-live="off"`; det som läses upp är
+fasbyten, fel och var 30:e sekund. Tråden ritas inte längre om varje sekund: det levande arbetet uppdateras i
+arbetsvyn genom en egen poll, så utfällda rader och markering överlever. Esc två gånger inom två sekunder avbryter
+(bara med fokus i rutan, utan öppen meny eller dialog); knappen Avbryt finns kvar.
+
+**När turen är klar** fälls loggen ihop till en rad ovanför svaret, `▸ Arbetade 42 s · 9 steg · 31k in / 1,8k ut ·
+Opus 5.5 · high · 1 fel` (ägarens val 2026-10-01). Klick fäller ut den och hämtar loggen; sidfoten har lästa källor,
+listpriset och valet "Visa arbetet i alla svar" (`localStorage['arbete:visa']`). En tur som avbröts, begränsades eller
+slutade med fel har loggen öppen: då är den förklaringen. En utredning får samma vy i sitt kort, levande och efteråt
+(`korning` i trådvyn pekar på dess katalog). Äldre turer utan händelselogg visar journalens korta steg.
+
+**Hur det byggs.** `partnern/strom.py` tolkar Claude Codes stream-json (och Codex `exec --json`) till rader:
+`{n, tid, typ, text, id, foralder, verktyg, beskrivning, indata, status, ms, resultat, data}` med typerna `start, ko,
+verktyg, utredare, resultat, nekat, varning, omforsok, komprimering, kvot, text, uppgift, push, pr, jobb, overlamning,
+forstaelse, resonemang, trad, koppling, slut`. Ett anrop och dess resultat är två rader med samma `id` (ytan viker
+ihop dem), så loggen är bara tillägg. Varje rad skrivs till `turer/<id>/handelser.jsonl` (0600) i samma stund som den
+tolkas; efter en krasch läser `aterhamta` loggen därifrån, så arbetet som syntes går inte förlorat. Journalens
+`tur_klar.steg` är som förut en kort sammanfattning (högst 60 rader, `{tid, typ, text}`, ett anrop med ` · fel` eller
+tid ihopvikt) och `tur_klar.handelser` antalet rader; loggen i sin helhet journalförs aldrig. Resultat sparas som en
+avgörande rad (första raden eller exit-koden, storlek, fel) och ett utdrag om högst 2 000 tecken; Edits `originalFile`,
+`oldString`/`newString` och Reads filinnehåll läses aldrig, okända fält krymps till 300 tecken, och allt tvättas från
+hemlighetsliknande värden. Räknarna (`raknare`: meddelanden, verktyg, fel, tokens in, cache läst och skriven, tokens
+ut, tänkta tokens, sammanhang, komprimeringar, omförsök, kvotfönster, modell, ansträngning) är en löpande
+uppskattning ur strömmen, inte abonnemangets kvot; vid `result` tas usage därifrån. Kö (`samtidiga_korningar`) är en
+fas, aldrig en status: avbryt och återhämtning förutsätter `undersoker`, så en köad tur kan avbrytas och startar då
+aldrig modellen.
+
+**API.** `GET /api/korning/<tur_…|jobbk_…>/handelser?fran=<n>&max=<antal>` (inloggning krävs) ger raderna från och
+med `n`, `nasta` (nästa n), `aktiv`/`klar`, `fas`, `raknare`, `raknare_ur` och `delsvar` medan körningen pågår; för en
+avslutad körning läses filen (`klar: true`, räknare ur raderna). `fran` bortom slutet ger tomt; `fran` större än
+`nasta` (en omstart) ger `aterstall: true`, och ytan börjar om från noll. Okänd eller raderad körning ger 404 (en
+raderad tråd tar sin logg med sig). Pollvägen loggas inte i `tjanst.log`. `GET /api/trad/<id>` bär som förut
+`aktiv.steg` (40 korta rader) och `aktiv.delsvar`, nu också `aktiv.fas`, `aktiv.raknare` och `aktiv.nasta`;
+`/api/tradar` bär `jobb_aktiva` per tråd.
+
+**Gränser.** Händelseformerna är lästa ur Claude Code 2.1.280 (partnern) och 2.1.285/2.1.257 (mottagarsessioner)
+2026-10-01; en händelse tolken inte känner räknas (`utan_tolkning`, visas som antal i statusraden) och ett fel i
+tolkningen ger en varningsrad, aldrig ett avbrott. Tankeresonemangets text är tom i strömmen, så bara
+tokenuppskattningen visas. Underagentens nästling och Codex-vägen (command_execution, file_change) är provade mot fejken;
+ingen verklig underagentkörning eller Codex-ström från partnern finns sparad. Esc-två-gånger finns bara på
+tangentbord. Loggen renderar högst 200 rader levande (120 klara) innan äldre läggs bakom "Visa N tidigare rader".
+
 ## Data och säkerhet
 
 Datan ligger privat i `evidence/partner/local/` (git-ignorerad, katalog 0700, filer 0600): `journal/`, `blobs/`,
-`harlett/`, `turer/` (per körning: systemprompt, rå ström, delsvar), `index.sqlite`. Inloggningsnyckeln och
+`harlett/`, `turer/` (per körning: systemprompt, rå ström, händelselogg, delsvar), `index.sqlite`. Inloggningsnyckeln och
 kaknyckeln ligger i `~/.nortropic-hemligheter/partner/`. Servern svarar bara på 127.0.0.1 och godkända
 Host-namn; API:t kräver inloggningskaka (HttpOnly, SameSite=Strict) och ett eget huvud på skrivningar;
 bryggan och kroken kräver en körningsnyckel som bara gäller under körningen. Bilagor visas med
@@ -481,6 +542,19 @@ partnern arbetar i tråden. GitHub prövas med en fejkad `gh`: hela trädet mär
 ett kapat träd, en fil över 1 MB läst i delar till sista raden och hämtad en gång, säkerhetsmeddelanden, en kapad lista
 och en otillåten sökväg. Modellvalet prövas så att utredaren får samma modell och ansträngning och kroken nekar andra
 agenttyper och modeller.
+Arbetsvyn (PARTNER-INSYN-20261001) prövas i `tools/test_strom.py` utan server: parning av anrop och resultat med tid
+och status, saknat id, sammanfattningarna av Bash, Edit, Read, WebSearch och MCP-verktyg utan filinnehåll, utdragens
+tak och tvätt, tusen hjärtslag som blir fas och inte rader, status requesting/compacting/null, komprimering,
+omförsök, push, PR, bakgrundsuppgift, kvotrad bara vid tröskel eller stopp, meddelanden och tokens med och utan
+partiella meddelanden, underagentens `foralder`, result med och utan `result`-nyckel, startraden bara för egen start,
+trasiga händelser, Codex item-typer, loggens markör och fil, den korta formen, filreserven med ofullständig sista rad
+och svansläsaren (tillväxt, tillbakahållen rad, inode-byte, vägrad länk, stora filer). I `test_partner.py` talar
+fejken dessutom raderna `RESULTAT`, `TÄNK`, `STATUS`, `KOMPRIMERA`, `KVOTHÄNDELSE`, `MEDDELANDE`, `OMFÖRSÖK`, `PUSH`,
+`PR` och `UNDERAGENT`; `HandelserProv` prövar den levande loggen genom API:t (markör, fas, räknare, delsvar, 401, 404,
+400), filen som sanning efter avbrott, journalens korta form, utredningens logg efter klar, krasch med återhämtning ur
+filen och radering, och `KoProv` att kön är en fas som kan avbrytas utan att modellen startar. Webbläsarprovet
+`evidence/nasta-uppdrag/local/partner-insyn-20261001/prov/arbetsvy.js` kör ytan mot en provinstans med fejkad claude i
+Chromium och WebKit (dator, mobil och reduced motion; 62 kontroller, bland dem ett trådbyte mitt i arbetet).
 `python3 -B -m unittest tools.test_codexpartner` prövar partnern på Codex mot en fejkad `codex` som gör det riktiga Codex
 gör i en tur: kör partnerns krok mot servern med körningens nyckel ur miljön och startar MCP-bryggan med bara de
 namngivna miljövariablerna. Proven visar att modellen avgör utföraren och att Claude Code aldrig startas, att bryggan
