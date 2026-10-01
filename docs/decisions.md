@@ -9540,3 +9540,29 @@ därför den vanliga vägen.
 **Återgång.** Återställ integrationscommiten med `git revert`.
 
 **Avslut.** Klart när ändringen är integrerad. Därefter används verktyget för rena dokumentändringar.
+
+
+## BACKLOG-DIGITALA-KONTROLLER-20261001 — förslag inför nästa fiktiva fall
+
+**Status:** förslag enligt OVL-20260930-b35d4f-digitala, avsnittet Ordning
+och beroenden. Kodleveransen är integrerad i Digitala genom PR21
+(https://github.com/Nortropic/nortropic-digitala/pull/21). Denna post fullföljer
+beställningens förslagsrad i kontorets plan.
+
+**Förslaget.** När Johnny väljer och beställer nästa fiktiva fall prövas
+A3–A6 skarpt där av Digitalas session: registret över typsnitts- och ikonlicenser, säkerhetsrubriker
+och CSP på alla sitemaprutter, TBT som labbproxy medan INP står EJ_MATT, samt
+sidornas och de viktiga formulärens funktion med JavaScript avstängt.
+Källa: beställningens Krav och prov samt Ordning och beroenden.
+
+**ÄGARENS TUR.** Den befintliga raden om nästa fiktiva fall preciseras med
+kontrollerna och denna källpost. Dess ursprungliga datum och övriga ägarrader
+behålls. Ett nytt fiktivt fall kräver fortfarande Johnnys beställning.
+
+**Bevis.** Beställning OVL-20260930-b35d4f-digitala, Krav och prov samt
+Ordning och beroenden; Digitalas leveranskvitto för PR21 finns i det privata
+granskningsunderlaget.
+
+**Omfattning och återgång.** Bara denna förslagspost och planraden ändras.
+Inget nytt fall startas och överlämningens kvittens ändras inte. Förslaget kan
+återtas genom en rättelsepost och motsvarande ändring av planraden.
