@@ -9494,3 +9494,49 @@ planen. Den här ändringen innehåller kod och går därför själv den vanliga
 
 **Avslut.** Första steget är klart när ändringen är integrerad. Beslutet är helt infört när utfärdarens dokumentsort är
 antagen och Runtime-övergången är körd.
+
+**Delvis ersatt av:** DOKUMENTVAG-RATTELSE-20261001, i fråga om punkt 1 (vilka tecken en sökväg får ha) och punkt 3
+(samma granskning efter en omläggning kräver också basens byte). Övrigt gäller.
+
+## DOKUMENTVAG-RATTELSE-20261001 — granskningens anteckningar om tools/dokumentpost.py tas före verktygets första skarpa användning
+
+**Status:** registrerat 2026-10-01 av sessionen nortropic-repos-07 (Claude Code). Följer DOKUMENTVAG-20261001 (PR 158),
+vars granskning godkände utan blockerande fynd och lämnade tolv anteckningar. Enligt Johnnys beslut tas sådana i nästa
+ändring, och det är den här. Anteckningarna står ordagrant och numrerade i
+`evidence/nasta-uppdrag/local/dokumentvag-20261001/NOTER.md`.
+
+**Rättat i verktyget** (anteckning 1–7):
+1. `publicera --ref` godtar samma granskning efter en omläggning bara om de ändrade filernas byte är desamma både i
+   kandidaten och i basen. Tidigare jämfördes bara kandidatens sida, och en omläggning kunde då tyst ta bort det main
+   ändrat i samma fil. Granskningens bindning (`files-sha256.json`) och förseglingen tar nu med basens byte.
+2. Varje publiceringsförsök får ett eget namn hos utfärdaren (`office-dok-ID-TIDPUNKT`). Förseglingen skriver
+   exklusivt, så ett fast namn spärrade varje nytt försök efter en torrkörning eller ett avbrott. `--torr` förseglar och
+   torrkör publiceringen men publicerar inte.
+3. Gränsprobens utfall godtas bara fullständigt: varje väntad rad, fungerande loopback och inget läsbart eller öppet.
+   Ett tomt utfall godtogs tidigare.
+4. Dokumentfallet måste skilja kandidaten från main.
+5. En sökväg får bara ha A–Z, a–z, 0–9, punkt, understreck och bindestreck, och det står nu i verktyget och i dess
+   nekande. En .md-fil med å, ä, ö eller mellanslag i sökvägen går den vanliga vägen.
+6. En granskningsrunda som avbröts utan utfall ger ett tydligt nej i `publicera` i stället för ett programfel.
+7. Granskarens etikett, som publiceras ordagrant, görs till en ren etikett. Den och de två texter som publiceras
+   prövas med publiceringsskriptets regler före förseglingens första skrivning, inte efter den.
+
+**Förtydliganden till DOKUMENTVAG-20261001** (anteckning 8–12):
+- Planens tillägg står 06:40 UTC. Den första kandidaten med tillägget committades 06:41:01Z.
+- Med "värdägda kontroller" i Codex 1225ac menas `runtime/decision_guard.py` och `runtime/content_guard.py` i
+  Runtimes kod. Kontoret har inte granskat deras innehåll.
+- Beslutsloggen före posten, utan markeringen, hade samma sha256 som på main 60b0b6e. Det frysta fallet mäter bara
+  kandidatens värde; sessionen jämförde det med main efter mätningen.
+- `granska` ger granskaren varje ändrad fil hel utom beslutsloggen. Den är större än läsarens gräns och finns därför
+  bara som patch.
+- Den kredentialfria mätningen intygas av verktyget självt i samma körning. Sviten och gränsproben körs i samma
+  profil, och publiceringen nekas om proben finner något läsbart eller öppet eller om utfallet är ofullständigt. Ingen
+  människa läser mätningen före förseglingen.
+
+**Här.** `tools/dokumentpost.py`, `tools/dokumentpost_utfardare.py` och deras prov (`tools/test_dokumentpost.py`),
+den här posten, markeringen sist i DOKUMENTVAG-20261001 och ett tillägg i planen. Ändringen innehåller kod och går
+därför den vanliga vägen.
+
+**Återgång.** Återställ integrationscommiten med `git revert`.
+
+**Avslut.** Klart när ändringen är integrerad. Därefter används verktyget för rena dokumentändringar.

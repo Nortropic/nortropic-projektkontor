@@ -4,6 +4,7 @@ import ast
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -92,6 +93,11 @@ class Regeln(Rig):
         self.assertEqual(r['nya_poster'], ['POST-C'])
         self.assertEqual(r['agarens_tur_rader'], 2)
         self.assertIn('140', r['tal_i_tillagda_rader']); self.assertIn('05:04', r['tal_i_tillagda_rader'])
+
+    def test_basens_byte_binds_for_andrade_filer_och_null_for_nya(self):
+        self.commit(**{'docs__annat.md': 'ändrat\n', 'docs__ny.md': 'ny\n'})
+        r = dp.regel(self.repo, 'HEAD', bas=self.bas)
+        self.assertEqual(r['bas_filer'], {'docs/annat.md': dp.sha(b'annat\n'), 'docs/ny.md': None})
 
     def test_en_ny_rad_i_agarens_tur_godtas(self):
         self.commit(**{'docs__plan.md': PLAN.replace('— sedan 2026-09-02\n', '— sedan 2026-09-02\n- [beslut] Ny (POST-C) — sedan 2026-10-01\n')})
@@ -193,10 +199,11 @@ class Publiceringen(Rig):
         patcher = mock.patch.multiple(dp, KONTOR=self.repo, TILLSTAND=self.tillstand)
         patcher.start(); self.addCleanup(patcher.stop)
 
-    def runda(self, svar, filer=None):
+    def runda(self, svar, filer=None, bas_filer=None):
         runda = self.tillstand / 'p1/granskning/r1'; runda.mkdir(parents=True)
         r = dp.regel(self.repo, self.kandidat, bas=self.bas)
-        (runda / 'regel.json').write_text(json.dumps({**r, 'filer': filer or r['filer'], 'kalla': '/x', 'bevis': []}))
+        (runda / 'regel.json').write_text(json.dumps({**r, 'filer': filer or r['filer'], 'bas_filer': bas_filer or r['bas_filer'],
+                                                      'kalla': '/x', 'bevis': []}))
         (runda / 'review.json').write_text(json.dumps({'answer': svar}))
 
     def test_utan_granskning_vagras_publiceringen(self):
@@ -218,6 +225,23 @@ class Publiceringen(Rig):
         with self.assertRaisesRegex(dp.Nekad, 'andra byte än de granskade'):
             dp.publicera('p1', None, True)
 
+    def test_andra_byte_i_basen_an_de_granskade_vagras(self):
+        self.runda({'verdict': 'approved', 'blocking_findings': []}, bas_filer={'docs/decisions.md': '0' * 64})
+        with self.assertRaisesRegex(dp.Nekad, 'i kandidaten eller i basen'):
+            dp.publicera('p1', None, True)
+
+    def test_en_runda_utan_granskning_vagras_med_besked(self):
+        (self.tillstand / 'p1/granskning/r1').mkdir(parents=True)
+        with self.assertRaisesRegex(dp.Nekad, 'har ingen granskning'):
+            dp.publicera('p1', None, True)
+
+    def test_varje_forsok_far_ett_eget_giltigt_namn_hos_utfardaren(self):
+        langst = 'a' * 41
+        namn = dp.vardnamn(langst, '20261001T073002Z')
+        self.assertEqual(namn, 'office-dok-%s-20261001t073002z' % langst)
+        self.assertLessEqual(len(namn), 80)
+        self.assertNotEqual(namn, dp.vardnamn(langst, '20261001T073003Z'))
+
     def test_main_som_flyttat_vagras_med_anvisning(self):
         self.runda({'verdict': 'approved', 'blocking_findings': []})
         annan = Path(self.tmp.name) / 'annan'
@@ -225,6 +249,51 @@ class Publiceringen(Rig):
         (annan / 'docs/annat.md').write_text('flyttat\n'); run(annan, 'commit', '-qam', 'm'); run(annan, 'push', '-q', 'origin', 'main')
         with self.assertRaisesRegex(dp.Nekad, 'publicera p1 --ref'):
             dp.publicera('p1', None, True)
+
+
+class Gransproben(unittest.TestCase):
+    STANGD = {k: 'nekad (PermissionError)' for k in dp.GRANSNYCKLAR} | {'loopback': 'ok', 'utgaende_ip': 'stängt (PermissionError)'}
+
+    def test_nycklarna_ar_de_proben_skriver(self):
+        trad = ast.parse(dp.GRANSPROB)
+        skriver = {n.slice.value for n in ast.walk(trad) if isinstance(n, ast.Subscript) and getattr(n.value, 'id', None) == 'ut'
+                   and isinstance(n.slice, ast.Constant)}
+        listor = [n for n in ast.walk(trad) if isinstance(n, ast.For)]
+        namn = {e.elts[0].value for f in listor if isinstance(f.iter, ast.Tuple) for e in f.iter.elts}
+        vagar = {e.value for f in listor if isinstance(f.iter, ast.List) for e in f.iter.elts}
+        self.assertEqual(skriver | namn | vagar, dp.GRANSNYCKLAR)
+
+    def test_bara_ett_fullstandigt_stangt_utfall_godtas(self):
+        self.assertIsNone(dp.stangd(0, json.dumps(self.STANGD), 'x'))
+        for kod, text in ((0, ''), (0, '{}'), (1, json.dumps(self.STANGD)), (0, json.dumps({**self.STANGD, 'loopback': 'FEL x'})),
+                          (0, json.dumps({k: v for k, v in self.STANGD.items() if k != '.ssh'}))):
+            with self.subTest(kod=kod, text=text[:40]), self.assertRaisesRegex(dp.Nekad, 'fullständigt'):
+                dp.stangd(kod, text, 'x')
+        for nyckel, varde in (('.ssh', 'LÄSBAR'), ('utgaende_github', 'ÖPPET')):
+            with self.subTest(nyckel=nyckel), self.assertRaisesRegex(dp.Nekad, 'läsbart eller öppet'):
+                dp.stangd(0, json.dumps({**self.STANGD, nyckel: varde}), 'x')
+
+
+class Forseglingen(unittest.TestCase):
+    """De rena hjälpfunktionerna i tools/dokumentpost_utfardare.py, utan Runtime: lästa ur filens syntaxträd."""
+    def setUp(self):
+        trad = ast.parse((HERE / 'dokumentpost_utfardare.py').read_text(encoding='utf-8'))
+        delar = [n for n in trad.body if isinstance(n, ast.FunctionDef) and n.name in ('granskarens_namn', 'publicerbar')]
+        self.ns = {'re': re}
+        exec(compile(ast.Module(body=delar, type_ignores=[]), 'dokumentpost_utfardare.py', 'exec'), self.ns)
+
+    def test_granskarens_namn_ar_alltid_en_ren_etikett(self):
+        for run in ('20260930T200815Z-granskning-m-r2', 'R1 Åäö_x..y', '-' * 200, 'x' * 300):
+            with self.subTest(run=run[:30]):
+                self.assertRegex(self.ns['granskarens_namn'](run), r'\A[a-z0-9][a-z0-9-]{0,119}\Z')
+        self.assertEqual(self.ns['granskarens_namn']('20260930T200815Z-granskning-m-r2'),
+                         'kontorsgranskning-20260930t200815z-granskning-m-r2')
+
+    def test_publicerbar_nekar_sokvagar_lankar_och_annat_an_ascii(self):
+        self.assertTrue(self.ns['publicerbar']('Independent reader (tools/granska.py, claude-fable-5-1), read-only.'))
+        for text in ('se /Users/x', 'evidence/y', 'https://a', 'PR #158', 'a@b', 'räksmörgås', 'x' * 3001):
+            with self.subTest(text=text[:20]):
+                self.assertFalse(self.ns['publicerbar'](text))
 
 
 class Proben(unittest.TestCase):

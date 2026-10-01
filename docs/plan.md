@@ -341,6 +341,9 @@ ett kommando (DOKUMENTVAG-20261001). Första steget är kontorsverktyget `tools/
 byggs när Codex 1225ac är på Runtimes main; utfärdaren antas då på nytt, och Johnny kör en Runtime-övergång.
 Återupptagning: `evidence/nasta-uppdrag/local/dokumentvag-20261001/`.
 
+Tillägg 2026-10-01 (07:35 UTC): granskningens anteckningar om `tools/dokumentpost.py` tas före verktygets första
+skarpa användning (DOKUMENTVAG-RATTELSE-20261001). Därefter används verktyget för rena dokumentändringar.
+
 Återupptagning: `evidence/nasta-uppdrag/local/forbattringspartner-20260928/LAGE.md` (tidsstämplade rader) och
 arbetsordern bredvid. Öppna överlämningar från partnern listas med `python3 -B tools/partner.py overlamningar`.
 
