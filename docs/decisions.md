@@ -9372,3 +9372,61 @@ Runtimes Codex 0.155.1 saknar gpt-6.1-sol.
 
 **Avslut.** Klart när ändringen är integrerad och partnerns tjänst har startats om ur main enligt driftregeln. Raden i
 ÄGARENS TUR stängs när Johnny har kört övergång 22.
+
+**Delvis ersatt av:** RUNTIME-CODEX-AKTIV-20261001, i fråga om att övergång 22 väntar på Johnny, raden i ÄGARENS TUR och
+stycket "Efter övergång 22": blocket kördes 2026-10-01 04:52Z, raden är stängd, modellerna är mätta med Runtimes Codex
+0.159.2 och partnern är omstartad. Övrigt gäller.
+
+## RUNTIME-CODEX-AKTIV-20261001 — Johnny körde övergång 22; Runtime kör Codex 0.159.2, och gpt-6.1-sol går att välja för Runtime
+
+**Status:** registrerat 2026-10-01 av sessionen nortropic-repos-07 (Claude Code). Johnnys terminalutskrift är sparad
+ordagrant i `evidence/nasta-uppdrag/local/runtime-binarer-20260930/overgang-22/OWNER-ACTIVATION-TERMINAL-22.txt`. Läget med
+kvitton står i `evidence/nasta-uppdrag/local/runtime-binarer-20260930/LAGE.md`.
+
+**Vad Johnny körde.** Blocket i OPERATORSSTEG-22.md, 2026-10-01: checken höll, och aktiveringen bytte releasen ffffb12
+(konfiguration `227d4ee8`) mot D047:s merge 3cbb00b (konfiguration `b349797b`). Aktiveringens egen återläsning
+04:52:39Z fann inga problem, och verktyget slutade med "KLART".
+
+**Återläst av sessionen 04:55:55Z** (`overgang-22/LASNING-EFTER-AKTIVERING.json`):
+- pekaren står på den stegade releasen, och releasens egna kontroller håller (236 filer, inga vaktavvikelser);
+- tjänstens tre processer lever på den nya konfigurationen;
+- AP10 är bunden till den, inte pausad, med nästa körning 07:00Z;
+- det avslutade AP-11 är oförändrat;
+- valen var oförändrade vid återläsningen: Fable 5.1 (max) för utvecklingsrollerna och gpt-6-astra (high) för bevakningen;
+- agentfilen är exakt den releasen installerar;
+- AP-10:s kommando, byggt av den aktiva koden, startar `.runtime/bin/codex-0.159.2/codex`. Binären är de fästa bytena
+  och svarar "codex-cli 0.159.2".
+
+**Agentens första titt efter aktiveringen** (05:14:52Z) gav kodövergången `current` för 3cbb00b. Johnny sparade 05:13Z
+ett nytt val i Flödet: Opus 5.5 (max) för Runtime, med bevakningen oförändrad. Agenten stegade det, väntade (`waiting`)
+medan en webbprofil körde (en kritik) och aktiverade det själv 05:20:06Z: konfigurationen `32840324` på samma kod 3cbb00b
+(`automatic-choice-status.json`, `in_effect`). Valet kunde stegas för att
+modellmätningen nu namnger Runtimes Codex 0.159.2: aktiveraren kräver att mätningens Codex-program är den fästa binären
+(`model_choice.measured`), och mätningen från 2026-09-30 namngav 0.155.1.
+
+**Modellmätningen.** Arbetsplatsens egen mätning (`partner.py matmodeller`) kördes två gånger med Runtimes Codex
+0.159.2. Båda gav 140 av 140 fungerande kombinationer, men listan över Codex-modeller skilde sig:
+- första gången (04:56–04:59Z) saknade Runtimes program gpt-6.1-sol, medan Johnnys egen Codex 0.159.0 hade den;
+- ett enskilt anrop med gpt-6.1-sol genom Runtimes 0.159.2 fungerade direkt efteråt, och listan som 0.159.2 skrev sist
+  i den gemensamma `models_cache.json` innehöll den;
+- andra gången (05:01–05:04Z) hade Runtimes program gpt-6.1-sol, och den fungerade på alla sex nivåer (low–ultra);
+  i stället saknades den för Johnnys egen Codex, som den också gjorde i kvittot från 2026-09-30 21:02Z.
+
+Kvittot som gäller nu är det andra. Flödet erbjuder därför gpt-6.1-sol för Runtimes Codex, både i Runtimes val och för
+läsarna, men inte för partnerns egen Codex förrän en mätning visar den där. Varför listan efter ett programs
+uppvärmningsanrop varierar mellan körningar är inte utrett. Mätningen läser listan ur den gemensamma `models_cache.json`
+direkt efter programmets uppvärmningsanrop (`tools/partnern/modellmatning.py`). Variationen syns för båda Codex-versionerna,
+och gpt-6.1-sol saknades för Johnnys egen Codex redan i kvittot före D047. Den behöver utredas som en egen brist i
+mätningen.
+
+**Partnern** startades om ur main 05:05:05Z. Startvakten läser nu Runtimes Codex 0.159.2 ur den aktiva releasen.
+
+**ÄGARENS TUR.** Raden om övergång 22 är stängd.
+
+**Oförändrat.** Här ändras bara planen (raden i ÄGARENS TUR stängs, räkningen under rubriken och ett tillägg) och
+beslutsloggen (den nya posten och markeringen sist i RUNTIME-CODEX-20261001).
+
+**Återgång.** Återställ integrationscommiten med `git revert`.
+
+**Avslut.** Klart när ändringen är integrerad. Med den är Johnnys beställning från 2026-09-30 levererad: Opus 5.5 och
+gpt-6.1-sol går att välja för Runtime, och läsarnas nivå är ett val i kontoret och Digitala.
