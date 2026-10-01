@@ -1267,7 +1267,7 @@ i detta stycke och aldrig under rubriken, eftersom Aquarium slutar läsa blocket
 `- [beslut]` eller `- [operatörshandling]` (RUNTIME-PROFILER-AGARTUR-RATTELSE-20260927).
 
 ÄGARENS TUR
-- [beslut] Digitala: nästa fiktiva fall — välj och beställ det med dina ändringar från Norrglänta (DIGITALA-1-AGARBEDOMNING-20260927) — sedan 2026-09-27
+- [beslut] Digitala: nästa fiktiva fall — välj och beställ det med dina ändringar från Norrglänta; förslaget är att Digitalas session då genomför A3–A6: typsnitts-/ikonlicenser, säkerhetsrubriker och CSP på alla sitemaprutter, TBT som labbproxy med INP fortsatt EJ_MATT samt viktiga formulär utan JavaScript (DIGITALA-1-AGARBEDOMNING-20260927, BACKLOG-DIGITALA-KONTROLLER-20261001) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: kundredo kräver att förhandsvisningens inloggningsskydd lyfts för kundlänkar, en delbar länk till utomstående enligt MANDAT §2; beställ när ett kunduppdrag finns (KUNDSTART-20260927) — sedan 2026-09-27
 - [beslut] Digitala Kundstart: bevarandetid och radering för kundmaterial i Blob-lagret är inte beslutade (KUNDSTART-20260927) — sedan 2026-09-27
 - [beslut] Digitala: schemalagd driftkontroll (drift_kontroll.py) genom Runtime kräver ett eget Runtime-mandat med release och övergång (AP-10:s schema är hårdkodat till bedömningen; inga generella schemalagda kommandon) — beställ eller avstå (HELHET-RESULTAT-20260927) — sedan 2026-09-27
